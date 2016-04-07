@@ -1,0 +1,4 @@
+syntax: regexp
+target      # maven output
+TAGS        # tags table
+.*\.swp$    # swap files

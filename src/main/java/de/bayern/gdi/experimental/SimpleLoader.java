@@ -15,33 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi;
+package de.bayern.gdi.experimental;
 
-import de.bayern.gdi.experimental.SimpleLoader;
+/** An experimental class to check if GeoTools is capable of WFS 2.0. */
+public class SimpleLoader {
 
-/**
- * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
- */
-public class App {
+    private String url;
 
-    private static final String DEMO_URL =
-        "http://geoserv.weichand.de:8080/geoserver/wfs?"
-        + "service=WFS&acceptversions=2.0.0&request=GetCapabilities";
-
-    private App() {
+    public SimpleLoader(String url) {
+        this.url = url;
     }
 
-    /**
-     * @param args the command line arguments
+    /** download.
+     * @throws Exception if something goes wrong.
      */
-    public static void main(String[] args) {
-        SimpleLoader sl = new SimpleLoader(DEMO_URL);
-
-        try {
-            sl.download();
-        } catch (Exception e) {
-            // TODO: Add logging.
-            System.err.println(e);
-        }
+    public void download() throws Exception {
+        System.out.println("Hello: " + this.url);
     }
 }
