@@ -17,10 +17,41 @@
  */
 package de.bayern.gdi.experimental;
 
+import java.util.Map;
+//import java.util.Iterator;
+import java.util.HashMap;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+
+import org.geotools.data.FeatureSource;
+
+import org.opengis.feature.simple.SimpleFeature;
+
+//import org.geotools.geometry.jts.ReferencedEnvelope;
+
+//import org.opengis.filter.FilterFactory2;
+
+//import org.geotools.factory.CommonFactoryFinder;
+
+//import org.opengis.filter.spatial.Intersects;
+
+//import org.geotools.data.DefaultQuery;
+//import org.geotools.data.Query;
+
+//import org.opengis.feature.Feature;
+//import org.geotools.feature.FeatureCollection;
+
+import org.opengis.feature.simple.SimpleFeatureType;
+
+
 /** An experimental class to check if GeoTools is capable of WFS 2.0. */
 public class SimpleLoader {
 
     private String url;
+
+    private static final com.vividsolutions.jts.geom.Envelope BBOX
+        = new com.vividsolutions.jts.geom.Envelope(-100.0, -70, 25, 40);
 
     public SimpleLoader(String url) {
         this.url = url;
@@ -30,6 +61,52 @@ public class SimpleLoader {
      * @throws Exception if something goes wrong.
      */
     public void download() throws Exception {
-        System.out.println("Hello: " + this.url);
+
+        Map connectionParameters = new HashMap();
+        connectionParameters.put(
+            "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.url);
+
+        // Step 2 - connection
+        DataStore data = DataStoreFinder.getDataStore(connectionParameters);
+
+        // Step 3 - discouvery
+        String [] typeNames = data.getTypeNames();
+        String typeName = typeNames[0];
+        SimpleFeatureType schema = data.getSchema(typeName);
+
+        // Step 4 - target
+        FeatureSource<SimpleFeatureType, SimpleFeature>
+            source = data.getFeatureSource(typeName);
+        System.out.println("Metadata Bounds:" + source.getBounds());
+
+        /*
+
+        // Step 5 - query
+        String geomName = schema.getDefaultGeometry().getLocalName();
+
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
+            GeoTools.getDefaultHints());
+        Object polygon = JTS.toGeometry(BBOX);
+        Intersects filter = ff.intersects(
+            ff.property(geomName),
+            ff.literal(polygon));
+
+        Query query = new DefaultQuery(
+            typeName, filter, new String[]{geomName});
+        FeatureCollection<SimpleFeatureType, SimpleFeature>
+            features = source.getFeatures(query);
+
+        ReferencedEnvelope bounds = new ReferencedEnvelope();
+        Iterator<SimpleFeature> iterator = features.iterator();
+        try {
+            while (iterator.hasNext()) {
+                Feature feature = (Feature)iterator.next();
+                bounds.include(feature.getBounds());
+            }
+            System.out.println("Calculated Bounds:" + bounds);
+        } finally {
+            features.close(iterator);
+        }
+        */
     }
 }
