@@ -27,14 +27,18 @@ import javafx.event.EventHandler;
  */
 public class Controller {
 
-    // dataBean
-    private dataBean dataBean;
+    // DataBean
+    private DataBean dataBean;
 
     // View
     private View view;
 
 
-    public Controller(dataBean dataBean) {
+    /**
+     * @brief Creates the Conroller
+     * @param dataBean the model
+     */
+    public Controller(DataBean dataBean) {
         this.dataBean = dataBean;
         this.view = new View();
 
@@ -42,7 +46,10 @@ public class Controller {
         view.getOkBtn().setOnAction(new OkBtnEventHandler());
     }
 
-    public void show(){
+    /**
+     * @brief shows the view
+     */
+    public void show() {
         view.show(dataBean.getPrimaryStage());
     }
 
@@ -51,7 +58,10 @@ public class Controller {
     //+++++++++++++++++++++++++++++++++++++++++++++
 
 
-    class OkBtnEventHandler implements EventHandler<ActionEvent>{
+    /**
+     * @brief Event Handler for the OK Button
+     */
+    class OkBtnEventHandler implements EventHandler<ActionEvent> {
 
         @Override
         public void handle(ActionEvent e) {

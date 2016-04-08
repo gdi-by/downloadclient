@@ -22,13 +22,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
@@ -37,59 +35,88 @@ import javafx.stage.Stage;
  */
 public class View {
 
-        private Scene scene;
+    private Scene scene;
 
-        private GridPane grid;
-        private Text scenetitle;
+    private GridPane grid;
+    private Text scenetitle;
 
-        private Label vornameLB;
-        private TextField vornameTF;
+    private Text meldungT;
 
-        private Label nachnameLB;
-        private TextField nachnameTF;
+    private Button okBtn;
 
-        private Text meldungT;
+    private HBox hbBtn;
 
-        private Button okBtn;
+    private static final int PADDING = 25;
 
-        private HBox hbBtn;
+    private static final int FONT_SIZE = 20;
 
-        public View() {
-            // Layout
-            grid = new GridPane();
-            grid.setAlignment(Pos.CENTER);
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(25, 25, 25, 25));
+    private static final int SCENE_HEIGHT = 300;
+    private static final int SCENE_WIDTH = 300;
 
-            // Ueberschrift
-            scenetitle = new Text("Hallo");
-            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-            grid.add(scenetitle, 0, 0, 2, 1);
+    private static final int BUTTONGROUP_X_GRID = 1;
+    private static final int BUTTONGROUP_Y_GRID = 4;
 
-            okBtn = new Button("OK");
+    private static final int HEADER_COLUMN_INDEX = 0;
+    private static final int HEADER_ROW_INDEX = 0;
+    private static final int HEADER_COLSPAN = 2;
+    private static final int HEADER_ROWSPAN = 1;
 
-            // Buttongruppe
-            hbBtn = new HBox(10);
-            hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-            hbBtn.getChildren().add(okBtn);
-            grid.add(hbBtn, 1, 4);
+    private static final int GRID_HGAP = 10;
+    private static final int GRID_VGAP = 10;
 
-            // Meldung
-            meldungT = new Text();
-            grid.add(meldungT, 1, 6);
+    private static final int BUTTONBOX_SIZE = 10;
 
-            scene = new Scene(grid, 300, 300);
-        }
+    private static final int ALERT_COLUMN_INDEX = 1;
+    private static final int ALERT_ROW_INDEX = 6;
 
-        public void show(Stage stage) {
-            stage.setTitle("Test");
-            stage.setScene(scene);
-            stage.show();
-        }
+    /**
+     * @brief Constructor
+     */
+    public View() {
+        // Layout
+        grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(GRID_HGAP);
+        grid.setVgap(GRID_VGAP);
+        grid.setPadding(new Insets(PADDING, PADDING, PADDING, PADDING));
 
-        public Button getOkBtn() {
-            return okBtn;
-        }
+        // Ueberschrift
+        scenetitle = new Text("Hallo");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, FONT_SIZE));
+        grid.add(scenetitle, HEADER_COLUMN_INDEX, HEADER_ROW_INDEX,
+                HEADER_COLSPAN, HEADER_ROWSPAN);
+
+        okBtn = new Button("OK");
+
+        // Buttongruppe
+        hbBtn = new HBox(BUTTONBOX_SIZE);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(okBtn);
+        grid.add(hbBtn, BUTTONGROUP_X_GRID, BUTTONGROUP_Y_GRID);
+
+        // Meldung
+        meldungT = new Text();
+        grid.add(meldungT, ALERT_COLUMN_INDEX, ALERT_ROW_INDEX);
+
+        scene = new Scene(grid, SCENE_HEIGHT, SCENE_WIDTH);
+    }
+
+    /**
+     * @param stage the stage to show
+     * @brief shows the current stage
+     */
+    public void show(Stage stage) {
+        stage.setTitle("Test");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    /**
+     * @return the OK Button
+     * @brief gets the OK Buttons
+     */
+    public Button getOkBtn() {
+        return okBtn;
+    }
 
 }

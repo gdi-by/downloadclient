@@ -31,7 +31,7 @@ public class Start extends Application {
 
         // session scope /application scope Beans initialisieren!
         // muss von Controller zu Controller weitergegeben werden
-        dataBean dataBean = new dataBean(primaryStage);
+        DataBean dataBean = new DataBean(primaryStage);
 
 
         // Ersten Controller aufrufen

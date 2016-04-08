@@ -27,20 +27,31 @@ import java.util.Observable;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class dataBean extends Observable {
+public class DataBean extends Observable {
 
     private Stage primaryStage = null;
     private Map<String , String> namePwMap = null;
 
-    public dataBean(Stage primaryStage) {
+    /**
+     * @brief Constructor
+     */
+    public DataBean(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.namePwMap = new HashMap<>();
     }
 
+    /**
+     * @brief returns the Name Map
+     * @return the Name Map
+     */
     public Map<String, String> getNamePwMap() {
         return namePwMap;
     }
 
+    /**
+     * @brief returns the current stage
+     * @return the stage
+     */
     public Stage getPrimaryStage() {
         return primaryStage;
     }

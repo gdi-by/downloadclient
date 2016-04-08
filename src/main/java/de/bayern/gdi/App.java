@@ -39,11 +39,11 @@ public class App {
         //check the arguments
         for (String arg: args) {
             System.out.println(arg);
-            if(arg.equals("-headless")) {
+            if (arg.equals("-headless")) {
                 headless = true;
             }
         }
-        if(headless) {
+        if (headless) {
             SimpleLoader sl = new SimpleLoader(DEMO_URL);
             try {
                 sl.download();
