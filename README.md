@@ -10,8 +10,13 @@ Do not use it by now! :-)
     $ mvn clean compile
 
 ## Run
+To start with UI:
 
     $ mvn exec:java 
+
+To start in headless mode:
+
+    $ mvn exec:java -Dexec.args=-headless 
 
 ## License
 
