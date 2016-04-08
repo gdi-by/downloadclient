@@ -2,7 +2,7 @@
 GDI-BY DownloadClient
 
 A Java 8 / JavaFX based desktop client to download geo data.
-This project is an very and experimental stage.  
+This project is in a very experimental stage.  
 Do not use it by now! :-)
 
 ## Build
