@@ -58,4 +58,5 @@ nbactions.xml
 # IntelliJ
 .idea/
 *.iws
+*.iml
 out/
