@@ -18,7 +18,6 @@
 package de.bayern.gdi.experimental;
 
 import java.util.Map;
-//import java.util.Iterator;
 import java.util.HashMap;
 
 import org.geotools.data.DataStore;
@@ -28,21 +27,29 @@ import org.geotools.data.FeatureSource;
 
 import org.opengis.feature.simple.SimpleFeature;
 
-//import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
-//import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.FilterFactory2;
 
-//import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.CommonFactoryFinder;
 
-//import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Intersects;
 
-//import org.geotools.data.DefaultQuery;
-//import org.geotools.data.Query;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.Query;
 
-//import org.opengis.feature.Feature;
-//import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
 
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import org.geotools.geometry.jts.JTS;
+
+import org.geotools.factory.GeoTools;
 
 
 /** An experimental class to check if GeoTools is capable of WFS 2.0. */
@@ -51,7 +58,9 @@ public class SimpleLoader {
     private String url;
 
     private static final com.vividsolutions.jts.geom.Envelope BBOX
-        = new com.vividsolutions.jts.geom.Envelope(-100.0, -70, 25, 40);
+        = new com.vividsolutions.jts.geom.Envelope(
+            5234456.559480272, 5609330.972506456,
+            4268854.282683062, 4644619.626498722);
 
     public SimpleLoader(String url) {
         this.url = url;
@@ -69,20 +78,47 @@ public class SimpleLoader {
         // Step 2 - connection
         DataStore data = DataStoreFinder.getDataStore(connectionParameters);
 
+        System.out.println("data store class: " + data.getClass());
+
         // Step 3 - discouvery
         String [] typeNames = data.getTypeNames();
         String typeName = typeNames[0];
+
+
+        for (String tName: typeNames) {
+            System.out.println("\ttype: '" + tName + "'");
+        }
+
         SimpleFeatureType schema = data.getSchema(typeName);
+
+        System.out.println("schema class: " + schema.getClass());
 
         // Step 4 - target
         FeatureSource<SimpleFeatureType, SimpleFeature>
             source = data.getFeatureSource(typeName);
         System.out.println("Metadata Bounds:" + source.getBounds());
 
-        /*
+        // XXX: This is a bit cumbersome.
+        GeometryType gt = null;
+        System.out.println("types:");
+        for (AttributeType type: schema.getTypes()) {
+            System.out.println("\t'" + type + "'");
+            if (type instanceof GeometryType) {
+                gt = (GeometryType)type;
+
+            }
+        }
+
+        if (gt == null) {
+            throw new Exception("No geometry found.");
+        }
+
+        String geomName = gt.getName().getLocalPart();
+
+        System.out.println("Using '" + geomName + "' as geometry column.");
+
 
         // Step 5 - query
-        String geomName = schema.getDefaultGeometry().getLocalName();
 
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
             GeoTools.getDefaultHints());
@@ -93,20 +129,20 @@ public class SimpleLoader {
 
         Query query = new DefaultQuery(
             typeName, filter, new String[]{geomName});
+
         FeatureCollection<SimpleFeatureType, SimpleFeature>
             features = source.getFeatures(query);
 
         ReferencedEnvelope bounds = new ReferencedEnvelope();
-        Iterator<SimpleFeature> iterator = features.iterator();
-        try {
+        try (FeatureIterator<SimpleFeature> iterator = features.features()) {
+            int count = 0;
             while (iterator.hasNext()) {
-                Feature feature = (Feature)iterator.next();
+                Feature feature = iterator.next();
+                ++count;
+                System.out.println(count);
                 bounds.include(feature.getBounds());
             }
-            System.out.println("Calculated Bounds:" + bounds);
-        } finally {
-            features.close(iterator);
         }
-        */
+        System.out.println("Calculated Bounds:" + bounds);
     }
 }

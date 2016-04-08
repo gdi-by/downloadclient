@@ -41,6 +41,7 @@ public class App {
             System.out.println(arg);
             if (arg.equals("-headless")) {
                 headless = true;
+                break;
             }
         }
         if (headless) {
