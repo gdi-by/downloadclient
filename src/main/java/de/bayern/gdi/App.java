@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.experimental.SimpleLoader;
-import de.bayern.gdi.experimental.gui.Start;
+import de.bayern.gdi.experimental.gui.chooseService.Start;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
@@ -57,6 +57,10 @@ public class App {
             // Its kind of complicated to start a javafx applicaiton from
             // another class. Thank god for StackExchange:
             // http://stackoverflow.com/a/25909862
+            // TODO: Make shure the correct screen starts
+            // There are 4 Kinds of Screens: Searching for a service
+            // WFS-1 Service, WFS-2 Service and ATOM
+            // Currently, we start the chooseService Window
             new Thread() {
                 @Override
                 public void run() {

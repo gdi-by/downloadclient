@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.experimental.gui.serviceWFSone;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.experimental.gui.serviceWFStwo;
 
 import javafx.stage.Stage;
 
@@ -32,6 +32,8 @@ public class DataBean extends Observable {
     private Stage primaryStage = null;
     private Map<String , String> namePwMap = null;
 
+    private de.bayern.gdi.experimental.gui.chooseService.DataBean
+            serviceDataBean;
     /**
      * @brief Constructor
      */

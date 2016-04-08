@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.experimental.gui.serviceATOM;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,6 +38,7 @@ public class View {
     private Scene scene;
 
     private GridPane grid;
+
     private Text scenetitle;
 
     private Button okBtn;
@@ -91,6 +92,7 @@ public class View {
         hbBtn.getChildren().add(okBtn);
         grid.add(hbBtn, BUTTONGROUP_X_GRID, BUTTONGROUP_Y_GRID);
 
+        // TODO: Read envirnoment for Screen size, but min. 640x480
         scene = new Scene(grid, SCENE_HEIGHT, SCENE_WIDTH);
     }
 
