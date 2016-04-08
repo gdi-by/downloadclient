@@ -29,13 +29,11 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
 import org.geotools.factory.CommonFactoryFinder;
 
-import org.opengis.filter.spatial.Intersects;
-
-//import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 
 import org.opengis.feature.Feature;
@@ -96,7 +94,9 @@ public class SimpleLoader {
         // Step 4 - target
         FeatureSource<SimpleFeatureType, SimpleFeature>
             source = data.getFeatureSource(typeName);
-        System.out.println("Metadata Bounds:" + source.getBounds());
+
+        ReferencedEnvelope bbox = source.getBounds();
+        System.out.println("Metadata Bounds:" + bbox);
 
         // XXX: This is a bit cumbersome.
         GeometryType gt = null;
@@ -122,16 +122,17 @@ public class SimpleLoader {
 
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
             GeoTools.getDefaultHints());
+
         Object polygon = JTS.toGeometry(BBOX);
-        Intersects filter = ff.intersects(
+
+        Filter filter = ff.bbox(
             ff.property(geomName),
-            ff.literal(polygon));
+            new ReferencedEnvelope(
+                BBOX, bbox.getCoordinateReferenceSystem()));
 
         Query query = new Query(typeName,
-                org.opengis.filter.Filter.INCLUDE,
+                filter,
                 new String[]{geomName});
-        //Query query = new DefaultQuery(
-        //    typeName, filter, new String[]{geomName});
 
         FeatureCollection<SimpleFeatureType, SimpleFeature>
             features = source.getFeatures(query);
@@ -142,7 +143,7 @@ public class SimpleLoader {
             while (iterator.hasNext()) {
                 Feature feature = iterator.next();
                 ++count;
-                System.out.println(count);
+                System.out.println(count + " " + feature.getBounds());
                 bounds.include(feature.getBounds());
             }
         }
