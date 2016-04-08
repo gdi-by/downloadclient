@@ -35,7 +35,7 @@ import org.geotools.factory.CommonFactoryFinder;
 
 import org.opengis.filter.spatial.Intersects;
 
-import org.geotools.data.DefaultQuery;
+//import org.geotools.data.DefaultQuery;
 import org.geotools.data.Query;
 
 import org.opengis.feature.Feature;
@@ -127,8 +127,9 @@ public class SimpleLoader {
             ff.property(geomName),
             ff.literal(polygon));
 
-        Query query = new DefaultQuery(
-            typeName, filter, new String[]{geomName});
+        Query query = Query.ALL;
+        //Query query = new DefaultQuery(
+        //    typeName, filter, new String[]{geomName});
 
         FeatureCollection<SimpleFeatureType, SimpleFeature>
             features = source.getFeatures(query);
