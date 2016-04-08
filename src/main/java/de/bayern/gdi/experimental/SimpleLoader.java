@@ -127,7 +127,9 @@ public class SimpleLoader {
             ff.property(geomName),
             ff.literal(polygon));
 
-        Query query = Query.ALL;
+        Query query = new Query(typeName,
+                org.opengis.filter.Filter.INCLUDE,
+                new String[]{geomName});
         //Query query = new DefaultQuery(
         //    typeName, filter, new String[]{geomName});
 
