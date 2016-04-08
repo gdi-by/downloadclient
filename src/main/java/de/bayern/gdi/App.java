@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.experimental.SimpleLoader;
-
+import de.bayern.gdi.experimental.gui.Start;
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
@@ -35,13 +35,26 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SimpleLoader sl = new SimpleLoader(DEMO_URL);
-
-        try {
-            sl.download();
-        } catch (Exception e) {
-            // TODO: Add logging.
-            System.err.println(e);
+        boolean headless = false;
+        //check the arguments
+        for (String arg: args) {
+            System.out.println(arg);
+            if(arg.equals("-headless")) {
+                headless = true;
+            }
+        }
+        if(headless) {
+            SimpleLoader sl = new SimpleLoader(DEMO_URL);
+            try {
+                sl.download();
+            } catch (Exception e) {
+                // TODO: Add logging.
+                System.err.println(e);
+            }
+        } else {
+            System.out.println("Loading Gui");
+            Start startGui = new Start();
+            startGui.start(null);
         }
     }
 }
