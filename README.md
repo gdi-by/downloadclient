@@ -11,7 +11,7 @@ Do not use it by now! :-)
 
 ## Run
 
-    $ mvn exec:java -Dexec.mainClass=de.bayern.gdi.App
+    $ mvn exec:java 
 
 ## License
 
