@@ -19,6 +19,7 @@ package de.bayern.gdi;
 
 import de.bayern.gdi.experimental.SimpleLoader;
 import de.bayern.gdi.experimental.gui.Start;
+
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
@@ -53,9 +54,17 @@ public class App {
                 System.err.println(e);
             }
         } else {
-            System.out.println("Loading Gui");
-            Start startGui = new Start();
-            startGui.start(null);
+            // Its kind of complicated to start a javafx applicaiton from
+            // another class. Thank god for StackExchange:
+            // http://stackoverflow.com/a/25909862
+            new Thread() {
+                @Override
+                public void run() {
+                    javafx.application.Application.launch(Start.class);
+                }
+            }.start();
+            Start start = Start.waitForStart();
+            start.printInvoking();
         }
     }
 }

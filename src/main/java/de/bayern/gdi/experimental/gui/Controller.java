@@ -43,7 +43,7 @@ public class Controller {
         this.view = new View();
 
         // Eventhandler registrieren
-        view.getOkBtn().setOnAction(new OkBtnEventHandler());
+        //view.getOkBtn().setOnAction(new OkBtnEventHandler());
     }
 
     /**

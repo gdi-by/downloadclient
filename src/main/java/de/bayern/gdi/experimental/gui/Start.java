@@ -18,14 +18,51 @@
 
 package de.bayern.gdi.experimental.gui;
 
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.util.concurrent.CountDownLatch;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Start extends Application {
 
+    private static final CountDownLatch LATCH = new CountDownLatch(1);
+    private static Start start = null;
+
+    /**
+     * @brief waits for the javafx application to startup
+     * @return the application
+     */
+    public static Start waitForStart() {
+        try {
+            LATCH.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return start;
+    }
+
+    /**
+     * @brief Constructor
+     */
+    public Start() {
+        start = this;
+        LATCH.countDown();
+    }
+
+    /**
+     * @brief print a String, if this was invoked
+     */
+    public void printInvoking() {
+        System.out.println("You called a method on the application");
+    }
+
+    /**
+     * @brief starts the application
+     * @param primaryStage the stage
+     */
     @Override
     public void start(Stage primaryStage) {
 

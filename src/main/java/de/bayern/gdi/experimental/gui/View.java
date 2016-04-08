@@ -40,8 +40,6 @@ public class View {
     private GridPane grid;
     private Text scenetitle;
 
-    private Text meldungT;
-
     private Button okBtn;
 
     private HBox hbBtn;
@@ -66,8 +64,6 @@ public class View {
 
     private static final int BUTTONBOX_SIZE = 10;
 
-    private static final int ALERT_COLUMN_INDEX = 1;
-    private static final int ALERT_ROW_INDEX = 6;
 
     /**
      * @brief Constructor
@@ -80,23 +76,20 @@ public class View {
         grid.setVgap(GRID_VGAP);
         grid.setPadding(new Insets(PADDING, PADDING, PADDING, PADDING));
 
-        // Ueberschrift
+        // HEADLINE
         scenetitle = new Text("Hallo");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, FONT_SIZE));
         grid.add(scenetitle, HEADER_COLUMN_INDEX, HEADER_ROW_INDEX,
                 HEADER_COLSPAN, HEADER_ROWSPAN);
 
-        okBtn = new Button("OK");
+        okBtn = new Button();
+        okBtn.setText("Ok");
 
-        // Buttongruppe
+        // BUTTONGRP
         hbBtn = new HBox(BUTTONBOX_SIZE);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(okBtn);
         grid.add(hbBtn, BUTTONGROUP_X_GRID, BUTTONGROUP_Y_GRID);
-
-        // Meldung
-        meldungT = new Text();
-        grid.add(meldungT, ALERT_COLUMN_INDEX, ALERT_ROW_INDEX);
 
         scene = new Scene(grid, SCENE_HEIGHT, SCENE_WIDTH);
     }
