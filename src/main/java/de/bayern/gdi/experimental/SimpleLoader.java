@@ -17,37 +17,35 @@
  */
 package de.bayern.gdi.experimental;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
-
 import org.geotools.data.FeatureSource;
-
-import org.opengis.feature.simple.SimpleFeature;
-
-import org.geotools.geometry.jts.ReferencedEnvelope;
-
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-
-import org.geotools.factory.CommonFactoryFinder;
-
 import org.geotools.data.Query;
 
-import org.opengis.feature.Feature;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
+import org.opengis.feature.Feature;
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 
-import org.opengis.feature.simple.SimpleFeatureType;
-
-import org.geotools.geometry.jts.JTS;
-
-import org.geotools.factory.GeoTools;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 
 
 /** An experimental class to check if GeoTools is capable of WFS 2.0. */
@@ -68,6 +66,18 @@ public class SimpleLoader {
      * @throws Exception if something goes wrong.
      */
     public void download() throws Exception {
+
+        System.out.println("Available data stores:");
+
+        Iterator<DataStoreFactorySpi> fi
+            = DataStoreFinder.getAvailableDataStores();
+
+        while (fi.hasNext()) {
+            DataStoreFactorySpi f = fi.next();
+            System.out.println("\t'"
+                + f.getDisplayName() + "': '"
+                + f.getDescription() + "'");
+        }
 
         Map connectionParameters = new HashMap();
         connectionParameters.put(
@@ -105,7 +115,6 @@ public class SimpleLoader {
             System.out.println("\t'" + type + "'");
             if (type instanceof GeometryType) {
                 gt = (GeometryType)type;
-
             }
         }
 
