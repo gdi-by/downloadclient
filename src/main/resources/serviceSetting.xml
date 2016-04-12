@@ -1,0 +1,10 @@
+<services>
+    <service>
+        <name>test1</name>
+        <url>http://google.de</url>
+    </service>
+    <service>
+        <name>test2</name>
+        <url>http://yahoo.com</url>
+    </service>
+</services>

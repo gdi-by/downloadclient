@@ -18,11 +18,13 @@
 
 package de.bayern.gdi.experimental.gui.chooseService;
 
+import de.bayern.gdi.experimental.ServiceSetting;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
+import java.util.Iterator;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -31,6 +33,8 @@ public class DataBean extends Observable {
 
     private Stage primaryStage = null;
     private Map<String , String> namePwMap = null;
+    private ServiceSetting serviceSetting = null;
+    private Map<String, String> services;
 
     /**
      * @brief Constructor
@@ -38,6 +42,9 @@ public class DataBean extends Observable {
     public DataBean(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.namePwMap = new HashMap<>();
+        this.serviceSetting = new ServiceSetting();
+        this.services = this.serviceSetting.getServices();
+        printStringMap(this.services);
     }
 
     /**
@@ -54,6 +61,15 @@ public class DataBean extends Observable {
      */
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    private void printStringMap(Map<String, String> map) {
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            System.out.println(pair.getKey() + " = " + pair.getValue());
+            it.remove();
+        }
     }
 
 }
