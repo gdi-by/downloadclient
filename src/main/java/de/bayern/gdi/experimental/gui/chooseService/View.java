@@ -28,6 +28,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
+import javafx.geometry.Rectangle2D;
 
 
 /**
@@ -49,8 +51,8 @@ public class View {
 
     private static final int FONT_SIZE = 20;
 
-    private static final int SCENE_HEIGHT = 300;
-    private static final int SCENE_WIDTH = 300;
+    private int sceneHeight = 480;
+    private int sceneWidth = 640;
 
     private static final int BUTTONGROUP_X_GRID = 1;
     private static final int BUTTONGROUP_Y_GRID = 4;
@@ -92,8 +94,15 @@ public class View {
         hbBtn.getChildren().add(okBtn);
         grid.add(hbBtn, BUTTONGROUP_X_GRID, BUTTONGROUP_Y_GRID);
 
-        // TODO: Read envirnoment for Screen size, but min. 640x480
-        scene = new Scene(grid, SCENE_HEIGHT, SCENE_WIDTH);
+        //Get Screen Bounds
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        if(primaryScreenBounds.getWidth()*0.8 > sceneWidth ) {
+            sceneWidth = (int) (primaryScreenBounds.getWidth()*0.8);
+        }
+        if(primaryScreenBounds.getHeight()*0.8 > sceneWidth) {
+            sceneWidth = (int) (primaryScreenBounds.getHeight()*0.8);
+        }
+        scene = new Scene(grid, sceneHeight, sceneWidth);
     }
 
     /**

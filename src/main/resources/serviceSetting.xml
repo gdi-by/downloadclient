@@ -1,10 +1,18 @@
-<services>
-    <service>
-        <name>test1</name>
-        <url>http://google.de</url>
-    </service>
-    <service>
-        <name>test2</name>
-        <url>http://yahoo.com</url>
-    </service>
-</services>
+<settings>
+    <catalogues>
+        <catalog>
+            <name>Test Katalog</name>
+            <url>http://testurl.de</url>
+        </catalog>
+    </catalogues>
+    <services>
+        <service>
+            <name>weichand_Demo1</name>
+            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+        </service>
+        <service>
+            <name>weichand_Demo2</name>
+            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+        </service>
+    </services>
+</settings>

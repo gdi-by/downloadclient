@@ -22,9 +22,10 @@ import de.bayern.gdi.experimental.ServiceSetting;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Iterator;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -35,6 +36,7 @@ public class DataBean extends Observable {
     private Map<String , String> namePwMap = null;
     private ServiceSetting serviceSetting = null;
     private Map<String, String> services;
+    private Map<String, String> catalogues;
 
     /**
      * @brief Constructor
@@ -45,6 +47,21 @@ public class DataBean extends Observable {
         this.serviceSetting = new ServiceSetting();
         this.services = this.serviceSetting.getServices();
         printStringMap(this.services);
+        this.catalogues = this.serviceSetting.getCatalogues();
+        printStringMap(this.catalogues);
+        /*
+        //FIXME: THIS IS JUST FOR TESTING!
+        Iterator it = this.services.entrySet().iterator();
+        if (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            try {
+                WFStwo wfs = new WFStwo((String) pair.getValue());
+                wfs.getAttributes(wfs.getTypes().elementAt(0));
+            } catch (Exception e) {
+                System.err.println(e.getStackTrace());
+            }
+        }
+        */
     }
 
     /**
@@ -68,7 +85,6 @@ public class DataBean extends Observable {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
-            it.remove();
         }
     }
 

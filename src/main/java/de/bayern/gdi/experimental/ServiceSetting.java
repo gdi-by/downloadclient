@@ -38,6 +38,7 @@ public class ServiceSetting {
     private Document xmlSettingFile = null;
     private static final String SERVICE_SETTING_FILEPATH =
             "serviceSetting.xml";
+    private Map<String, String> catalogues;
 
     /**
      * @brief Constructor
@@ -53,7 +54,7 @@ public class ServiceSetting {
     public ServiceSetting(String filePath) {
         this.settingFile = getFile(filePath);
         this.xmlSettingFile = getXMLDocument(this.settingFile);
-        this.services = parseXML(this.xmlSettingFile);
+        parseDocument(this.xmlSettingFile);
     }
 
     /**
@@ -64,10 +65,23 @@ public class ServiceSetting {
         return this.services;
     }
 
-    private Map<String, String> parseXML(Document xmlDocument) {
+    /**
+     * @brief returns a map of Strings with catalogue Names and URLS
+     * @return Map of Strings with <Name, URL> of Catalogs
+     */
+    public Map<String, String> getCatalogues() {
+        return this.catalogues;
+    }
+
+    private void parseDocument(Document xmlDocument) {
+        this.services = parseNameURLScheme(xmlDocument,"services");
+        this.catalogues = parseNameURLScheme(xmlDocument,"catalogues");
+    }
+
+    private Map<String, String> parseNameURLScheme(Document xmlDocument, String nodeName) {
         Map<String, String> servicesMap = new HashMap<String, String>();
 
-        NodeList servicesNL = xmlDocument.getElementsByTagName("services");
+        NodeList servicesNL = xmlDocument.getElementsByTagName(nodeName);
         Node servicesNode = servicesNL.item(0);
         NodeList serviceNL = servicesNode.getChildNodes();
         Node serviceNode, serviceValueNode;
