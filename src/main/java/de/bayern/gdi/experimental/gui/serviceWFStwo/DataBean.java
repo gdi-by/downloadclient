@@ -35,7 +35,7 @@ public class DataBean extends Observable {
     private de.bayern.gdi.experimental.gui.chooseService.DataBean
             serviceDataBean;
     /**
-     * @brief Constructor
+     * Constructor.
      */
     public DataBean(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -43,7 +43,7 @@ public class DataBean extends Observable {
     }
 
     /**
-     * @brief returns the Name Map
+     * returns the Name Map.
      * @return the Name Map
      */
     public Map<String, String> getNamePwMap() {
@@ -51,7 +51,7 @@ public class DataBean extends Observable {
     }
 
     /**
-     * @brief returns the current stage
+     * returns the current stage.
      * @return the stage
      */
     public Stage getPrimaryStage() {

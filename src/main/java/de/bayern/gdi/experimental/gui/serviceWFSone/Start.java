@@ -32,7 +32,7 @@ public class Start extends Application {
     private static Start start = null;
 
     /**
-     * @brief waits for the javafx application to startup
+     * waits for the javafx application to startup.
      * @return the application
      */
     public static Start waitForStart() {
@@ -45,7 +45,7 @@ public class Start extends Application {
     }
 
     /**
-     * @brief Constructor
+     * Constructor.
      */
     public Start() {
         start = this;
@@ -53,14 +53,14 @@ public class Start extends Application {
     }
 
     /**
-     * @brief print a String, if this was invoked
+     * print a String, if this was invoked.
      */
     public void printInvoking() {
         System.out.println("You called a method on the application");
     }
 
     /**
-     * @brief starts the application
+     * starts the application.
      * @param primaryStage the stage
      */
     @Override

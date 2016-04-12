@@ -74,11 +74,12 @@ public class ServiceSetting {
     }
 
     private void parseDocument(Document xmlDocument) {
-        this.services = parseNameURLScheme(xmlDocument,"services");
-        this.catalogues = parseNameURLScheme(xmlDocument,"catalogues");
+        this.services = parseNameURLScheme(xmlDocument, "services");
+        this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
     }
 
-    private Map<String, String> parseNameURLScheme(Document xmlDocument, String nodeName) {
+    private Map<String, String> parseNameURLScheme(Document xmlDocument,
+                                                   String nodeName) {
         Map<String, String> servicesMap = new HashMap<String, String>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName(nodeName);

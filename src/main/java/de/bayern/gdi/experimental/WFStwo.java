@@ -40,7 +40,12 @@ public class WFStwo {
     private Vector<String> types = new Vector();
     private DataStore data;
 
-    public WFStwo (String url) throws Exception{
+    /**
+     * Constructor.
+     * @param url URL to Service
+     * @throws Exception when something goes wrong
+     */
+    public WFStwo(String url) throws Exception {
         this.url = url;
         Iterator<DataStoreFactorySpi> fi
                 = DataStoreFinder.getAvailableDataStores();
@@ -135,10 +140,20 @@ public class WFStwo {
         */
     }
 
+    /**
+     * gets the types of a service.
+     * @return the types
+     */
     public Vector<String> getTypes() {
         return this.types;
     }
 
+    /**
+     * gets the attributes of a tye.
+     * @param type type to get attributes of
+     * @return the attributes
+     * @throws Exception when something goes wrong
+     */
     public Vector<AttributeType> getAttributes(String type) throws Exception {
         Vector<AttributeType> attributes = new Vector();
         SimpleFeatureType schema = this.data.getSchema(type);

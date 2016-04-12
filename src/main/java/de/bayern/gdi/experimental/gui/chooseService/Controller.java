@@ -18,8 +18,7 @@
 
 package de.bayern.gdi.experimental.gui.chooseService;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -34,19 +33,20 @@ public class Controller {
 
 
     /**
-     * @brief Creates the Conroller
+     * Creates the Conroller.
      * @param dataBean the model
      */
     public Controller(DataBean dataBean) {
         this.dataBean = dataBean;
         this.view = new View();
+        this.view.setServiceList(this.dataBean.getServicesAsList());
 
         // Eventhandler registrieren
         //view.getOkBtn().setOnAction(new OkBtnEventHandler());
     }
 
     /**
-     * @brief shows the view
+     * shows the view.
      */
     public void show() {
         view.show(dataBean.getPrimaryStage());
@@ -58,8 +58,9 @@ public class Controller {
 
 
     /**
-     * @brief Event Handler for the OK Button
+     * Event Handler for the OK Button.
      */
+    /*
     class OkBtnEventHandler implements EventHandler<ActionEvent> {
 
         @Override
@@ -68,4 +69,6 @@ public class Controller {
         }
 
     }
+    */
+
 }

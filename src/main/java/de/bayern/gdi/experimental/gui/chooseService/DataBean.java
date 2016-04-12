@@ -19,6 +19,8 @@
 package de.bayern.gdi.experimental.gui.chooseService;
 
 import de.bayern.gdi.experimental.ServiceSetting;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -39,33 +41,18 @@ public class DataBean extends Observable {
     private Map<String, String> catalogues;
 
     /**
-     * @brief Constructor
+     * Constructor.
      */
     public DataBean(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
         this.services = this.serviceSetting.getServices();
-        printStringMap(this.services);
         this.catalogues = this.serviceSetting.getCatalogues();
-        printStringMap(this.catalogues);
-        /*
-        //FIXME: THIS IS JUST FOR TESTING!
-        Iterator it = this.services.entrySet().iterator();
-        if (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            try {
-                WFStwo wfs = new WFStwo((String) pair.getValue());
-                wfs.getAttributes(wfs.getTypes().elementAt(0));
-            } catch (Exception e) {
-                System.err.println(e.getStackTrace());
-            }
-        }
-        */
     }
 
     /**
-     * @brief returns the Name Map
+     * returns the Name Map.
      * @return the Name Map
      */
     public Map<String, String> getNamePwMap() {
@@ -73,7 +60,35 @@ public class DataBean extends Observable {
     }
 
     /**
-     * @brief returns the current stage
+     * Builds a Observable List from the services Map.
+     * @return List build from services Map
+     */
+    public ObservableList<String> getServicesAsList() {
+        ObservableList<String> serviceNames =
+                FXCollections.observableArrayList();
+        Iterator it = this.services.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            serviceNames.add((String) pair.getKey());
+        }
+        return serviceNames;
+    }
+
+    /**
+     * Returns the Service URL for a given Service Name.
+     * @param serviceName name of a Service
+     * @return the url of the service
+     */
+    public String getServiceURL(String serviceName) {
+        String returnStr = null;
+        if (this.services.containsKey(serviceName)) {
+            returnStr = this.services.get(serviceName);
+        }
+        return returnStr;
+    }
+
+    /**
+     * returns the current stage.
      * @return the stage
      */
     public Stage getPrimaryStage() {

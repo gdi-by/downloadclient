@@ -34,7 +34,7 @@ public class Controller {
 
 
     /**
-     * @brief Creates the Conroller
+     * Creates the Conroller.
      * @param dataBean the model
      */
     public Controller(DataBean dataBean) {
@@ -46,7 +46,7 @@ public class Controller {
     }
 
     /**
-     * @brief shows the view
+     * shows the view.
      */
     public void show() {
         view.show(dataBean.getPrimaryStage());
@@ -58,7 +58,7 @@ public class Controller {
 
 
     /**
-     * @brief Event Handler for the OK Button
+     * Event Handler for the OK Button.
      */
     class OkBtnEventHandler implements EventHandler<ActionEvent> {
 

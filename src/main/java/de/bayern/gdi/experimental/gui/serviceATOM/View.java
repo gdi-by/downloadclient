@@ -67,7 +67,7 @@ public class View {
 
 
     /**
-     * @brief Constructor
+     * Constructor.
      */
     public View() {
         // Layout
@@ -98,7 +98,7 @@ public class View {
 
     /**
      * @param stage the stage to show
-     * @brief shows the current stage
+     * shows the current stage.
      */
     public void show(Stage stage) {
         stage.setTitle("Test");
@@ -108,7 +108,7 @@ public class View {
 
     /**
      * @return the OK Button
-     * @brief gets the OK Buttons
+     * gets the OK Buttons.
      */
     public Button getOkBtn() {
         return okBtn;

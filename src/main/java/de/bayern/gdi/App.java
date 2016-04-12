@@ -68,7 +68,7 @@ public class App {
                 }
             }.start();
             Start start = Start.waitForStart();
-            start.printInvoking();
+            //start.printInvoking();
         }
     }
 }
