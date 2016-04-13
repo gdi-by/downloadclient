@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental;
+package de.bayern.gdi.helper;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

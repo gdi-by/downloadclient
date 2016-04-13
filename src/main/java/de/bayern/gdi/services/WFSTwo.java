@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.services;
+package de.bayern.gdi.services;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;

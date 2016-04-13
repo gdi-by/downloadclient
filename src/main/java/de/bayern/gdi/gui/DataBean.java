@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.gui;
 
-import de.bayern.gdi.experimental.ServiceSetting;
-import de.bayern.gdi.experimental.services.WebService;
+import de.bayern.gdi.helper.ServiceSetting;
+import de.bayern.gdi.services.WebService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;

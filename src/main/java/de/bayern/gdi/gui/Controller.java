@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.gui;
 
 
-import de.bayern.gdi.experimental.ServiceChecker;
-import de.bayern.gdi.experimental.services.Atom;
-import de.bayern.gdi.experimental.services.WFSOne;
-import de.bayern.gdi.experimental.services.WFSTwo;
-import de.bayern.gdi.experimental.services.WebService;
+import de.bayern.gdi.helper.ServiceChecker;
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.WFSOne;
+import de.bayern.gdi.services.WFSTwo;
+import de.bayern.gdi.services.WebService;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

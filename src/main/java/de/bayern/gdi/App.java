@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.experimental.SimpleLoader;
-import de.bayern.gdi.experimental.gui.Start;
+import de.bayern.gdi.gui.Start;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)

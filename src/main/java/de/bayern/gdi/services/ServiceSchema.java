@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.services;
+package de.bayern.gdi.services;
 
 import org.opengis.feature.type.AttributeType;
 

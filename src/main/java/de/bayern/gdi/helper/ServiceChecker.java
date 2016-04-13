@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental;
+package de.bayern.gdi.helper;
 
-import de.bayern.gdi.experimental.services.WebService;
+import de.bayern.gdi.services.WebService;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;

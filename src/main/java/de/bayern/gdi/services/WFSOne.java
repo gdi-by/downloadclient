@@ -16,36 +16,41 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.services;
+package de.bayern.gdi.services;
+
+import org.opengis.feature.type.AttributeType;
+
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-
-public abstract class WebService implements ServiceSchema {
-
-    public enum Type {
-        WFSOne,
-        WFSTwo,
-        Atom
-    }
+public class WFSOne extends WebService {
     private String serviceURL;
 
-    private String serviceType;
-
-    public WebService() {
-        this.serviceURL = null;
-    }
     /**
      * Constructor.
-     * @param serviceURL URL to the Service
+     * @param serviceURL the service URL
      */
-    public WebService(String serviceURL) {
+    public WFSOne(String serviceURL) {
         this.serviceURL = serviceURL;
-        this.createService();
     }
 
-    private void createService() {
-        System.out.println("Test");
+    /**
+     * gets the Types of this service.
+     * @return types of the service
+     */
+    public ArrayList<String> getTypes() {
+        return null;
     }
+
+    /**
+     * gets the attributes of a type.
+     * @param type the type
+     * @return the attributes
+     */
+    public ArrayList<AttributeType> getAttributes(String type) {
+        return null;
+    }
+
 }

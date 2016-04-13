@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui;
+package de.bayern.gdi.gui;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
