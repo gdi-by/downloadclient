@@ -37,9 +37,10 @@ public class Controller {
      * Creates the Conroller.
      * @param dataBean the model
      */
-    public Controller(DataBean dataBean) {
+    public Controller(DataBean dataBean,
+                      de.bayern.gdi.experimental.gui.View serviceView) {
         this.dataBean = dataBean;
-        this.view = new View();
+        this.view = new View(serviceView);
 
         // Eventhandler registrieren
         //view.getOkBtn().setOnAction(new OkBtnEventHandler());

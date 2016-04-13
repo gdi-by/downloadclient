@@ -32,7 +32,7 @@ public class DataBean extends Observable {
     private Stage primaryStage = null;
     private Map<String , String> namePwMap = null;
 
-    private de.bayern.gdi.experimental.gui.chooseService.DataBean
+    private de.bayern.gdi.experimental.gui.DataBean
             serviceDataBean;
 
     /**

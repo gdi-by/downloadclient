@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.serviceWFStwo;
+package de.bayern.gdi.experimental.gui;
 
 
 import javafx.application.Application;
@@ -69,10 +69,10 @@ public class Start extends Application {
         // session scope /application scope Beans initialisieren!
         // muss von Controller zu Controller weitergegeben werden
         DataBean dataBean = new DataBean(primaryStage);
-
-
         // Ersten Controller aufrufen
         Controller c = new Controller(dataBean);
         c.show();
     }
+
+
 }

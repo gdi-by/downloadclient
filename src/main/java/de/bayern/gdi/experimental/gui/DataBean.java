@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.chooseService;
+package de.bayern.gdi.experimental.gui;
 
 import de.bayern.gdi.experimental.ServiceSetting;
 import javafx.collections.FXCollections;
