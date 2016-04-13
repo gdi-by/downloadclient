@@ -130,8 +130,8 @@ public class ServiceSetting {
         return document;
     }
 
-    private File getFile(String fileName) {
-        ClassLoader classLoader = getClass().getClassLoader();
+    private static File getFile(String fileName) {
+        ClassLoader classLoader = ServiceSetting.class.getClassLoader();
         File file = new File(classLoader.getResource(fileName).getFile());
         return file;
 
