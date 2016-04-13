@@ -84,10 +84,10 @@ public class Controller {
     }
 
     /**
-     * Updates the view
+     * Updates the view.
      */
     public void updateView() {
-        if(dataBean.isWebServiceSet()) {
+        if (dataBean.isWebServiceSet()) {
             System.out.println("Building View based on Webservice");
         }
     }
@@ -191,7 +191,7 @@ public class Controller {
                 view.setStatusBarText("Check for Servicetype");
                 WebService.Type st = ServiceChecker.checkService(serviceURL);
                 WebService ws = null;
-                switch(st){
+                switch (st) {
                     case Atom:
                         view.setStatusBarText("Found Atom Service");
                         ws = new Atom(serviceURL);
@@ -205,7 +205,8 @@ public class Controller {
                         ws = new WFSTwo(serviceURL);
                         break;
                     default:
-                        view.setStatusBarText("Could not determine Service Type");
+                        view.
+                          setStatusBarText("Could not determine Service Type");
                 }
                 dataBean.setWebService(ws);
                 updateView();

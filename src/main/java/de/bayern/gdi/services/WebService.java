@@ -23,19 +23,34 @@ package de.bayern.gdi.services;
  */
 
 public abstract class WebService implements ServiceSchema {
-
+    /**
+     * Types of Webservices.
+     */
     public enum Type {
+        /**
+         * WFSOne Webservice.
+         */
         WFSOne,
+        /**
+         * WFSTwo Webservice.
+         */
         WFSTwo,
+        /**
+         * Atom Webservice.
+         */
         Atom
     }
     private String serviceURL;
 
     private String serviceType;
 
+    /**
+     * Constructor.
+     */
     public WebService() {
         this.serviceURL = null;
     }
+
     /**
      * Constructor.
      * @param serviceURL URL to the Service

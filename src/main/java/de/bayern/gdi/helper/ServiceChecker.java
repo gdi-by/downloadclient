@@ -34,13 +34,16 @@ import java.net.URLConnection;
  */
 public class ServiceChecker {
 
+    private ServiceChecker() {
+
+    }
+
     /**
-     * checks the service type
+     * checks the service type.
      * @param serviceURL the service url
      * @return the type of service; null if failed
      */
-    public static WebService.Type checkService(String serviceURL)
-    {
+    public static WebService.Type checkService(String serviceURL) {
         try {
             URL url = new URL(serviceURL);
             URLConnection conn = url.openConnection();
@@ -51,15 +54,15 @@ public class ServiceChecker {
             Document doc = builder.parse(conn.getInputStream());
 
             NodeList nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
-            if (nl.getLength() != 0){
+            if (nl.getLength() != 0) {
                 Node n = nl.item(0);
                 NamedNodeMap nnm = n.getAttributes();
-                String wfs_version =
+                String wfsVersion =
                         nnm.getNamedItem("version").getNodeValue();
-                if(wfs_version.equals("2.0.0")) {
+                if (wfsVersion.equals("2.0.0")) {
                     return WebService.Type.WFSTwo;
-                } else if (wfs_version.equals("1.0.0")
-                        || wfs_version.equals("1.1.0")) {
+                } else if (wfsVersion.equals("1.0.0")
+                        || wfsVersion.equals("1.1.0")) {
                     return WebService.Type.WFSOne;
                 }
             }
@@ -67,9 +70,9 @@ public class ServiceChecker {
             if (nl.getLength() != 0) {
                 Node n = nl.item(0);
                 NamedNodeMap nnm = n.getAttributes();
-                String wfs_version = nnm.getNamedItem("xmlns").getNodeValue();
-                if (wfs_version.endsWith("Atom")
-                        || wfs_version.endsWith("atom")) {
+                String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
+                if (wfsVersion.endsWith("Atom")
+                        || wfsVersion.endsWith("atom")) {
                     return WebService.Type.Atom;
                 }
             }

@@ -64,7 +64,7 @@ public class WFSTwo extends WebService {
      * @return the types
      */
     public ArrayList<String> getTypes() {
-        if (this.types == null ) {
+        if (this.types == null) {
             this.types = new ArrayList();
             try {
                 String[] typeNames = this.data.getTypeNames();
@@ -98,7 +98,7 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * gets the service URL
+     * gets the service URL.
      * @return the service URL
      */
     public String getServiceURL() {
@@ -106,7 +106,7 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * gets the dataStore
+     * gets the dataStore.
      * @return datastore
      */
     public DataStore getData() {

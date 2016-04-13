@@ -54,7 +54,7 @@ public class WFSOne extends WebService {
     }
 
     /**
-     * returns the services URL
+     * returns the services URL.
      * @return service URL
      */
     public String getServiceURL() {
