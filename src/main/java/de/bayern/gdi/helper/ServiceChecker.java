@@ -55,15 +55,15 @@ public class ServiceChecker {
 
             NodeList nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
             if (nl.getLength() != 0) {
-                Node n = nl.item(0);
-                NamedNodeMap nnm = n.getAttributes();
-                String wfsVersion =
-                        nnm.getNamedItem("version").getNodeValue();
-                if (wfsVersion.equals("2.0.0")) {
-                    return WebService.Type.WFSTwo;
-                } else if (wfsVersion.equals("1.0.0")
-                        || wfsVersion.equals("1.1.0")) {
-                    return WebService.Type.WFSOne;
+                NamedNodeMap nnm = nl.item(0).getAttributes();
+                switch (nnm.getNamedItem("version").getNodeValue()) {
+                    case "1.0.0":
+                    case "1.1.0":
+                        return WebService.Type.WFSOne;
+                    case "2.0.0":
+                        return WebService.Type.WFSTwo;
+                    default:
+                        return null;
                 }
             }
             nl = doc.getElementsByTagName("feed");
@@ -71,8 +71,7 @@ public class ServiceChecker {
                 Node n = nl.item(0);
                 NamedNodeMap nnm = n.getAttributes();
                 String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
-                if (wfsVersion.endsWith("Atom")
-                        || wfsVersion.endsWith("atom")) {
+                if (wfsVersion.toLowerCase().endsWith("atom")) {
                     return WebService.Type.Atom;
                 }
             }
