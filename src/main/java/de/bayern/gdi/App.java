@@ -20,10 +20,15 @@ package de.bayern.gdi;
 import de.bayern.gdi.experimental.SimpleLoader;
 import de.bayern.gdi.gui.Start;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
+
+    private static final Logger log = Logger.getLogger(App.class.getName());
 
     private static final String DEMO_URL =
         "http://geoserv.weichand.de:8080/geoserver/wfs?"
@@ -47,12 +52,12 @@ public class App {
     public static void main(String[] args) {
 
         if (runHeadless(args)) {
+            log.info("Running in headless mode");
             SimpleLoader sl = new SimpleLoader(DEMO_URL);
             try {
                 sl.download();
             } catch (Exception e) {
-                // TODO: Add logging.
-                System.err.println(e);
+                log.log(Level.SEVERE, e.getMessage(), e);
             }
             return;
         }

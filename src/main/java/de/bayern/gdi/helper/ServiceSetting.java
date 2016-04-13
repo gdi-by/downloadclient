@@ -28,14 +28,20 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class ServiceSetting {
 
-    private File settingFile = null;
+    private static final Logger log
+        = Logger.getLogger(ServiceSetting.class.getName());
+
+    private File settingFile;
     private Map<String, String> services;
-    private Document xmlSettingFile = null;
+    private Document xmlSettingFile;
     private static final String SERVICE_SETTING_FILEPATH =
             "serviceSetting.xml";
     private Map<String, String> catalogues;
@@ -119,8 +125,7 @@ public class ServiceSetting {
             DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(fileName);
         } catch (Exception e) {
-            // TODO: Add logging.
-            System.err.println(e);
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return document;
     }

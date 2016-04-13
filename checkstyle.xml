@@ -74,7 +74,10 @@ Maven Checkstyle plugin. Some design related checks where removed.
 
   <!-- Checks for Naming Conventions.                  -->
   <!-- See http://checkstyle.sf.net/config_naming.html -->
-  <module name="ConstantName"/>
+  <module name="ConstantName">
+    <!-- Allow "log" -->
+    <property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|log)$"/>
+  </module>
   <module name="LocalFinalVariableName"/>
   <module name="LocalVariableName"/>
   <module name="MemberName"/>

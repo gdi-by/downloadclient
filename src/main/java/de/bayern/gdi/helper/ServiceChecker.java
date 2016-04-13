@@ -29,13 +29,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class ServiceChecker {
 
-    private ServiceChecker() {
+    private static final Logger log
+        = Logger.getLogger(ServiceChecker.class.getName());
 
+    private ServiceChecker() {
     }
 
     /**
@@ -76,8 +81,7 @@ public class ServiceChecker {
                 }
             }
         } catch (Exception e) {
-            //TODO Logging
-            System.err.println(e.getStackTrace());
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }

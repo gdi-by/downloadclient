@@ -27,13 +27,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class WFSTwo extends WebService {
 
-    private String serviceURL;
+    private static final Logger log
+        = Logger.getLogger(WFSTwo.class.getName());
 
+    private String serviceURL;
 
     private ArrayList<String> types;
     private DataStore data;
@@ -52,8 +57,7 @@ public class WFSTwo extends WebService {
         try {
             this.data = DataStoreFinder.getDataStore(connectionParameters);
         } catch (Exception e) {
-            //TODO Logging
-            System.err.println(e.getStackTrace());
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -71,8 +75,7 @@ public class WFSTwo extends WebService {
                     this.types.add(tName);
                 }
             } catch (Exception e) {
-                //TODO logging
-                System.err.println(e.getStackTrace());
+                log.log(Level.SEVERE, e.getMessage(), e);
             }
         }
         return this.types;
@@ -89,8 +92,7 @@ public class WFSTwo extends WebService {
             SimpleFeatureType schema = this.data.getSchema(type);
             attributes.addAll(schema.getTypes());
         } catch (Exception e) {
-            //TODO Logging
-            System.err.println(e.getStackTrace());
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         return attributes;
     }
