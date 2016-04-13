@@ -21,8 +21,14 @@ package de.bayern.gdi.experimental.services;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
+
 public abstract class WebService implements ServiceSchema {
 
+    public enum Type {
+        WFSOne,
+        WFSTwo,
+        Atom
+    }
     private String serviceURL;
 
     private String serviceType;

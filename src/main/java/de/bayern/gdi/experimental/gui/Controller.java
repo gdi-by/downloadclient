@@ -19,7 +19,11 @@
 package de.bayern.gdi.experimental.gui;
 
 
+import de.bayern.gdi.experimental.ServiceChecker;
+import de.bayern.gdi.experimental.services.Atom;
+import de.bayern.gdi.experimental.services.WFSOne;
 import de.bayern.gdi.experimental.services.WFSTwo;
+import de.bayern.gdi.experimental.services.WebService;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -176,8 +180,25 @@ public class Controller {
             }
             if (serviceURL != null) {
                 view.setStatusBarText("Check for Servicetype");
-                //
-                dataBean.setWebService(new WFSTwo(serviceURL));
+                WebService.Type st = ServiceChecker.checkService(serviceURL);
+                WebService ws = null;
+                switch(st){
+                    case Atom:
+                        view.setStatusBarText("Found Atom Service");
+                        ws = new Atom(serviceURL);
+                        break;
+                    case WFSOne:
+                        view.setStatusBarText("Found WFSOne Service");
+                        ws = new WFSOne(serviceURL);
+                        break;
+                    case WFSTwo:
+                        view.setStatusBarText("Found WFSTwo Service");
+                        ws = new WFSTwo(serviceURL);
+                        break;
+                    default:
+                        view.setStatusBarText("Could not determine Service Type");
+                }
+                dataBean.setWebService(ws);
             } else {
                 view.setStatusBarText("Could not determine URL");
             }
