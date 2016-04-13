@@ -108,6 +108,8 @@ public class View {
 
     private ListView<String> serviceList;
 
+    private ObservableList<String> serviceListEntries;
+
     private TextField serviceSearch;
 
     private Label serviceURLLabel;
@@ -290,6 +292,24 @@ public class View {
     }
 
     /**
+     * gets the service List entries.
+     * @return service list entries
+     */
+    public ObservableList<String> getServiceListEntries() {
+        return serviceListEntries;
+    }
+
+    /**
+     * sets the service List entries.
+     * @param serviceListEntries the service List entires
+     */
+    public void setServiceListEntries(
+            ObservableList<String> serviceListEntries) {
+        this.serviceListEntries = serviceListEntries;
+        this.serviceList.setItems(this.serviceListEntries);
+    }
+
+    /**
      * sets the text in the statusbar.
      * @param statusBarText the text it should be set to
      */
@@ -304,7 +324,15 @@ public class View {
      * @param items the items
      */
     public void setServiceList(ObservableList<String> items) {
-        this.serviceList.setItems(items);
+        this.setServiceListEntries(items);
+    }
+
+    /**
+     * sets the service List.
+     * @param serviceList the service list
+     */
+    public void setServiceList(ListView<String> serviceList) {
+        this.serviceList = serviceList;
     }
 
     /**

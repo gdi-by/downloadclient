@@ -19,6 +19,10 @@
 package de.bayern.gdi.experimental.gui;
 
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
@@ -48,7 +52,7 @@ public class Controller {
     public Controller(DataBean dataBean) {
         this.dataBean = dataBean;
         this.view = new View();
-        this.view.setServiceList(this.dataBean.getServicesAsList());
+        this.view.setServiceListEntries(this.dataBean.getServicesAsList());
 
         // Register Event Handler
         view.getQuitMenuItem().
@@ -58,8 +62,14 @@ public class Controller {
         view.getServiceChooseButton().
                 setOnAction(new ServiceChooseButttonEventHandler());
 
+        // Register Listener
+        view.getServiceSearch().textProperty().
+                addListener(new SearchServiceListChangeListener());
+
+        // stage overrides
         this.dataBean.getPrimaryStage().
                 setOnCloseRequest(new ConfirmCloseEventHandler());
+
     }
 
     /**
@@ -67,6 +77,42 @@ public class Controller {
      */
     public void show() {
         view.show(dataBean.getPrimaryStage());
+    }
+
+    //+++++++++++++++++++++++++++++++++++++++++++++
+    // Listener
+    //+++++++++++++++++++++++++++++++++++++++++++++
+
+    /**
+     * listener for changes in search field, so the list can be searched.
+     */
+    private class SearchServiceListChangeListener
+            implements ChangeListener {
+        @Override
+        public void changed(ObservableValue observable, Object oldVal,
+                            Object newVal) {
+            searchServiceList((String) oldVal, (String) newVal);
+        }
+        public void searchServiceList(String oldVal, String newVal) {
+            if (oldVal != null && (newVal.length() < oldVal.length())) {
+                view.getServiceList().setItems(view.getServiceListEntries());
+            }
+            String value = newVal.toUpperCase();
+            ObservableList<String> subentries
+                    = FXCollections.observableArrayList();
+            for (Object entry : view.getServiceList().getItems()) {
+                boolean match = true;
+                String entryText = (String) entry;
+                if (!entryText.toUpperCase().contains(value)) {
+                    match = false;
+                    break;
+                }
+                if (match) {
+                    subentries.add(entryText);
+                }
+            }
+            view.getServiceList().setItems(subentries);
+        }
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++
