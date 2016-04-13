@@ -315,7 +315,7 @@ public class View {
      */
     public void setStatusBarText(String statusBarText) {
         final Text statusText = new Text(statusBarText);
-        this.statusBar.getChildren().remove(1);
+        this.statusBar.getChildren().remove(0);
         this.statusBar.getChildren().add(statusText);
     }
 

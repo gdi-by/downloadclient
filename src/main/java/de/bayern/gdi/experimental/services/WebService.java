@@ -16,37 +16,30 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.serviceWFSone;
-
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
+package de.bayern.gdi.experimental.services;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class View extends de.bayern.gdi.experimental.gui.View {
+public abstract class WebService implements ServiceSchema {
 
-    private de.bayern.gdi.experimental.gui.View mainView;
-    private Scene scene;
+    private String serviceURL;
 
+    private String serviceType;
+
+    public WebService() {
+        this.serviceURL = null;
+    }
     /**
      * Constructor.
+     * @param serviceURL URL to the Service
      */
-    public View(de.bayern.gdi.experimental.gui.View mainView) {
-        this.mainView = mainView;
-        this.scene = this.mainView.getScene();
+    public WebService(String serviceURL) {
+        this.serviceURL = serviceURL;
+        this.createService();
     }
 
-    /**
-     * @param stage the stage to show
-     * shows the current stage.
-     */
-    public void show(Stage stage) {
-        stage.setTitle("Test");
-        stage.setScene(scene);
-        stage.show();
+    private void createService() {
+        System.out.println("Test");
     }
-
-
 }

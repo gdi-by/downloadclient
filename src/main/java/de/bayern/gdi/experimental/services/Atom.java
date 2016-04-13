@@ -16,37 +16,42 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.serviceATOM;
+package de.bayern.gdi.experimental.services;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 
+import org.opengis.feature.type.AttributeType;
+
+import java.util.Vector;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class View extends de.bayern.gdi.experimental.gui.View {
-
-    private de.bayern.gdi.experimental.gui.View mainView;
-    private Scene scene;
+public class Atom  extends WebService {
+    private String serviceURL;
 
     /**
      * Constructor.
+     * @param serviceURL the Service URL
      */
-    public View(de.bayern.gdi.experimental.gui.View mainView) {
-        this.mainView = mainView;
-        this.scene = this.mainView.getScene();
+    public Atom(String serviceURL) {
+        this.serviceURL = serviceURL;
     }
 
     /**
-     * @param stage the stage to show
-     * shows the current stage.
+     * gets the Types of this service.
+     * @return types of the service
      */
-    public void show(Stage stage) {
-        stage.setTitle("Test");
-        stage.setScene(scene);
-        stage.show();
+    public Vector<String> getTypes() {
+        return null;
     }
 
+    /**
+     * gets the attributes of a type.
+     * @param type the type
+     * @return the attributes
+     */
+    public Vector<AttributeType> getAttributes(String type) {
+        return null;
+    }
 
 }

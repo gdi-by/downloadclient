@@ -19,6 +19,7 @@
 package de.bayern.gdi.experimental.gui;
 
 import de.bayern.gdi.experimental.ServiceSetting;
+import de.bayern.gdi.experimental.services.WebService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -39,6 +40,7 @@ public class DataBean extends Observable {
     private ServiceSetting serviceSetting = null;
     private Map<String, String> services;
     private Map<String, String> catalogues;
+    private WebService webService;
 
     /**
      * Constructor.
@@ -49,6 +51,7 @@ public class DataBean extends Observable {
         this.serviceSetting = new ServiceSetting();
         this.services = this.serviceSetting.getServices();
         this.catalogues = this.serviceSetting.getCatalogues();
+        this.webService = null;
     }
 
     /**
@@ -101,6 +104,34 @@ public class DataBean extends Observable {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
         }
+    }
+
+    /**
+     * gets the Webservice.
+     * @return webservice
+     */
+    public WebService getWebService() {
+        return webService;
+    }
+
+    /**
+     * sets the webservice.
+     * @param webService webservice
+     */
+    public void setWebService(WebService webService) {
+        this.webService = webService;
+    }
+
+    /**
+     * returns true if webservice is set.
+     * @return true if webservice ist set; false if not set
+     */
+    public boolean isWebServiceSet() {
+        if (this.webService == null) {
+            return false;
+        }
+        return true;
+
     }
 
 }

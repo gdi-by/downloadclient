@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental;
+package de.bayern.gdi.experimental.services;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
@@ -34,48 +34,46 @@ import java.util.Vector;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WFStwo {
+public class WFStwo extends WebService {
 
-    private String url;
+    private String serviceURL;
     private Vector<String> types = new Vector();
     private DataStore data;
 
     /**
      * Constructor.
      * @param url URL to Service
-     * @throws Exception when something goes wrong
      */
-    public WFStwo(String url) throws Exception {
-        this.url = url;
+    public WFStwo(String url) {
+        this.serviceURL = url;
         Iterator<DataStoreFactorySpi> fi
                 = DataStoreFinder.getAvailableDataStores();
 
         while (fi.hasNext()) {
             DataStoreFactorySpi f = fi.next();
-            /*
-            System.out.println("\t'"
-                    + f.getDisplayName() + "': '"
-                    + f.getDescription() + "'");
-                    */
         }
 
         Map connectionParameters = new HashMap();
         connectionParameters.put(
-                "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.url);
+                "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.serviceURL);
 
         // Step 2 - connection
-        this.data = DataStoreFinder.getDataStore(connectionParameters);
+        try {
+            this.data = DataStoreFinder.getDataStore(connectionParameters);
 
-        //System.out.println("data store class: " + data.getClass());
+            //System.out.println("data store class: " + data.getClass());
 
-        // Step 3 - discovery
-        String [] typeNames = data.getTypeNames();
+            // Step 3 - discovery
+            String[] typeNames = data.getTypeNames();
 
 
-        for (String tName: typeNames) {
-            this.types.add(tName);
+            for (String tName : typeNames) {
+                this.types.add(tName);
+            }
+        } catch (Exception e) {
+            //TODO Logging
+            System.err.println(e.getStackTrace());
         }
-
         /*
         SimpleFeatureType schema = data.getSchema(typeName);
 
@@ -152,18 +150,22 @@ public class WFStwo {
      * gets the attributes of a tye.
      * @param type type to get attributes of
      * @return the attributes
-     * @throws Exception when something goes wrong
      */
-    public Vector<AttributeType> getAttributes(String type) throws Exception {
+    public Vector<AttributeType> getAttributes(String type) {
         Vector<AttributeType> attributes = new Vector();
-        SimpleFeatureType schema = this.data.getSchema(type);
+        try {
+            SimpleFeatureType schema = this.data.getSchema(type);
 
-        FeatureSource<SimpleFeatureType, SimpleFeature>
-                source = data.getFeatureSource(type);
+            FeatureSource<SimpleFeatureType, SimpleFeature>
+                    source = data.getFeatureSource(type);
 
-        //System.out.println("types:");
-        for (AttributeType aType: schema.getTypes()) {
-            attributes.add(aType);
+            //System.out.println("types:");
+            for (AttributeType aType : schema.getTypes()) {
+                attributes.add(aType);
+            }
+        } catch (Exception e) {
+            //TODO Logging
+            System.err.println(e.getStackTrace());
         }
         return attributes;
     }

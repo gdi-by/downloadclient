@@ -16,37 +16,16 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.serviceWFStwo;
+package de.bayern.gdi.experimental.services;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import org.opengis.feature.type.AttributeType;
 
+import java.util.Vector;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class View extends de.bayern.gdi.experimental.gui.View {
-
-    private de.bayern.gdi.experimental.gui.View mainView;
-    private Scene scene;
-
-    /**
-     * Constructor.
-     */
-    public View(de.bayern.gdi.experimental.gui.View mainView) {
-        this.mainView = mainView;
-        this.scene = this.mainView.getScene();
-    }
-
-    /**
-     * @param stage the stage to show
-     * shows the current stage.
-     */
-    public void show(Stage stage) {
-        stage.setTitle("Test");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-
+interface ServiceSchema {
+    Vector<String> getTypes();
+    Vector<AttributeType> getAttributes(String type);
 }

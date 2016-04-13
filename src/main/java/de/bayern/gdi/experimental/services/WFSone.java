@@ -16,47 +16,41 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.experimental.gui.serviceATOM;
+package de.bayern.gdi.experimental.services;
 
-import javafx.stage.Stage;
+import org.opengis.feature.type.AttributeType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
+import java.util.Vector;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class DataBean extends Observable {
-
-    private Stage primaryStage = null;
-    private Map<String , String> namePwMap = null;
-
-    private de.bayern.gdi.experimental.gui.DataBean
-            serviceDataBean;
+public class WFSone extends WebService {
+    private String serviceURL;
 
     /**
      * Constructor.
+     * @param serviceURL the service URL
      */
-    public DataBean(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.namePwMap = new HashMap<>();
+    public WFSone(String serviceURL) {
+        this.serviceURL = serviceURL;
     }
 
     /**
-     * returns the Name Map.
-     * @return the Name Map
+     * gets the Types of this service.
+     * @return types of the service
      */
-    public Map<String, String> getNamePwMap() {
-        return namePwMap;
+    public Vector<String> getTypes() {
+        return null;
     }
 
     /**
-     * returns the current stage.
-     * @return the stage
+     * gets the attributes of a type.
+     * @param type the type
+     * @return the attributes
      */
-    public Stage getPrimaryStage() {
-        return primaryStage;
+    public Vector<AttributeType> getAttributes(String type) {
+        return null;
     }
 
 }

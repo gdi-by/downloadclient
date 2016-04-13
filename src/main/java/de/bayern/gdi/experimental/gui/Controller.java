@@ -19,6 +19,7 @@
 package de.bayern.gdi.experimental.gui;
 
 
+import de.bayern.gdi.experimental.services.WFStwo;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -44,7 +45,6 @@ public class Controller {
     // View
     private View view;
 
-
     /**
      * Creates the Conroller.
      * @param dataBean the model
@@ -60,7 +60,7 @@ public class Controller {
         view.getResetMenuItem().
                 setOnAction(new ResetMenuItemEventHandler());
         view.getServiceChooseButton().
-                setOnAction(new ServiceChooseButttonEventHandler());
+                setOnAction(new ServiceChooseButtonEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -149,11 +149,38 @@ public class Controller {
     /**
      * Event Handler for the choose Service Button.
      */
-    private class ServiceChooseButttonEventHandler implements
+    private class ServiceChooseButtonEventHandler implements
             EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
             //Nada
+            String serviceURL = null;
+            String username = null;
+            String password = null;
+            if (view.getServiceList().getSelectionModel().getSelectedItems()
+                    != null) {
+                String serviceName =
+                        view.getServiceList().
+                                getSelectionModel().getSelectedItems().get(0);
+                serviceURL = dataBean.getServiceURL(serviceName);
+            } else if (view.getServiceURLfield().textProperty().getValue()
+                    != null) {
+                serviceURL =
+                        view.getServiceURLfield().textProperty().getValue();
+                if (view.getServiceUseAuthenticationCBX().isSelected()) {
+                    username = view.getServiceUser().textProperty().getValue();
+                    password = view.getServicePW().textProperty().getValue();
+                }
+                if (username != null && password != null) {
+                }
+            }
+            if (serviceURL != null) {
+                view.setStatusBarText("Check for Servicetype");
+                //
+                dataBean.setWebService(new WFStwo(serviceURL));
+            } else {
+                view.setStatusBarText("Could not determine URL");
+            }
         }
     }
 
