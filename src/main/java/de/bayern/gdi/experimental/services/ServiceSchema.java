@@ -20,12 +20,12 @@ package de.bayern.gdi.experimental.services;
 
 import org.opengis.feature.type.AttributeType;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 interface ServiceSchema {
-    Vector<String> getTypes();
-    Vector<AttributeType> getAttributes(String type);
+    ArrayList<String> getTypes();
+    ArrayList<AttributeType> getAttributes(String type);
 }

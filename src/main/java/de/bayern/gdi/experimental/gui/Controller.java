@@ -19,7 +19,7 @@
 package de.bayern.gdi.experimental.gui;
 
 
-import de.bayern.gdi.experimental.services.WFStwo;
+import de.bayern.gdi.experimental.services.WFSTwo;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -177,7 +177,7 @@ public class Controller {
             if (serviceURL != null) {
                 view.setStatusBarText("Check for Servicetype");
                 //
-                dataBean.setWebService(new WFStwo(serviceURL));
+                dataBean.setWebService(new WFSTwo(serviceURL));
             } else {
                 view.setStatusBarText("Could not determine URL");
             }

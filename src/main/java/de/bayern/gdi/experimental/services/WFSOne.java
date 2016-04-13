@@ -20,19 +20,19 @@ package de.bayern.gdi.experimental.services;
 
 import org.opengis.feature.type.AttributeType;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WFSone extends WebService {
+public class WFSOne extends WebService {
     private String serviceURL;
 
     /**
      * Constructor.
      * @param serviceURL the service URL
      */
-    public WFSone(String serviceURL) {
+    public WFSOne(String serviceURL) {
         this.serviceURL = serviceURL;
     }
 
@@ -40,7 +40,7 @@ public class WFSone extends WebService {
      * gets the Types of this service.
      * @return types of the service
      */
-    public Vector<String> getTypes() {
+    public ArrayList<String> getTypes() {
         return null;
     }
 
@@ -49,7 +49,7 @@ public class WFSone extends WebService {
      * @param type the type
      * @return the attributes
      */
-    public Vector<AttributeType> getAttributes(String type) {
+    public ArrayList<AttributeType> getAttributes(String type) {
         return null;
     }
 

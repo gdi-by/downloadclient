@@ -96,10 +96,11 @@ public class ServiceSetting {
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
                     serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
-                        if (serviceValueNode.getNodeName() == "url") {
+                        if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
                              serviceValueNode.getFirstChild().getTextContent();
-                        } else if (serviceValueNode.getNodeName() == "name") {
+                        } else if (serviceValueNode.getNodeName()
+                                .equals("name")) {
                             serviceName =
                              serviceValueNode.getFirstChild().getTextContent();
                         }

@@ -29,22 +29,22 @@ import org.opengis.feature.type.AttributeType;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WFStwo extends WebService {
+public class WFSTwo extends WebService {
 
     private String serviceURL;
-    private Vector<String> types = new Vector();
+    private ArrayList<String> types = new ArrayList();
     private DataStore data;
 
     /**
      * Constructor.
      * @param url URL to Service
      */
-    public WFStwo(String url) {
+    public WFSTwo(String url) {
         this.serviceURL = url;
         Iterator<DataStoreFactorySpi> fi
                 = DataStoreFinder.getAvailableDataStores();
@@ -142,7 +142,7 @@ public class WFStwo extends WebService {
      * gets the types of a service.
      * @return the types
      */
-    public Vector<String> getTypes() {
+    public ArrayList<String> getTypes() {
         return this.types;
     }
 
@@ -151,8 +151,8 @@ public class WFStwo extends WebService {
      * @param type type to get attributes of
      * @return the attributes
      */
-    public Vector<AttributeType> getAttributes(String type) {
-        Vector<AttributeType> attributes = new Vector();
+    public ArrayList<AttributeType> getAttributes(String type) {
+        ArrayList<AttributeType> attributes = new ArrayList();
         try {
             SimpleFeatureType schema = this.data.getSchema(type);
 

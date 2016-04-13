@@ -21,12 +21,12 @@ package de.bayern.gdi.experimental.services;
 
 import org.opengis.feature.type.AttributeType;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class Atom  extends WebService {
+public class Atom extends WebService {
     private String serviceURL;
 
     /**
@@ -41,7 +41,7 @@ public class Atom  extends WebService {
      * gets the Types of this service.
      * @return types of the service
      */
-    public Vector<String> getTypes() {
+    public ArrayList<String> getTypes() {
         return null;
     }
 
@@ -50,7 +50,7 @@ public class Atom  extends WebService {
      * @param type the type
      * @return the attributes
      */
-    public Vector<AttributeType> getAttributes(String type) {
+    public ArrayList<AttributeType> getAttributes(String type) {
         return null;
     }
 
