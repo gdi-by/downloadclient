@@ -48,7 +48,6 @@ public abstract class WebService implements ServiceSchema {
      * Constructor.
      */
     public WebService() {
-        this.serviceURL = null;
     }
 
     /**

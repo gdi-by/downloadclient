@@ -44,8 +44,6 @@ public class WFSTwo extends WebService {
      */
     public WFSTwo(String serviceURL) {
         this.serviceURL = serviceURL;
-        this.types = null;
-        this.data = null;
 
         Map connectionParameters = new HashMap();
         connectionParameters.put(
@@ -87,13 +85,13 @@ public class WFSTwo extends WebService {
      */
     public ArrayList<AttributeType> getAttributes(String type) {
         ArrayList<AttributeType> attributes = new ArrayList();
-            try {
-                SimpleFeatureType schema = this.data.getSchema(type);
-                attributes.addAll(schema.getTypes());
-            } catch (Exception e) {
-                //TODO Logging
-                System.err.println(e.getStackTrace());
-            }
+        try {
+            SimpleFeatureType schema = this.data.getSchema(type);
+            attributes.addAll(schema.getTypes());
+        } catch (Exception e) {
+            //TODO Logging
+            System.err.println(e.getStackTrace());
+        }
         return attributes;
     }
 
@@ -112,5 +110,4 @@ public class WFSTwo extends WebService {
     public DataStore getData() {
         return this.data;
     }
-
 }
