@@ -32,20 +32,21 @@ public class App {
     private App() {
     }
 
+    private static boolean runHeadless(String[] args) {
+        for (String arg: args) {
+            if (arg.equals("-headless")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        boolean headless = false;
-        //check the arguments
-        for (String arg: args) {
-            System.out.println(arg);
-            if (arg.equals("-headless")) {
-                headless = true;
-                break;
-            }
-        }
-        if (headless) {
+
+        if (runHeadless(args)) {
             SimpleLoader sl = new SimpleLoader(DEMO_URL);
             try {
                 sl.download();
@@ -53,22 +54,23 @@ public class App {
                 // TODO: Add logging.
                 System.err.println(e);
             }
-        } else {
-            // Its kind of complicated to start a javafx applicaiton from
-            // another class. Thank god for StackExchange:
-            // http://stackoverflow.com/a/25909862
-            // TODO: Make shure the correct screen starts
-            // There are 4 Kinds of Screens: Searching for a service
-            // WFS-1 Service, WFS-2 Service and ATOM
-            // Currently, we start the chooseService Window
-            new Thread() {
-                @Override
-                public void run() {
-                    javafx.application.Application.launch(Start.class);
-                }
-            }.start();
-            Start start = Start.waitForStart();
-            //start.printInvoking();
+            return;
         }
+
+        // Its kind of complicated to start a javafx applicaiton from
+        // another class. Thank god for StackExchange:
+        // http://stackoverflow.com/a/25909862
+        // TODO: Make sure the correct screen starts
+        // There are 4 Kinds of Screens: Searching for a service
+        // WFS-1 Service, WFS-2 Service and ATOM
+        // Currently, we start the chooseService Window
+        new Thread() {
+            @Override
+            public void run() {
+                javafx.application.Application.launch(Start.class);
+            }
+        }.start();
+        Start start = Start.waitForStart();
+        //start.printInvoking();
     }
 }
