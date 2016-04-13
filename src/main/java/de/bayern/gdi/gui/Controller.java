@@ -83,6 +83,15 @@ public class Controller {
         view.show(dataBean.getPrimaryStage());
     }
 
+    /**
+     * Updates the view
+     */
+    public void updateView() {
+        if(dataBean.isWebServiceSet()) {
+            System.out.println("Building View based on Webservice");
+        }
+    }
+
     //+++++++++++++++++++++++++++++++++++++++++++++
     // Listener
     //+++++++++++++++++++++++++++++++++++++++++++++
@@ -199,6 +208,7 @@ public class Controller {
                         view.setStatusBarText("Could not determine Service Type");
                 }
                 dataBean.setWebService(ws);
+                updateView();
             } else {
                 view.setStatusBarText("Could not determine URL");
             }

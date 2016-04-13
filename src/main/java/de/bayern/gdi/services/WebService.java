@@ -42,10 +42,6 @@ public abstract class WebService implements ServiceSchema {
      */
     public WebService(String serviceURL) {
         this.serviceURL = serviceURL;
-        this.createService();
     }
 
-    private void createService() {
-        System.out.println("Test");
-    }
 }

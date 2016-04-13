@@ -28,4 +28,5 @@ import java.util.ArrayList;
 interface ServiceSchema {
     ArrayList<String> getTypes();
     ArrayList<AttributeType> getAttributes(String type);
+    String getServiceURL();
 }
