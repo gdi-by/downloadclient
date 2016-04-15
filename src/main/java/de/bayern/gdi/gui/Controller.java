@@ -35,7 +35,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
+import org.opengis.feature.type.AttributeType;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -65,6 +69,10 @@ public class Controller {
                 setOnAction(new ResetMenuItemEventHandler());
         view.getServiceChooseButton().
                 setOnAction(new ServiceChooseButtonEventHandler());
+        view.getTypeComboBox().
+                setOnAction(new ChooseTypeEventHandler());
+        view.getAttributesFilledButton().
+                setOnAction(new AttributesFilledEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -84,11 +92,24 @@ public class Controller {
     }
 
     /**
-     * Updates the view.
+     * sets the Service Types.
      */
-    public void updateView() {
+    public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
-            System.out.println("Building View based on Webservice");
+            System.out.println("Building Types based on Webservice");
+            dataBean.setServiceTypes(dataBean.getWebService().getTypes());;
+            view.setTypes(dataBean.getServiceTypes());
+        }
+    }
+
+    /**
+     * sets the Service Types Attributes.
+     * @param map the Map of Attributes
+     */
+    public void setServiceAttributes(Map<String, Class> map) {
+        if (dataBean.isWebServiceSet()) {
+            System.out.println("Building Attributes based on Webservice");
+            view.setAttributes(map);
         }
     }
 
@@ -131,6 +152,43 @@ public class Controller {
     //+++++++++++++++++++++++++++++++++++++++++++++
     // Events
     //+++++++++++++++++++++++++++++++++++++++++++++
+
+    /**
+     * Event Handler for choosing a type.
+     */
+    private class ChooseTypeEventHandler
+        implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            Map map = new HashMap<String, Class>();
+            if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
+                    != null) {
+                String choosenType =
+                        view.getTypeComboBox().getSelectionModel()
+                        .getSelectedItem()
+                        .toString();
+                ArrayList <AttributeType> attributes =
+                        dataBean.getWebService().getAttributes(choosenType);
+                for (AttributeType attribute: attributes) {
+                    map.put(attribute.getName().toString(),
+                            attribute.getBinding());
+                }
+                dataBean.setAttributes(map);
+                setServiceAttributes(dataBean.getAttributes());
+            }
+        }
+    }
+
+    /**
+     * Class for handling stuff if Attributes are filled.
+     */
+    private class AttributesFilledEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            //Nada
+        }
+    }
 
     /**
      * Event Handler for the Quit Programm Menu Entry.
@@ -209,7 +267,7 @@ public class Controller {
                           setStatusBarText("Could not determine Service Type");
                 }
                 dataBean.setWebService(ws);
-                updateView();
+                setServiceTypes();
             } else {
                 view.setStatusBarText("Could not determine URL");
             }

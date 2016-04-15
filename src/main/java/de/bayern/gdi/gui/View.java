@@ -18,18 +18,22 @@
 
 package de.bayern.gdi.gui;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -40,6 +44,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Iterator;
 
 
 /**
@@ -57,6 +65,9 @@ public class View {
     private static final int EIGHT = 8;
     private static final int NINE = 9;
     private static final int ZERO = 0;
+
+    private static final double TWO_FIFTH = TWO / FIVE;
+    private static final double THREE_FIFTH = THREE / FIVE;
 
     private static final int GRID_HGAP = 10;
     private static final int GRID_VGAP = 10;
@@ -144,6 +155,16 @@ public class View {
 
     private Menu optionsMenu;
 
+    private ComboBox typeComboBox;
+
+    private ScrollPane attributePane;
+
+    private HBox attributesFilledBox;
+
+    private Button attributesFilledButton;
+
+    private Group attributeGroup;
+
     /**
      * Constructor.
      */
@@ -160,7 +181,7 @@ public class View {
             sceneHeight =
                     (int) (primaryScreenBounds.getHeight() * EIGHTY_PERCENT_OF);
         }
-        columnWidth = sceneWidth / MAX_COLUMN;
+        this.columnWidth = sceneWidth / MAX_COLUMN;
         // Layout
         this.prgrmLayout = new BorderPane();
 
@@ -279,6 +300,11 @@ public class View {
         prgrmLayout.setBottom(this.statusBar);
         this.scene = new Scene(prgrmLayout, sceneHeight, sceneWidth);
 
+        //Initializing later used sutff
+        this.attributesFilledBox = new HBox(BUTTONBOX_SIZE);
+        this.attributesFilledButton = new Button();
+        this.typeComboBox = new ComboBox();
+        this.attributeGroup = new Group();
     }
 
     /**
@@ -291,6 +317,65 @@ public class View {
         stage.show();
     }
 
+    /**
+     * sets the Types of a Service.
+     * @param types types
+     */
+    public void setTypes(ArrayList<String> types) {
+        ObservableList<String> options =
+                FXCollections.observableArrayList(types);
+        this.typeComboBox.setItems(options);
+        this.grid.add(this.getTypeComboBox(),
+                SECOND_COLUMN,
+                FIRST_ROW);
+    }
+
+    /**
+     * sets the Attributes.
+     * @param attributes map of Attributes
+     */
+    public void setAttributes(Map<String, Class> attributes) {
+        //Grid in Grid - Gridception... (I'll show myself the way out)
+        GridPane attributeGrid = new GridPane();
+
+        ColumnConstraints labelColumn = new ColumnConstraints();
+        labelColumn.setPercentWidth(this.columnWidth * TWO_FIFTH);
+        attributeGrid.getColumnConstraints().add(labelColumn);
+
+        ColumnConstraints fieldColumn = new ColumnConstraints();
+        fieldColumn.setPercentWidth(this.columnWidth * THREE_FIFTH);
+        attributeGrid.getColumnConstraints().add(fieldColumn);
+
+
+        for (int i = 0; i < attributes.size(); i++) {
+            RowConstraints row = new RowConstraints();
+            row.setPercentHeight((MAX_ROW / FULLSIZE) / FULLSIZE);
+            attributeGrid.getRowConstraints().add(row);
+        }
+
+        Iterator it = attributes.entrySet().iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            TextField tf = new TextField(pair.getValue().toString());
+            attributeGrid.add(tf, ONE, i);
+            Label l = new Label((String) pair.getKey());
+            attributeGrid.add(l, ZERO, i);
+            i++;
+        }
+
+        ScrollPane sp = new ScrollPane(attributeGrid);
+        this.grid.add(sp,
+                SECOND_COLUMN,
+                SECOND_ROW);
+        sp.setFitToWidth(true);
+        this.attributesFilledButton.setText("All Attributes Filled");
+        this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
+        this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
+        this.grid.add(this.attributesFilledBox,
+                SECOND_COLUMN,
+                THIRD_ROW);
+    }
     /**
      * gets the service List entries.
      * @return service list entries
@@ -708,4 +793,67 @@ public class View {
         this.optionsMenu = optionsMenu;
     }
 
+    /**
+     * Gets the Combo Box for Types.
+     * @return Combobox of Types
+     */
+    public ComboBox getTypeComboBox() {
+        return typeComboBox;
+    }
+
+    /**
+     * sets the Combobox of types.
+     * @param typeComboBox the combobox
+     */
+    public void setTypeComboBox(ComboBox typeComboBox) {
+        this.typeComboBox = typeComboBox;
+    }
+
+    /**
+     * gets the Attribute Pane.
+     * @return the Attribute Pane
+     */
+    public ScrollPane getAttributePane() {
+        return attributePane;
+    }
+
+    /**
+     * sets the Attribute Pane.
+     * @param attributePane the Attribute Pane
+     */
+    public void setAttributePane(ScrollPane attributePane) {
+        this.attributePane = attributePane;
+    }
+
+    /**
+     * gets the Box for the Attributes Button.
+     * @return the box for the attributes button
+     */
+    public HBox getAttributesFilledBox() {
+        return attributesFilledBox;
+    }
+
+    /**
+     * sets the Box for the Attributes Button.
+     * @param attributesFilledBox the Box for the Atributes Button
+     */
+    public void setAttributesFilledBox(HBox attributesFilledBox) {
+        this.attributesFilledBox = attributesFilledBox;
+    }
+
+    /**
+     * gets the Attributes Filled Button.
+     * @return the Attributes Filled Button
+     */
+    public Button getAttributesFilledButton() {
+        return attributesFilledButton;
+    }
+
+    /**
+     * sets the attributesFilledButton.
+     * @param attributesFilledButton the Attributes Filled Button
+     */
+    public void setAttributesFilledButton(Button attributesFilledButton) {
+        this.attributesFilledButton = attributesFilledButton;
+    }
 }

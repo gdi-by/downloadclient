@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
+import java.util.ArrayList;
 
 
 /**
@@ -41,6 +42,8 @@ public class DataBean extends Observable {
     private Map<String, String> services;
     private Map<String, String> catalogues;
     private WebService webService;
+    private ArrayList<String> serviceTypes;
+    private Map<String, Class> attributes;
 
     /**
      * Constructor.
@@ -132,6 +135,38 @@ public class DataBean extends Observable {
         }
         return true;
 
+    }
+
+    /**
+     * gets the service Types.
+     * @return serviceTypes
+     */
+    public ArrayList<String> getServiceTypes() {
+        return serviceTypes;
+    }
+
+    /**
+     * sets the service Types.
+     * @param serviceTypes service Types
+     */
+    public void setServiceTypes(ArrayList<String> serviceTypes) {
+        this.serviceTypes = serviceTypes;
+    }
+
+    /**
+     * gets the Attributes for a the selected service.
+     * @return the attributes
+     */
+    public Map<String, Class> getAttributes() {
+        return attributes;
+    }
+
+    /**
+     * sets the Attributes for a selected Service.
+     * @param attributes tha attributes
+     */
+    public void setAttributes(Map<String, Class> attributes) {
+        this.attributes = attributes;
     }
 
 }
