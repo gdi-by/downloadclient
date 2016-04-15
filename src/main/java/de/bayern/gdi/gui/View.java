@@ -866,7 +866,7 @@ public class View {
     }
 
     /**
-     * gets the group with the Attributes in
+     * gets the group with the Attributes in.
      * @return the group with the attributes in
      */
     public GridPane getAttributeGridPane() {
@@ -874,7 +874,7 @@ public class View {
     }
 
     /**
-     * sets the group with the attributes in
+     * sets the group with the attributes in.
      * @param attributeGridPane group with the attributes in
      */
     public void setAttributeGridPane(GridPane attributeGridPane) {
