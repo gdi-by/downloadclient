@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Downloadschritt für den Downloadclient der GDI-BY
+
+    Stand: 25.11.2015
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<!-- https://gist.github.com/gdi-by/ebfa67fbda614fa30e59 -->
+
+<DownloadSchritt>
+    <ServiceTyp>WFS2_SIMPLE</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs</URL>
+    <Dataset>GemeindeByGemeindeschluesselEpsg31468</Dataset>
+    <Parameters>
+        <Parameter>
+            <Name>gemeindeschluessel</Name>
+            <Wert>09162000</Wert>
+        </Parameter>
+    </Parameters>
+    <Verarbeitungskette>
+        <Verarbeitungsschritt>
+            <Name>toShape</Name>
+            <Parameters>
+                <Parameter>
+                    <Name>EPSG</Name>
+                    <Wert>EPSG:4258</Wert>
+                </Parameter>
+            </Parameters>
+        </Verarbeitungsschritt>
+    </Verarbeitungskette>
+    <DownloadPfad>/tmp/</DownloadPfad>
+</DownloadSchritt>

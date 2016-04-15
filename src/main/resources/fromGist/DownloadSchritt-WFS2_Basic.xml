@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Downloadschritt für den Downloadclient der GDI-BY
+
+    Stand: 25.11.2015
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<!-- https://gist.github.com/gdi-by/d02e71e0bb1c1ac21cd7 -->
+
+<DownloadSchritt>
+    <ServiceTyp>WFS2_BASIC</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs</URL>
+    <Dataset>bvv:gmd_ex</Dataset>
+    <Parameters>
+        <Parameter>
+            <!-- Fester Parameter bei WFS 2.0 Basic -->
+            <Name>srsName</Name>
+            <Wert>urn:ogc:def:crs:EPSG::31468</Wert>
+        </Parameter>
+        <Parameter>
+            <!-- Fester Parameter bei WFS 2.0 Basic -->
+            <Name>bbox</Name>
+            <!-- Achsenreihenfolge vgl. http://www.weichand.de/2013/03/24/wfs-achsenreihenfolge-von-koordinatensystemen/ -->
+            <Wert>5500000,4500000,5500500,4500500,urn:ogc:def:crs:EPSG::31468</Wert>
+        </Parameter>
+    </Parameters>
+    <DownloadPfad>/tmp/</DownloadPfad>
+</DownloadSchritt>
