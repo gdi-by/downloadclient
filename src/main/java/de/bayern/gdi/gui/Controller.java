@@ -33,6 +33,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.Node;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
 import org.opengis.feature.type.AttributeType;
@@ -186,7 +187,10 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //Nada
+            Map map = dataBean.getAttributes();
+            for (Node n:view.getAttributeGridPane().getChildren()) {
+                System.out.println(n.toString());
+            }
         }
     }
 

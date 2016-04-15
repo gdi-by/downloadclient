@@ -23,7 +23,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -46,8 +45,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -157,13 +156,13 @@ public class View {
 
     private ComboBox typeComboBox;
 
-    private ScrollPane attributePane;
+    private ScrollPane attributeScrollPane;
 
     private HBox attributesFilledBox;
 
     private Button attributesFilledButton;
 
-    private Group attributeGroup;
+    private GridPane attributeGridPane;
 
     /**
      * Constructor.
@@ -304,7 +303,8 @@ public class View {
         this.attributesFilledBox = new HBox(BUTTONBOX_SIZE);
         this.attributesFilledButton = new Button();
         this.typeComboBox = new ComboBox();
-        this.attributeGroup = new Group();
+        this.attributeScrollPane = new ScrollPane();
+        this.attributeGridPane = new GridPane();
     }
 
     /**
@@ -324,8 +324,10 @@ public class View {
     public void setTypes(ArrayList<String> types) {
         ObservableList<String> options =
                 FXCollections.observableArrayList(types);
+        this.typeComboBox.getItems().removeAll(this.typeComboBox.getItems());
         this.typeComboBox.setItems(options);
-        this.grid.add(this.getTypeComboBox(),
+        this.grid.getChildren().remove(this.typeComboBox);
+        this.grid.add(this.typeComboBox,
                 SECOND_COLUMN,
                 FIRST_ROW);
     }
@@ -336,21 +338,22 @@ public class View {
      */
     public void setAttributes(Map<String, Class> attributes) {
         //Grid in Grid - Gridception... (I'll show myself the way out)
-        GridPane attributeGrid = new GridPane();
-
+        this.attributeGridPane.getChildren().remove(
+                this.attributeGridPane.getChildren()
+        );
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setPercentWidth(this.columnWidth * TWO_FIFTH);
-        attributeGrid.getColumnConstraints().add(labelColumn);
+        this.attributeGridPane.getColumnConstraints().add(labelColumn);
 
         ColumnConstraints fieldColumn = new ColumnConstraints();
         fieldColumn.setPercentWidth(this.columnWidth * THREE_FIFTH);
-        attributeGrid.getColumnConstraints().add(fieldColumn);
+        this.attributeGridPane.getColumnConstraints().add(fieldColumn);
 
 
         for (int i = 0; i < attributes.size(); i++) {
             RowConstraints row = new RowConstraints();
             row.setPercentHeight((MAX_ROW / FULLSIZE) / FULLSIZE);
-            attributeGrid.getRowConstraints().add(row);
+            this.attributeGridPane.getRowConstraints().add(row);
         }
 
         Iterator it = attributes.entrySet().iterator();
@@ -358,20 +361,25 @@ public class View {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             TextField tf = new TextField(pair.getValue().toString());
-            attributeGrid.add(tf, ONE, i);
+            this.attributeGridPane.add(tf, ONE, i);
             Label l = new Label((String) pair.getKey());
-            attributeGrid.add(l, ZERO, i);
+            this.attributeGridPane.add(l, ZERO, i);
             i++;
         }
 
-        ScrollPane sp = new ScrollPane(attributeGrid);
-        this.grid.add(sp,
+        this.attributeScrollPane.setContent(this.attributeGridPane);
+        this.grid.getChildren().remove(this.attributeScrollPane);
+        this.grid.add(this.attributeScrollPane,
                 SECOND_COLUMN,
                 SECOND_ROW);
-        sp.setFitToWidth(true);
+        attributeScrollPane.setFitToWidth(true);
         this.attributesFilledButton.setText("All Attributes Filled");
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
+        this.attributesFilledBox.getChildren().removeAll(
+                this.attributesFilledBox.getChildren()
+        );
         this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
+        this.grid.getChildren().remove(this.attributesFilledBox);
         this.grid.add(this.attributesFilledBox,
                 SECOND_COLUMN,
                 THIRD_ROW);
@@ -813,16 +821,16 @@ public class View {
      * gets the Attribute Pane.
      * @return the Attribute Pane
      */
-    public ScrollPane getAttributePane() {
-        return attributePane;
+    public ScrollPane getAttributeScrollPane() {
+        return attributeScrollPane;
     }
 
     /**
      * sets the Attribute Pane.
      * @param attributePane the Attribute Pane
      */
-    public void setAttributePane(ScrollPane attributePane) {
-        this.attributePane = attributePane;
+    public void setAttributeScrollPane(ScrollPane attributePane) {
+        this.attributeScrollPane = attributePane;
     }
 
     /**
@@ -855,5 +863,21 @@ public class View {
      */
     public void setAttributesFilledButton(Button attributesFilledButton) {
         this.attributesFilledButton = attributesFilledButton;
+    }
+
+    /**
+     * gets the group with the Attributes in
+     * @return the group with the attributes in
+     */
+    public GridPane getAttributeGridPane() {
+        return attributeGridPane;
+    }
+
+    /**
+     * sets the group with the attributes in
+     * @param attributeGridPane group with the attributes in
+     */
+    public void setAttributeGridPane(GridPane attributeGridPane) {
+        this.attributeGridPane = attributeGridPane;
     }
 }
