@@ -21,12 +21,16 @@ package de.bayern.gdi.utils;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import java.io.IOException;
 import java.io.File;
 
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 /**
  * Helper to handle XML documents.
@@ -50,7 +54,7 @@ public class XML {
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(fileName);
-        } catch (Exception e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return document;
