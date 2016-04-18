@@ -23,6 +23,7 @@ import java.util.logging.Level;
 
 import java.io.IOException;
 import java.io.File;
+import java.io.InputStream;
 
 import org.w3c.dom.Document;
 
@@ -44,7 +45,7 @@ public class XML {
     }
 
     /**
-     * Loads XML document from a file.
+     * Loads an XML document from a file.
      * @param fileName the name of the XML file.
      * @return the loaded XML document of null if there was an error.
      */
@@ -54,6 +55,23 @@ public class XML {
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(fileName);
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return document;
+    }
+
+    /**
+     * Loads an XML document from an input stream.
+     * @param input the input stream.
+     * @return the loaded XML document of null if there was an error.
+     */
+    public static Document getDocument(InputStream input) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document document = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            document = builder.parse(input);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }

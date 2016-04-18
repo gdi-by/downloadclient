@@ -24,8 +24,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -53,10 +51,10 @@ public class ServiceChecker {
             URL url = new URL(serviceURL);
             URLConnection conn = url.openConnection();
 
-            DocumentBuilderFactory factory =
-                    DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(conn.getInputStream());
+            Document doc = XML.getDocument(conn.getInputStream());
+            if (doc == null) {
+                return null;
+            }
 
             NodeList nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
             if (nl.getLength() != 0) {
