@@ -22,14 +22,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -59,7 +56,7 @@ public class ServiceSetting {
      */
     public ServiceSetting(String filePath) {
         this.settingFile = getFile(filePath);
-        this.xmlSettingFile = getXMLDocument(this.settingFile);
+        this.xmlSettingFile = XML.getDocument(this.settingFile);
         parseDocument(this.xmlSettingFile);
     }
 
@@ -116,18 +113,6 @@ public class ServiceSetting {
             }
         }
         return servicesMap;
-    }
-
-    private Document getXMLDocument(File fileName) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(fileName);
-        } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return document;
     }
 
     private static File getFile(String fileName) {
