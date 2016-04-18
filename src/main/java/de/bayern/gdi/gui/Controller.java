@@ -19,7 +19,7 @@
 package de.bayern.gdi.gui;
 
 
-import de.bayern.gdi.helper.ServiceChecker;
+import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;

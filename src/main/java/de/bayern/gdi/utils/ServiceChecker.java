@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.helper;
+package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.WebService;
 import org.w3c.dom.Document;

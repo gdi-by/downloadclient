@@ -18,7 +18,7 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.helper.ServiceSetting;
+import de.bayern.gdi.utils.ServiceSetting;
 import de.bayern.gdi.services.WebService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
