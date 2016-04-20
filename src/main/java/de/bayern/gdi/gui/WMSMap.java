@@ -31,6 +31,8 @@ import com.vividsolutions.jts.geom.Envelope;
 public class WMSMap {
 
     //http://docs.geotools.org/latest/userguide/tutorial/raster/image.html
+    //https://github.com/rafalrusin/geotools-fx-test/blob/master/src/geotools
+    // /fx/test/GeotoolsFxTest.java
     private Envelope outerBBOX;
     private String serviceURL;
     private int dimensionX;
