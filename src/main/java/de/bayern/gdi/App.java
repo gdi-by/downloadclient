@@ -17,11 +17,13 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.experimental.SimpleLoader;
+import de.bayern.gdi.experimental.WFSTwoServiceHandler;
 import de.bayern.gdi.gui.Start;
+import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.ServiceChecker;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
@@ -33,6 +35,7 @@ public class App {
     private static final String DEMO_URL =
         "http://geoserv.weichand.de:8080/geoserver/wfs?"
         + "service=WFS&acceptversions=2.0.0&request=GetCapabilities";
+    //TODO: Remove DEMO_URL and read Infos from args or external file
 
     private App() {
     }
@@ -46,31 +49,47 @@ public class App {
         return false;
     }
 
+    private static WebService.Type serviceType(String url) {
+        return ServiceChecker.checkService(url);
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         if (runHeadless(args)) {
             log.info("Running in headless mode");
-            SimpleLoader sl = new SimpleLoader(DEMO_URL);
-            try {
-                sl.download();
-            } catch (Exception e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+            //There could be a Service Handler for each Service that deals
+            //with command line arguments and/or a stored XML File
+            WebService.Type st = ServiceChecker.checkService(DEMO_URL);
+            switch (st) {
+                case Atom:
+                    log.info("Atom Service Found");
+                    break;
+                case WFSOne:
+                    log.info("WFSOne Service Found");
+                    break;
+                case WFSTwo:
+                    log.info("WFSTwo Service Found");
+                    WFSTwoServiceHandler wfstwo =
+                            new WFSTwoServiceHandler(DEMO_URL);
+                    break;
+                default:
+                    log.log(Level.SEVERE, "Could not determine Service Type");
+                    break;
             }
-            return;
+        } else {
+            // Its kind of complicated to start a javafx application from
+            // another class. Thank god for StackExchange:
+            // http://stackoverflow.com/a/25909862
+            new Thread() {
+                @Override
+                public void run() {
+                    javafx.application.Application.launch(Start.class);
+                }
+            }.start();
+            Start start = Start.waitForStart();
+            //start.printInvoking();
         }
-
-        // Its kind of complicated to start a javafx application from
-        // another class. Thank god for StackExchange:
-        // http://stackoverflow.com/a/25909862
-        new Thread() {
-            @Override
-            public void run() {
-                javafx.application.Application.launch(Start.class);
-            }
-        }.start();
-        Start start = Start.waitForStart();
-        //start.printInvoking();
     }
 }
