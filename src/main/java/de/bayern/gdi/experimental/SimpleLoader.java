@@ -157,5 +157,8 @@ public class SimpleLoader {
             }
         }
         System.out.println("Calculated Bounds:" + bounds);
+
+        data.dispose();
+
     }
 }
