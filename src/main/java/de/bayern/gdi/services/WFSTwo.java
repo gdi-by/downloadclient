@@ -36,7 +36,6 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
