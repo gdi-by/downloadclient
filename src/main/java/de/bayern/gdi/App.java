@@ -50,7 +50,6 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
         if (runHeadless(args)) {
             log.info("Running in headless mode");
             SimpleLoader sl = new SimpleLoader(DEMO_URL);
@@ -62,13 +61,9 @@ public class App {
             return;
         }
 
-        // Its kind of complicated to start a javafx applicaiton from
+        // Its kind of complicated to start a javafx application from
         // another class. Thank god for StackExchange:
         // http://stackoverflow.com/a/25909862
-        // TODO: Make sure the correct screen starts
-        // There are 4 Kinds of Screens: Searching for a service
-        // WFS-1 Service, WFS-2 Service and ATOM
-        // Currently, we start the chooseService Window
         new Thread() {
             @Override
             public void run() {

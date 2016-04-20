@@ -79,6 +79,7 @@ public class ServiceChecker {
                 }
             }
         } catch (Exception e) {
+            //TODO: Be more specific about exceptions
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;

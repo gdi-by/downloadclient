@@ -75,6 +75,7 @@ public class WFSTwo extends WebService {
                     this.types.add(tName);
                 }
             } catch (Exception e) {
+                //TODO: Be more specific about execptions
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
         }
