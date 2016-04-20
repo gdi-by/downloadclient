@@ -25,8 +25,8 @@ package de.bayern.gdi.gui;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * This class is going to Manage the Display of a Map based on a WFS Service
- * It should have some widgets to zoom and to draw a Bounding Box
+ * This class is going to Manage the Display of a Map based on a WFS Service.
+ * It should have some widgets to zoom and to draw a Bounding Box.
  */
 public class WMSMap {
 
@@ -40,6 +40,14 @@ public class WMSMap {
     private static final String INIT_SPACIAL_REF_SYS = "EPSG:4326";
     private String spacialRefSystem;
 
+    /**
+     * Constructor.
+     * @param serviceURL URL of the Service
+     * @param outerBBOX Outer Bounds of the Picture
+     * @param dimensionX X Dimension of the picuter
+     * @param dimensionY Y Dimenstion of the Picture
+     * @param spacialRefSystem Spacial Ref System ID
+     */
     public WMSMap(String serviceURL,
                   Envelope outerBBOX,
                   int dimensionX,
@@ -52,6 +60,13 @@ public class WMSMap {
         this.spacialRefSystem = spacialRefSystem;
     }
 
+    /**
+     * Constructor.
+     * @param serviceURL URL of the Service
+     * @param outerBBOX Outer Bounds of the Picture
+     * @param dimensionX X Dimension of the picuter
+     * @param dimensionY Y Dimenstion of the Picture
+     */
     public WMSMap(String serviceURL,
                   Envelope outerBBOX,
                   int dimensionX,
