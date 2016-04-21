@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.utils;
 
+import java.util.Map;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -32,6 +34,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathVariableResolver;
+
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 
 /**
  * Helper to handle XML documents.
@@ -76,5 +87,129 @@ public class XML {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return document;
+    }
+
+    /**
+     * Creates a new XPath without a namespace context.
+     * @return the new XPath.
+     */
+    public static final XPath newXPath() {
+        return newXPath(null, null);
+    }
+
+    /**
+     * Creates a new XPath with a given namespace context.
+     * @param namespaceContext The namespace context to be used or null
+     * if none should be used.
+     * @param resolver The name space resolver.
+     * @return The new XPath
+     */
+    public static final XPath newXPath(
+        NamespaceContext      namespaceContext,
+        XPathVariableResolver resolver
+    ) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath        xpath   = factory.newXPath();
+        if (namespaceContext != null) {
+            xpath.setNamespaceContext(namespaceContext);
+        }
+
+        if (resolver != null) {
+            xpath.setXPathVariableResolver(resolver);
+        }
+        return xpath;
+    }
+
+    /**
+     * Evaluates an XPath query on a given object and returns the result
+     * as a given type. No namespace context is used.
+     * @param root  The object which is used as the root of the tree to
+     * be searched in.
+     * @param query The XPath query
+     * @param returnTyp The type of the result.
+     * @return The result of type 'returnTyp' or null if something
+     * went wrong during XPath evaluation.
+     */
+    public static final Object xpath(
+        Object root,
+        String query,
+        QName  returnTyp
+    ) {
+        return xpath(root, query, returnTyp, null);
+    }
+
+    /**
+     * Evaluates an XPath query on a given object and returns the result
+     * as a string. A given namespace context is used.
+     * @param root  The object which is used as the root of the tree to
+     * be searched in.
+     * @param query The XPath query
+     * @param namespaceContext The namespace context to be used or null
+     * if none should be used.
+     * @return The result of the query or null if something went wrong
+     * during XPath evaluation.
+     */
+    public static final String xpathString(
+        Object root, String query, NamespaceContext namespaceContext
+    ) {
+        return (String)xpath(
+            root, query, XPathConstants.STRING, namespaceContext);
+    }
+
+    /**
+     * Evaluates an XPath query on a given object and returns the result
+     * as a given type. Optionally a namespace context is used.
+     * @param root The object which is used as the root of the tree to
+     * be searched in.
+     * @param query The XPath query
+     * @param returnType The type of the result.
+     * @param namespaceContext The namespace context to be used or null
+     * if none should be used.
+     * @return The result of type 'returnTyp' or null if something
+     * went wrong during XPath evaluation.
+     */
+    public static final Object xpath(
+        Object           root,
+        String           query,
+        QName            returnType,
+        NamespaceContext namespaceContext
+    ) {
+        return xpath(root, query, returnType, namespaceContext, null);
+    }
+
+    /**
+     * xpath evaluates ax XPath expression.
+     * @param root The root object of the evaluation being applied to.
+     * @param query The XPath query.
+     * @param returnType The type to be returned.
+     * @param namespaceContext An optional namespace context.
+     * @param variables A map variables to be used during evaluation.
+     * @return The result of the evaluation.
+     */
+    public static final Object xpath(
+        Object           root,
+        String           query,
+        QName            returnType,
+        NamespaceContext namespaceContext,
+        Map<String, String> variables
+    ) {
+        if (root == null) {
+            return null;
+        }
+
+        XPathVariableResolver resolver = variables != null
+            ? new MapXPathVariableResolver(variables)
+            : null;
+
+        try {
+            XPath xpath = newXPath(namespaceContext, resolver);
+            if (xpath != null) {
+                return xpath.evaluate(query, root, returnType);
+            }
+        } catch (XPathExpressionException xpee) {
+            log.log(Level.SEVERE, xpee.getLocalizedMessage(), xpee);
+        }
+
+        return null;
     }
 }
