@@ -80,6 +80,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
                 log.log(
                     Level.WARNING, "Deleting file '" + file + "' failed.");
             }
+            throw ioe;
         }
         return Boolean.TRUE;
     }
