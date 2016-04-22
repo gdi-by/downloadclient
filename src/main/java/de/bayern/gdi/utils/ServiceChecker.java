@@ -24,6 +24,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -78,8 +79,7 @@ public class ServiceChecker {
                     return WebService.Type.Atom;
                 }
             }
-        } catch (Exception e) {
-            //TODO: Be more specific about exceptions
+        } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;

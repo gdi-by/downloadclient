@@ -44,6 +44,8 @@ public class DataBean extends Observable {
     private WebService webService;
     private ArrayList<String> serviceTypes;
     private Map<String, Class> attributes;
+    private String wmsUrl;
+    private String wmsName;
 
     /**
      * Constructor.
@@ -55,6 +57,8 @@ public class DataBean extends Observable {
         this.services = this.serviceSetting.getServices();
         this.catalogues = this.serviceSetting.getCatalogues();
         this.webService = null;
+        this.wmsUrl = this.serviceSetting.getWMSUrl();
+        this.wmsName = this.serviceSetting.getWMSName();
     }
 
     /**
@@ -167,6 +171,38 @@ public class DataBean extends Observable {
      */
     public void setAttributes(Map<String, Class> attributes) {
         this.attributes = attributes;
+    }
+
+    /**
+     * gets the WMS Url.
+     * @return WMS Url
+     */
+    public String getWmsUrl() {
+        return wmsUrl;
+    }
+
+    /**
+     * sets the WMS Url.
+     * @param wmsUrl WMS Url
+     */
+    public void setWmsUrl(String wmsUrl) {
+        this.wmsUrl = wmsUrl;
+    }
+
+    /**
+     * gets the WMS Name.
+     * @return WMS Name
+     */
+    public String getWmsName() {
+        return wmsName;
+    }
+
+    /**
+     * sets the WMS Name.
+     * @param wmsName WMS Name
+     */
+    public void setWmsName(String wmsName) {
+        this.wmsName = wmsName;
     }
 
 }

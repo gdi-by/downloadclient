@@ -24,6 +24,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import java.util.logging.Logger;
@@ -42,16 +43,17 @@ public class ServiceSetting {
     private static final String SERVICE_SETTING_FILEPATH =
             "serviceSetting.xml";
     private Map<String, String> catalogues;
+    private Map<String, String> wms;
 
     /**
-     * @brief Constructor
+     * Constructor.
      */
     public ServiceSetting() {
         this(SERVICE_SETTING_FILEPATH);
     }
 
     /**
-     * @brief Constructor
+     * Constructor.
      * @param filePath Path the the serviceSettings.xml
      */
     public ServiceSetting(String filePath) {
@@ -61,7 +63,7 @@ public class ServiceSetting {
     }
 
     /**
-     * @breif returns a map of Strings with service Names und URLS
+     * returns a map of Strings with service Names und URLS.
      * @return Map of Strings with <Name, URL> of Services
      */
     public Map<String, String> getServices()  {
@@ -69,16 +71,37 @@ public class ServiceSetting {
     }
 
     /**
-     * @brief returns a map of Strings with catalogue Names and URLS
+     * returns a map of Strings with catalogue Names and URLS.
      * @return Map of Strings with <Name, URL> of Catalogs
      */
     public Map<String, String> getCatalogues() {
         return this.catalogues;
     }
 
+    /**
+     * gets the WMS Url.
+     * @return the WMS url
+     */
+    public String getWMSUrl() {
+        Iterator it = this.wms.entrySet().iterator();
+        Map.Entry pair = (Map.Entry)it.next();
+        return (String) pair.getValue();
+    }
+
+    /**
+     * gets the WMS Name.
+     * @return the WMS Name
+     */
+    public String getWMSName() {
+        Iterator it = this.wms.entrySet().iterator();
+        Map.Entry pair = (Map.Entry)it.next();
+        return (String) pair.getKey();
+    }
+
     private void parseDocument(Document xmlDocument) {
         this.services = parseNameURLScheme(xmlDocument, "services");
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
+        this.wms = parseNameURLScheme(xmlDocument, "wms");
     }
 
     private Map<String, String> parseNameURLScheme(Document xmlDocument,
@@ -121,4 +144,5 @@ public class ServiceSetting {
         return file;
 
     }
+
 }

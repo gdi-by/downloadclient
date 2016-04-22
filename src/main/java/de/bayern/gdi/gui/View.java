@@ -18,6 +18,9 @@
 
 package de.bayern.gdi.gui;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -43,10 +46,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 
 /**
@@ -103,6 +102,18 @@ public class View {
     private static final int EIGHT_ROW = EIGHT;
     private static final int NINETH_ROW = NINE;
     private static final int MAX_ROW = NINETH_ROW;
+
+    //private static final String INITALBBOX
+    //        = "-131.13151509433965,46.60532747661736,"+
+    //        "-117.61620566037737,56.34191403281659";
+
+    //private static final String INITALBBOX
+    //        = "5234456.559480272,5609330.972506456," +
+    //        "4268854.282683062,4644619.626498722";
+
+    private static final String INITALBBOX
+            = "939258.2035682457,6731350.458905762,"
+            + "1095801.2374962866,6887893.4928338";
 
     private int sceneHeight = MIN_WINDOWHEIGHT;
 
@@ -163,6 +174,8 @@ public class View {
     private Button attributesFilledButton;
 
     private GridPane attributeGridPane;
+
+    private WMSMap wmsMap;
 
     /**
      * Constructor.
@@ -305,6 +318,7 @@ public class View {
         this.typeComboBox = new ComboBox();
         this.attributeScrollPane = new ScrollPane();
         this.attributeGridPane = new GridPane();
+        this.wmsMap = new WMSMap();
     }
 
     /**
@@ -383,6 +397,52 @@ public class View {
         this.grid.add(this.attributesFilledBox,
                 SECOND_COLUMN,
                 THIRD_ROW);
+    }
+
+    /**.
+     * sets the WMS Map on the Grid
+     * @param wmsUrl the WMS Url
+     * @param wmsName the WMS Name
+     */
+    public void setWMSMap(String wmsUrl, String wmsName) {
+
+        this.wmsMap = new WMSMap(wmsUrl,
+                wmsName,
+                INITALBBOX,
+                this.getColumnWidth(),
+                (int) this.getAttributeScrollPane().getHeight());
+        this.grid.getChildren().remove(this.wmsMap);
+        this.grid.add(wmsMap,
+                THIRD_COLUMN,
+                FIRST_ROW);
+    /*
+        try {
+            URL capabilitiesURL = new URL(wmsUrl);
+            if (capabilitiesURL == null) {
+                System.exit(0); // canceled
+            }
+            WebMapServer wms = new WebMapServer(capabilitiesURL);
+
+            List<Layer> wmsLayers = wms.getCapabilities().getLayerList();
+            if (wmsLayers == null) {
+                JOptionPane.showMessageDialog(null,
+                "Could not connect - check url");
+                System.exit(0);
+            }
+            MapContent mapcontent = new MapContent();
+            mapcontent.setTitle(wms.getCapabilities().getService().getTitle());
+
+            for (Layer wmsLayer : wmsLayers) {
+                WMSLayer displayLayer = new WMSLayer(wms, wmsLayer);
+                mapcontent.addLayer(displayLayer);
+            }
+            // Now display the map
+            JMapFrame.showMap(mapcontent);
+            //JMapFrame.
+            //this.grid.add(mapcontent,THIRD_COLUMN,FIRST_ROW);
+        } catch (Exception e) {
+            System.err.println("bla");
+        }*/
     }
     /**
      * gets the service List entries.
@@ -879,5 +939,21 @@ public class View {
      */
     public void setAttributeGridPane(GridPane attributeGridPane) {
         this.attributeGridPane = attributeGridPane;
+    }
+
+    /**
+     * gets the WMS Map.
+     * @return WMS Map
+     */
+    public WMSMap getWmsMap() {
+        return wmsMap;
+    }
+
+    /**
+     * sets the WMS Map.
+     * @param wmsMap WMS Map
+     */
+    public void setWmsMap(WMSMap wmsMap) {
+        this.wmsMap = wmsMap;
     }
 }

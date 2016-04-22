@@ -111,7 +111,12 @@ public class Controller {
         if (dataBean.isWebServiceSet()) {
             System.out.println("Building Attributes based on Webservice");
             view.setAttributes(map);
+            setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
         }
+    }
+
+    private void setWMSMap(String wmsUrl, String wmsName) {
+        view.setWMSMap(wmsUrl, wmsName);
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++
@@ -228,7 +233,6 @@ public class Controller {
             EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //Nada
             String serviceURL = null;
             String username = null;
             String password = null;
