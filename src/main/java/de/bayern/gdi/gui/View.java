@@ -115,6 +115,10 @@ public class View {
             = "939258.2035682457,6731350.458905762,"
             + "1095801.2374962866,6887893.4928338";
 
+    //private static final String INITALBBOX
+    //        = "9.000,50.500,"
+    //        + "14.000,47.300";
+
     private int sceneHeight = MIN_WINDOWHEIGHT;
 
     private int sceneWidth = MIN_WINDOWWIDTH;
@@ -410,7 +414,7 @@ public class View {
                 wmsName,
                 INITALBBOX,
                 this.getColumnWidth(),
-                (int) this.getAttributeScrollPane().getHeight());
+                this.getColumnWidth());
         this.grid.getChildren().remove(this.wmsMap);
         this.grid.add(wmsMap,
                 THIRD_COLUMN,

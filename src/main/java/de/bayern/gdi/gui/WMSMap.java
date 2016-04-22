@@ -22,23 +22,25 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-import org.geotools.data.ows.Layer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javax.imageio.ImageIO;
+import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import javafx.scene.layout.StackPane;
 
 
 /**
@@ -57,14 +59,20 @@ public class WMSMap extends Parent {
     private int dimensionY;
     private static final String FORMAT = "image/png";
     private static final boolean TRANSPARACY = true;
-    private static final String INIT_SPACIAL_REF_SYS = "EPSG:3857";
+    private static final String INIT_SPACIAL_REF_SYS = "EPSG:31468";
     private String spacialRefSystem;
     WebMapServer wms;
     private static final Logger log
             = Logger.getLogger(WMSMap.class.getName());
-    WMSCapabilities capabilities;
+    private WMSCapabilities capabilities;
+    private List layers;
+    private StackPane localStackPane;
 
-    private ImageView imView;
+
+    @Override
+    public ObservableList getChildren() {
+        return super.getChildren();
+    }
 
     /**
      * Constructor.
@@ -87,42 +95,20 @@ public class WMSMap extends Parent {
         this.dimensionX = dimensionX;
         this.dimensionY = dimensionY;
         this.spacialRefSystem = spacialRefSystem;
-        System.out.println(serviceURL);
-        System.out.println(serviceName);
+        localStackPane = new StackPane();
 
         try {
             URL serviceURLObj = new URL(this.serviceURL);
             wms = new WebMapServer(serviceURLObj);
             capabilities = wms.getCapabilities();
-            List layers = capabilities.getLayerList();
-            GetMapRequest request = wms.createGetMapRequest();
-            request.setFormat(this.FORMAT);
-            request.setDimensions(this.dimensionX, this.dimensionY);
-            request.setTransparent(this.TRANSPARACY);
-            request.setSRS(this.spacialRefSystem);
-            request.setBBox(this.outerBBOX);
-            //WMSLayer layer = new WMSLayer(wms, (Layer) layers.get(1));
-            request.addLayer((Layer) layers.get(1));
-
-            GetMapResponse response
-                    = (GetMapResponse) wms.issueRequest(request);
-            BufferedImage bfimage = ImageIO.read(response.getInputStream());
-            WritableImage wr = null;
-            if (bfimage != null) {
-                wr = new WritableImage(bfimage.getWidth(), bfimage.getHeight());
-                PixelWriter pw = wr.getPixelWriter();
-                for (int x = 0; x < bfimage.getWidth(); x++) {
-                    for (int y = 0; y < bfimage.getHeight(); y++) {
-                        pw.setArgb(x, y, bfimage.getRGB(x, y));
-                    }
-                }
-            }
-            this.imView = new ImageView(wr);
+            layers = capabilities.getLayerList();
+            ImageView iw = new ImageView(this.getWritableImage());
+            localStackPane.getChildren().add(iw);
+            this.getChildren().add(localStackPane);
 
         } catch (IOException | org.geotools.ows.ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-
     }
 
     /**
@@ -151,6 +137,39 @@ public class WMSMap extends Parent {
      * Constructor.
      */
     public WMSMap() {
+    }
+
+    private WritableImage getWritableImage() {
+        try {
+            GetMapRequest request = wms.createGetMapRequest();
+            request.setFormat(this.FORMAT);
+            request.setDimensions(this.dimensionX, this.dimensionY);
+            request.setTransparent(this.TRANSPARACY);
+            request.setSRS(this.spacialRefSystem);
+            request.setBBox(this.outerBBOX);
+            //WMSLayer layer = new WMSLayer(wms, (Layer) layers.get(1));
+            request.addLayer((Layer) layers.get(1));
+
+            GetMapResponse response
+                    = (GetMapResponse) wms.issueRequest(request);
+            BufferedImage bfimage = ImageIO.read(response.getInputStream());
+            WritableImage wr = null;
+            if (bfimage != null) {
+                wr = new WritableImage(bfimage.getWidth(), bfimage.getHeight());
+                PixelWriter pw = wr.getPixelWriter();
+                for (int x = 0; x < bfimage.getWidth(); x++) {
+                    for (int y = 0; y < bfimage.getHeight(); y++) {
+                        pw.setArgb(x, y, bfimage.getRGB(x, y));
+                    }
+                }
+            }
+            return wr;
+
+
+        } catch (IOException | org.geotools.ows.ServiceException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 
     public ReferencedEnvelope getBounds() {
