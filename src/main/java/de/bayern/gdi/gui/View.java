@@ -108,13 +108,20 @@ public class View {
     //        "-117.61620566037737,56.34191403281659";
 
     //private static final String INITALBBOX
-    //        = "5234456.559480272,5609330.972506456," +
-    //        "4268854.282683062,4644619.626498722";
+    //        = "5234456.559480272,5609330.972506456,"
+    //        + "4268854.282683062,4644619.626498722";
 
     private static final String INITALBBOX
-            = "939258.2035682457,6731350.458905762,"
-            + "1095801.2374962866,6887893.4928338";
+            = "4253019,5760588,"
+            + "4278454,5777977";
 
+    //private static final String INITALBBOX
+    //        = "939258.2035682457,6731350.458905762,"
+    //        + "1095801.2374962866,6887893.4928338";
+
+    //private static final String INITALBBOX
+    //        = "4443138,5356232,"
+    //        + "4505393,5298301";
     //private static final String INITALBBOX
     //        = "9.000,50.500,"
     //        + "14.000,47.300";
@@ -409,44 +416,16 @@ public class View {
      * @param wmsName the WMS Name
      */
     public void setWMSMap(String wmsUrl, String wmsName) {
-
         this.wmsMap = new WMSMap(wmsUrl,
                 wmsName,
                 INITALBBOX,
-                this.getColumnWidth(),
-                this.getColumnWidth());
-        this.grid.getChildren().remove(this.wmsMap);
+                (int) serviceList.getWidth(),
+                (int) serviceList.getWidth());
+        this.grid.getChildren().remove(this.wmsMap
+           );
         this.grid.add(wmsMap,
                 THIRD_COLUMN,
-                FIRST_ROW);
-    /*
-        try {
-            URL capabilitiesURL = new URL(wmsUrl);
-            if (capabilitiesURL == null) {
-                System.exit(0); // canceled
-            }
-            WebMapServer wms = new WebMapServer(capabilitiesURL);
-
-            List<Layer> wmsLayers = wms.getCapabilities().getLayerList();
-            if (wmsLayers == null) {
-                JOptionPane.showMessageDialog(null,
-                "Could not connect - check url");
-                System.exit(0);
-            }
-            MapContent mapcontent = new MapContent();
-            mapcontent.setTitle(wms.getCapabilities().getService().getTitle());
-
-            for (Layer wmsLayer : wmsLayers) {
-                WMSLayer displayLayer = new WMSLayer(wms, wmsLayer);
-                mapcontent.addLayer(displayLayer);
-            }
-            // Now display the map
-            JMapFrame.showMap(mapcontent);
-            //JMapFrame.
-            //this.grid.add(mapcontent,THIRD_COLUMN,FIRST_ROW);
-        } catch (Exception e) {
-            System.err.println("bla");
-        }*/
+                SECOND_ROW);
     }
     /**
      * gets the service List entries.

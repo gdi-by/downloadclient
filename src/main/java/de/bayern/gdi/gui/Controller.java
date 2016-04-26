@@ -97,7 +97,6 @@ public class Controller {
      */
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
-            System.out.println("Building Types based on Webservice");
             dataBean.setServiceTypes(dataBean.getWebService().getTypes());;
             view.setTypes(dataBean.getServiceTypes());
         }
@@ -109,7 +108,6 @@ public class Controller {
      */
     public void setServiceAttributes(Map<String, Class> map) {
         if (dataBean.isWebServiceSet()) {
-            System.out.println("Building Attributes based on Webservice");
             view.setAttributes(map);
             setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
         }
@@ -313,4 +311,5 @@ public class Controller {
             }
         }
     }
+
 }

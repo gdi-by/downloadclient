@@ -22,25 +22,35 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javax.imageio.ImageIO;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import javafx.scene.layout.StackPane;
 
 
 /**
@@ -60,18 +70,29 @@ public class WMSMap extends Parent {
     private static final String FORMAT = "image/png";
     private static final boolean TRANSPARACY = true;
     private static final String INIT_SPACIAL_REF_SYS = "EPSG:31468";
+    private static final int INIT_LAYER_NUMBER = 1;
     private String spacialRefSystem;
     WebMapServer wms;
     private static final Logger log
             = Logger.getLogger(WMSMap.class.getName());
     private WMSCapabilities capabilities;
     private List layers;
-    private StackPane localStackPane;
+    private VBox vBox;
+    private Label sourceLabel;
+    private ImageView iw;
 
+    private TextField epsgField;
+    private TextField boundingBoxField;
+    private Button updateImageButton;
 
     @Override
     public ObservableList getChildren() {
         return super.getChildren();
+    }
+
+    public void add(Node n) {
+        this.vBox.getChildren().remove(n);
+        this.vBox.getChildren().add(n);
     }
 
     /**
@@ -95,16 +116,32 @@ public class WMSMap extends Parent {
         this.dimensionX = dimensionX;
         this.dimensionY = dimensionY;
         this.spacialRefSystem = spacialRefSystem;
-        localStackPane = new StackPane();
+        this.iw = new ImageView();
+        this.epsgField = new TextField(this.spacialRefSystem);
+        this.boundingBoxField = new TextField(this.outerBBOX);
+        this.updateImageButton = new Button("Update Image");
+        vBox = new VBox();
 
         try {
             URL serviceURLObj = new URL(this.serviceURL);
             wms = new WebMapServer(serviceURLObj);
             capabilities = wms.getCapabilities();
             layers = capabilities.getLayerList();
-            ImageView iw = new ImageView(this.getWritableImage());
-            localStackPane.getChildren().add(iw);
-            this.getChildren().add(localStackPane);
+            this.setMapImage(this.outerBBOX,
+                    this.spacialRefSystem,
+                    this.INIT_LAYER_NUMBER);
+
+            sourceLabel = new Label(this.serviceName);
+            sourceLabel.setLabelFor(this.iw);
+            this.add(iw);
+            this.add(sourceLabel);
+            this.add(epsgField);
+            this.add(boundingBoxField);
+            this.add(updateImageButton);
+            this.getChildren().add(vBox);
+            this.updateImageButton.setOnAction(
+                    new UpdateImageButtonEventHandler()
+            );
 
         } catch (IOException | org.geotools.ows.ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -139,40 +176,78 @@ public class WMSMap extends Parent {
     public WMSMap() {
     }
 
-    private WritableImage getWritableImage() {
+    private void setMapImage(String bBox,
+                             String spacialRefSys,
+                             int layerNumber) {
         try {
             GetMapRequest request = wms.createGetMapRequest();
             request.setFormat(this.FORMAT);
             request.setDimensions(this.dimensionX, this.dimensionY);
             request.setTransparent(this.TRANSPARACY);
-            request.setSRS(this.spacialRefSystem);
-            request.setBBox(this.outerBBOX);
-            //WMSLayer layer = new WMSLayer(wms, (Layer) layers.get(1));
-            request.addLayer((Layer) layers.get(1));
+            request.setSRS(spacialRefSys);
+            request.setBBox(bBox);
+            request.addLayer((Layer) layers.get(layerNumber));
 
             GetMapResponse response
                     = (GetMapResponse) wms.issueRequest(request);
-            BufferedImage bfimage = ImageIO.read(response.getInputStream());
-            WritableImage wr = null;
-            if (bfimage != null) {
-                wr = new WritableImage(bfimage.getWidth(), bfimage.getHeight());
-                PixelWriter pw = wr.getPixelWriter();
-                for (int x = 0; x < bfimage.getWidth(); x++) {
-                    for (int y = 0; y < bfimage.getHeight(); y++) {
-                        pw.setArgb(x, y, bfimage.getRGB(x, y));
-                    }
-                }
-            }
-            return wr;
-
-
+            log.log(Level.INFO, "WMS Call for Map Image: "
+                    + request.getFinalURL().toString());
+            Image im = new Image(response.getInputStream());
+            this.iw.setImage(im);
         } catch (IOException | org.geotools.ows.ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            this.errorPopup(e);
         }
-        return null;
     }
 
     public ReferencedEnvelope getBounds() {
         return new ReferencedEnvelope();
+    }
+
+    public void errorPopup(Exception ex) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Something went wrong");
+        alert.setHeaderText("An Excpetion was raised!");
+        alert.setContentText(ex.getMessage());
+
+
+// Create expandable Exception.
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        String exceptionText = sw.toString();
+
+        Label label = new Label("The exception stacktrace was:");
+
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+// Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        alert.showAndWait();
+    }
+    /**
+     * Event Handler for the choose Service Button.
+     */
+    private class UpdateImageButtonEventHandler implements
+            EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            setMapImage(epsgField.getText(),
+                    boundingBoxField.getText(),
+                    INIT_LAYER_NUMBER);
+        }
     }
 }
