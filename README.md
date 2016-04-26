@@ -9,6 +9,10 @@ Do not use it by now! :-)
 
     $ mvn clean compile
 
+## Bundle
+
+    $ mvn clean package assembly:single
+
 ## Run
 To start with UI:
 
