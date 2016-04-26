@@ -22,6 +22,7 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -49,9 +50,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.ows.ServiceException;
-import java.io.IOException;
 
 
 /**
@@ -122,6 +121,8 @@ public class WMSMap extends Parent {
         this.serviceURL = serviceURL;
         this.serviceName = serviceName;
         this.outerBBOX = outerBBOX;
+        // TODO:
+        // Make subclass from OuterBBOX with fouir fields, for x1, x2, y1, y2
         this.dimensionX = dimensionX;
         this.dimensionY = dimensionY;
         this.spacialRefSystem = spacialRefSystem;
@@ -130,7 +131,6 @@ public class WMSMap extends Parent {
         this.boundingBoxField = new TextField(this.outerBBOX);
         this.updateImageButton = new Button("Update Image");
         vBox = new VBox();
-
         try {
             URL serviceURLObj = new URL(this.serviceURL);
             wms = new WebMapServer(serviceURLObj);
@@ -201,6 +201,8 @@ public class WMSMap extends Parent {
             request.setTransparent(this.TRANSPARACY);
             request.setSRS(spacialRefSys);
             request.setBBox(bBox);
+            this.outerBBOX = bBox;
+            this.spacialRefSystem = spacialRefSys;
             request.addLayer((Layer) layers.get(layerNumber));
 
             GetMapResponse response
@@ -219,8 +221,16 @@ public class WMSMap extends Parent {
      * gets the referenced Evelope from the Map.
      * @return the reference Evelope
      */
-    public ReferencedEnvelope getBounds() {
-        return new ReferencedEnvelope();
+    public String getBounds() {
+        return this.outerBBOX;
+    }
+
+    /**
+     * gets the spacial reference system.
+     * @return spacial ref system
+     */
+    public String getSpacialRefSystem() {
+        return this.spacialRefSystem;
     }
 
     /**
