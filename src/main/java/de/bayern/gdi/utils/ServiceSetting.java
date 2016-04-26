@@ -18,16 +18,14 @@
 
 package de.bayern.gdi.utils;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -37,7 +35,7 @@ public class ServiceSetting {
     private static final Logger log
         = Logger.getLogger(ServiceSetting.class.getName());
 
-    private File settingFile;
+    private InputStream settingStream;
     private Map<String, String> services;
     private Document xmlSettingFile;
     private static final String SERVICE_SETTING_FILEPATH =
@@ -57,8 +55,8 @@ public class ServiceSetting {
      * @param filePath Path the the serviceSettings.xml
      */
     public ServiceSetting(String filePath) {
-        this.settingFile = getFile(filePath);
-        this.xmlSettingFile = XML.getDocument(this.settingFile);
+        this.settingStream = getFileStream(filePath);
+        this.xmlSettingFile = XML.getDocument(this.settingStream);
         parseDocument(this.xmlSettingFile);
     }
 
@@ -138,11 +136,23 @@ public class ServiceSetting {
         return servicesMap;
     }
 
-    private static File getFile(String fileName) {
-        ClassLoader classLoader = ServiceSetting.class.getClassLoader();
-        File file = new File(classLoader.getResource(fileName).getFile());
-        return file;
+    private static InputStream getFileStream(String fileName) {
 
+        ClassLoader classLoader = ServiceSetting.class.getClassLoader();
+        InputStream stream = classLoader.getResourceAsStream(fileName);
+
+        return stream;
+        /*
+        File file = null;
+        try {
+            System.out.println("Try to open: "
+                            + classLoader.getResource(fileName).toURI());
+            file = new File(classLoader.getResource(fileName).toURI());
+        } catch (NullPointerException | URISyntaxException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return file;
+        */
     }
 
 }

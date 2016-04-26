@@ -22,7 +22,6 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -151,7 +150,11 @@ public class WMSMap extends Parent {
                     new UpdateImageButtonEventHandler()
             );
 
-        } catch (IOException | org.geotools.ows.ServiceException e) {
+        } catch (Exception e) {
+        //} catch (IOException | org.geotools.ows.ServiceException e) {
+            //ServiceExcption from geotools.ows DOES NOT WORK! THERE IS NO
+            //CLASS FOUND WHEN BOUNDLED IM MAVEN!
+            //NO SPECIFIC HANDLING OF EXCEPTIONS HERE!
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -208,7 +211,11 @@ public class WMSMap extends Parent {
                     + request.getFinalURL().toString());
             Image im = new Image(response.getInputStream());
             this.iw.setImage(im);
-        } catch (IOException | org.geotools.ows.ServiceException e) {
+        } catch (Exception e) {
+        //} catch (IOException | org.geotools.ows.ServiceException e) {
+            //ServiceExcption from geotools.ows DOES NOT WORK! THERE IS NO
+            //CLASS FOUND WHEN BOUNDLED IM MAVEN!
+            //NO SPECIFIC HANDLING OF EXCEPTIONS HERE!
             log.log(Level.SEVERE, e.getMessage(), e);
             this.errorPopup(e);
         }
