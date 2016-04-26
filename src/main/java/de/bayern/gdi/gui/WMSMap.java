@@ -85,11 +85,19 @@ public class WMSMap extends Parent {
     private TextField boundingBoxField;
     private Button updateImageButton;
 
+    /**
+     * gets the children of this node.
+     * @return the children of the node
+     */
     @Override
     public ObservableList getChildren() {
         return super.getChildren();
     }
 
+    /**
+     * adds a node to this map.
+     * @param n the node
+     */
     public void add(Node n) {
         this.vBox.getChildren().remove(n);
         this.vBox.getChildren().add(n);
@@ -176,6 +184,12 @@ public class WMSMap extends Parent {
     public WMSMap() {
     }
 
+    /**
+     * sets the Map Image.
+     * @param bBox the Bounding Box
+     * @param spacialRefSys The EPSG of the Bounding Box
+     * @param layerNumber The number of the Layer
+     */
     private void setMapImage(String bBox,
                              String spacialRefSys,
                              int layerNumber) {
@@ -200,10 +214,18 @@ public class WMSMap extends Parent {
         }
     }
 
+    /**
+     * gets the referenced Evelope from the Map.
+     * @return the reference Evelope
+     */
     public ReferencedEnvelope getBounds() {
         return new ReferencedEnvelope();
     }
 
+    /**
+     * raises a dialogue with an exception.
+     * @param ex the exception
+     */
     public void errorPopup(Exception ex) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Something went wrong");
