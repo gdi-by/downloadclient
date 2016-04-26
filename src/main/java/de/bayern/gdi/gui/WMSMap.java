@@ -50,6 +50,8 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.ows.ServiceException;
+import java.io.IOException;
 
 
 /**
@@ -150,11 +152,7 @@ public class WMSMap extends Parent {
                     new UpdateImageButtonEventHandler()
             );
 
-        } catch (Exception e) {
-        //} catch (IOException | org.geotools.ows.ServiceException e) {
-            //ServiceExcption from geotools.ows DOES NOT WORK! THERE IS NO
-            //CLASS FOUND WHEN BOUNDLED IM MAVEN!
-            //NO SPECIFIC HANDLING OF EXCEPTIONS HERE!
+        } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -211,11 +209,7 @@ public class WMSMap extends Parent {
                     + request.getFinalURL().toString());
             Image im = new Image(response.getInputStream());
             this.iw.setImage(im);
-        } catch (Exception e) {
-        //} catch (IOException | org.geotools.ows.ServiceException e) {
-            //ServiceExcption from geotools.ows DOES NOT WORK! THERE IS NO
-            //CLASS FOUND WHEN BOUNDLED IM MAVEN!
-            //NO SPECIFIC HANDLING OF EXCEPTIONS HERE!
+        } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             this.errorPopup(e);
         }
