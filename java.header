@@ -15,20 +15,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.downloadclient;
-
-/**
- *
- * @author Juergen Weichand, LDBV Bayern
- */
-public class SomeClass 
-{
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) 
-    {
-        System.out.println("Hello world!");
-    }   
-}
-
