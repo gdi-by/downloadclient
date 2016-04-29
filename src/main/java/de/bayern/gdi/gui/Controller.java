@@ -274,6 +274,11 @@ public class Controller {
                 }
                 dataBean.setWebService(ws);
                 setServiceTypes();
+                //Preselect the first entry and mock the corresponding event
+                view.getTypeComboBox().getSelectionModel().select(0);
+                ChooseTypeEventHandler chooseType
+                        = new ChooseTypeEventHandler();
+                chooseType.handle(e);
             } else {
                 view.setStatusBarText("Could not determine URL");
             }
