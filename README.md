@@ -22,6 +22,10 @@ To start in headless mode:
 
     $ mvn exec:java -Dexec.args=-headless 
 
+If you have built the single assembly version:
+
+    $ java -jar target/downloadclient-1.0-SNAPSHOT-jar-with-dependencies.jar
+
 ## License
 
 This is Free Software covered by the terms of the Apache License 2.0.  
