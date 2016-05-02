@@ -1,5 +1,4 @@
-# download-client
-GDI-BY DownloadClient
+# GDI-BY DownloadClient [![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)](https://travis-ci.org/gdi-by/downloadclient)
 
 A Java 8 / JavaFX based desktop client to download geo data.
 This project is in a very experimental stage.  
