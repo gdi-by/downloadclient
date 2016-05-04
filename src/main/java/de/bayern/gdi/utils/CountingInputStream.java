@@ -26,6 +26,15 @@ import java.io.IOException;
  */
 public class CountingInputStream extends FilterInputStream {
 
+    /** Instance to easy wrap an inputstream with a counter. */
+    public static final WrapInputStreamFactory WRAP_FACTORY
+        = new WrapInputStreamFactory() {
+            @Override
+            public InputStream wrap(InputStream in) {
+                return new CountingInputStream(in);
+            }
+        };
+
     private long counter;
 
     public CountingInputStream(InputStream in) {
