@@ -74,9 +74,9 @@ public class DownloadJob implements Job, CountingInputStream.CountListener {
             try {
                 httpclient.close();
             } catch (IOException ioe) {
-            log.log(Level.SEVERE,
-                "Closing HTTP client failed: "
-                    + ioe.getLocalizedMessage(), ioe);
+                log.log(Level.SEVERE,
+                    "Closing HTTP client failed: "
+                        + ioe.getLocalizedMessage(), ioe);
             }
         }
     }
