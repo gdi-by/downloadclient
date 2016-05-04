@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.services;
 
+import java.util.ArrayList;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -56,6 +58,22 @@ public abstract class WebService implements ServiceSchema {
      */
     public WebService(String serviceURL) {
         this.serviceURL = serviceURL;
+    }
+
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    public ArrayList<String> getStoredQueries() {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    public ArrayList<String> getRequestMethods() {
+        return null;
     }
 
 }

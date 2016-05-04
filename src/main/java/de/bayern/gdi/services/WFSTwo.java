@@ -19,45 +19,36 @@
 package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import net.opengis.ows11.OperationType;
+import net.opengis.ows11.OperationsMetadataType;
+import net.opengis.wfs20.ListStoredQueriesResponseType;
+import net.opengis.wfs20.StoredQueryListItemType;
+import net.opengis.wfs20.WFSCapabilitiesType;
+import org.eclipse.emf.common.util.EList;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.xml.Parser;
+import org.opengis.feature.type.AttributeType;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class WFSTwo extends WebService {
 
-    private static final Logger log
-        = Logger.getLogger(WFSTwo.class.getName());
-
     private String serviceURL;
-
-    private ArrayList<String> types;
-    private DataStore data;
-
-    private FeatureSource<SimpleFeatureType, SimpleFeature>
-            source;
+    private static final Logger log
+            = Logger.getLogger(WFSTwo.class.getName());
+    private ArrayList<String> requestMethods;
+    private WFSOne wfsOne;
 
     /**
      * Constructor.
@@ -65,54 +56,44 @@ public class WFSTwo extends WebService {
      */
     public WFSTwo(String serviceURL) {
         this.serviceURL = serviceURL;
-
-        Map connectionParameters = new HashMap();
-        connectionParameters.put(
-                "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.serviceURL);
-
-        try {
-            this.data = DataStoreFinder.getDataStore(connectionParameters);
-        } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * gets the types of a service.
-     * @return the types
-     */
-    public ArrayList<String> getTypes() {
-        if (this.types == null) {
-            this.types = new ArrayList();
+            this.requestMethods = new ArrayList();
+            org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                    new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+            Parser parser = new Parser(configuration);
             try {
-                String[] typeNames = this.data.getTypeNames();
-
-                for (String tName : typeNames) {
-                    this.types.add(tName);
+                URL url = new URL(this.serviceURL);
+                InputSource xml = new InputSource(url.openStream());
+                Object parsed = parser.parse(xml);
+                WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;
+                OperationsMetadataType om = caps.getOperationsMetadata();
+                for (int i = 0; i < om.getOperation().size(); i++) {
+                    this.requestMethods.add(
+                            ((OperationType)
+                                    om.getOperation().get(i)).getName());
                 }
-            } catch (Exception e) {
-                //TODO: Be more specific about execptions
+                this.wfsOne = new WFSOne(this.serviceURL);
+            } catch (IOException
+                    | SAXException
+                    | ParserConfigurationException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
-        }
-        return this.types;
     }
 
     /**
-     * gets the attributes of a tye.
-     * @param type type to get attributes of
-     * @return the attributes
+     * @inheritDoc
+     * @return the Types of the Service
+     */
+    public ArrayList<String> getTypes() {
+        return this.wfsOne.getTypes();
+    }
+
+    /**
+     * @inheritDoc
+     * @param type the Type
+     * @return the Attributes of a Type
      */
     public ArrayList<AttributeType> getAttributes(String type) {
-        ArrayList<AttributeType> attributes = new ArrayList();
-        try {
-            SimpleFeatureType schema = this.data.getSchema(type);
-            this.source = this.data.getFeatureSource(type);
-            attributes.addAll(schema.getTypes());
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return attributes;
+        return this.wfsOne.getAttributes(type);
     }
 
     /**
@@ -123,89 +104,71 @@ public class WFSTwo extends WebService {
      */
     public ReferencedEnvelope getBounds(Envelope outerBBOX,
                                         String typeName) {
-        SimpleFeatureType schema = null;
-        ReferencedEnvelope bbox = null;
-        FeatureCollection<SimpleFeatureType, SimpleFeature>
-                features = null;
-        try {
-            schema = this.data.getSchema(typeName);
-            this.source = this.data.getFeatureSource(typeName);
-            bbox = source.getBounds();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        System.out.println("Metadata Bounds:" + bbox);
-
-        // XXX: This is a bit cumbersome.
-        GeometryType gt = null;
-        System.out.println("types:");
-        for (AttributeType type: schema.getTypes()) {
-            System.out.println("\t'" + type + "'");
-            if (type instanceof GeometryType) {
-                gt = (GeometryType)type;
-            }
-        }
-
-        if (gt == null) {
-            log.log(Level.SEVERE, "No geometry found.");
-            return null;
-            //throw new Exception("No geometry found.");
-        }
-
-        String geomName = gt.getName().getLocalPart();
-
-        System.out.println("Using '" + geomName + "' as geometry column.");
-
-
-        // Step 5 - query
-
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
-                GeoTools.getDefaultHints());
-
-        Object polygon = JTS.toGeometry(outerBBOX);
-
-        Filter filter = ff.bbox(
-                ff.property(geomName),
-                new ReferencedEnvelope(
-                        outerBBOX, bbox.getCoordinateReferenceSystem()));
-
-        Query query = new Query(typeName,
-                filter,
-                new String[]{geomName});
-        try {
-            features = source.getFeatures(query);
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        ReferencedEnvelope bounds = new ReferencedEnvelope();
-        try (FeatureIterator<SimpleFeature> iterator = features.features()) {
-            int count = 0;
-            while (iterator.hasNext()) {
-                Feature feature = iterator.next();
-                ++count;
-                System.out.println(count + " " + feature.getBounds());
-                bounds.include(feature.getBounds());
-            }
-        }
-        System.out.println("Calculated Bounds:" + bounds);
-        return bounds;
+        return null;
     }
 
     /**
-     * gets the service URL.
-     * @return the service URL
+     * @inheritDoc
+     * @return the URL of the Service
      */
     public String getServiceURL() {
         return this.serviceURL;
     }
 
     /**
-     * gets the dataStore.
-     * @return datastore
+     * @inheritDoc
+     * @return the stored Queries
      */
-    public DataStore getData() {
-        return this.data;
+    @Override
+    public ArrayList<String> getStoredQueries()  {
+        ArrayList<String> storedQueries = new ArrayList();
+        String storedQueriesURL = setURLRequest("ListStoredQueries");
+
+        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+        Parser parser = new Parser(configuration);
+        try {
+            URL url = new URL(storedQueriesURL);
+            InputSource xml = new InputSource(url.openStream());
+            Object parsed = parser.parse(xml);
+            ListStoredQueriesResponseType storedQueriesResponse =
+                    (ListStoredQueriesResponseType) parsed;
+            EList<StoredQueryListItemType> storedQueryList =
+                    storedQueriesResponse.getStoredQuery();
+
+            for (Iterator it = storedQueryList.iterator(); it.hasNext();) {
+                StoredQueryListItemType sle =
+                        (StoredQueryListItemType) it.next();
+                storedQueries.add(sle.getId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return storedQueries;
     }
+
+    /**
+     * @inheritDoc
+     * @return the Methods that can be requested
+     */
+    @Override
+    public ArrayList<String> getRequestMethods() {
+        return this.requestMethods;
+    }
+
+    private String setURLRequest(String request) {
+        String newURL = "";
+        try {
+            if (this.requestMethods.contains(request)) {
+                newURL = this.serviceURL.replace("GetCapabilities", request);
+            } else {
+                throw new MalformedURLException("Service not capable for this"
+                        + "request");
+            }
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return newURL;
+    }
+
 }

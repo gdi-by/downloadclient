@@ -26,7 +26,30 @@ import java.util.ArrayList;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 interface ServiceSchema {
+    /**
+     * gets the Types of a Service.
+     * @return ArrayList of Types
+     */
     ArrayList<String> getTypes();
+
+    /**
+     * gets the Attributes of a Type.
+     * @param type the Type
+     */
     ArrayList<AttributeType> getAttributes(String type);
+
+    /**
+     * gets the URL of a service.
+     */
     String getServiceURL();
+
+    /**
+     * gets stored Queries of a Service.
+     */
+    ArrayList<String> getStoredQueries();
+
+    /**
+     * gets the Request Methods of a Service.
+     */
+    ArrayList<String> getRequestMethods();
 }

@@ -30,33 +30,33 @@ public class Atom extends WebService {
     private String serviceURL;
 
     /**
-     * Constructor.
-     * @param serviceURL the Service URL
+     * @inheritDoc
+     * @return the URL of the Service
      */
     public Atom(String serviceURL) {
         this.serviceURL = serviceURL;
     }
 
     /**
-     * gets the Types of this service.
-     * @return types of the service
+     * @inheritDoc
+     * @return the Types of the service
      */
     public ArrayList<String> getTypes() {
         return null;
     }
 
     /**
-     * gets the attributes of a type.
-     * @param type the type
-     * @return the attributes
+     * @inheritDoc
+     * @param type the Type
+     * @return The Attributes of the Service
      */
     public ArrayList<AttributeType> getAttributes(String type) {
         return null;
     }
 
     /**
-     * returns the services URL.
-     * @return service URL
+     * @inheritDoc
+     * @return the URL of the Service
      */
     public String getServiceURL() {
         return this.serviceURL;
