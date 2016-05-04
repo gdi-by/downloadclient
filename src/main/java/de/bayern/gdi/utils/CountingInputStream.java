@@ -26,19 +26,24 @@ import java.io.IOException;
  */
 public class CountingInputStream extends FilterInputStream {
 
-    /** Instance to easy wrap an inputstream with a counter. */
-    public static final WrapInputStreamFactory WRAP_FACTORY
-        = new WrapInputStreamFactory() {
-            @Override
-            public InputStream wrap(InputStream in) {
-                return new CountingInputStream(in);
-            }
-        };
+    /** An interface to report the number of bytes counted. */
+    public interface CountListener {
+        /** bytesCounted is called to report the number of bytes already copied.
+         *  @param counter The number of bytes.
+         */
+        void bytesCounted(long counter);
+    }
 
     private long counter;
+    private CountListener listener;
 
     public CountingInputStream(InputStream in) {
         super(in);
+    }
+
+    public CountingInputStream(InputStream in, CountListener listener) {
+        super(in);
+        this.listener = listener;
     }
 
     /** Resets the internal counter back to zero. */
@@ -53,11 +58,18 @@ public class CountingInputStream extends FilterInputStream {
         return this.counter;
     }
 
+    private void reportCount() {
+        if (this.listener != null) {
+            this.listener.bytesCounted(this.counter);
+        }
+    }
+
     @Override
     public int read() throws IOException {
         int x = in.read();
         if (x >= 0) {
             this.counter++;
+            reportCount();
         }
         return x;
     }
@@ -66,8 +78,23 @@ public class CountingInputStream extends FilterInputStream {
     public int read(byte[] n, int off, int len) throws IOException {
         int x = in.read(n, off, len);
         if (x > 0) {
-            this.counter++;
+            this.counter += x;
+            reportCount();
         }
         return x;
+    }
+
+    /** Instance to wrap an inputstream with a reporting counter.
+     * @param listener The listener to report to. Can be null.
+     * @return The factory to create a wrapper.
+     */
+    public static WrapInputStreamFactory createWrapFactory(
+        CountListener listener) {
+        return new WrapInputStreamFactory() {
+            @Override
+            public InputStream wrap(InputStream in) {
+                return new CountingInputStream(in, listener);
+            }
+        };
     }
 }
