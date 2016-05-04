@@ -89,7 +89,7 @@ public class CountingInputStream extends FilterInputStream {
      * @return The factory to create a wrapper.
      */
     public static WrapInputStreamFactory createWrapFactory(
-        CountListener listener) {
+        final CountListener listener) {
         return new WrapInputStreamFactory() {
             @Override
             public InputStream wrap(InputStream in) {

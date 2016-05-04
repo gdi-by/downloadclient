@@ -17,14 +17,67 @@
  */
 package de.bayern.gdi.processor;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.io.IOException;
+
+import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.CountingInputStream;
+import de.bayern.gdi.utils.WrapInputStreamFactory;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+import org.w3c.dom.Document;
+
 /** DownloadJob is a job to download features from a service. */
-public class DownloadJob implements Job {
+public class DownloadJob implements Job, CountingInputStream.CountListener {
+
+    private static final Logger log
+        = Logger.getLogger(DownloadJob.class.getName());
+
+    private String url;
 
     public DownloadJob() {
     }
 
+    public DownloadJob(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public void bytesCounted(long count) {
+        //TODO: Forward to UI.
+        log.log(Level.INFO, "bytes downloaded: " + count);
+    }
+
     @Override
     public void run() {
-        // TODO: Implement me!
+        // TODO: Do more fancy stuff like e.g. auth.
+        WrapInputStreamFactory wrapFactory
+            = CountingInputStream.createWrapFactory(this);
+
+        DocumentResponseHandler responseHandler
+            = new DocumentResponseHandler(wrapFactory);
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        try {
+            HttpGet httpget = new HttpGet(this.url);
+            Document doc = httpclient.execute(httpget, responseHandler);
+            // TODO: Do something with document loaded.
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE,
+                "Download failed: " + ioe.getLocalizedMessage(), ioe);
+        } finally {
+            try {
+                httpclient.close();
+            } catch (IOException ioe) {
+            log.log(Level.SEVERE,
+                "Closing HTTP client failed: "
+                    + ioe.getLocalizedMessage(), ioe);
+            }
+        }
     }
 }
