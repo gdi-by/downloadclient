@@ -62,4 +62,11 @@ public class Atom extends WebService {
         return this.serviceURL;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public WebService.Type getServiceType() {
+        return Type.Atom;
+    }
+
 }

@@ -43,7 +43,7 @@ public class DataBean extends Observable {
     private Map<String, String> catalogues;
     private WebService webService;
     private ArrayList<String> serviceTypes;
-    private Map<String, Class> attributes;
+    private Map<String, String> attributes;
     private String wmsUrl;
     private String wmsName;
 
@@ -161,7 +161,7 @@ public class DataBean extends Observable {
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public Map<String, Class> getAttributes() {
+    public Map<String, String> getAttributes() {
         return attributes;
     }
 
@@ -169,7 +169,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(Map<String, Class> attributes) {
+    public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
     }
 
@@ -204,5 +204,6 @@ public class DataBean extends Observable {
     public void setWmsName(String wmsName) {
         this.wmsName = wmsName;
     }
+
 
 }

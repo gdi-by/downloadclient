@@ -19,6 +19,7 @@
 package de.bayern.gdi.services;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -76,4 +77,11 @@ public abstract class WebService implements ServiceSchema {
         return null;
     }
 
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    public Map<String,String> getParameters(String QueryName) {
+        return null;
+    }
 }

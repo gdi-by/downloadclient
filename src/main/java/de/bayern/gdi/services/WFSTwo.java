@@ -23,14 +23,17 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import net.opengis.ows11.OperationType;
 import net.opengis.ows11.OperationsMetadataType;
-import net.opengis.wfs20.ListStoredQueriesResponseType;
-import net.opengis.wfs20.StoredQueryListItemType;
+import net.opengis.wfs20.DescribeStoredQueriesResponseType;
+import net.opengis.wfs20.ParameterExpressionType;
+import net.opengis.wfs20.StoredQueryDescriptionType;
 import net.opengis.wfs20.WFSCapabilitiesType;
 import org.eclipse.emf.common.util.EList;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -120,33 +123,66 @@ public class WFSTwo extends WebService {
      * @return the stored Queries
      */
     @Override
-    public ArrayList<String> getStoredQueries()  {
+    public ArrayList<String> getStoredQueries() {
         ArrayList<String> storedQueries = new ArrayList();
-        String storedQueriesURL = setURLRequest("ListStoredQueries");
-
-        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
-                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
-        Parser parser = new Parser(configuration);
-        try {
-            URL url = new URL(storedQueriesURL);
-            InputSource xml = new InputSource(url.openStream());
-            Object parsed = parser.parse(xml);
-            ListStoredQueriesResponseType storedQueriesResponse =
-                    (ListStoredQueriesResponseType) parsed;
-            EList<StoredQueryListItemType> storedQueryList =
-                    storedQueriesResponse.getStoredQuery();
-
-            for (Iterator it = storedQueryList.iterator(); it.hasNext();) {
-                StoredQueryListItemType sle =
-                        (StoredQueryListItemType) it.next();
-                storedQueries.add(sle.getId());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        EList<StoredQueryDescriptionType> storedQueryDescription =
+                getDescribeStoredQueries();
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+            StoredQueryDescriptionType sqdt =
+                    (StoredQueryDescriptionType) it.next();
+            storedQueries.add(sqdt.getId());
+            System.out.println(sqdt.toString());
         }
         return storedQueries;
     }
 
+    private EList<StoredQueryDescriptionType> getDescribeStoredQueries() {
+        String describeStroedQueriesURL =
+                setURLRequest("DescribeStoredQueries");
+        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+        Parser parser = new Parser(configuration);
+        EList<StoredQueryDescriptionType> storedQueryDescription = null;
+        try {
+            URL url = new URL(describeStroedQueriesURL);
+            InputSource xml = new InputSource(url.openStream());
+            Object parsed = parser.parse(xml);
+
+            DescribeStoredQueriesResponseType storedQueriesType =
+                    (DescribeStoredQueriesResponseType) parsed;
+            storedQueryDescription =
+                    storedQueriesType.getStoredQueryDescription();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return storedQueryDescription;
+    }
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    @Override
+    public Map<String,String> getParameters(String QueryName) {
+        Map<String,String> parameters = new HashMap<String,String>();
+        EList<StoredQueryDescriptionType> storedQueryDescription =
+                getDescribeStoredQueries();
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+            StoredQueryDescriptionType sqdt =
+                    (StoredQueryDescriptionType) it.next();
+            if(sqdt.getId().equals(QueryName)) {
+                EList<ParameterExpressionType> parameterList
+                        = sqdt.getParameter();
+                for(Iterator ärdbärkäse = parameterList.iterator();
+                        ärdbärkäse.hasNext();) {
+                    ParameterExpressionType parameter =
+                            (ParameterExpressionType) ärdbärkäse.next();
+                    parameters.put(parameter.getName(),
+                            parameter.getType().toString());
+                }
+            }
+        }
+        return parameters;
+    }
     /**
      * @inheritDoc
      * @return the Methods that can be requested
@@ -171,4 +207,10 @@ public class WFSTwo extends WebService {
         return newURL;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public WebService.Type getServiceType() {
+        return Type.WFSTwo;
+    }
 }

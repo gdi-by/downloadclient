@@ -21,6 +21,8 @@ package de.bayern.gdi.experimental;
 import de.bayern.gdi.services.WFSTwo;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import net.opengis.wfs20.StoredQueryListItemType;
 import net.opengis.wfs20.impl.ListStoredQueriesResponseTypeImpl;
 import org.geotools.xml.Parser;
@@ -52,6 +54,7 @@ public class DebugWFSTwo {
         wfstwo = new WFSTwo(this.urlString);
         printArrayStringList(wfstwo.getRequestMethods());
         printArrayStringList(wfstwo.getStoredQueries());
+        printStringMap(wfstwo.getParameters(wfstwo.getStoredQueries().get(0)));
     }
 
     private ArrayList<String> storedQueires() {
@@ -125,6 +128,14 @@ public class DebugWFSTwo {
     private void printArrayStringList(ArrayList<String> als) {
         for (String str : als) {
             System.out.println(str);
+        }
+    }
+
+    private void printStringMap(Map<String,String> map)  {
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            System.out.println(pair.getKey() + " = " + pair.getValue());
         }
     }
 }

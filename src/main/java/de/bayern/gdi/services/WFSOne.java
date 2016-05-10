@@ -201,4 +201,11 @@ public class WFSOne extends WebService {
         return this.data;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public WebService.Type getServiceType() {
+        return Type.WFSOne;
+    }
+
 }

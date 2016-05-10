@@ -97,7 +97,14 @@ public class Controller {
      */
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
-            dataBean.setServiceTypes(dataBean.getWebService().getTypes());;
+            switch (dataBean.getWebService().getServiceType()) {
+                case WFSOne:
+                    dataBean.setServiceTypes(dataBean.getWebService().getTypes());
+                case WFSTwo:
+                    dataBean.setServiceTypes(dataBean.getWebService().getStoredQueries());
+                case Atom:
+                default:
+            }
             view.setTypes(dataBean.getServiceTypes());
         }
     }
@@ -106,7 +113,7 @@ public class Controller {
      * sets the Service Types Attributes.
      * @param map the Map of Attributes
      */
-    public void setServiceAttributes(Map<String, Class> map) {
+    public void setServiceAttributes(Map<String, String> map) {
         if (dataBean.isWebServiceSet()) {
             view.setAttributes(map);
             setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
@@ -164,18 +171,27 @@ public class Controller {
         implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            Map map = new HashMap<String, Class>();
+            Map map = new HashMap<String, String>();
             if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
                     != null) {
                 String choosenType =
                         view.getTypeComboBox().getSelectionModel()
                         .getSelectedItem()
                         .toString();
-                ArrayList <AttributeType> attributes =
-                        dataBean.getWebService().getAttributes(choosenType);
-                for (AttributeType attribute: attributes) {
-                    map.put(attribute.getName().toString(),
-                            attribute.getBinding());
+                ArrayList <AttributeType> attributes = null;
+                switch (dataBean.getWebService().getServiceType()) {
+                    case WFSOne:
+                        attributes = dataBean.getWebService()
+                                        .getAttributes(choosenType);
+                        for (AttributeType attribute: attributes) {
+                            map.put(attribute.getName().toString(),
+                                    attribute.getBinding().toString());
+                        }
+                    case WFSTwo:
+                        map = dataBean.getWebService()
+                                .getParameters(choosenType);
+                    case Atom:
+                    default:
                 }
                 dataBean.setAttributes(map);
                 setServiceAttributes(dataBean.getAttributes());

@@ -361,7 +361,7 @@ public class View {
      * sets the Attributes.
      * @param attributes map of Attributes
      */
-    public void setAttributes(Map<String, Class> attributes) {
+    public void setAttributes(Map<String, String> attributes) {
         //Grid in Grid - Gridception... (I'll show myself the way out)
         this.attributeGridPane.getChildren().remove(
                 this.attributeGridPane.getChildren()
