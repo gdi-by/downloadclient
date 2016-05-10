@@ -24,9 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import net.opengis.ows11.OperationType;
@@ -38,7 +38,6 @@ import net.opengis.wfs20.WFSCapabilitiesType;
 import org.eclipse.emf.common.util.EList;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.Parser;
-import org.opengis.feature.type.AttributeType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -95,7 +94,7 @@ public class WFSTwo extends WebService {
      * @param type the Type
      * @return the Attributes of a Type
      */
-    public ArrayList<AttributeType> getAttributes(String type) {
+    public Map<String, String> getAttributes(String type) {
         return this.wfsOne.getAttributes(type);
     }
 
@@ -131,7 +130,6 @@ public class WFSTwo extends WebService {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
             storedQueries.add(sqdt.getId());
-            System.out.println(sqdt.toString());
         }
         return storedQueries;
     }
@@ -162,20 +160,20 @@ public class WFSTwo extends WebService {
      * @return NULL
      */
     @Override
-    public Map<String,String> getParameters(String QueryName) {
-        Map<String,String> parameters = new HashMap<String,String>();
+    public Map<String, String> getParameters(String queryName) {
+        Map<String, String> parameters = new HashMap<String, String>();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
         for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
-            if(sqdt.getId().equals(QueryName)) {
+            if (sqdt.getId().equals(queryName)) {
                 EList<ParameterExpressionType> parameterList
                         = sqdt.getParameter();
-                for(Iterator ärdbärkäse = parameterList.iterator();
-                        ärdbärkäse.hasNext();) {
+                for (Iterator it2 = parameterList.iterator();
+                        it2.hasNext();) {
                     ParameterExpressionType parameter =
-                            (ParameterExpressionType) ärdbärkäse.next();
+                            (ParameterExpressionType) it2.next();
                     parameters.put(parameter.getName(),
                             parameter.getType().toString());
                 }
@@ -209,6 +207,7 @@ public class WFSTwo extends WebService {
 
     /**
      * @inheritDoc
+     * @return the Type
      */
     public WebService.Type getServiceType() {
         return Type.WFSTwo;

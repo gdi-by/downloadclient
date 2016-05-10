@@ -95,16 +95,21 @@ public class WFSOne extends WebService {
      * @param type type to get attributes of
      * @return the attributes
      */
-    public ArrayList<AttributeType> getAttributes(String type) {
+    public Map<String, String> getAttributes(String type) {
         ArrayList<AttributeType> attributes = new ArrayList();
+        Map<String, String> map = new HashMap<String, String>();
         try {
             SimpleFeatureType schema = this.data.getSchema(type);
             this.source = this.data.getFeatureSource(type);
             attributes.addAll(schema.getTypes());
+            for (AttributeType attribute: attributes) {
+                map.put(attribute.getName().toString(),
+                        attribute.getBinding().toString());
+            }
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return attributes;
+        return map;
     }
 
     /**
@@ -203,6 +208,7 @@ public class WFSOne extends WebService {
 
     /**
      * @inheritDoc
+     * @return the ServiceType
      */
     public WebService.Type getServiceType() {
         return Type.WFSOne;

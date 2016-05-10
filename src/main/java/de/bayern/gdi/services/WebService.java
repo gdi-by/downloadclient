@@ -80,8 +80,9 @@ public abstract class WebService implements ServiceSchema {
     /**
      * @inheritDoc
      * @return NULL
+     * @param queryName The Name of the query
      */
-    public Map<String,String> getParameters(String QueryName) {
+    public Map<String, String> getParameters(String queryName) {
         return null;
     }
 }

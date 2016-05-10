@@ -18,8 +18,6 @@
 
 package de.bayern.gdi.services;
 
-import org.opengis.feature.type.AttributeType;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -37,7 +35,7 @@ interface ServiceSchema {
      * gets the Attributes of a Type.
      * @param type the Type
      */
-    ArrayList<AttributeType> getAttributes(String type);
+    Map<String, String> getAttributes(String type);
 
     /**
      * gets the URL of a service.
@@ -55,12 +53,12 @@ interface ServiceSchema {
     ArrayList<String> getRequestMethods();
 
     /**
-     * gets the Parameters for a Stored Query
+     * gets the Parameters for a Stored Query.
      */
-    Map<String,String> getParameters(String QueryName);
+    Map<String, String> getParameters(String queryName);
 
     /**
-     * gets the ServiceType
+     * gets the ServiceType.
      */
     WebService.Type getServiceType();
 }

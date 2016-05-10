@@ -131,7 +131,7 @@ public class DebugWFSTwo {
         }
     }
 
-    private void printStringMap(Map<String,String> map)  {
+    private void printStringMap(Map<String, String> map)  {
         Iterator it = map.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();

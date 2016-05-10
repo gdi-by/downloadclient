@@ -19,7 +19,7 @@
 package de.bayern.gdi.services;
 
 
-import org.opengis.feature.type.AttributeType;
+import java.util.Map;
 
 import java.util.ArrayList;
 
@@ -50,7 +50,7 @@ public class Atom extends WebService {
      * @param type the Type
      * @return The Attributes of the Service
      */
-    public ArrayList<AttributeType> getAttributes(String type) {
+    public Map<String, String> getAttributes(String type) {
         return null;
     }
 
@@ -64,6 +64,7 @@ public class Atom extends WebService {
 
     /**
      * @inheritDoc
+     * @return the Type of the Service
      */
     public WebService.Type getServiceType() {
         return Type.Atom;

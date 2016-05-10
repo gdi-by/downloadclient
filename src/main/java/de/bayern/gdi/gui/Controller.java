@@ -99,9 +99,11 @@ public class Controller {
         if (dataBean.isWebServiceSet()) {
             switch (dataBean.getWebService().getServiceType()) {
                 case WFSOne:
-                    dataBean.setServiceTypes(dataBean.getWebService().getTypes());
+                    dataBean.setServiceTypes(
+                            dataBean.getWebService().getTypes());
                 case WFSTwo:
-                    dataBean.setServiceTypes(dataBean.getWebService().getStoredQueries());
+                    dataBean.setServiceTypes(
+                            dataBean.getWebService().getStoredQueries());
                 case Atom:
                 default:
             }
@@ -181,12 +183,8 @@ public class Controller {
                 ArrayList <AttributeType> attributes = null;
                 switch (dataBean.getWebService().getServiceType()) {
                     case WFSOne:
-                        attributes = dataBean.getWebService()
+                        map = dataBean.getWebService()
                                         .getAttributes(choosenType);
-                        for (AttributeType attribute: attributes) {
-                            map.put(attribute.getName().toString(),
-                                    attribute.getBinding().toString());
-                        }
                     case WFSTwo:
                         map = dataBean.getWebService()
                                 .getParameters(choosenType);
