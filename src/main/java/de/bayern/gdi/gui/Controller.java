@@ -19,29 +19,31 @@
 package de.bayern.gdi.gui;
 
 
-import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.Node;
-import javafx.stage.Modality;
-import javafx.stage.WindowEvent;
-import org.opengis.feature.type.AttributeType;
-
+import de.bayern.gdi.utils.ServiceChecker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import javafx.beans.value.ChangeListener;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
+import javafx.stage.WindowEvent;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -245,57 +247,94 @@ public class Controller {
             EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            String serviceURL = null;
-            String username = null;
-            String password = null;
-            if (view.getServiceList().getSelectionModel().getSelectedItems()
-                    != null) {
-                String serviceName =
-                        view.getServiceList().
-                                getSelectionModel().getSelectedItems().get(0);
-                serviceURL = dataBean.getServiceURL(serviceName);
-            } else if (view.getServiceURLfield().textProperty().getValue()
-                    != null) {
-                serviceURL =
-                        view.getServiceURLfield().textProperty().getValue();
-                if (view.getServiceUseAuthenticationCBX().isSelected()) {
-                    username = view.getServiceUser().textProperty().getValue();
-                    password = view.getServicePW().textProperty().getValue();
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    view.getScene().setCursor(Cursor.WAIT);
+                    String serviceURL = null;
+                    String username = null;
+                    String password = null;
+                    if (view.getServiceList().
+                            getSelectionModel().getSelectedItems() != null) {
+                        String serviceName =
+                                view.getServiceList().
+                                        getSelectionModel().
+                                        getSelectedItems().get(0);
+                        serviceURL = dataBean.getServiceURL(serviceName);
+                    } else if (view.getServiceURLfield()
+                            .textProperty().getValue()
+                            != null) {
+                        serviceURL =
+                                view.getServiceURLfield().
+                                        textProperty().getValue();
+                        if (view.getServiceUseAuthenticationCBX().
+                                isSelected()) {
+                            username =
+                                    view.getServiceUser().
+                                            textProperty().getValue();
+                            password =
+                                    view.getServicePW().
+                                            textProperty().getValue();
+                        }
+                        if (username != null && password != null) {
+                        }
+                    }
+                    if (serviceURL != null) {
+                        //view.setStatusBarText("Check for Servicetype");
+                        WebService.Type st =
+                                ServiceChecker.checkService(serviceURL);
+                        WebService ws = null;
+                        switch (st) {
+                            case Atom:
+                                Platform.runLater(() -> {
+                                    view.setStatusBarText("Found Atom "
+                                            + "Service");
+                                });
+                                ws = new Atom(serviceURL);
+                                break;
+                            case WFSOne:
+                                Platform.runLater(() -> {
+                                    view.setStatusBarText("Found WFSOne "
+                                            + "Service");
+                                });
+                                ws = new WFSOne(serviceURL);
+                                break;
+                            case WFSTwo:
+                                Platform.runLater(() -> {
+                                    view.setStatusBarText("Found WFSTwo "
+                                            + "Service");
+                                });
+                                ws = new WFSTwo(serviceURL);
+                                break;
+                            default:
+                                Platform.runLater(() -> {
+                                    view.setStatusBarText("Could not "
+                                            + "determine URL");
+                                });
+                        }
+                        dataBean.setWebService(ws);
+                        Platform.runLater(() -> {
+                            setServiceTypes();
+                            view.getTypeComboBox().
+                                    getSelectionModel().select(0);
+                            ChooseTypeEventHandler chooseType
+                                    = new ChooseTypeEventHandler();
+                            chooseType.handle(e);
+                            view.setStatusBarText("Ready");
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            view.setStatusBarText("Could not determine URL");
+                        });
+                    }
+                    view.getScene().setCursor(Cursor.DEFAULT);
+                    return 0;
                 }
-                if (username != null && password != null) {
-                }
-            }
-            if (serviceURL != null) {
-                view.setStatusBarText("Check for Servicetype");
-                WebService.Type st = ServiceChecker.checkService(serviceURL);
-                WebService ws = null;
-                switch (st) {
-                    case Atom:
-                        view.setStatusBarText("Found Atom Service");
-                        ws = new Atom(serviceURL);
-                        break;
-                    case WFSOne:
-                        view.setStatusBarText("Found WFSOne Service");
-                        ws = new WFSOne(serviceURL);
-                        break;
-                    case WFSTwo:
-                        view.setStatusBarText("Found WFSTwo Service");
-                        ws = new WFSTwo(serviceURL);
-                        break;
-                    default:
-                        view.
-                          setStatusBarText("Could not determine Service Type");
-                }
-                dataBean.setWebService(ws);
-                setServiceTypes();
-                //Preselect the first entry and mock the corresponding event
-                view.getTypeComboBox().getSelectionModel().select(0);
-                ChooseTypeEventHandler chooseType
-                        = new ChooseTypeEventHandler();
-                chooseType.handle(e);
-            } else {
-                view.setStatusBarText("Could not determine URL");
-            }
+            };
+                Thread th = new Thread(task);
+                view.setStatusBarText("Calling Service to get Infos");
+                th.setDaemon(true);
+                th.start();
         }
     }
 

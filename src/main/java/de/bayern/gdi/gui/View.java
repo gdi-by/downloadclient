@@ -317,7 +317,7 @@ public class View {
         //Statusbar
         this.statusBar = new VBox();
         statusBar.setStyle("-fx-background-color: gainsboro");
-        final Text statusText = new Text("I'm important");
+        final Text statusText = new Text("Ready");
         statusBar.getChildren().add(statusText);
 
         //Setting everything
