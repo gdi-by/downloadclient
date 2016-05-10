@@ -319,10 +319,6 @@ public class Controller {
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
             closeConfirmation.initOwner(dataBean.getPrimaryStage());
 
-            closeConfirmation.setX(dataBean.getPrimaryStage().getX());
-            closeConfirmation.setY(dataBean.getPrimaryStage().getY()
-                    + dataBean.getPrimaryStage().getHeight());
-
             Optional<ButtonType> closeResponse =
                     closeConfirmation.showAndWait();
             if (!ButtonType.OK.equals(closeResponse.get())) {
