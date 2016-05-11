@@ -337,6 +337,19 @@ public class View {
     }
 
     /**
+     * Resets the View to the initial Position
+     */
+    public void reset() {
+        this.grid.getChildren().removeAll(this.attributesFilledBox,
+                this.attributesFilledButton,
+                this.typeComboBox,
+                this.attributeScrollPane,
+                this.attributeGridPane,
+                this.wmsMap,
+                this.mapGroup);
+    }
+
+    /**
      * @param stage the stage to show
      * shows the current stage.
      */
@@ -406,7 +419,7 @@ public class View {
         this.attributesFilledBox.getChildren().removeAll(
                 this.attributesFilledBox.getChildren()
         );
-        this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
+        //this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
         this.grid.getChildren().remove(this.attributesFilledBox);
         this.grid.add(this.attributesFilledBox,
                 SECOND_COLUMN,
@@ -426,6 +439,7 @@ public class View {
                 (int) serviceList.getWidth());
         this.mapGroup.getChildren().clear();
         this.mapGroup.getChildren().add(this.wmsMap);
+        this.grid.getChildren().remove(this.mapGroup);
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 SECOND_ROW);

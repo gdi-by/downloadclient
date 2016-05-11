@@ -236,7 +236,7 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //Nada
+            view.reset();
         }
     }
 
