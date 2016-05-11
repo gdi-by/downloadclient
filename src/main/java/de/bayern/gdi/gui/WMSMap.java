@@ -100,7 +100,7 @@ public class WMSMap extends Parent {
     private double previousMouseXPosOnClick;
     private double previousMouseYPosOnClick;
 
-    private final double DRAGGING_OFFSET = 4;
+    private static final double DRAGGING_OFFSET = 4;
     private Group boxGroup;
 
     /**
@@ -312,16 +312,18 @@ public class WMSMap extends Parent {
         System.out.println("Zomm Out");
     }
 
+    private static final double HUNDRED = 100d;
+
     private void drawMarker(double xPosition, double yPosition) {
-        double markerSpan = (this.iw.getImage().getWidth()/100)*1;
-        double upperLeftX = xPosition-markerSpan;
-        double upperLeftY = yPosition+markerSpan;
-        double upperRightX = xPosition+markerSpan;
-        double upperRightY = yPosition+markerSpan;
-        double lowerLeftX = xPosition-markerSpan;
-        double lowerLeftY = yPosition-markerSpan;
-        double lowerRightX = xPosition+markerSpan;
-        double lowerRightY = yPosition-markerSpan;
+        double markerSpan = this.iw.getImage().getWidth() / HUNDRED;
+        double upperLeftX = xPosition - markerSpan;
+        double upperLeftY = yPosition + markerSpan;
+        double upperRightX = xPosition + markerSpan;
+        double upperRightY = yPosition + markerSpan;
+        double lowerLeftX = xPosition - markerSpan;
+        double lowerLeftY = yPosition - markerSpan;
+        double lowerRightX = xPosition + markerSpan;
+        double lowerRightY = yPosition - markerSpan;
         Line upperLeftToLowerRight = new Line(upperLeftX, upperLeftY,
                 lowerRightX, lowerRightY);
         Line upperRightToLowerLeft = new Line(upperRightX, upperRightY,
@@ -375,6 +377,7 @@ public class WMSMap extends Parent {
         }
     }
 
+    /** Eventhandler for mouse events on map. */
     private class OnMousePressedEvent
             implements EventHandler<MouseEvent> {
         @Override
@@ -382,7 +385,7 @@ public class WMSMap extends Parent {
             //WHEN ON SAME X,Y SET MARKER, WEHN MARKER SET, MAKE BBBOX, WHEN
             //ON DIFFERENT, MOVE MAP. WHEN DOUBLE LEFT-CLICKED, ZOOM IN, WHEN
             //DOUBLE RIGHT, ZOOM OUT
-            if(e.getButton().equals(MouseButton.PRIMARY)) {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
                 if (e.getClickCount() > 1) {
                     zoomIn();
                 }
@@ -391,7 +394,7 @@ public class WMSMap extends Parent {
                     mouseYPosOnClick = e.getY();
                 }
             }
-            if(e.getButton().equals(MouseButton.SECONDARY)) {
+            if (e.getButton().equals(MouseButton.SECONDARY)) {
                 if (e.getClickCount() > 1) {
                     zoomOut();
 
@@ -403,20 +406,21 @@ public class WMSMap extends Parent {
         }
     }
 
+    /** Eventhandler for mouse events on map. */
     private class OnMouseReleasedEvent
             implements EventHandler<MouseEvent> {
         @Override
         public void handle(MouseEvent e) {
             //SAVE STATES WHEN MOUSE IS RELEASED TO DETERMINE IF DRAGGED OR
             //IF MARKER WAS SET
-            if (e.getX() < (mouseXPosOnClick + DRAGGING_OFFSET) &&
-                    e.getX() > (mouseXPosOnClick - DRAGGING_OFFSET) &&
-                    e.getY() < (mouseYPosOnClick + DRAGGING_OFFSET) &&
-                    e.getY() > (mouseYPosOnClick - DRAGGING_OFFSET)) {
+            if (e.getX() < (mouseXPosOnClick + DRAGGING_OFFSET)
+                    && e.getX() > (mouseXPosOnClick - DRAGGING_OFFSET)
+                    && e.getY() < (mouseYPosOnClick + DRAGGING_OFFSET)
+                    && e.getY() > (mouseYPosOnClick - DRAGGING_OFFSET)) {
                 System.out.println("Maker Set");
                 drawMarker(mouseXPosOnClick, mouseYPosOnClick);
-                markerCount = markerCount +1 ;
-                if (markerCount == 2 ) {
+                markerCount++;
+                if (markerCount == 2) {
                     //TODO: Bounding Box
                     if (mouseXPosOnClick > previousMouseXPosOnClick) {
                         drawBox(mouseXPosOnClick, mouseYPosOnClick,
@@ -428,7 +432,7 @@ public class WMSMap extends Parent {
                                 mouseYPosOnClick);
                     }
                     System.out.println("Draw Bounding-Box");
-                } else if(markerCount > 2) {
+                } else if (markerCount > 2) {
                     boxGroup.getChildren().clear();
                     markerCount = 0;
                 }
@@ -443,15 +447,16 @@ public class WMSMap extends Parent {
         }
     }
 
+    /** Eventhandler for mouse events on map. */
     private class OnMouseScrollEvent
             implements EventHandler<ScrollEvent> {
         @Override
         public void handle(ScrollEvent e) {
             //WHEN SCROLLED IN, ZOOOM IN, WHEN SCROLLED OUT, ZOOM OUT
-            if (e.getDeltaY() > 0 ) {
+            if (e.getDeltaY() > 0) {
                 zoomOut();
             }
-            if (e.getDeltaY() < 0 ) {
+            if (e.getDeltaY() < 0) {
                 zoomIn();
             }
         }

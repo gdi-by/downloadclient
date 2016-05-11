@@ -337,7 +337,7 @@ public class View {
     }
 
     /**
-     * Resets the View to the initial Position
+     * Resets the View to the initial Position.
      */
     public void reset() {
         this.grid.getChildren().removeAll(this.attributesFilledBox,
