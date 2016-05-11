@@ -32,18 +32,19 @@ import org.apache.http.impl.client.HttpClients;
 
 import org.w3c.dom.Document;
 
-/** DownloadJob is a job to download features from a service. */
-public class DownloadJob implements Job, CountingInputStream.CountListener {
+/** DocumentDownloadJob is a job to download features from a service. */
+public class DocumentDownloadJob
+    implements Job, CountingInputStream.CountListener {
 
     private static final Logger log
-        = Logger.getLogger(DownloadJob.class.getName());
+        = Logger.getLogger(DocumentDownloadJob.class.getName());
 
     private String url;
 
-    public DownloadJob() {
+    public DocumentDownloadJob() {
     }
 
-    public DownloadJob(String url) {
+    public DocumentDownloadJob(String url) {
         this.url = url;
     }
 
