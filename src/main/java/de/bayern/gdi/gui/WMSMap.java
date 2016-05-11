@@ -49,6 +49,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
@@ -90,10 +92,16 @@ public class WMSMap extends Parent {
     private TextField boundingBoxField;
     private Button updateImageButton;
 
+    private int markerCount;
+
     private double mouseXPosOnClick;
     private double mouseYPosOnClick;
 
+    private double previousMouseXPosOnClick;
+    private double previousMouseYPosOnClick;
+
     private final double DRAGGING_OFFSET = 4;
+    private Group boxGroup;
 
     /**
      * gets the children of this node.
@@ -158,13 +166,14 @@ public class WMSMap extends Parent {
             capabilities = wms.getCapabilities();
             layers = capabilities.getLayerList();
             this.ig = new Group();
+            boxGroup = new Group();
             this.setMapImage(this.outerBBOX,
                     this.spacialRefSystem,
                     this.INIT_LAYER_NUMBER);
 
             sourceLabel = new Label(this.serviceName);
             sourceLabel.setLabelFor(this.ig);
-
+            this.ig.getChildren().add(boxGroup);
             this.add(ig);
             this.add(sourceLabel);
             this.add(epsgField);
@@ -214,6 +223,7 @@ public class WMSMap extends Parent {
                              String spacialRefSys,
                              int layerNumber) {
         try {
+            boxGroup.getChildren().clear();
             GetMapRequest request = wms.createGetMapRequest();
             request.setFormat(this.FORMAT);
             request.setDimensions(this.dimensionX, this.dimensionY);
@@ -301,6 +311,57 @@ public class WMSMap extends Parent {
     private void zoomOut() {
         System.out.println("Zomm Out");
     }
+
+    private void drawMarker(double xPosition, double yPosition) {
+        double markerSpan = (this.iw.getImage().getWidth()/100)*1;
+        double upperLeftX = xPosition-markerSpan;
+        double upperLeftY = yPosition+markerSpan;
+        double upperRightX = xPosition+markerSpan;
+        double upperRightY = yPosition+markerSpan;
+        double lowerLeftX = xPosition-markerSpan;
+        double lowerLeftY = yPosition-markerSpan;
+        double lowerRightX = xPosition+markerSpan;
+        double lowerRightY = yPosition-markerSpan;
+        Line upperLeftToLowerRight = new Line(upperLeftX, upperLeftY,
+                lowerRightX, lowerRightY);
+        Line upperRightToLowerLeft = new Line(upperRightX, upperRightY,
+                lowerLeftX, lowerLeftY);
+        upperLeftToLowerRight.setFill(null);
+        upperLeftToLowerRight.setStroke(Color.RED);
+        upperLeftToLowerRight.setStrokeWidth(2);
+        upperRightToLowerLeft.setFill(null);
+        upperRightToLowerLeft.setStroke(Color.RED);
+        upperRightToLowerLeft.setStrokeWidth(2);
+        boxGroup.getChildren().add(upperLeftToLowerRight);
+        boxGroup.getChildren().add(upperRightToLowerLeft);
+    }
+
+    private void drawBox(double beginX, double beginY, double endX, double
+            endY) {
+        Line upperLine = new Line(beginX, beginY, endX, beginY);
+        upperLine.setFill(null);
+        upperLine.setStroke(Color.RED);
+        upperLine.setStrokeWidth(2);
+        boxGroup.getChildren().add(upperLine);
+
+        Line leftLine = new Line(beginX, beginY, beginX, endY);
+        leftLine.setFill(null);
+        leftLine.setStroke(Color.RED);
+        leftLine.setStrokeWidth(2);
+        boxGroup.getChildren().add(leftLine);
+
+        Line buttomLine = new Line(beginX, endY, endX, endY);
+        buttomLine.setFill(null);
+        buttomLine.setStroke(Color.RED);
+        buttomLine.setStrokeWidth(2);
+        boxGroup.getChildren().add(buttomLine);
+
+        Line rightLine = new Line(endX, beginY , endX, endY);
+        rightLine.setFill(null);
+        rightLine.setStroke(Color.RED);
+        rightLine.setStrokeWidth(2);
+        boxGroup.getChildren().add(rightLine);
+    }
     /**
      * Event Handler for the choose Service Button.
      */
@@ -333,10 +394,10 @@ public class WMSMap extends Parent {
             if(e.getButton().equals(MouseButton.SECONDARY)) {
                 if (e.getClickCount() > 1) {
                     zoomOut();
+
                 }
                 if (e.getClickCount() == 1) {
-                    System.out.println("Deleted the Box");
-                    //TODO: Delete the Bounding Box
+                    boxGroup.getChildren().clear();
                 }
             }
         }
@@ -352,11 +413,32 @@ public class WMSMap extends Parent {
                     e.getX() > (mouseXPosOnClick - DRAGGING_OFFSET) &&
                     e.getY() < (mouseYPosOnClick + DRAGGING_OFFSET) &&
                     e.getY() > (mouseYPosOnClick - DRAGGING_OFFSET)) {
-                //TODO: Set marker, if one is there, set second and draw box
                 System.out.println("Maker Set");
+                drawMarker(mouseXPosOnClick, mouseYPosOnClick);
+                markerCount = markerCount +1 ;
+                if (markerCount == 2 ) {
+                    //TODO: Bounding Box
+                    if (mouseXPosOnClick > previousMouseXPosOnClick) {
+                        drawBox(mouseXPosOnClick, mouseYPosOnClick,
+                                previousMouseXPosOnClick,
+                                previousMouseYPosOnClick);
+                    } else {
+                        drawBox(previousMouseXPosOnClick,
+                                previousMouseYPosOnClick, mouseXPosOnClick,
+                                mouseYPosOnClick);
+                    }
+                    System.out.println("Draw Bounding-Box");
+                } else if(markerCount > 2) {
+                    boxGroup.getChildren().clear();
+                    markerCount = 0;
+                }
+                previousMouseXPosOnClick = mouseXPosOnClick;
+                previousMouseYPosOnClick = mouseYPosOnClick;
             } else {
                 System.out.println("Dragged image");
                 //TODO: Calculate new Coordinates for Picture
+                boxGroup.getChildren().clear();
+                markerCount = 0;
             }
         }
     }
