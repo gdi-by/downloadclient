@@ -43,11 +43,24 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
 
     private File file;
 
+    private WrapInputStreamFactory wrapFactory;
+
     public FileResponseHandler() {
     }
 
     public FileResponseHandler(File file) {
+        this(file, null);
+    }
+
+    public FileResponseHandler(File file, WrapInputStreamFactory wrapFactory) {
         this.file = file;
+        this.wrapFactory = wrapFactory;
+    }
+
+    private InputStream wrap(InputStream in) {
+        return this.wrapFactory != null
+            ? this.wrap(in)
+            : in;
     }
 
     @Override
@@ -67,7 +80,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
             try (FileOutputStream out = new FileOutputStream(this.file)) {
                 byte [] buf = new byte[BUF_SIZE];
                 int r;
-                InputStream ins = entity.getContent();
+                InputStream ins = wrap(entity.getContent());
                 while ((r = ins.read(buf)) >= 0) {
                     out.write(buf, 0, r);
                 }
