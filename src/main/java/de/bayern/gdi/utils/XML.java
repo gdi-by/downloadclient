@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import java.io.IOException;
 import java.io.File;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 
 import org.w3c.dom.Document;
 
@@ -43,6 +45,12 @@ import javax.xml.xpath.XPathVariableResolver;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
+import javax.xml.stream.events.XMLEvent;
 
 /**
  * Helper to handle XML documents.
@@ -210,6 +218,39 @@ public class XML {
             log.log(Level.SEVERE, xpee.getLocalizedMessage(), xpee);
         }
 
+        return null;
+    }
+
+    /** containsTags is a cheap way to detect if a XML file
+     *  contains some special tags. Useful for error detection.
+     *  @param file The XML file to check.
+     *  @param tags the list of tags to check for.
+     *  @return The first tag that was found. Null if the tags are not in file.
+     *  @throws XMLStreamException if an exception happends while
+     *          processoing the XML file.
+     *  @throws IOException if an I/O error happens.
+     */
+    public static final String containsTags(File file, String []tags)
+        throws XMLStreamException, IOException {
+
+        XMLInputFactory xmlif = XMLInputFactory.newInstance();
+        XMLStreamReader xmlr = xmlif.createXMLStreamReader(
+                new BufferedInputStream(
+                new FileInputStream(file)));
+        try {
+            while (xmlr.hasNext()) {
+                if (xmlr.next() == XMLEvent.START_ELEMENT) {
+                    String needle = xmlr.getLocalName();
+                    for (String tag: tags) {
+                        if (needle.equals(tag)) {
+                            return tag;
+                        }
+                    }
+                }
+            }
+        } finally {
+            xmlr.close();
+        }
         return null;
     }
 }
