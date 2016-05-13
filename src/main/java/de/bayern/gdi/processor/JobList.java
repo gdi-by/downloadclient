@@ -15,20 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package de.bayern.gdi.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Job implements a job to be run by a processor.
+ * JobList is a job of a sequence of depended jobs.
  */
-public interface Job {
+public class JobList implements Job {
+
+    private List<Job> jobs;
+
+    public JobList() {
+        jobs = new ArrayList<Job>();
+    }
 
     /**
-     * Run the job.
-     * @throws JobExecutionException if the job execution failed.
+     * Add a job to this job list.
+     * @param job The job to be added.
      */
-    void run() throws JobExecutionException;
+    public void add(Job job) {
+        jobs.add(job);
+    }
 
+    @Override
+    public void run() throws JobExecutionException {
+        for (Job job: jobs) {
+            job.run();
+        }
+    }
 }
-
-
 

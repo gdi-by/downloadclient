@@ -18,16 +18,20 @@
 package de.bayern.gdi.processor;
 
 /**
- * Job implements a job to be run by a processor.
+ * Exception thrown if a job execution failed.
  */
-public interface Job {
+public class JobExecutionException extends Exception {
 
-    /**
-     * Run the job.
-     * @throws JobExecutionException if the job execution failed.
-     */
-    void run() throws JobExecutionException;
+    public JobExecutionException() {
+    }
 
+    public JobExecutionException(String msg) {
+        super(msg);
+    }
+
+    public JobExecutionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }
 
 
