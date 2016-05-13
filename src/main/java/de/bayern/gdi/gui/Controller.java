@@ -339,7 +339,7 @@ public class Controller {
                                     break;
                                 default:
                                     log.log(Level.WARNING,
-                                            "Could not determine URL" , st);
+                                        "Could not determine URL" , st);
                                     Platform.runLater(() -> {
                                         view.setStatusBarText("Could not "
                                                 + "determine URL");

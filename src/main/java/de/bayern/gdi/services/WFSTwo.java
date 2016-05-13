@@ -75,9 +75,8 @@ public class WFSTwo extends WebService {
         try {
             URL url = new URL(this.serviceURL);
             if (url.toString().toLowerCase().startsWith("https")) {
-                System.setProperty("jsse.enableSNIExtension", "false");
-                HttpsURLConnection con =
-                        (HttpsURLConnection)url.openConnection();
+                HttpsURLConnection con
+                    = (HttpsURLConnection)url.openConnection();
                 conn = (URLConnection) con;
             }  else {
                 conn = url.openConnection();

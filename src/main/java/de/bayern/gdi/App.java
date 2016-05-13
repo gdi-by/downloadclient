@@ -77,8 +77,8 @@ public class App {
             //with command line arguments and/or a stored XML File
             String userName = null;
             String password = null;
-            WebService.Type st = ServiceChecker.checkService(DEMO_URL,
-                    getBase64EncAuth(userName, password));
+            WebService.Type st = ServiceChecker.checkService(
+                    DEMO_URL, getBase64EncAuth(userName, password));
             switch (st) {
                 case Atom:
                     log.info("Atom Service Found");

@@ -249,11 +249,9 @@ public class DataBean extends Observable {
     public String getBase64EncAuth() {
         if (this.userName == null || this.password == null) {
             return null;
-        } else {
-            String authString = this.userName + ":" + this.password;
-            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
-            String authStringEnc = new String(authEncBytes);
-            return authStringEnc;
         }
+        String authString = this.userName + ":" + this.password;
+        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+        return new String(authEncBytes);
     }
 }
