@@ -27,7 +27,6 @@ public interface Job {
      * @throws JobExecutionException if the job execution failed.
      */
     void run() throws JobExecutionException;
-
 }
 
 
