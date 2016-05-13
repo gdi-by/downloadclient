@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -56,6 +58,8 @@ public class Controller {
     // View
     private View view;
 
+    private static final Logger log
+            = Logger.getLogger(WMSMap.class.getName());
     /**
      * Creates the Conroller.
      * @param dataBean the model
@@ -260,6 +264,17 @@ public class Controller {
                                 view.getServiceList().
                                         getSelectionModel().
                                         getSelectedItems().get(0);
+                        if (view.getServiceUseAuthenticationCBX().
+                                isSelected()) {
+                            username =
+                                    view.getServiceUser().
+                                            textProperty().getValue();
+                            dataBean.setUsername(username);
+                            password =
+                                    view.getServicePW().
+                                            textProperty().getValue();
+                            dataBean.setPassword(password);
+                        }
                         serviceURL = dataBean.getServiceURL(serviceName);
                     } else if (view.getServiceURLfield()
                             .textProperty().getValue()
@@ -272,9 +287,11 @@ public class Controller {
                             username =
                                     view.getServiceUser().
                                             textProperty().getValue();
+                            dataBean.setUsername(username);
                             password =
                                     view.getServicePW().
                                             textProperty().getValue();
+                            dataBean.setPassword(password);
                         }
                         if (username != null && password != null) {
                         }
@@ -282,35 +299,53 @@ public class Controller {
                     if (serviceURL != null) {
                         //view.setStatusBarText("Check for Servicetype");
                         WebService.Type st =
-                                ServiceChecker.checkService(serviceURL);
+                                ServiceChecker.checkService(serviceURL,
+                                        dataBean.getBase64EncAuth());
                         WebService ws = null;
-                        switch (st) {
-                            case Atom:
-                                Platform.runLater(() -> {
-                                    view.setStatusBarText("Found Atom "
-                                            + "Service");
-                                });
-                                ws = new Atom(serviceURL);
-                                break;
-                            case WFSOne:
-                                Platform.runLater(() -> {
-                                    view.setStatusBarText("Found WFSOne "
-                                            + "Service");
-                                });
-                                ws = new WFSOne(serviceURL);
-                                break;
-                            case WFSTwo:
-                                Platform.runLater(() -> {
-                                    view.setStatusBarText("Found WFSTwo "
-                                            + "Service");
-                                });
-                                ws = new WFSTwo(serviceURL);
-                                break;
-                            default:
-                                Platform.runLater(() -> {
-                                    view.setStatusBarText("Could not "
-                                            + "determine URL");
-                                });
+                        //Check for null, since switch breaks on a null value
+                        if (st == null) {
+                            log.log(Level.WARNING, "Could not determine " +
+                                    "Service Type" , st);
+                            Platform.runLater(() -> {
+                                view.setStatusBarText("Could not determine "
+                                        + "Service Type");
+                            });
+                        } else {
+                            switch (st) {
+                                case Atom:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found Atom "
+                                                + "Service");
+                                    });
+                                    ws = new Atom(serviceURL);
+                                    break;
+                                case WFSOne:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found WFSOne "
+                                                + "Service");
+                                    });
+                                    ws = new WFSOne(serviceURL, dataBean
+                                            .getUserName(), dataBean
+                                            .getPassword());
+                                    break;
+                                case WFSTwo:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found WFSTwo "
+                                                + "Service");
+                                    });
+                                    ws = new WFSTwo(serviceURL, dataBean
+                                            .getUserName(), dataBean
+                                            .getPassword());
+                                    break;
+                                default:
+                                    log.log(Level.WARNING, "Could not determine " +
+                                            "URL" , st);
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Could not "
+                                                + "determine URL");
+                                    });
+                                    break;
+                            }
                         }
                         dataBean.setWebService(ws);
                         Platform.runLater(() -> {

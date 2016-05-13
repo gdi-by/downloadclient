@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 import java.util.ArrayList;
+import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -46,6 +47,8 @@ public class DataBean extends Observable {
     private Map<String, String> attributes;
     private String wmsUrl;
     private String wmsName;
+    private String userName;
+    private String password;
 
     /**
      * Constructor.
@@ -59,6 +62,8 @@ public class DataBean extends Observable {
         this.webService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
+        this.userName = null;
+        this.password = null;
     }
 
     /**
@@ -205,5 +210,30 @@ public class DataBean extends Observable {
         this.wmsName = wmsName;
     }
 
+    public void setUsername(String userName) {
+        this.userName = userName;
+    }
 
+    public String getUserName() {
+        return this.userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public String getBase64EncAuth() {
+        if (this.userName == null || this.password == null) {
+            return null;
+        } else {
+            String authString = this.userName + ":" + this.password;
+            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+            String authStringEnc = new String(authEncBytes);
+            return authStringEnc;
+        }
+    }
 }

@@ -28,6 +28,8 @@ public class WFSTwoServiceHandler {
 
     private String serviceURL;
     private WFSTwo ws;
+    private String userName;
+    private String password;
     private String typeName;
 
     private static final com.vividsolutions.jts.geom.Envelope BBOX
@@ -39,9 +41,12 @@ public class WFSTwoServiceHandler {
      * Handles the WFSTwoService, when not called from Frontend.
      * @param serviceURL URL of the Service
      */
-    public WFSTwoServiceHandler(String serviceURL) {
+    public WFSTwoServiceHandler(String serviceURL, String userName, String
+            password) {
         this.serviceURL = serviceURL;
-        this.ws = new WFSTwo(this.serviceURL);
+        this.userName = userName;
+        this.password = password;
+        this.ws = new WFSTwo(this.serviceURL, this.userName, this.password);
         typeName = this.ws.getTypes().get(0);
         System.out.println(ws.getBounds(BBOX, typeName));
     }

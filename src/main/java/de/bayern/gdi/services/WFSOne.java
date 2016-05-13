@@ -56,16 +56,30 @@ public class WFSOne extends WebService {
     private ArrayList<String> types;
     private DataStore data;
 
+    private String userName;
+    private String password;
+
     private FeatureSource<SimpleFeatureType, SimpleFeature>
             source;
     /**
      * Constructor.
      * @param serviceURL the service URL
+     * @param userName username if authentication is needed, else null
+     * @param password password if auth is needed, else null
      */
-    public WFSOne(String serviceURL) {
+    public WFSOne(String serviceURL, String userName, String password) {
         this.serviceURL = serviceURL;
 
+        this.userName = userName;
+        this.password = password;
+
         Map connectionParameters = new HashMap();
+
+        if(getBase64EncAuth(this.userName, this.password) != null) {
+            connectionParameters.put(
+                    "Authorization", "Basic "
+                            + getBase64EncAuth(this.userName, this.password));
+        }
         connectionParameters.put(
                 "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.serviceURL);
 

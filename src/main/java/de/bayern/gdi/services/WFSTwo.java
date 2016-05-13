@@ -20,14 +20,17 @@ package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.ParserConfigurationException;
 import net.opengis.ows11.OperationType;
 import net.opengis.ows11.OperationsMetadataType;
@@ -40,7 +43,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.Parser;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -51,48 +53,79 @@ public class WFSTwo extends WebService {
             = Logger.getLogger(WFSTwo.class.getName());
     private ArrayList<String> requestMethods;
     private WFSOne wfsOne;
+    private String password;
+    private String userName;
 
     /**
      * Constructor.
+     *
      * @param serviceURL URL to Service
+     * @param userName userName if auth is needed else null
+     * @param password pw if auth is needed else null
      */
-    public WFSTwo(String serviceURL) {
+    public WFSTwo(String serviceURL, String userName, String password) {
         this.serviceURL = serviceURL;
-            this.requestMethods = new ArrayList();
-            org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
-                    new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
-            Parser parser = new Parser(configuration);
-            try {
-                URL url = new URL(this.serviceURL);
-                InputSource xml = new InputSource(url.openStream());
-                Object parsed = parser.parse(xml);
-                WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;
-                OperationsMetadataType om = caps.getOperationsMetadata();
-                for (int i = 0; i < om.getOperation().size(); i++) {
-                    this.requestMethods.add(
-                            ((OperationType)
-                                    om.getOperation().get(i)).getName());
-                }
-                this.wfsOne = new WFSOne(this.serviceURL);
-            } catch (IOException
-                    | SAXException
-                    | ParserConfigurationException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+        this.userName = userName;
+        this.password = password;
+        this.requestMethods = new ArrayList();
+        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+        Parser parser = new Parser(configuration);
+        URLConnection conn = null;
+        try {
+            URL url = new URL(this.serviceURL);
+            if (url.toString().toLowerCase().startsWith("https"))
+            {
+                System.setProperty("jsse.enableSNIExtension", "false");
+                HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+                conn = (URLConnection) con;
+            }  else {
+                conn = url.openConnection();
             }
+            if (getBase64EncAuth(this.userName, this.password) != null) {
+                conn.setRequestProperty("Authorization", "Basic "
+                        + getBase64EncAuth(this.userName, this.password));
+            }
+            InputStream is = conn.getInputStream();
+        /*
+            final BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader.close();
+*/
+            InputSource xml = new InputSource(is);
+            Object parsed = parser.parse(xml);
+            WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;
+            OperationsMetadataType om = caps.getOperationsMetadata();
+            for (int i = 0; i < om.getOperation().size(); i++) {
+                this.requestMethods.add(
+                        ((OperationType)
+                                om.getOperation().get(i)).getName());
+            }
+            this.wfsOne = new WFSOne(this.serviceURL,
+                    this.userName, this.password);
+        } catch (IOException
+                | SAXException
+                | ParserConfigurationException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     /**
-     * @inheritDoc
      * @return the Types of the Service
+     * @inheritDoc
      */
     public ArrayList<String> getTypes() {
         return this.wfsOne.getTypes();
     }
 
     /**
-     * @inheritDoc
      * @param type the Type
      * @return the Attributes of a Type
+     * @inheritDoc
      */
     public Map<String, String> getAttributes(String type) {
         return this.wfsOne.getAttributes(type);
@@ -100,8 +133,9 @@ public class WFSTwo extends WebService {
 
     /**
      * Experimental Class to get the Bounds of a Type.
+     *
      * @param outerBBOX the Outer Bounding Box
-     * @param typeName the Type Name
+     * @param typeName  the Type Name
      * @return the Bounds
      */
     public ReferencedEnvelope getBounds(Envelope outerBBOX,
@@ -110,23 +144,23 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * @inheritDoc
      * @return the URL of the Service
+     * @inheritDoc
      */
     public String getServiceURL() {
         return this.serviceURL;
     }
 
     /**
-     * @inheritDoc
      * @return the stored Queries
+     * @inheritDoc
      */
     @Override
     public ArrayList<String> getStoredQueries() {
         ArrayList<String> storedQueries = new ArrayList();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
-        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext(); ) {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
             storedQueries.add(sqdt.getId());
@@ -155,23 +189,24 @@ public class WFSTwo extends WebService {
         }
         return storedQueryDescription;
     }
+
     /**
-     * @inheritDoc
      * @return NULL
+     * @inheritDoc
      */
     @Override
     public Map<String, String> getParameters(String queryName) {
         Map<String, String> parameters = new HashMap<String, String>();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
-        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext(); ) {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
             if (sqdt.getId().equals(queryName)) {
                 EList<ParameterExpressionType> parameterList
                         = sqdt.getParameter();
                 for (Iterator it2 = parameterList.iterator();
-                        it2.hasNext();) {
+                     it2.hasNext(); ) {
                     ParameterExpressionType parameter =
                             (ParameterExpressionType) it2.next();
                     parameters.put(parameter.getName(),
@@ -181,9 +216,10 @@ public class WFSTwo extends WebService {
         }
         return parameters;
     }
+
     /**
-     * @inheritDoc
      * @return the Methods that can be requested
+     * @inheritDoc
      */
     @Override
     public ArrayList<String> getRequestMethods() {
@@ -206,10 +242,11 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * @inheritDoc
      * @return the Type
+     * @inheritDoc
      */
     public WebService.Type getServiceType() {
         return Type.WFSTwo;
     }
+
 }

@@ -35,10 +35,14 @@ public class DebugWFSTwo {
 
     private WFSTwo wfstwo;
     private String urlString;
+    private String userName;
+    private String password;
 
 
-    private DebugWFSTwo(String url) {
+    private DebugWFSTwo(String url, String userName, String password) {
         this.urlString = url;
+        this.userName = userName;
+        this.password = password;
     }
 
     /**
@@ -46,12 +50,12 @@ public class DebugWFSTwo {
      * @param args Single Argument, just a URL to a WFSTwo Service
      */
     public static void main(String[] args) {
-        DebugWFSTwo dwfs = new DebugWFSTwo(args[0]);
+        DebugWFSTwo dwfs = new DebugWFSTwo(args[0], args[1], args[2]);
         dwfs.go();
     }
 
     private void go() {
-        wfstwo = new WFSTwo(this.urlString);
+        wfstwo = new WFSTwo(this.urlString, this.userName, this.password);
         printArrayStringList(wfstwo.getRequestMethods());
         printArrayStringList(wfstwo.getStoredQueries());
         printStringMap(wfstwo.getParameters(wfstwo.getStoredQueries().get(0)));

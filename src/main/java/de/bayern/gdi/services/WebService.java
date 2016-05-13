@@ -20,6 +20,7 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.Map;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -84,5 +85,16 @@ public abstract class WebService implements ServiceSchema {
      */
     public Map<String, String> getParameters(String queryName) {
         return null;
+    }
+
+    protected String getBase64EncAuth(String userName, String password) {
+        if (userName == null || password == null) {
+            return null;
+        } else {
+            String authString = userName + ":" + password;
+            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+            String authStringEnc = new String(authEncBytes);
+            return authStringEnc;
+        }
     }
 }
