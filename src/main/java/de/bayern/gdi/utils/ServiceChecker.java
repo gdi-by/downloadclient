@@ -52,8 +52,7 @@ public class ServiceChecker {
         try {
             URL url = new URL(serviceURL);
             URLConnection conn = null;
-            if (url.toString().toLowerCase().startsWith("https"))
-            {
+            if (url.toString().toLowerCase().startsWith("https")) {
                 System.setProperty("jsse.enableSNIExtension", "false");
                 conn = url.openConnection();
             }

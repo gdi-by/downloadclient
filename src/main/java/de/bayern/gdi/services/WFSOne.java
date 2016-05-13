@@ -75,7 +75,7 @@ public class WFSOne extends WebService {
 
         Map connectionParameters = new HashMap();
 
-        if(getBase64EncAuth(this.userName, this.password) != null) {
+        if (getBase64EncAuth(this.userName, this.password) != null) {
             connectionParameters.put(
                     "Authorization", "Basic "
                             + getBase64EncAuth(this.userName, this.password));

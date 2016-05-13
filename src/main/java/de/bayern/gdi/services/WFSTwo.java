@@ -74,10 +74,10 @@ public class WFSTwo extends WebService {
         URLConnection conn = null;
         try {
             URL url = new URL(this.serviceURL);
-            if (url.toString().toLowerCase().startsWith("https"))
-            {
+            if (url.toString().toLowerCase().startsWith("https")) {
                 System.setProperty("jsse.enableSNIExtension", "false");
-                HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+                HttpsURLConnection con =
+                        (HttpsURLConnection)url.openConnection();
                 conn = (URLConnection) con;
             }  else {
                 conn = url.openConnection();
@@ -160,7 +160,7 @@ public class WFSTwo extends WebService {
         ArrayList<String> storedQueries = new ArrayList();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
-        for (Iterator it = storedQueryDescription.iterator(); it.hasNext(); ) {
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
             storedQueries.add(sqdt.getId());
@@ -199,14 +199,14 @@ public class WFSTwo extends WebService {
         Map<String, String> parameters = new HashMap<String, String>();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
-        for (Iterator it = storedQueryDescription.iterator(); it.hasNext(); ) {
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
             StoredQueryDescriptionType sqdt =
                     (StoredQueryDescriptionType) it.next();
             if (sqdt.getId().equals(queryName)) {
                 EList<ParameterExpressionType> parameterList
                         = sqdt.getParameter();
                 for (Iterator it2 = parameterList.iterator();
-                     it2.hasNext(); ) {
+                     it2.hasNext();) {
                     ParameterExpressionType parameter =
                             (ParameterExpressionType) it2.next();
                     parameters.put(parameter.getName(),

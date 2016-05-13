@@ -210,22 +210,42 @@ public class DataBean extends Observable {
         this.wmsName = wmsName;
     }
 
-    public void setUsername(String userName) {
-        this.userName = userName;
+    /**
+     * sets the Username.
+     * @param username the username
+     */
+    public void setUsername(String username) {
+        this.userName = username;
     }
 
+    /**
+     * gets the username.
+     * @return the username
+     */
     public String getUserName() {
         return this.userName;
     }
 
+    /**
+     * sets the password.
+     * @param password the password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * gets the password.
+     * @return the password
+     */
     public String getPassword() {
         return this.password;
     }
 
+    /**
+     * gets the username and password as base64 encrypted string.
+     * @return the base 64 encrypted username and password string
+     */
     public String getBase64EncAuth() {
         if (this.userName == null || this.password == null) {
             return null;

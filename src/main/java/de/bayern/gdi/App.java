@@ -78,7 +78,7 @@ public class App {
             String userName = null;
             String password = null;
             WebService.Type st = ServiceChecker.checkService(DEMO_URL,
-                    getBase64EncAuth(userName,password));
+                    getBase64EncAuth(userName, password));
             switch (st) {
                 case Atom:
                     log.info("Atom Service Found");

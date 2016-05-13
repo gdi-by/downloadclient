@@ -304,8 +304,8 @@ public class Controller {
                         WebService ws = null;
                         //Check for null, since switch breaks on a null value
                         if (st == null) {
-                            log.log(Level.WARNING, "Could not determine " +
-                                    "Service Type" , st);
+                            log.log(Level.WARNING, "Could not determine "
+                                    + "Service Type" , st);
                             Platform.runLater(() -> {
                                 view.setStatusBarText("Could not determine "
                                         + "Service Type");
@@ -338,8 +338,8 @@ public class Controller {
                                             .getPassword());
                                     break;
                                 default:
-                                    log.log(Level.WARNING, "Could not determine " +
-                                            "URL" , st);
+                                    log.log(Level.WARNING,
+                                            "Could not determine URL" , st);
                                     Platform.runLater(() -> {
                                         view.setStatusBarText("Could not "
                                                 + "determine URL");

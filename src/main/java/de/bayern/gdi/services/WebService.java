@@ -87,6 +87,12 @@ public abstract class WebService implements ServiceSchema {
         return null;
     }
 
+    /**
+     * gets the username and password as base64 encoded string.
+     * @param userName the username
+     * @param password the password
+     * @return the base64 encoded string
+     */
     protected String getBase64EncAuth(String userName, String password) {
         if (userName == null || password == null) {
             return null;
