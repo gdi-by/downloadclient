@@ -1,8 +1,8 @@
 <settings>
     <catalogues>
         <catalog>
-            <name>Test Katalog</name>
-            <url>http://testurl.de</url>
+            <name>CSW GDI-BY</name>
+            <url>http://geoportal.bayern.de/csw/gdi?</url>
         </catalog>
     </catalogues>
     <wms>
@@ -13,92 +13,33 @@
     </wms>
     <services>
         <service>
-            <name>lorem</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>INSPIRE WFS 2.0 DemoServer Verwaltungsgrenzen Bayern</name>
+            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=wfs&amp;version=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>ipsum</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>UMN MapServer 7 - WFS 2.0 Vorschau</name>
+            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>dolor</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>(Vendor Specific) UMN MapServer 7 - WFS 2.0 Vorschau</name>
+            <url>http://geoserv.weichand.de/cgi-bin/mapserv-dev?map=/home/wei/wfs20-example.map&amp;service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>sit</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>(Auth http) UMN MapServer 7 - WFS 2.0 Vorschau</name>
+            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7-pwd.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>amet</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>(Auth https) UMN MapServer 7 - WFS 2.0 Vorschau</name>
+            <url>https://geoserv.weichand.de/cgi-bin/test-mapserver7-pwd-https.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>consetetur</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>(Paging) UMN MapServer 7 - WFS 2.0 Vorschau</name>
+            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7-limited.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
         <service>
-            <name>sadipscing</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
+            <name>(complex) INSPIRE Addresses</name>
+            <url>http://demo.deegree.org/inspire-workspace/services/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
-        <service>
-            <name>elitr</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>sed</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>diam</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>nonumy</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>eirmod</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>nonumy</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>tempor</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>invidunt</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>ut</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>labore</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>accusam</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>justo</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>dolores</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>sanctus</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>takimata</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
+
     </services>
 </settings>

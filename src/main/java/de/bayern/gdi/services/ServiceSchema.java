@@ -18,15 +18,47 @@
 
 package de.bayern.gdi.services;
 
-import org.opengis.feature.type.AttributeType;
-
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 interface ServiceSchema {
+    /**
+     * gets the Types of a Service.
+     * @return ArrayList of Types
+     */
     ArrayList<String> getTypes();
-    ArrayList<AttributeType> getAttributes(String type);
+
+    /**
+     * gets the Attributes of a Type.
+     * @param type the Type
+     */
+    Map<String, String> getAttributes(String type);
+
+    /**
+     * gets the URL of a service.
+     */
     String getServiceURL();
+
+    /**
+     * gets stored Queries of a Service.
+     */
+    ArrayList<String> getStoredQueries();
+
+    /**
+     * gets the Request Methods of a Service.
+     */
+    ArrayList<String> getRequestMethods();
+
+    /**
+     * gets the Parameters for a Stored Query.
+     */
+    Map<String, String> getParameters(String queryName);
+
+    /**
+     * gets the ServiceType.
+     */
+    WebService.Type getServiceType();
 }

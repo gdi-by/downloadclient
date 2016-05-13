@@ -18,6 +18,7 @@
 package de.bayern.gdi.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -32,7 +33,19 @@ import org.w3c.dom.Document;
  */
 public class DocumentResponseHandler implements ResponseHandler<Document> {
 
+    private WrapInputStreamFactory wrapFactory;
+
     public DocumentResponseHandler() {
+    }
+
+    public DocumentResponseHandler(WrapInputStreamFactory wrapFactory) {
+        this.wrapFactory = wrapFactory;
+    }
+
+    private InputStream wrap(InputStream in) {
+        return this.wrapFactory != null
+            ? this.wrap(in)
+            : in;
     }
 
     @Override
@@ -47,6 +60,6 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         HttpEntity entity = response.getEntity();
         return entity == null
             ? null
-            : XML.getDocument(entity.getContent());
+            : XML.getDocument(wrap(entity.getContent()));
     }
 }

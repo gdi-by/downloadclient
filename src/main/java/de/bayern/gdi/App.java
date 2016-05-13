@@ -24,6 +24,7 @@ import de.bayern.gdi.utils.ServiceChecker;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
@@ -49,8 +50,21 @@ public class App {
         return false;
     }
 
-    private static WebService.Type serviceType(String url) {
-        return ServiceChecker.checkService(url);
+    private static String getBase64EncAuth(String username, String password) {
+        if (username == null || password == null) {
+            return null;
+        } else {
+            String authString = username + ":" + password;
+            System.out.println("auth string: " + authString);
+            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+            String authStringEnc = new String(authEncBytes);
+            return authStringEnc;
+        }
+    }
+    private static WebService.Type serviceType(String url, String userName,
+                                               String password) {
+        return ServiceChecker.checkService(url, getBase64EncAuth(userName,
+                password));
     }
 
     /**
@@ -61,7 +75,10 @@ public class App {
             log.info("Running in headless mode");
             //There could be a Service Handler for each Service that deals
             //with command line arguments and/or a stored XML File
-            WebService.Type st = ServiceChecker.checkService(DEMO_URL);
+            String userName = null;
+            String password = null;
+            WebService.Type st = ServiceChecker.checkService(
+                    DEMO_URL, getBase64EncAuth(userName, password));
             switch (st) {
                 case Atom:
                     log.info("Atom Service Found");
@@ -72,7 +89,8 @@ public class App {
                 case WFSTwo:
                     log.info("WFSTwo Service Found");
                     WFSTwoServiceHandler wfstwo =
-                            new WFSTwoServiceHandler(DEMO_URL);
+                            new WFSTwoServiceHandler(DEMO_URL, userName,
+                                    password);
                     break;
                 default:
                     log.log(Level.SEVERE, "Could not determine Service Type");

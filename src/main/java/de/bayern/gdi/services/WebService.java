@@ -18,6 +18,10 @@
 
 package de.bayern.gdi.services;
 
+import java.util.ArrayList;
+import java.util.Map;
+import org.apache.commons.codec.binary.Base64;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -58,4 +62,43 @@ public abstract class WebService implements ServiceSchema {
         this.serviceURL = serviceURL;
     }
 
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    public ArrayList<String> getStoredQueries() {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     * @return NULL
+     */
+    public ArrayList<String> getRequestMethods() {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     * @return NULL
+     * @param queryName The Name of the query
+     */
+    public Map<String, String> getParameters(String queryName) {
+        return null;
+    }
+
+    /**
+     * gets the username and password as base64 encoded string.
+     * @param userName the username
+     * @param password the password
+     * @return the base64 encoded string
+     */
+    protected String getBase64EncAuth(String userName, String password) {
+        if (userName == null || password == null) {
+            return null;
+        }
+        String authString = userName + ":" + password;
+        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+        return new String(authEncBytes);
+    }
 }

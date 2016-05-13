@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 import java.util.ArrayList;
+import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -43,9 +44,11 @@ public class DataBean extends Observable {
     private Map<String, String> catalogues;
     private WebService webService;
     private ArrayList<String> serviceTypes;
-    private Map<String, Class> attributes;
+    private Map<String, String> attributes;
     private String wmsUrl;
     private String wmsName;
+    private String userName;
+    private String password;
 
     /**
      * Constructor.
@@ -59,6 +62,8 @@ public class DataBean extends Observable {
         this.webService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
+        this.userName = null;
+        this.password = null;
     }
 
     /**
@@ -161,7 +166,7 @@ public class DataBean extends Observable {
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public Map<String, Class> getAttributes() {
+    public Map<String, String> getAttributes() {
         return attributes;
     }
 
@@ -169,7 +174,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(Map<String, Class> attributes) {
+    public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
     }
 
@@ -205,4 +210,48 @@ public class DataBean extends Observable {
         this.wmsName = wmsName;
     }
 
+    /**
+     * sets the Username.
+     * @param username the username
+     */
+    public void setUsername(String username) {
+        this.userName = username;
+    }
+
+    /**
+     * gets the username.
+     * @return the username
+     */
+    public String getUserName() {
+        return this.userName;
+    }
+
+    /**
+     * sets the password.
+     * @param password the password
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * gets the password.
+     * @return the password
+     */
+    public String getPassword() {
+        return this.password;
+    }
+
+    /**
+     * gets the username and password as base64 encrypted string.
+     * @return the base 64 encrypted username and password string
+     */
+    public String getBase64EncAuth() {
+        if (this.userName == null || this.password == null) {
+            return null;
+        }
+        String authString = this.userName + ":" + this.password;
+        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+        return new String(authEncBytes);
+    }
 }

@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -188,6 +189,8 @@ public class View {
 
     private WMSMap wmsMap;
 
+    private Group mapGroup;
+
     /**
      * Constructor.
      */
@@ -314,7 +317,7 @@ public class View {
         //Statusbar
         this.statusBar = new VBox();
         statusBar.setStyle("-fx-background-color: gainsboro");
-        final Text statusText = new Text("I'm important");
+        final Text statusText = new Text("Ready");
         statusBar.getChildren().add(statusText);
 
         //Setting everything
@@ -330,6 +333,20 @@ public class View {
         this.attributeScrollPane = new ScrollPane();
         this.attributeGridPane = new GridPane();
         this.wmsMap = new WMSMap();
+        this.mapGroup = new Group();
+    }
+
+    /**
+     * Resets the View to the initial Position.
+     */
+    public void reset() {
+        this.grid.getChildren().removeAll(this.attributesFilledBox,
+                this.attributesFilledButton,
+                this.typeComboBox,
+                this.attributeScrollPane,
+                this.attributeGridPane,
+                this.wmsMap,
+                this.mapGroup);
     }
 
     /**
@@ -361,11 +378,10 @@ public class View {
      * sets the Attributes.
      * @param attributes map of Attributes
      */
-    public void setAttributes(Map<String, Class> attributes) {
+    public void setAttributes(Map<String, String> attributes) {
         //Grid in Grid - Gridception... (I'll show myself the way out)
-        this.attributeGridPane.getChildren().remove(
-                this.attributeGridPane.getChildren()
-        );
+
+        this.attributeGridPane.getChildren().clear();
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setPercentWidth(this.columnWidth * TWO_FIFTH);
         this.attributeGridPane.getColumnConstraints().add(labelColumn);
@@ -403,7 +419,7 @@ public class View {
         this.attributesFilledBox.getChildren().removeAll(
                 this.attributesFilledBox.getChildren()
         );
-        this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
+        //this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
         this.grid.getChildren().remove(this.attributesFilledBox);
         this.grid.add(this.attributesFilledBox,
                 SECOND_COLUMN,
@@ -421,9 +437,10 @@ public class View {
                 INITALBBOX,
                 (int) serviceList.getWidth(),
                 (int) serviceList.getWidth());
-        this.grid.getChildren().remove(this.wmsMap
-           );
-        this.grid.add(wmsMap,
+        this.mapGroup.getChildren().clear();
+        this.mapGroup.getChildren().add(this.wmsMap);
+        this.grid.getChildren().remove(this.mapGroup);
+        this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 SECOND_ROW);
     }

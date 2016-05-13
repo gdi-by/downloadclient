@@ -19,29 +19,33 @@
 package de.bayern.gdi.gui;
 
 
-import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.Node;
-import javafx.stage.Modality;
-import javafx.stage.WindowEvent;
-import org.opengis.feature.type.AttributeType;
-
+import de.bayern.gdi.utils.ServiceChecker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
+import javafx.stage.WindowEvent;
+import org.opengis.feature.type.AttributeType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -54,6 +58,8 @@ public class Controller {
     // View
     private View view;
 
+    private static final Logger log
+            = Logger.getLogger(WMSMap.class.getName());
     /**
      * Creates the Conroller.
      * @param dataBean the model
@@ -97,7 +103,16 @@ public class Controller {
      */
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
-            dataBean.setServiceTypes(dataBean.getWebService().getTypes());;
+            switch (dataBean.getWebService().getServiceType()) {
+                case WFSOne:
+                    dataBean.setServiceTypes(
+                            dataBean.getWebService().getTypes());
+                case WFSTwo:
+                    dataBean.setServiceTypes(
+                            dataBean.getWebService().getStoredQueries());
+                case Atom:
+                default:
+            }
             view.setTypes(dataBean.getServiceTypes());
         }
     }
@@ -106,7 +121,7 @@ public class Controller {
      * sets the Service Types Attributes.
      * @param map the Map of Attributes
      */
-    public void setServiceAttributes(Map<String, Class> map) {
+    public void setServiceAttributes(Map<String, String> map) {
         if (dataBean.isWebServiceSet()) {
             view.setAttributes(map);
             setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
@@ -164,18 +179,23 @@ public class Controller {
         implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            Map map = new HashMap<String, Class>();
+            Map map = new HashMap<String, String>();
             if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
                     != null) {
                 String choosenType =
                         view.getTypeComboBox().getSelectionModel()
                         .getSelectedItem()
                         .toString();
-                ArrayList <AttributeType> attributes =
-                        dataBean.getWebService().getAttributes(choosenType);
-                for (AttributeType attribute: attributes) {
-                    map.put(attribute.getName().toString(),
-                            attribute.getBinding());
+                ArrayList <AttributeType> attributes = null;
+                switch (dataBean.getWebService().getServiceType()) {
+                    case WFSOne:
+                        map = dataBean.getWebService()
+                                        .getAttributes(choosenType);
+                    case WFSTwo:
+                        map = dataBean.getWebService()
+                                .getParameters(choosenType);
+                    case Atom:
+                    default:
                 }
                 dataBean.setAttributes(map);
                 setServiceAttributes(dataBean.getAttributes());
@@ -220,7 +240,7 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //Nada
+            view.reset();
         }
     }
 
@@ -231,57 +251,120 @@ public class Controller {
             EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            String serviceURL = null;
-            String username = null;
-            String password = null;
-            if (view.getServiceList().getSelectionModel().getSelectedItems()
-                    != null) {
-                String serviceName =
-                        view.getServiceList().
-                                getSelectionModel().getSelectedItems().get(0);
-                serviceURL = dataBean.getServiceURL(serviceName);
-            } else if (view.getServiceURLfield().textProperty().getValue()
-                    != null) {
-                serviceURL =
-                        view.getServiceURLfield().textProperty().getValue();
-                if (view.getServiceUseAuthenticationCBX().isSelected()) {
-                    username = view.getServiceUser().textProperty().getValue();
-                    password = view.getServicePW().textProperty().getValue();
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    view.getScene().setCursor(Cursor.WAIT);
+                    String serviceURL = null;
+                    String username = null;
+                    String password = null;
+                    if (view.getServiceUseAuthenticationCBX().
+                            isSelected()) {
+                        username =
+                                view.getServiceUser().
+                                        textProperty().getValue();
+                        dataBean.setUsername(username);
+                        password =
+                                view.getServicePW().
+                                        textProperty().getValue();
+                        dataBean.setPassword(password);
+                    }
+                    if (view.getServiceList().
+                            getSelectionModel().getSelectedItems().get(0)
+                            != null) {
+                        String serviceName =
+                                view.getServiceList().
+                                        getSelectionModel().
+                                        getSelectedItems().get(0);
+                        serviceURL = dataBean.getServiceURL(serviceName);
+                    } else {
+                        serviceURL =
+                                view.getServiceURLfield().
+                                        textProperty().getValue();
+                    }
+                    if (view.getServiceUseAuthenticationCBX().
+                            isSelected()) {
+                        username = view.getServiceUser().
+                                        textProperty().getValue();
+                        dataBean.setUsername(username);
+                        password = view.getServicePW().
+                                        textProperty().getValue();
+                        dataBean.setPassword(password);
+                    }
+                    if (serviceURL != null) {
+                        //view.setStatusBarText("Check for Servicetype");
+                        WebService.Type st =
+                                ServiceChecker.checkService(serviceURL,
+                                        dataBean.getBase64EncAuth());
+                        WebService ws = null;
+                        //Check for null, since switch breaks on a null value
+                        if (st == null) {
+                            log.log(Level.WARNING, "Could not determine "
+                                    + "Service Type" , st);
+                            Platform.runLater(() -> {
+                                view.setStatusBarText("Could not determine "
+                                        + "Service Type");
+                            });
+                        } else {
+                            switch (st) {
+                                case Atom:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found Atom "
+                                                + "Service");
+                                    });
+                                    ws = new Atom(serviceURL);
+                                    break;
+                                case WFSOne:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found WFSOne "
+                                                + "Service");
+                                    });
+                                    ws = new WFSOne(serviceURL, dataBean
+                                            .getUserName(), dataBean
+                                            .getPassword());
+                                    break;
+                                case WFSTwo:
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Found WFSTwo "
+                                                + "Service");
+                                    });
+                                    ws = new WFSTwo(serviceURL, dataBean
+                                            .getUserName(), dataBean
+                                            .getPassword());
+                                    break;
+                                default:
+                                    log.log(Level.WARNING,
+                                        "Could not determine URL" , st);
+                                    Platform.runLater(() -> {
+                                        view.setStatusBarText("Could not "
+                                                + "determine URL");
+                                    });
+                                    break;
+                            }
+                        }
+                        dataBean.setWebService(ws);
+                        Platform.runLater(() -> {
+                            setServiceTypes();
+                            view.getTypeComboBox().
+                                    getSelectionModel().select(0);
+                            ChooseTypeEventHandler chooseType
+                                    = new ChooseTypeEventHandler();
+                            chooseType.handle(e);
+                            view.setStatusBarText("Ready");
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            view.setStatusBarText("Could not determine URL");
+                        });
+                    }
+                    view.getScene().setCursor(Cursor.DEFAULT);
+                    return 0;
                 }
-                if (username != null && password != null) {
-                }
-            }
-            if (serviceURL != null) {
-                view.setStatusBarText("Check for Servicetype");
-                WebService.Type st = ServiceChecker.checkService(serviceURL);
-                WebService ws = null;
-                switch (st) {
-                    case Atom:
-                        view.setStatusBarText("Found Atom Service");
-                        ws = new Atom(serviceURL);
-                        break;
-                    case WFSOne:
-                        view.setStatusBarText("Found WFSOne Service");
-                        ws = new WFSOne(serviceURL);
-                        break;
-                    case WFSTwo:
-                        view.setStatusBarText("Found WFSTwo Service");
-                        ws = new WFSTwo(serviceURL);
-                        break;
-                    default:
-                        view.
-                          setStatusBarText("Could not determine Service Type");
-                }
-                dataBean.setWebService(ws);
-                setServiceTypes();
-                //Preselect the first entry and mock the corresponding event
-                view.getTypeComboBox().getSelectionModel().select(0);
-                ChooseTypeEventHandler chooseType
-                        = new ChooseTypeEventHandler();
-                chooseType.handle(e);
-            } else {
-                view.setStatusBarText("Could not determine URL");
-            }
+            };
+                Thread th = new Thread(task);
+                view.setStatusBarText("Calling Service to get Infos");
+                th.setDaemon(true);
+                th.start();
         }
     }
 
@@ -304,10 +387,6 @@ public class Controller {
             closeConfirmation.setHeaderText("Confirm Exit");
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
             closeConfirmation.initOwner(dataBean.getPrimaryStage());
-
-            closeConfirmation.setX(dataBean.getPrimaryStage().getX());
-            closeConfirmation.setY(dataBean.getPrimaryStage().getY()
-                    + dataBean.getPrimaryStage().getHeight());
 
             Optional<ButtonType> closeResponse =
                     closeConfirmation.showAndWait();

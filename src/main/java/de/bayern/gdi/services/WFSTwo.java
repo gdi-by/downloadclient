@@ -19,193 +19,235 @@
 package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.GeometryType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.ParserConfigurationException;
+import net.opengis.ows11.OperationType;
+import net.opengis.ows11.OperationsMetadataType;
+import net.opengis.wfs20.DescribeStoredQueriesResponseType;
+import net.opengis.wfs20.ParameterExpressionType;
+import net.opengis.wfs20.StoredQueryDescriptionType;
+import net.opengis.wfs20.WFSCapabilitiesType;
+import org.eclipse.emf.common.util.EList;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.xml.Parser;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class WFSTwo extends WebService {
 
-    private static final Logger log
-        = Logger.getLogger(WFSTwo.class.getName());
-
     private String serviceURL;
-
-    private ArrayList<String> types;
-    private DataStore data;
-
-    private FeatureSource<SimpleFeatureType, SimpleFeature>
-            source;
+    private static final Logger log
+            = Logger.getLogger(WFSTwo.class.getName());
+    private ArrayList<String> requestMethods;
+    private WFSOne wfsOne;
+    private String password;
+    private String userName;
 
     /**
      * Constructor.
+     *
      * @param serviceURL URL to Service
+     * @param userName userName if auth is needed else null
+     * @param password pw if auth is needed else null
      */
-    public WFSTwo(String serviceURL) {
+    public WFSTwo(String serviceURL, String userName, String password) {
         this.serviceURL = serviceURL;
-
-        Map connectionParameters = new HashMap();
-        connectionParameters.put(
-                "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.serviceURL);
-
+        this.userName = userName;
+        this.password = password;
+        this.requestMethods = new ArrayList();
+        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+        Parser parser = new Parser(configuration);
+        URLConnection conn = null;
         try {
-            this.data = DataStoreFinder.getDataStore(connectionParameters);
-        } catch (Exception e) {
+            URL url = new URL(this.serviceURL);
+            if (url.toString().toLowerCase().startsWith("https")) {
+                HttpsURLConnection con
+                    = (HttpsURLConnection)url.openConnection();
+                conn = (URLConnection) con;
+            }  else {
+                conn = url.openConnection();
+            }
+            if (getBase64EncAuth(this.userName, this.password) != null) {
+                conn.setRequestProperty("Authorization", "Basic "
+                        + getBase64EncAuth(this.userName, this.password));
+            }
+            InputStream is = conn.getInputStream();
+        /*
+            final BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader.close();
+*/
+            InputSource xml = new InputSource(is);
+            Object parsed = parser.parse(xml);
+            WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;
+            OperationsMetadataType om = caps.getOperationsMetadata();
+            for (int i = 0; i < om.getOperation().size(); i++) {
+                this.requestMethods.add(
+                        ((OperationType)
+                                om.getOperation().get(i)).getName());
+            }
+            this.wfsOne = new WFSOne(this.serviceURL,
+                    this.userName, this.password);
+        } catch (RuntimeException
+                | IOException
+                | SAXException
+                | ParserConfigurationException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
     /**
-     * gets the types of a service.
-     * @return the types
+     * @return the Types of the Service
+     * @inheritDoc
      */
     public ArrayList<String> getTypes() {
-        if (this.types == null) {
-            this.types = new ArrayList();
-            try {
-                String[] typeNames = this.data.getTypeNames();
-
-                for (String tName : typeNames) {
-                    this.types.add(tName);
-                }
-            } catch (Exception e) {
-                //TODO: Be more specific about execptions
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
-        }
-        return this.types;
+        return this.wfsOne.getTypes();
     }
 
     /**
-     * gets the attributes of a tye.
-     * @param type type to get attributes of
-     * @return the attributes
+     * @param type the Type
+     * @return the Attributes of a Type
+     * @inheritDoc
      */
-    public ArrayList<AttributeType> getAttributes(String type) {
-        ArrayList<AttributeType> attributes = new ArrayList();
-        try {
-            SimpleFeatureType schema = this.data.getSchema(type);
-            this.source = this.data.getFeatureSource(type);
-            attributes.addAll(schema.getTypes());
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return attributes;
+    public Map<String, String> getAttributes(String type) {
+        return this.wfsOne.getAttributes(type);
     }
 
     /**
      * Experimental Class to get the Bounds of a Type.
+     *
      * @param outerBBOX the Outer Bounding Box
-     * @param typeName the Type Name
+     * @param typeName  the Type Name
      * @return the Bounds
      */
     public ReferencedEnvelope getBounds(Envelope outerBBOX,
                                         String typeName) {
-        SimpleFeatureType schema = null;
-        ReferencedEnvelope bbox = null;
-        FeatureCollection<SimpleFeatureType, SimpleFeature>
-                features = null;
-        try {
-            schema = this.data.getSchema(typeName);
-            this.source = this.data.getFeatureSource(typeName);
-            bbox = source.getBounds();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        System.out.println("Metadata Bounds:" + bbox);
-
-        // XXX: This is a bit cumbersome.
-        GeometryType gt = null;
-        System.out.println("types:");
-        for (AttributeType type: schema.getTypes()) {
-            System.out.println("\t'" + type + "'");
-            if (type instanceof GeometryType) {
-                gt = (GeometryType)type;
-            }
-        }
-
-        if (gt == null) {
-            log.log(Level.SEVERE, "No geometry found.");
-            return null;
-            //throw new Exception("No geometry found.");
-        }
-
-        String geomName = gt.getName().getLocalPart();
-
-        System.out.println("Using '" + geomName + "' as geometry column.");
-
-
-        // Step 5 - query
-
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
-                GeoTools.getDefaultHints());
-
-        Object polygon = JTS.toGeometry(outerBBOX);
-
-        Filter filter = ff.bbox(
-                ff.property(geomName),
-                new ReferencedEnvelope(
-                        outerBBOX, bbox.getCoordinateReferenceSystem()));
-
-        Query query = new Query(typeName,
-                filter,
-                new String[]{geomName});
-        try {
-            features = source.getFeatures(query);
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        ReferencedEnvelope bounds = new ReferencedEnvelope();
-        try (FeatureIterator<SimpleFeature> iterator = features.features()) {
-            int count = 0;
-            while (iterator.hasNext()) {
-                Feature feature = iterator.next();
-                ++count;
-                System.out.println(count + " " + feature.getBounds());
-                bounds.include(feature.getBounds());
-            }
-        }
-        System.out.println("Calculated Bounds:" + bounds);
-        return bounds;
+        return null;
     }
 
     /**
-     * gets the service URL.
-     * @return the service URL
+     * @return the URL of the Service
+     * @inheritDoc
      */
     public String getServiceURL() {
         return this.serviceURL;
     }
 
     /**
-     * gets the dataStore.
-     * @return datastore
+     * @return the stored Queries
+     * @inheritDoc
      */
-    public DataStore getData() {
-        return this.data;
+    @Override
+    public ArrayList<String> getStoredQueries() {
+        ArrayList<String> storedQueries = new ArrayList();
+        EList<StoredQueryDescriptionType> storedQueryDescription =
+                getDescribeStoredQueries();
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+            StoredQueryDescriptionType sqdt =
+                    (StoredQueryDescriptionType) it.next();
+            storedQueries.add(sqdt.getId());
+        }
+        return storedQueries;
     }
+
+    private EList<StoredQueryDescriptionType> getDescribeStoredQueries() {
+        String describeStroedQueriesURL =
+                setURLRequest("DescribeStoredQueries");
+        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+        Parser parser = new Parser(configuration);
+        EList<StoredQueryDescriptionType> storedQueryDescription = null;
+        try {
+            URL url = new URL(describeStroedQueriesURL);
+            InputSource xml = new InputSource(url.openStream());
+            Object parsed = parser.parse(xml);
+
+            DescribeStoredQueriesResponseType storedQueriesType =
+                    (DescribeStoredQueriesResponseType) parsed;
+            storedQueryDescription =
+                    storedQueriesType.getStoredQueryDescription();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return storedQueryDescription;
+    }
+
+    /**
+     * @return NULL
+     * @inheritDoc
+     */
+    @Override
+    public Map<String, String> getParameters(String queryName) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        EList<StoredQueryDescriptionType> storedQueryDescription =
+                getDescribeStoredQueries();
+        for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
+            StoredQueryDescriptionType sqdt =
+                    (StoredQueryDescriptionType) it.next();
+            if (sqdt.getId().equals(queryName)) {
+                EList<ParameterExpressionType> parameterList
+                        = sqdt.getParameter();
+                for (Iterator it2 = parameterList.iterator();
+                     it2.hasNext();) {
+                    ParameterExpressionType parameter =
+                            (ParameterExpressionType) it2.next();
+                    parameters.put(parameter.getName(),
+                            parameter.getType().toString());
+                }
+            }
+        }
+        return parameters;
+    }
+
+    /**
+     * @return the Methods that can be requested
+     * @inheritDoc
+     */
+    @Override
+    public ArrayList<String> getRequestMethods() {
+        return this.requestMethods;
+    }
+
+    private String setURLRequest(String request) {
+        String newURL = "";
+        try {
+            if (this.requestMethods.contains(request)) {
+                newURL = this.serviceURL.replace("GetCapabilities", request);
+            } else {
+                throw new MalformedURLException("Service not capable for this"
+                        + "request");
+            }
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return newURL;
+    }
+
+    /**
+     * @return the Type
+     * @inheritDoc
+     */
+    public WebService.Type getServiceType() {
+        return Type.WFSTwo;
+    }
+
 }
