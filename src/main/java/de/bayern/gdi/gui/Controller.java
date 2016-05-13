@@ -258,43 +258,40 @@ public class Controller {
                     String serviceURL = null;
                     String username = null;
                     String password = null;
+                    if (view.getServiceUseAuthenticationCBX().
+                            isSelected()) {
+                        username =
+                                view.getServiceUser().
+                                        textProperty().getValue();
+                        dataBean.setUsername(username);
+                        password =
+                                view.getServicePW().
+                                        textProperty().getValue();
+                        dataBean.setPassword(password);
+                    }
                     if (view.getServiceList().
-                            getSelectionModel().getSelectedItems() != null) {
+                            getSelectionModel().getSelectedItems().get(0) !=
+                            null) {
                         String serviceName =
                                 view.getServiceList().
                                         getSelectionModel().
                                         getSelectedItems().get(0);
-                        if (view.getServiceUseAuthenticationCBX().
-                                isSelected()) {
-                            username =
-                                    view.getServiceUser().
-                                            textProperty().getValue();
-                            dataBean.setUsername(username);
-                            password =
-                                    view.getServicePW().
-                                            textProperty().getValue();
-                            dataBean.setPassword(password);
-                        }
                         serviceURL = dataBean.getServiceURL(serviceName);
-                    } else if (view.getServiceURLfield()
-                            .textProperty().getValue()
-                            != null) {
+                    } else {
                         serviceURL =
                                 view.getServiceURLfield().
                                         textProperty().getValue();
-                        if (view.getServiceUseAuthenticationCBX().
-                                isSelected()) {
-                            username =
-                                    view.getServiceUser().
-                                            textProperty().getValue();
-                            dataBean.setUsername(username);
-                            password =
-                                    view.getServicePW().
-                                            textProperty().getValue();
-                            dataBean.setPassword(password);
-                        }
-                        if (username != null && password != null) {
-                        }
+                    }
+                    if (view.getServiceUseAuthenticationCBX().
+                            isSelected()) {
+                        username =
+                                view.getServiceUser().
+                                        textProperty().getValue();
+                        dataBean.setUsername(username);
+                        password =
+                                view.getServicePW().
+                                        textProperty().getValue();
+                        dataBean.setPassword(password);
                     }
                     if (serviceURL != null) {
                         //view.setStatusBarText("Check for Servicetype");
