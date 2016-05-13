@@ -21,10 +21,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Collection;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Processor runs job out of a queue.
  */
 public class Processor implements Runnable {
+
+    private static final Logger log
+        = Logger.getLogger(Processor.class.getName());
 
     private static final long WAIT_TIME = 1000;
 
@@ -70,7 +76,11 @@ public class Processor implements Runnable {
                 }
                 job = this.jobs.poll();
             }
-            job.run();
+            try {
+                job.run();
+            } catch (JobExecutionException jee) {
+                log.log(Level.SEVERE, jee.getMessage(), jee);
+            }
         }
     }
 }
