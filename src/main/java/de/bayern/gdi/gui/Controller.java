@@ -270,8 +270,8 @@ public class Controller {
                         dataBean.setPassword(password);
                     }
                     if (view.getServiceList().
-                            getSelectionModel().getSelectedItems().get(0) !=
-                            null) {
+                            getSelectionModel().getSelectedItems().get(0)
+                            != null) {
                         String serviceName =
                                 view.getServiceList().
                                         getSelectionModel().
@@ -284,12 +284,10 @@ public class Controller {
                     }
                     if (view.getServiceUseAuthenticationCBX().
                             isSelected()) {
-                        username =
-                                view.getServiceUser().
+                        username = view.getServiceUser().
                                         textProperty().getValue();
                         dataBean.setUsername(username);
-                        password =
-                                view.getServicePW().
+                        password = view.getServicePW().
                                         textProperty().getValue();
                         dataBean.setPassword(password);
                     }
