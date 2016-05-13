@@ -15,7 +15,7 @@ Do not use it by now! :-)
 ## Run
 To start with UI:
 
-x    $ mvn exec:java
+    $ mvn exec:java
 
 To start in headless mode:
 
