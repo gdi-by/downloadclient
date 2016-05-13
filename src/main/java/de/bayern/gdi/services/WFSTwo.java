@@ -43,6 +43,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.Parser;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -106,7 +107,8 @@ public class WFSTwo extends WebService {
             }
             this.wfsOne = new WFSOne(this.serviceURL,
                     this.userName, this.password);
-        } catch (IOException
+        } catch (RuntimeException
+                | IOException
                 | SAXException
                 | ParserConfigurationException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
