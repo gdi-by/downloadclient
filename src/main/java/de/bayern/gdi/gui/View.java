@@ -356,6 +356,10 @@ public class View {
     public void show(Stage stage) {
         stage.setTitle("GDI-BY Downloadclient");
         stage.setScene(scene);
+        Rectangle2D primaryScreenBounds =
+                Screen.getPrimary().getVisualBounds();
+        stage.setWidth(primaryScreenBounds.getWidth());
+        stage.setHeight(primaryScreenBounds.getHeight());
         stage.show();
     }
 

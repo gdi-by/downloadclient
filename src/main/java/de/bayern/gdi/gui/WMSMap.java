@@ -26,9 +26,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.sun.tools.javac.util.Convert;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -101,6 +104,9 @@ public class WMSMap extends Parent {
     private double previousMouseYPosOnClick;
 
     private static final double DRAGGING_OFFSET = 4;
+    private static final double ZOOM_FACTOR = 10d;
+    private static final double HUNDRED = 100d;
+
     private Group boxGroup;
 
     /**
@@ -312,7 +318,29 @@ public class WMSMap extends Parent {
         System.out.println("Zomm Out");
     }
 
-    private static final double HUNDRED = 100d;
+    private void drag(double fromX, double fromY, double toX, double toY) {
+        //Upper Left Corner is 0,0
+        System.out.println("Dragging Image...");
+        System.out.println("From: " + fromX + ", " + fromY);
+        System.out.println("To: " + toX + ", " + toY);
+        double xOffset = toX - fromX;
+        double yOffset = toY - fromY;
+        //Trying it withe the diffence of from and to and add it to the image
+        List<String> bBoxStrList = Arrays.asList(this.outerBBOX.split(","));
+        double upperRightX = Double.parseDouble(bBoxStrList.get(0));
+        double upperRightY = Double.parseDouble(bBoxStrList.get(1));
+        double lowerLeftX = Double.parseDouble(bBoxStrList.get(2));
+        double lowerLeftY = Double.parseDouble(bBoxStrList.get(3));
+
+        upperRightX = upperRightX + xOffset;
+        lowerLeftX = lowerLeftX + xOffset;
+
+        upperRightY = upperRightY + yOffset;
+        lowerLeftY = lowerLeftY + yOffset;
+
+        String bbox = upperRightX + "," + upperRightY + "," + lowerLeftX + "," + lowerLeftY;
+        setMapImage(bbox,INIT_SPACIAL_REF_SYS,INIT_LAYER_NUMBER);
+    }
 
     private void drawMarker(double xPosition, double yPosition) {
         double markerSpan = this.iw.getImage().getWidth() / HUNDRED;
@@ -439,8 +467,7 @@ public class WMSMap extends Parent {
                 previousMouseXPosOnClick = mouseXPosOnClick;
                 previousMouseYPosOnClick = mouseYPosOnClick;
             } else {
-                System.out.println("Dragged image");
-                //TODO: Calculate new Coordinates for Picture
+                drag(mouseXPosOnClick, mouseYPosOnClick, e.getX(), e.getY());
                 boxGroup.getChildren().clear();
                 markerCount = 0;
             }
