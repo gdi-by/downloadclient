@@ -19,12 +19,12 @@ package de.bayern.gdi;
 
 import de.bayern.gdi.experimental.WFSTwoServiceHandler;
 import de.bayern.gdi.services.WebService;
+
 import de.bayern.gdi.utils.ServiceChecker;
+import de.bayern.gdi.utils.StringUtils;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * The command line tool.
@@ -42,21 +42,11 @@ public class Headless {
     private Headless() {
     }
 
-    private static String getBase64EncAuth(String username, String password) {
-        if (username == null || password == null) {
-            return null;
-        } else {
-            String authString = username + ":" + password;
-            System.out.println("auth string: " + authString);
-            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
-            String authStringEnc = new String(authEncBytes);
-            return authStringEnc;
-        }
-    }
     private static WebService.Type serviceType(String url, String userName,
                                                String password) {
-        return ServiceChecker.checkService(url, getBase64EncAuth(userName,
-                password));
+        return ServiceChecker.checkService(
+            url,
+            StringUtils.getBase64EncAuth(userName, password));
     }
 
     /**
@@ -69,7 +59,8 @@ public class Headless {
         String userName = null;
         String password = null;
         WebService.Type st = ServiceChecker.checkService(
-                DEMO_URL, getBase64EncAuth(userName, password));
+                DEMO_URL,
+                StringUtils.getBase64EncAuth(userName, password));
         switch (st) {
             case Atom:
                 log.info("Atom Service Found");
