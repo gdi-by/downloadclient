@@ -19,6 +19,8 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.utils.ServiceSetting;
+import de.bayern.gdi.utils.StringUtils;
+
 import de.bayern.gdi.services.WebService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 import java.util.ArrayList;
-import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -247,11 +248,6 @@ public class DataBean extends Observable {
      * @return the base 64 encrypted username and password string
      */
     public String getBase64EncAuth() {
-        if (this.userName == null || this.password == null) {
-            return null;
-        }
-        String authString = this.userName + ":" + this.password;
-        byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
-        return new String(authEncBytes);
+        return StringUtils.getBase64EncAuth(this.userName, this.password);
     }
 }

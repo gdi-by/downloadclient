@@ -43,6 +43,8 @@ import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
+import de.bayern.gdi.utils.StringUtils;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -75,10 +77,12 @@ public class WFSOne extends WebService {
 
         Map connectionParameters = new HashMap();
 
-        if (getBase64EncAuth(this.userName, this.password) != null) {
+        if (StringUtils.getBase64EncAuth(
+            this.userName, this.password) != null) {
             connectionParameters.put(
                     "Authorization", "Basic "
-                            + getBase64EncAuth(this.userName, this.password));
+                            + StringUtils.getBase64EncAuth(
+                            this.userName, this.password));
         }
         connectionParameters.put(
                 "WFSDataStoreFactory:GET_CAPABILITIES_URL", this.serviceURL);

@@ -44,6 +44,8 @@ import org.geotools.xml.Parser;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import de.bayern.gdi.utils.StringUtils;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -82,9 +84,11 @@ public class WFSTwo extends WebService {
             }  else {
                 conn = url.openConnection();
             }
-            if (getBase64EncAuth(this.userName, this.password) != null) {
+            if (StringUtils.getBase64EncAuth(
+                this.userName, this.password) != null) {
                 conn.setRequestProperty("Authorization", "Basic "
-                        + getBase64EncAuth(this.userName, this.password));
+                        + StringUtils.getBase64EncAuth(
+                            this.userName, this.password));
             }
             InputStream is = conn.getInputStream();
         /*
