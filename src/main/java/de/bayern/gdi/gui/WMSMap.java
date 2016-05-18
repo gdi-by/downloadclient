@@ -23,40 +23,45 @@ package de.bayern.gdi.gui;
  */
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
 import java.net.URL;
+
 import java.util.Arrays;
 import java.util.List;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.BoundingBox;
+
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
 import javafx.scene.paint.Color;
+
 import javafx.scene.shape.Line;
+
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
+
 import org.geotools.data.wms.WebMapServer;
+
 import org.geotools.data.wms.request.GetMapRequest;
+
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.ows.ServiceException;
 import com.vividsolutions.jts.geom.Envelope;
@@ -104,9 +109,13 @@ public class WMSMap extends Parent {
     private double previousMouseYPosOnClick;
 
     private static final double DRAGGING_OFFSET = 4;
-    private static final double ZOOM_FACTOR = 100d;
+    private static final double ZOOM_FACTOR = 10d;
     private static final double HUNDRED = 100d;
-
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
+    private static final int FOUR = 4;
     private static final double TEN_PERCENT_OF = 0.1d;
 
     private Group boxGroup;
@@ -266,7 +275,7 @@ public class WMSMap extends Parent {
 
 
     /**
-     * gets the referenced Envelope as BoundingBox
+     * gets the referenced Envelope as BoundingBox.
      * @return the Bounding Box
      */
     public Envelope getBoundsAsEnvelope() {
@@ -295,30 +304,30 @@ public class WMSMap extends Parent {
     private void zoomIn() {
         System.out.println("Zoom In");
         Envelope bBox = getBoundsAsEnvelope();
-        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX() + bBox.getMinY();
-        median = median / 4;
+        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX()
+                + bBox.getMinY();
+        median = median / FOUR;
         String bBoxStr
-                = (bBox.getMaxX() - (ZOOM_FACTOR)) + "," + (bBox.getMaxY() - (ZOOM_FACTOR))+ ","
-                + (bBox.getMinX() - (ZOOM_FACTOR)) + "," + (bBox.getMinY() - (ZOOM_FACTOR));
+                = (bBox.getMaxX() - (ZOOM_FACTOR)) + ","
+                + (bBox.getMaxY() - (ZOOM_FACTOR)) + ","
+                + (bBox.getMinX() - (ZOOM_FACTOR)) + ","
+                + (bBox.getMinY() - (ZOOM_FACTOR));
         setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
 
     private void zoomOut() {
         System.out.println("Zomm Out");
         Envelope bBox = getBoundsAsEnvelope();
-        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX() + bBox.getMinY();
-        median = median / 4;
+        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX()
+                + bBox.getMinY();
+        median = median / FOUR;
         String bBoxStr
-                = (bBox.getMaxX() + ZOOM_FACTOR) + "," + (bBox.getMaxY() + ZOOM_FACTOR)+ ","
-                + (bBox.getMinX() + ZOOM_FACTOR) + "," + (bBox.getMinY() + ZOOM_FACTOR);
+                = (bBox.getMaxX() + ZOOM_FACTOR) + ","
+                + (bBox.getMaxY() + ZOOM_FACTOR) + ","
+                + (bBox.getMinX() + ZOOM_FACTOR) + ","
+                + (bBox.getMinY() + ZOOM_FACTOR);
         setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
-
-
-    private static final int ZERO = 0;
-    private static final int ONE = 1;
-    private static final int TWO = 2;
-    private static final int THREE = 3;
 
     private void drag(double fromX, double fromY, double toX, double toY) {
         System.out.println("Dragging Image...");
@@ -329,8 +338,10 @@ public class WMSMap extends Parent {
         Envelope bBox = this.getBoundsAsEnvelope();
 
         String bBoxStr
-            = (bBox.getMaxX() + xOffset) + "," + (bBox.getMaxY() + yOffset)+ ","
-            + (bBox.getMinX() + xOffset) + "," + (bBox.getMinY() + yOffset);
+            = (bBox.getMaxX() + xOffset) + ","
+                + (bBox.getMaxY() + yOffset) + ","
+                + (bBox.getMinX() + xOffset) + ","
+                + (bBox.getMinY() + yOffset);
         setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
 

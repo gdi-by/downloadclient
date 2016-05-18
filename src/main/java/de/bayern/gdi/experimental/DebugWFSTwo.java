@@ -19,13 +19,19 @@
 package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.services.WFSTwo;
+
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+
 import net.opengis.wfs20.StoredQueryListItemType;
+
 import net.opengis.wfs20.impl.ListStoredQueriesResponseTypeImpl;
+
 import org.geotools.xml.Parser;
+
 import org.xml.sax.InputSource;
 
 /**

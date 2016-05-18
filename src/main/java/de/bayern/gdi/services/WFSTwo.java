@@ -19,32 +19,44 @@
 package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import de.bayern.gdi.utils.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.net.ssl.HttpsURLConnection;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import net.opengis.ows11.OperationType;
 import net.opengis.ows11.OperationsMetadataType;
+
 import net.opengis.wfs20.DescribeStoredQueriesResponseType;
 import net.opengis.wfs20.ParameterExpressionType;
 import net.opengis.wfs20.StoredQueryDescriptionType;
 import net.opengis.wfs20.WFSCapabilitiesType;
+
 import org.eclipse.emf.common.util.EList;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import org.geotools.xml.Parser;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

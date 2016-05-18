@@ -17,19 +17,20 @@
  */
 package de.bayern.gdi.utils;
 
-import java.io.IOException;
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileOutputStream;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
 
 /**
  * File handler for HttpClient.

@@ -18,24 +18,29 @@
 
 package de.bayern.gdi.utils;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import java.util.Map;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.InputStream;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-
-import org.w3c.dom.Document;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import javax.xml.stream.events.XMLEvent;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -43,14 +48,9 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
+import org.w3c.dom.Document;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import javax.xml.stream.events.XMLEvent;
+import org.xml.sax.SAXException;
 
 /**
  * Helper to handle XML documents.

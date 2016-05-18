@@ -19,11 +19,10 @@
 package de.bayern.gdi.processor;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import java.io.IOException;
 
 /**
  * Starts an external process with optional arguments and
