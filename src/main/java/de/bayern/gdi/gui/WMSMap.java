@@ -30,10 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.BoundingBox;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -59,6 +59,7 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
 import org.geotools.ows.ServiceException;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -103,8 +104,10 @@ public class WMSMap extends Parent {
     private double previousMouseYPosOnClick;
 
     private static final double DRAGGING_OFFSET = 4;
-    private static final double ZOOM_FACTOR = 10d;
+    private static final double ZOOM_FACTOR = 100d;
     private static final double HUNDRED = 100d;
+
+    private static final double TEN_PERCENT_OF = 0.1d;
 
     private Group boxGroup;
 
@@ -250,7 +253,6 @@ public class WMSMap extends Parent {
             this.ig.getChildren().add(this.iw);
         } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
-            this.errorPopup(e);
         }
     }
 
@@ -258,8 +260,26 @@ public class WMSMap extends Parent {
      * gets the referenced Evelope from the Map.
      * @return the reference Evelope
      */
-    public String getBounds() {
+    public String getBoundsAsString() {
         return this.outerBBOX;
+    }
+
+
+    /**
+     * gets the referenced Envelope as BoundingBox
+     * @return the Bounding Box
+     */
+    public Envelope getBoundsAsEnvelope() {
+        List<String> bBoxStrList = Arrays.asList(this.outerBBOX.split(","));
+        double upperRightX = Double.parseDouble(bBoxStrList.get(ZERO));
+        double upperRightY = Double.parseDouble(bBoxStrList.get(ONE));
+        double lowerLeftX = Double.parseDouble(bBoxStrList.get(TWO));
+        double lowerLeftY = Double.parseDouble(bBoxStrList.get(THREE));
+        com.vividsolutions.jts.geom.Envelope bBox
+                = new com.vividsolutions.jts.geom.Envelope(
+                upperRightX, upperRightY,
+                lowerLeftX, lowerLeftY);
+        return bBox;
     }
 
     /**
@@ -270,52 +290,30 @@ public class WMSMap extends Parent {
         return this.spacialRefSystem;
     }
 
-    /**
-     * raises a dialogue with an exception.
-     * @param ex the exception
-     */
-    public void errorPopup(Exception ex) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Something went wrong");
-        alert.setHeaderText("An Excpetion was raised!");
-        alert.setContentText(ex.getMessage());
 
-
-// Create expandable Exception.
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
-        String exceptionText = sw.toString();
-
-        Label label = new Label("The exception stacktrace was:");
-
-        TextArea textArea = new TextArea(exceptionText);
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
-
-// Set expandable Exception into the dialog pane.
-        alert.getDialogPane().setExpandableContent(expContent);
-
-        alert.showAndWait();
-    }
 
     private void zoomIn() {
         System.out.println("Zoom In");
+        Envelope bBox = getBoundsAsEnvelope();
+        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX() + bBox.getMinY();
+        median = median / 4;
+        String bBoxStr
+                = (bBox.getMaxX() - (ZOOM_FACTOR)) + "," + (bBox.getMaxY() - (ZOOM_FACTOR))+ ","
+                + (bBox.getMinX() - (ZOOM_FACTOR)) + "," + (bBox.getMinY() - (ZOOM_FACTOR));
+        setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
 
     private void zoomOut() {
         System.out.println("Zomm Out");
+        Envelope bBox = getBoundsAsEnvelope();
+        double median = bBox.getMaxX() + bBox.getMaxY() + bBox.getMinX() + bBox.getMinY();
+        median = median / 4;
+        String bBoxStr
+                = (bBox.getMaxX() + ZOOM_FACTOR) + "," + (bBox.getMaxY() + ZOOM_FACTOR)+ ","
+                + (bBox.getMinX() + ZOOM_FACTOR) + "," + (bBox.getMinY() + ZOOM_FACTOR);
+        setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
+
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
@@ -323,29 +321,17 @@ public class WMSMap extends Parent {
     private static final int THREE = 3;
 
     private void drag(double fromX, double fromY, double toX, double toY) {
-        //Upper Left Corner is 0,0
         System.out.println("Dragging Image...");
         System.out.println("From: " + fromX + ", " + fromY);
         System.out.println("To: " + toX + ", " + toY);
-        double xOffset = toX - fromX;
-        double yOffset = toY - fromY;
-        //Trying it withe the diffence of from and to and add it to the image
-        List<String> bBoxStrList = Arrays.asList(this.outerBBOX.split(","));
-        double upperRightX = Double.parseDouble(bBoxStrList.get(ZERO));
-        double upperRightY = Double.parseDouble(bBoxStrList.get(ONE));
-        double lowerLeftX = Double.parseDouble(bBoxStrList.get(TWO));
-        double lowerLeftY = Double.parseDouble(bBoxStrList.get(THREE));
+        double xOffset = (toX - fromX) * ZOOM_FACTOR;
+        double yOffset = (toY - fromY) * ZOOM_FACTOR;
+        Envelope bBox = this.getBoundsAsEnvelope();
 
-        upperRightX = upperRightX + xOffset;
-        lowerLeftX = lowerLeftX + xOffset;
-
-        upperRightY = upperRightY + yOffset;
-        lowerLeftY = lowerLeftY + yOffset;
-
-        String bbox
-            = upperRightX + "," + upperRightY + ","
-            + lowerLeftX + "," + lowerLeftY;
-        setMapImage(bbox, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
+        String bBoxStr
+            = (bBox.getMaxX() + xOffset) + "," + (bBox.getMaxY() + yOffset)+ ","
+            + (bBox.getMinX() + xOffset) + "," + (bBox.getMinY() + yOffset);
+        setMapImage(bBoxStr, INIT_SPACIAL_REF_SYS, INIT_LAYER_NUMBER);
     }
 
     private void drawMarker(double xPosition, double yPosition) {

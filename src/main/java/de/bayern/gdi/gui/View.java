@@ -476,6 +476,12 @@ public class View {
         this.statusBar.getChildren().add(statusText);
     }
 
+    public void setServiceURLText(String URL) {
+        TextField tf = getServiceURLfield();
+        tf.clear();
+        tf.setText(URL);
+        setServiceURLfield(tf);
+    }
     /**
      * sets the content of the select list for the services.
      * @param items the items
