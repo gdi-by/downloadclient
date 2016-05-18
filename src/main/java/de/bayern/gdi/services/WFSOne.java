@@ -19,31 +19,42 @@
 package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
+
+import de.bayern.gdi.utils.StringUtils;
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.GeoTools;
+
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import org.opengis.feature.Feature;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
+
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-
-import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

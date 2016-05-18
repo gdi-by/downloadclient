@@ -21,6 +21,7 @@ package de.bayern.gdi.utils;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+
 import java.util.logging.Logger;
 
 /**

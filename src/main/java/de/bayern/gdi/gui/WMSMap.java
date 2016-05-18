@@ -25,41 +25,57 @@ package de.bayern.gdi.gui;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import java.net.URL;
+
 import java.util.Arrays;
 import java.util.List;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
+
 import javafx.scene.control.Alert.AlertType;
+
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
 import javafx.scene.paint.Color;
+
 import javafx.scene.shape.Line;
+
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetMapResponse;
-import org.geotools.ows.ServiceException;
 
+import org.geotools.data.wms.WebMapServer;
+
+import org.geotools.data.wms.request.GetMapRequest;
+
+import org.geotools.data.wms.response.GetMapResponse;
+
+import org.geotools.ows.ServiceException;
 
 /**
  * This class is going to Manage the Display of a Map based on a WFS Service.

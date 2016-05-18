@@ -22,13 +22,16 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyCode;
-import javafx.scene.control.IndexRange;
-import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
-import javafx.scene.input.KeyEvent;
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+
+import javafx.collections.ObservableList;
+
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.IndexRange;
+import javafx.scene.control.ListView;
+
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  * Class to build a Autocomplete Combobox (Dropdown List).

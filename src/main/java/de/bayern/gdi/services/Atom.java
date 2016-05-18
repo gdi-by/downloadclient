@@ -18,10 +18,8 @@
 
 package de.bayern.gdi.services;
 
-
-import java.util.Map;
-
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

@@ -18,20 +18,21 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.services.WebService;
+
 import de.bayern.gdi.utils.ServiceSetting;
 import de.bayern.gdi.utils.StringUtils;
 
-import de.bayern.gdi.services.WebService;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.stage.Stage;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
-import java.util.ArrayList;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import javafx.stage.Stage;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

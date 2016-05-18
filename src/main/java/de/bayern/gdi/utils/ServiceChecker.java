@@ -19,16 +19,19 @@
 package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.WebService;
+
 import java.io.IOException;
+
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
