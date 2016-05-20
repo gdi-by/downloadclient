@@ -20,24 +20,17 @@ package de.bayern.gdi.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.SchemaOutputResolver;
-
-import javax.xml.bind.annotation.XmlSchemaType;
-
 import javax.xml.transform.Result;
-
 import javax.xml.transform.stream.StreamResult;
 
 /**
@@ -46,30 +39,13 @@ import javax.xml.transform.stream.StreamResult;
 
 public class DownloadStepFactory implements Serializable {
 
-    @XmlSchemaType(name = "string")
-    private String serviceType;
-
-    @XmlSchemaType(name = "string")
-    private String serviceURL;
-
-    @XmlSchemaType(name = "string")
-    private String dataSet;
-
-    @XmlSchemaType(name = "string")
-    private String parameters;
-
-    private static final transient Logger log
-            = Logger.getLogger(DownloadStepFactory.class.getName());
-
-    @XmlSchemaType(name = "string")
-    private static final long serialVersionUID = 7526471155622776147L;
-
+    private static final Logger log
+        = Logger.getLogger(DownloadStepFactory.class.getName());
 
     /**
      * Constructor.
      */
     public DownloadStepFactory() {
-
     }
 
     /**
@@ -86,16 +62,6 @@ public class DownloadStepFactory implements Serializable {
         }
     }
 
-    /**
-     * Save the Object.
-     * @param file File to save to
-     * @throws IOException if space does not exist
-     */
-    public void write(File file) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        writeObject(oos);
-    }
 
     private boolean validateState() {
         //TODO: Check for parameters and validate them.
