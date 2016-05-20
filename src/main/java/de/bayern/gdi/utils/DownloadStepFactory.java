@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +35,7 @@ import javax.xml.transform.stream.StreamResult;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-public class DownloadStepFactory implements Serializable {
+public class DownloadStepFactory {
 
     private static final Logger log
         = Logger.getLogger(DownloadStepFactory.class.getName());
@@ -90,23 +88,5 @@ public class DownloadStepFactory implements Serializable {
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
         }
-    }
-
-    private void readObject(java.io.ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-
-    }
-
-    private void readObjectNoData()
-            throws ObjectStreamException {
-
-    }
-
-    /**
-     * Writes to the files location.
-     * @param file file location
-     */
-    public void write(File file) {
-
     }
 }

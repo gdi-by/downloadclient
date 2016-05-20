@@ -51,6 +51,15 @@ public class DownloadStep implements Serializable {
     @XmlSchemaType(name = "string")
     private String parameters;
 
+    public DownloadStep() {
+    }
+
+    /**
+     * @param file The file to load data from.
+     */
+    public DownloadStep(File file) {
+    }
+
     /**
      * Save the Object.
      * @param file File to save to

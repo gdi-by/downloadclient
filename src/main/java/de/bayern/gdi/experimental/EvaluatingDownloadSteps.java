@@ -18,9 +18,9 @@
 
 package de.bayern.gdi.experimental;
 
-import de.bayern.gdi.utils.DownloadStepFactory;
-
 import java.io.File;
+
+import de.bayern.gdi.utils.DownloadStep;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -48,8 +48,8 @@ public class EvaluatingDownloadSteps {
         File file = new File(args[0]);
         if (inArgs(args, "-write")) {
             try {
-                DownloadStepFactory dsf = new DownloadStepFactory();
-                dsf.write(file);
+                DownloadStep ds = new DownloadStep();
+                ds.write(file);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -57,7 +57,7 @@ public class EvaluatingDownloadSteps {
 
         if (inArgs(args, "-read")) {
             try {
-                DownloadStepFactory dsf = new DownloadStepFactory(file);
+                DownloadStep ds = new DownloadStep(file);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
