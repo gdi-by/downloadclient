@@ -84,7 +84,6 @@ public class App {
                 javafx.application.Application.launch(Start.class);
             }
         }.start();
-        Start start = Start.waitForStart();
-        //start.printInvoking();
+        Start.waitForStart();
     }
 }
