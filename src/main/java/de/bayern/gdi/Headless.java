@@ -17,19 +17,12 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.experimental.WFSTwoServiceHandler;
-
-import de.bayern.gdi.services.WebService;
-
-import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.StringUtils;
-import de.bayern.gdi.utils.XML;
-
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
+import de.bayern.gdi.model.DownloadStep;
 
 /**
  * The command line tool.
@@ -39,19 +32,7 @@ public class Headless {
     private static final Logger log
         = Logger.getLogger(Headless.class.getName());
 
-    private static final String DEMO_URL =
-        "http://geoserv.weichand.de:8080/geoserver/wfs?"
-        + "service=WFS&acceptversions=2.0.0&request=GetCapabilities";
-    //TODO: Remove DEMO_URL and read Infos from args or external file
-
     private Headless() {
-    }
-
-    private static WebService.Type serviceType(String url, String userName,
-                                               String password) {
-        return ServiceChecker.checkService(
-            url,
-            StringUtils.getBase64EncAuth(userName, password));
     }
 
     /**
@@ -70,38 +51,20 @@ public class Headless {
 
         log.info("Using settings file: " + settingsFile);
 
-        Document settingsDoc = XML.getDocument(settingsFile);
-
-        if (settingsDoc == null) {
+        DownloadStep dls;
+        try {
+            dls = DownloadStep.read(settingsFile);
+        } catch (IOException ioe) {
             log.log(
-                Level.SEVERE, "Cannot find settings file: " + settingsFile);
+                Level.SEVERE,
+                "Cannot find settings file: " + settingsFile,
+                ioe);
             return 1;
         }
 
-        //There could be a Service Handler for each Service that deals
-        //with command line arguments and/or a stored XML File
-        String userName = null;
-        String password = null;
-        WebService.Type st = ServiceChecker.checkService(
-                DEMO_URL,
-                StringUtils.getBase64EncAuth(userName, password));
-        switch (st) {
-            case Atom:
-                log.info("Atom Service Found");
-                break;
-            case WFSOne:
-                log.info("WFSOne Service Found");
-                break;
-            case WFSTwo:
-                log.info("WFSTwo Service Found");
-                WFSTwoServiceHandler wfstwo =
-                        new WFSTwoServiceHandler(DEMO_URL, userName,
-                                password);
-                break;
-            default:
-                log.log(Level.SEVERE, "Could not determine Service Type");
-                break;
-        }
+        // TODO: Convert DownloadStep into
+        //       sequence of processor jobs.
+        //
         return 0;
     }
 }
