@@ -306,7 +306,7 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
-     * return the Bounds of the Map
+     * return the Bounds of the Map.
      * @return the Bounds of the Map
      */
     public Rectangle getBounds() {
