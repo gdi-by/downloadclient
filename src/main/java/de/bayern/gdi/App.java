@@ -61,6 +61,26 @@ public class App {
         System.exit(0);
     }
 
+    private static final String[] SETTINGS = {
+        "-s=",
+        "--settings=",
+        "-settings="
+    };
+
+
+    private static String extractSettings(String[] args) {
+
+        for (String arg: args) {
+            for (String s: SETTINGS) {
+                if (arg.startsWith(s)) {
+                    return arg.substring(s.length());
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -70,9 +90,10 @@ public class App {
             helpAndExit();
         }
 
+        String settings = extractSettings(args);
+
         if (runHeadless(args)) {
-            Headless.main(args);
-            System.exit(0);
+            System.exit(Headless.main(settings, args));
         }
 
         // Its kind of complicated to start a javafx application from
