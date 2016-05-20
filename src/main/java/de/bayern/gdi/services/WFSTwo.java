@@ -63,9 +63,10 @@ import org.xml.sax.SAXException;
  */
 public class WFSTwo extends WebService {
 
-    private String serviceURL;
     private static final Logger log
             = Logger.getLogger(WFSTwo.class.getName());
+
+    private String serviceURL;
     private ArrayList<String> requestMethods;
     private WFSOne wfsOne;
     private String password;
