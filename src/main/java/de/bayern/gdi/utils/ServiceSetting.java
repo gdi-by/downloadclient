@@ -133,7 +133,9 @@ public class ServiceSetting {
                         }
                     }
                 }
-                servicesMap.put(serviceName, serviceURL);
+                if (serviceURL != null && serviceName != null) {
+                    servicesMap.put(serviceName, serviceURL);
+                }
             }
         }
         return servicesMap;
