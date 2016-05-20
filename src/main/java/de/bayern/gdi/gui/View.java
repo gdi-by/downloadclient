@@ -85,6 +85,7 @@ public class View {
     private static final double THIRTHE_PERCENT_OF = 0.33D;
     private static final int MIN_WINDOWHEIGHT = 480;
     private static final int MIN_WINDOWWIDTH = 640;
+    private static final int MIN_FIELDWIDTH = 150;
 
     private static final int FIRST_COLUMN = ZERO;
     private static final int SECOND_COLUMN = ONE;
@@ -257,9 +258,11 @@ public class View {
         this.serviceAuthenticationFieldsBox.setSpacing(columnWidth / TWO);
         this.serviceUserLabel = new Label("User:");
         this.serviceUser = new TextField();
+        this.serviceUser.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUserLabel.setLabelFor(this.serviceUser);
         this.servicePWLabel = new Label("Password:");
         this.servicePW = new TextField();
+        this.servicePW.setMinWidth(MIN_FIELDWIDTH);
         this.servicePWLabel.setLabelFor(this.servicePW);
         this.serviceAuthenticationLabelsBox.getChildren()
                 .addAll(
@@ -349,7 +352,12 @@ public class View {
     public void setTypes(ArrayList<String> types) {
         ObservableList<String> options =
                 FXCollections.observableArrayList(types);
-        this.setTypeComboBox(new ComboBox(options));
+        this.typeComboBox.getItems().removeAll(this.typeComboBox.getItems());
+        this.typeComboBox.setItems(options);
+        this.grid.getChildren().remove(this.typeComboBox);
+        this.grid.add(this.typeComboBox,
+                SECOND_COLUMN,
+                FIRST_ROW);
     }
 
     /**
@@ -396,7 +404,8 @@ public class View {
                 this.attributesFilledBox.getChildren()
         );
         this.grid.getChildren().remove(this.attributesFilledBox);
-        this.grid.addColumn(SECOND_COLUMN, new Label());
+        this.grid.getChildren().remove(this.typeComboBox);
+        this.grid.addColumn(SECOND_COLUMN, this.typeComboBox);
         this.grid.add(this.attributeScrollPane,
                 SECOND_COLUMN,
                 FIRST_ROW);
