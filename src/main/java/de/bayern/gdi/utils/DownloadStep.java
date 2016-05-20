@@ -18,26 +18,27 @@
 
 package de.bayern.gdi.utils;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class DownloadStep implements Serializable {
+public class DownloadStep {
 
     private static final Logger log
         = Logger.getLogger(DownloadStep.class.getName());
-
-    private static final long serialVersionUID = 7526471155622776147L;
 
     @XmlSchemaType(name = "string")
     private String serviceType;
@@ -67,25 +68,33 @@ public class DownloadStep implements Serializable {
      */
     public void write(File file) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(file)) {
+            JAXBContext context = JAXBContext.newInstance(DownloadStep.class);
+            Marshaller m = context.createMarshaller();
+            // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            writeObject(oos);
-            oos.flush();
+            m.marshal(this, bos);
+            bos.flush();
+        } catch (JAXBException je) {
+            throw new IOException("", je);
         }
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-            throws IOException {
 
-    }
-
-    private void readObject(java.io.ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-
-    }
-
-    private void readObjectNoData()
-            throws ObjectStreamException {
+    /**
+     * Loads DownloadStep from a file.
+     * @param file The file to load the DownloadStep from.
+     * @return The restored DownloadStep.
+     * @throws IOException Something went wrong.
+     */
+    public static DownloadStep read(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            JAXBContext context = JAXBContext.newInstance(DownloadStep.class);
+            Unmarshaller um = context.createUnmarshaller();
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            return (DownloadStep)um.unmarshal(bis);
+        } catch (JAXBException je) {
+            throw new IOException("", je);
+        }
     }
 
     /**
