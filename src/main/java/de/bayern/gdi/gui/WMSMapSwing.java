@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import java.awt.Dimension;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -33,12 +35,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javax.swing.SwingUtilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
-import org.geotools.swing.JMapFrame;
+import org.geotools.swing.JMapPane;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -57,6 +60,9 @@ public class WMSMapSwing extends Parent {
     //private ListView wmsLayers;
     private ComboBox wmsLayers;
     private Label layerLabel;
+    private int mapWidth;
+    private int mapHeight;
+    private SwingNode mapNode;
 
     /**
      * adds a node to this map.
@@ -88,16 +94,19 @@ public class WMSMapSwing extends Parent {
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
-    public WMSMapSwing(String mapURL) throws MalformedURLException {
-        this(new URL(mapURL));
+    public WMSMapSwing(String mapURL, int width, int heigth) throws
+            MalformedURLException {
+        this(new URL(mapURL), width, heigth);
     }
 
     /**
      * Constructor.
      * @param mapURL The URL of the WMS Service
      */
-    public WMSMapSwing(URL mapURL) {
+    public WMSMapSwing(URL mapURL, int width, int heigth) {
         try {
+            this.mapHeight = heigth;
+            this.mapWidth = width;
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
@@ -116,8 +125,10 @@ public class WMSMapSwing extends Parent {
             this.layerLabel = new Label();
             this.layerLabel.setLabelFor(this.wmsLayers);
             this.layerLabel.setText("Layer: ");
+            this.mapNode = new SwingNode();
             this.add(this.layerLabel);
             this.add(this.wmsLayers);
+            this.add(this.mapNode);
             this.getChildren().add(vBox);
             this.wmsLayers.setOnAction(new SelectLayer());
 
@@ -137,7 +148,9 @@ public class WMSMapSwing extends Parent {
         System.out.println("Selected Layer: " + wmsLayer.getName());
         WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
         this.mapContent.addLayer(displayLayer);
-        JMapFrame.showMap(this.mapContent);
+        createSwingContent(this.mapNode);
+        //JMapPane mapPane = new JMapPane(this.mapContent);
+
     }
 
     /**
@@ -161,5 +174,17 @@ public class WMSMapSwing extends Parent {
                 displayMap(layer);
             }
         }
+    }
+
+    private void createSwingContent(final SwingNode swingNode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JMapPane mapPane = new JMapPane(mapContent);
+                mapPane.setPreferredSize(new Dimension(mapWidth,
+                        mapHeight));
+                swingNode.setContent(mapPane);
+            }
+        });
     }
 }
