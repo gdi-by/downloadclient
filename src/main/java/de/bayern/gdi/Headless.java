@@ -36,28 +36,30 @@ public class Headless {
     }
 
     /**
-     * @param settings The path to the settings file.
+     * @param downloadConfig The path to the downloadConfig file.
      * @param args The command line arguments.
      * @return Non zero if the operation fails.
      */
-    public static int main(String settings, String [] args) {
+    public static int main(String downloadConfig, String [] args) {
         log.info("Running in headless mode");
 
-        File settingsFile = settings != null
-            ? new File(settings)
+        File downloadConfigFile = downloadConfig != null
+            ? new File(downloadConfig)
             : new File(
                 new File(System.getProperty("user.home", "~")),
-                    "settings.xml");
+                    "downloadConfig.xml");
 
-        log.info("Using settings file: " + settingsFile);
+        log.info("Using download config file: "
+            + downloadConfigFile);
 
         DownloadStep dls;
         try {
-            dls = DownloadStep.read(settingsFile);
+            dls = DownloadStep.read(downloadConfigFile);
         } catch (IOException ioe) {
             log.log(
                 Level.SEVERE,
-                "Cannot find settings file: " + settingsFile,
+                "Cannot find downloadConfig file: "
+                    + downloadConfigFile,
                 ioe);
             return 1;
         }

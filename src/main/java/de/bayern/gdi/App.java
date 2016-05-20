@@ -56,24 +56,26 @@ public class App {
             "  -?|--help|-help: Print this message and exit.");
         System.out.println(
             "  -h|--headless|-headless: Start command line tool.");
+        System.out.println(
+            "  -d=|--download=|-download=xml: download configuration.");
         System.out.println("without options:");
         System.out.println("  Start as GUI application.");
         System.exit(0);
     }
 
-    private static final String[] SETTINGS = {
-        "-s=",
-        "--settings=",
-        "-settings="
+    private static final String[] DOWNLOADS = {
+        "-d=",
+        "--download=",
+        "-download="
     };
 
 
-    private static String extractSettings(String[] args) {
+    private static String downloadConfig(String[] args) {
 
         for (String arg: args) {
-            for (String s: SETTINGS) {
-                if (arg.startsWith(s)) {
-                    return arg.substring(s.length());
+            for (String d: DOWNLOADS) {
+                if (arg.startsWith(d)) {
+                    return arg.substring(d.length());
                 }
             }
         }
@@ -90,10 +92,10 @@ public class App {
             helpAndExit();
         }
 
-        String settings = extractSettings(args);
+        String downloadConfig = downloadConfig(args);
 
         if (runHeadless(args)) {
-            System.exit(Headless.main(settings, args));
+            System.exit(Headless.main(downloadConfig, args));
         }
 
         // Its kind of complicated to start a javafx application from
