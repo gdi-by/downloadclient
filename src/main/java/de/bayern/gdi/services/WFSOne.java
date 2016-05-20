@@ -62,7 +62,7 @@ import org.opengis.filter.FilterFactory2;
 public class WFSOne extends WebService {
 
     private static final Logger log
-            = Logger.getLogger(WFSTwo.class.getName());
+            = Logger.getLogger(WFSOne.class.getName());
 
     private String serviceURL;
 

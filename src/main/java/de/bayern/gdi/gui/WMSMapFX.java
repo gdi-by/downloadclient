@@ -71,7 +71,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * This class is going to Manage the Display of a Map based on a WFS Service.
  * It should have some widgets to zoom and to draw a Bounding Box.
  */
-public class WMSMap extends Parent {
+public class WMSMapFX extends Parent {
 
     //http://docs.geotools.org/latest/userguide/tutorial/raster/image.html
     //https://github.com/rafalrusin/geotools-fx-test/blob/master/src/geotools
@@ -88,7 +88,7 @@ public class WMSMap extends Parent {
     private String spacialRefSystem;
     WebMapServer wms;
     private static final Logger log
-            = Logger.getLogger(WMSMap.class.getName());
+            = Logger.getLogger(WMSMapFX.class.getName());
     private WMSCapabilities capabilities;
     private List layers;
     private VBox vBox;
@@ -147,12 +147,12 @@ public class WMSMap extends Parent {
      * @param dimensionY Y Dimenstion of the Picture
      * @param spacialRefSystem Spacial Ref System ID
      */
-    public WMSMap(String serviceURL,
-                  String serviceName,
-                  String outerBBOX,
-                  int dimensionX,
-                  int dimensionY,
-                  String spacialRefSystem) {
+    public WMSMapFX(String serviceURL,
+                    String serviceName,
+                    String outerBBOX,
+                    int dimensionX,
+                    int dimensionY,
+                    String spacialRefSystem) {
         this.serviceURL = serviceURL;
         this.serviceName = serviceName;
         this.outerBBOX = outerBBOX;
@@ -211,11 +211,11 @@ public class WMSMap extends Parent {
      * @param dimensionX X Dimension of the picuter
      * @param dimensionY Y Dimenstion of the Picture
      */
-    public WMSMap(String serviceURL,
-                  String serviceName,
-                  String outerBBOX,
-                  int dimensionX,
-                  int dimensionY) {
+    public WMSMapFX(String serviceURL,
+                    String serviceName,
+                    String outerBBOX,
+                    int dimensionX,
+                    int dimensionY) {
         this(serviceURL,
                 serviceName,
                 outerBBOX,
@@ -227,7 +227,7 @@ public class WMSMap extends Parent {
     /**
      * Constructor.
      */
-    public WMSMap() {
+    public WMSMapFX() {
     }
 
     /**

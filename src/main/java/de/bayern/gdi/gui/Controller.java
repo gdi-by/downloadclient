@@ -74,7 +74,7 @@ public class Controller {
     private View view;
 
     private static final Logger log
-            = Logger.getLogger(WMSMap.class.getName());
+            = Logger.getLogger(Controller.class.getName());
     /**
      * Creates the Conroller.
      * @param dataBean the model

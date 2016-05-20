@@ -18,20 +18,20 @@
 
 package de.bayern.gdi.gui;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-
 import javafx.scene.Group;
 import javafx.scene.Scene;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -42,16 +42,13 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-
 import javafx.scene.text.Text;
-
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -109,6 +106,9 @@ public class View {
     private static final int EIGHT_ROW = EIGHT;
     private static final int NINETH_ROW = NINE;
     private static final int MAX_ROW = NINETH_ROW;
+
+    private static final Logger log
+            = Logger.getLogger(View.class.getName());
 
     //private static final String INITALBBOX
     //        = "-131.13151509433965,46.60532747661736,"+
@@ -193,7 +193,9 @@ public class View {
 
     private GridPane attributeGridPane;
 
-    private WMSMap wmsMap;
+    private WMSMapFX wmsMapFX;
+
+    private WMSMapSwing wmsMapSwing;
 
     private Group mapGroup;
 
@@ -338,7 +340,8 @@ public class View {
         this.typeComboBox = new ComboBox();
         this.attributeScrollPane = new ScrollPane();
         this.attributeGridPane = new GridPane();
-        this.wmsMap = new WMSMap();
+        //this.wmsMapFX = new WMSMapFX();
+        this.wmsMapSwing = new WMSMapSwing();
         this.mapGroup = new Group();
     }
 
@@ -351,7 +354,8 @@ public class View {
                 this.typeComboBox,
                 this.attributeScrollPane,
                 this.attributeGridPane,
-                this.wmsMap,
+                //this.wmsMapFX,
+                this.wmsMapSwing,
                 this.mapGroup);
     }
 
@@ -442,17 +446,29 @@ public class View {
      * @param wmsName the WMS Name
      */
     public void setWMSMap(String wmsUrl, String wmsName) {
-        this.wmsMap = new WMSMap(wmsUrl,
+        URL url = null;
+        try {
+            url = new URL(wmsUrl);
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        this.wmsMapSwing = new WMSMapSwing(url, wmsName);
+        this.mapGroup.getChildren().clear();
+        this.mapGroup.getChildren().add(this.wmsMapSwing);
+        /*
+        this.wmsMapFX = new WMSMapFX(wmsUrl,
                 wmsName,
                 INITALBBOX,
                 (int) serviceList.getWidth(),
                 (int) serviceList.getWidth());
         this.mapGroup.getChildren().clear();
-        this.mapGroup.getChildren().add(this.wmsMap);
+        this.mapGroup.getChildren().add(this.wmsMapFX);
+        */
         this.grid.getChildren().remove(this.mapGroup);
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 SECOND_ROW);
+
     }
     /**
      * gets the service List entries.
@@ -965,15 +981,15 @@ public class View {
      * gets the WMS Map.
      * @return WMS Map
      */
-    public WMSMap getWmsMap() {
-        return wmsMap;
+    public WMSMapSwing getWmsSwingMap() {
+        return wmsMapSwing;
     }
 
     /**
      * sets the WMS Map.
      * @param wmsMap WMS Map
      */
-    public void setWmsMap(WMSMap wmsMap) {
-        this.wmsMap = wmsMap;
+    public void setWmsSwingMap(WMSMapSwing wmsMap) {
+        this.wmsMapSwing = wmsMap;
     }
 }
