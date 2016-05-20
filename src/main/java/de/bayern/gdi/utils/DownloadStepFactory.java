@@ -101,4 +101,12 @@ public class DownloadStepFactory implements Serializable {
             throws ObjectStreamException {
 
     }
+
+    /**
+     * Writes to the files location.
+     * @param file file location
+     */
+    public void write(File file) {
+
+    }
 }

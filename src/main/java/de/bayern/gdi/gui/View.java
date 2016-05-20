@@ -399,9 +399,10 @@ public class View {
         this.grid.addColumn(SECOND_COLUMN, new Label());
         this.grid.add(this.attributeScrollPane,
                 SECOND_COLUMN,
-                SECOND_ROW);
+                FIRST_ROW);
         this.grid.add(this.attributesFilledBox,
-                SECOND_COLUMN,THIRD_ROW);
+                SECOND_COLUMN,
+                SECOND_ROW);
     }
 
     /**.
@@ -434,7 +435,7 @@ public class View {
         this.grid.addColumn(THIRD_COLUMN, new Label());
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
-                SECOND_ROW);
+                FIRST_ROW);
 
     }
     /**

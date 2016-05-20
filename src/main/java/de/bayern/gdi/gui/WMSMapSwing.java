@@ -53,7 +53,6 @@ import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.swing.JMapPane;
-import org.geotools.swing.MapLayerTable;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
 import org.geotools.swing.action.PanAction;
@@ -83,36 +82,18 @@ public class WMSMapSwing extends Parent {
     private int mapHeight;
     private SwingNode mapNode;
 
-    /**
-     * Name assigned to toolbar button for feature info queries.
-     */
-    public static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
-    /**
-     * Name assigned to toolbar button for map panning.
-     */
-    public static final String TOOLBAR_PAN_BUTTON_NAME
+    private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
+    private static final String TOOLBAR_PAN_BUTTON_NAME
             = "ToolbarPanButton";
-    /**
-     * Name assigned to toolbar button for default pointer.
-     */
-    public static final String TOOLBAR_POINTER_BUTTON_NAME
+    private static final String TOOLBAR_POINTER_BUTTON_NAME
             = "ToolbarPointerButton";
-    /**
-     * Name assigned to toolbar button for map reset.
-     */
-    public static final String TOOLBAR_RESET_BUTTON_NAME
+    private static final String TOOLBAR_RESET_BUTTON_NAME
             = "ToolbarResetButton";
-    /**
-     * Name assigned to toolbar button for map zoom in.
-     */
-    public static final String TOOLBAR_ZOOMIN_BUTTON_NAME
+    private static final String TOOLBAR_ZOOMIN_BUTTON_NAME
             = "ToolbarZoomInButton";
-    /**
-     * Name assigned to toolbar button for map zoom out.
-     */
-    public static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
+    private static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
             = "ToolbarZoomOutButton";
-    
+
     /**
      * adds a node to this map.
      *
@@ -237,6 +218,8 @@ public class WMSMapSwing extends Parent {
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
+                mapPane.setMinimumSize(new Dimension(mapWidth,
+                        mapHeight));
                 mapPane.addFocusListener(new FocusAdapter() {
 
                     @Override
@@ -259,7 +242,7 @@ public class WMSMapSwing extends Parent {
                         mapPane.requestFocusInWindow();
                     }
                 });
-                MapLayerTable mapLayerTable;
+
                 StringBuilder sb = new StringBuilder();
                 sb.append("[]");
                 sb.append("[min!]");
