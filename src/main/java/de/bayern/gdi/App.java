@@ -18,35 +18,40 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.gui.Start;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
 
+    private static final String[] DOWNLOADS = {
+        "-d=",
+        "--download=",
+        "-download="
+    };
+
+    private static final String[] HEADLESS = {
+        "-h",
+        "--headless",
+        "-headless"
+    };
+
+    private static final String[] HELP = {
+        "-?",
+        "--help",
+        "-help"
+    };
+
     private App() {
     }
 
     private static boolean runHeadless(String[] args) {
-        for (String arg: args) {
-            if (arg.equals("-headless")
-            || arg.equals("--headless")
-            || arg.equals("-h")) {
-                return true;
-            }
-        }
-        return false;
+        return StringUtils.contains(args, HEADLESS);
     }
 
     private static boolean help(String[] args) {
-        for (String arg: args) {
-            if (arg.equals("-help")
-            || arg.equals("--help")
-            || arg.equals("-?")) {
-                return true;
-            }
-        }
-        return false;
+        return StringUtils.contains(args, HELP);
     }
 
     private static void helpAndExit() {
@@ -63,24 +68,9 @@ public class App {
         System.exit(0);
     }
 
-    private static final String[] DOWNLOADS = {
-        "-d=",
-        "--download=",
-        "-download="
-    };
-
 
     private static String downloadConfig(String[] args) {
-
-        for (String arg: args) {
-            for (String d: DOWNLOADS) {
-                if (arg.startsWith(d)) {
-                    return arg.substring(d.length());
-                }
-            }
-        }
-
-        return null;
+        return StringUtils.extractPostfix(args, DOWNLOADS);
     }
 
     /**

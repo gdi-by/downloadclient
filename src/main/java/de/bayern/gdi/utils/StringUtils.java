@@ -40,4 +40,40 @@ public class StringUtils {
         String auth = user + ":" + password;
         return new String(Base64.encodeBase64(auth.getBytes()));
     }
+
+    /**
+     * Searches a needle of a set of needles in a haystack.
+     * @param haystack The haystack.
+     * @param needles The needles.
+     * @return true if the haystack contains one of the needles.
+     * false otherwise.
+     */
+    public static boolean contains(String[] haystack, String[] needles) {
+        for (String straw: haystack) {
+            for (String needle: needles) {
+                if (straw.equals(needle)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Search for a prefix of a set of prefexis in a haystack.
+     * @param haystack The haystack.
+     * @param prefixes The prefixes.
+     * @return The postfix of the found prefix if found.
+     * null otherwise.
+     */
+    public static String extractPostfix(String []haystack, String[] prefixes) {
+        for (String straw: haystack) {
+            for (String p: prefixes) {
+                if (straw.startsWith(p)) {
+                    return straw.substring(p.length());
+                }
+            }
+        }
+        return null;
+    }
 }
