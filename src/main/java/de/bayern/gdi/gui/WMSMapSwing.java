@@ -18,7 +18,12 @@
 
 package de.bayern.gdi.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,13 +40,27 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import net.miginfocom.swing.MigLayout;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.swing.JMapPane;
+import org.geotools.swing.MapLayerTable;
+import org.geotools.swing.action.InfoAction;
+import org.geotools.swing.action.NoToolAction;
+import org.geotools.swing.action.PanAction;
+import org.geotools.swing.action.ResetAction;
+import org.geotools.swing.action.ZoomInAction;
+import org.geotools.swing.action.ZoomOutAction;
+import org.geotools.swing.control.JMapStatusBar;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -65,7 +84,38 @@ public class WMSMapSwing extends Parent {
     private SwingNode mapNode;
 
     /**
+     * Name assigned to toolbar button for feature info queries.
+     */
+    public static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
+    /**
+     * Name assigned to toolbar button for map panning.
+     */
+    public static final String TOOLBAR_PAN_BUTTON_NAME
+            = "ToolbarPanButton";
+    /**
+     * Name assigned to toolbar button for default pointer.
+     */
+    public static final String TOOLBAR_POINTER_BUTTON_NAME
+            = "ToolbarPointerButton";
+    /**
+     * Name assigned to toolbar button for map reset.
+     */
+    public static final String TOOLBAR_RESET_BUTTON_NAME
+            = "ToolbarResetButton";
+    /**
+     * Name assigned to toolbar button for map zoom in.
+     */
+    public static final String TOOLBAR_ZOOMIN_BUTTON_NAME
+            = "ToolbarZoomInButton";
+    /**
+     * Name assigned to toolbar button for map zoom out.
+     */
+    public static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
+            = "ToolbarZoomOutButton";
+    
+    /**
      * adds a node to this map.
+     *
      * @param n the node
      */
     public void add(Node n) {
@@ -75,6 +125,7 @@ public class WMSMapSwing extends Parent {
 
     /**
      * gets the children of this node.
+     *
      * @return the children of the node
      */
     @Override
@@ -91,6 +142,7 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Constructor.
+     *
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
@@ -101,6 +153,7 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Constructor.
+     *
      * @param mapURL The URL of the WMS Service
      */
     public WMSMapSwing(URL mapURL, int width, int heigth) {
@@ -112,7 +165,7 @@ public class WMSMapSwing extends Parent {
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
             ObservableList<String> layerList = FXCollections
                     .observableArrayList();
-            for (Layer layer: layers) {
+            for (Layer layer : layers) {
                 layerList.add(layer.getName());
             }
             if (layers == null) {
@@ -165,7 +218,7 @@ public class WMSMapSwing extends Parent {
                         .getSelectedItem();
                 List<Layer> layers = wms.getCapabilities().getLayerList();
                 Layer layer = null;
-                for (Layer lay: layers) {
+                for (Layer lay : layers) {
                     if (layerName == lay.getName()) {
                         layer = lay;
                         break;
@@ -183,7 +236,87 @@ public class WMSMapSwing extends Parent {
                 JMapPane mapPane = new JMapPane(mapContent);
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
-                swingNode.setContent(mapPane);
+                mapPane.setSize(mapWidth, mapHeight);
+                mapPane.addFocusListener(new FocusAdapter() {
+
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        mapPane.setBorder(
+                                BorderFactory.createLineBorder(Color.BLACK));
+                    }
+
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        mapPane.setBorder(
+                              BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                    }
+                });
+
+                mapPane.addMouseListener(new MouseAdapter() {
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        mapPane.requestFocusInWindow();
+                    }
+                });
+                MapLayerTable mapLayerTable;
+                StringBuilder sb = new StringBuilder();
+                sb.append("[]");
+                sb.append("[min!]");
+                JPanel panel = new JPanel(new MigLayout(
+                        "wrap 1, insets 0",
+
+                        "[grow]",
+
+                        sb.toString()));
+
+                JToolBar toolBar = new JToolBar();
+                toolBar.setOrientation(JToolBar.HORIZONTAL);
+                toolBar.setFloatable(false);
+
+                JButton btn;
+                ButtonGroup cursorToolGrp = new ButtonGroup();
+
+                btn = new JButton(new NoToolAction(mapPane));
+                btn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                toolBar.add(btn);
+                cursorToolGrp.add(btn);
+
+                btn = new JButton(new ZoomInAction(mapPane));
+                btn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
+                toolBar.add(btn);
+                cursorToolGrp.add(btn);
+
+                btn = new JButton(new ZoomOutAction(mapPane));
+                btn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
+                toolBar.add(btn);
+                cursorToolGrp.add(btn);
+
+                toolBar.addSeparator();
+
+                btn = new JButton(new PanAction(mapPane));
+                btn.setName(TOOLBAR_PAN_BUTTON_NAME);
+                toolBar.add(btn);
+                cursorToolGrp.add(btn);
+
+                toolBar.addSeparator();
+
+                btn = new JButton(new InfoAction(mapPane));
+                btn.setName(TOOLBAR_INFO_BUTTON_NAME);
+                toolBar.add(btn);
+
+                toolBar.addSeparator();
+
+                btn = new JButton(new ResetAction(mapPane));
+                btn.setName(TOOLBAR_RESET_BUTTON_NAME);
+                toolBar.add(btn);
+
+                panel.add(toolBar, "grow");
+
+                panel.add(mapPane, "grow");
+                panel.add(
+                        JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
+                swingNode.setContent(panel);
             }
         });
     }

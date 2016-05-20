@@ -81,19 +81,15 @@ public class View {
     private static final int FULLSIZE = 100;
 
     private static final double EIGHTY_PERCENT_OF = 0.8;
+    private static final double THIRTHY_PERCENT = 33.33D;
+    private static final double THIRTHE_PERCENT_OF = 0.33D;
     private static final int MIN_WINDOWHEIGHT = 480;
     private static final int MIN_WINDOWWIDTH = 640;
 
-    private static final int FIRST_COLUMN = ONE;
-    private static final int SECOND_COLUMN = TWO;
-    private static final int THIRD_COLUMN = THREE;
-    private static final int FOURTH_COLUMN = FOUR;
-    private static final int FIFTH_COLUMN = FIVE;
-    private static final int SIXTH_COLUMN = SIX;
-    private static final int SEVENTH_COLUMN = SEVEN;
-    private static final int EIGTH_COLUMN = EIGHT;
-    private static final int NINETH_COLUMN = NINE;
-    private static final int MAX_COLUMN = NINETH_COLUMN;
+    private static final int FIRST_COLUMN = ZERO;
+    private static final int SECOND_COLUMN = ONE;
+    private static final int THIRD_COLUMN = TWO;
+    private static final int MAX_COLUMN = THIRD_COLUMN;
 
 
     private static final int FIRST_ROW = ONE;
@@ -199,6 +195,8 @@ public class View {
 
     private Group mapGroup;
 
+    private VBox serviceVBox;
+
     /**
      * Constructor.
      */
@@ -220,17 +218,10 @@ public class View {
         this.prgrmLayout = new BorderPane();
 
         this.grid = new GridPane();
-        for (int i = 0; i < MAX_COLUMN; i++) {
-            ColumnConstraints column = new ColumnConstraints();
-            column.setPercentWidth((MAX_COLUMN / FULLSIZE) / FULLSIZE);
-            grid.getColumnConstraints().add(column);
-        }
 
-        for (int i = 0; i < MAX_ROW; i++) {
-            RowConstraints row = new RowConstraints();
-            row.setPercentHeight((MAX_ROW / FULLSIZE) / FULLSIZE);
-            grid.getRowConstraints().add(row);
-        }
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(THIRTHY_PERCENT);
+        grid.getColumnConstraints().add(column);
 
         this.grid.setAlignment(Pos.BASELINE_LEFT);
         this.grid.setHgap(GRID_HGAP);
@@ -285,33 +276,11 @@ public class View {
         this.serviceChooseBox.setAlignment(Pos.BOTTOM_RIGHT);
         this.serviceChooseBox.getChildren().add(this.serviceChooseButton);
 
-
         //Adding to the Layout
-        this.grid.add(this.serviceSearch,
-                FIRST_COLUMN,
-                FIRST_ROW);
-        this.grid.add(this.serviceList,
-                FIRST_COLUMN,
-                SECOND_ROW);
-        this.grid.add(this.serviceURLLabel,
-                FIRST_ROW,
-                THIRD_ROW);
-        this.grid.add(this.serviceURLfield,
-                FIRST_COLUMN,
-                FOURTH_ROW);
-        this.grid.add(this.serviceChooseBox,
-                FIRST_COLUMN,
-                FIFTH_ROW);
-        this.grid.add(this.serviceUseAuthenticationCBX,
-                FIRST_COLUMN,
-                SIXTH_ROW);
-        this.grid.add(this.serviceAuthenticationLabelsBox,
-                FIRST_COLUMN,
-                SEVENTH_ROW);
-        this.grid.add(this.serviceAuthenticationFieldsBox,
-                FIRST_COLUMN,
-                EIGHT_ROW);
-
+        this.grid.addColumn(FIRST_COLUMN, this.serviceSearch, this
+                .serviceList, this.serviceURLLabel, this.serviceURLfield,
+                this.serviceChooseBox, this.serviceUseAuthenticationCBX, this
+                        .serviceAuthenticationFieldsBox);
 
         //Menubar
         this.menubar = new MenuBar();
@@ -380,12 +349,7 @@ public class View {
     public void setTypes(ArrayList<String> types) {
         ObservableList<String> options =
                 FXCollections.observableArrayList(types);
-        this.typeComboBox.getItems().removeAll(this.typeComboBox.getItems());
-        this.typeComboBox.setItems(options);
-        this.grid.getChildren().remove(this.typeComboBox);
-        this.grid.add(this.typeComboBox,
-                SECOND_COLUMN,
-                FIRST_ROW);
+        this.setTypeComboBox(new ComboBox(options));
     }
 
     /**
@@ -424,20 +388,20 @@ public class View {
 
         this.attributeScrollPane.setContent(this.attributeGridPane);
         this.grid.getChildren().remove(this.attributeScrollPane);
-        this.grid.add(this.attributeScrollPane,
-                SECOND_COLUMN,
-                SECOND_ROW);
+
         attributeScrollPane.setFitToWidth(true);
         this.attributesFilledButton.setText("All Attributes Filled");
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
         this.attributesFilledBox.getChildren().removeAll(
                 this.attributesFilledBox.getChildren()
         );
-        //this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
         this.grid.getChildren().remove(this.attributesFilledBox);
-        this.grid.add(this.attributesFilledBox,
+        this.grid.addColumn(SECOND_COLUMN, new Label());
+        this.grid.add(this.attributeScrollPane,
                 SECOND_COLUMN,
-                THIRD_ROW);
+                SECOND_ROW);
+        this.grid.add(this.attributesFilledBox,
+                SECOND_COLUMN,THIRD_ROW);
     }
 
     /**.
@@ -467,6 +431,7 @@ public class View {
         this.mapGroup.getChildren().add(this.wmsMapFX);
         */
         this.grid.getChildren().remove(this.mapGroup);
+        this.grid.addColumn(THIRD_COLUMN, new Label());
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 SECOND_ROW);
