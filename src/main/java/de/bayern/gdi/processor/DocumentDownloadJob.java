@@ -17,16 +17,17 @@
  */
 package de.bayern.gdi.processor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import de.bayern.gdi.utils.CountingInputStream;
+import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 import java.io.IOException;
 
-import de.bayern.gdi.utils.DocumentResponseHandler;
-import de.bayern.gdi.utils.CountingInputStream;
-import de.bayern.gdi.utils.WrapInputStreamFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.client.methods.HttpGet;
+
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 

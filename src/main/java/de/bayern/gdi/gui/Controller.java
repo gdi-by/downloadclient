@@ -18,34 +18,49 @@
 
 package de.bayern.gdi.gui;
 
-
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
+
 import de.bayern.gdi.utils.ServiceChecker;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
+
 import javafx.application.Platform;
+
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
 import javafx.concurrent.Task;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
+
 import org.opengis.feature.type.AttributeType;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -59,7 +74,7 @@ public class Controller {
     private View view;
 
     private static final Logger log
-            = Logger.getLogger(WMSMap.class.getName());
+            = Logger.getLogger(Controller.class.getName());
     /**
      * Creates the Conroller.
      * @param dataBean the model
@@ -80,6 +95,8 @@ public class Controller {
                 setOnAction(new ChooseTypeEventHandler());
         view.getAttributesFilledButton().
                 setOnAction(new AttributesFilledEventHandler());
+        view.getServiceList().
+                setOnMouseClicked(new MouseClickedOnServiceList());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -249,6 +266,12 @@ public class Controller {
      */
     private class ServiceChooseButtonEventHandler implements
             EventHandler<ActionEvent> {
+
+        public void handle(MouseEvent e) {
+            ActionEvent ev = new ActionEvent();
+            handle(ev);
+        }
+
         @Override
         public void handle(ActionEvent e) {
             Task task = new Task() {
@@ -396,4 +419,32 @@ public class Controller {
         }
     }
 
+    /**
+     *  Eventhandler for mouse events on map.
+     */
+    private class MouseClickedOnServiceList
+            implements EventHandler<MouseEvent> {
+        @Override
+        public void handle(MouseEvent e) {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                if (e.getClickCount() > 1) {
+                    ServiceChooseButtonEventHandler se =
+                            new ServiceChooseButtonEventHandler();
+                    se.handle(e);
+                }
+                if (e.getClickCount() == 1) {
+                    if (view.getServiceList().
+                            getSelectionModel().getSelectedItems().get(0)
+                            != null) {
+                        String serviceName =
+                                view.getServiceList().
+                                        getSelectionModel().
+                                        getSelectedItems().get(0);
+                        String serviceURL = dataBean.getServiceURL(serviceName);
+                        view.setServiceURLText(serviceURL);
+                    }
+                }
+            }
+        }
+    }
 }

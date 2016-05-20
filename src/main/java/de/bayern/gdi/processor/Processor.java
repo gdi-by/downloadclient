@@ -18,8 +18,8 @@
 package de.bayern.gdi.processor;
 
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Collection;
+import java.util.Deque;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

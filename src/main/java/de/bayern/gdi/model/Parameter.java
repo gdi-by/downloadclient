@@ -15,34 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package de.bayern.gdi.utils;
-
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.util.logging.Logger;
+package de.bayern.gdi.model;
 
 /**
- * @author Jochen Saalfeld (jochen@intevation.de)
+ * Holds a key/value pair for a parameter.
  */
-public class DownloadStep implements Serializable {
+public class Parameter {
 
-    private static final Logger log
-            = Logger.getLogger(DownloadStep.class.getName());
+    private String key;
+    private String value;
 
-    private void writeObject(java.io.ObjectOutputStream out)
-            throws IOException {
-
+    public Parameter(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-
+    /**
+     * @return the key
+     */
+    public String getKey() {
+        return key;
     }
 
-    private void readObjectNoData()
-            throws ObjectStreamException {
+    /**
+     * @param key the key to set
+     */
+    public void setKey(String key) {
+        this.key = key;
+    }
 
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 }

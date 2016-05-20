@@ -19,10 +19,13 @@
 package de.bayern.gdi.utils;
 
 import java.io.InputStream;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import java.util.logging.Logger;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -130,7 +133,9 @@ public class ServiceSetting {
                         }
                     }
                 }
-                servicesMap.put(serviceName, serviceURL);
+                if (serviceURL != null && serviceName != null) {
+                    servicesMap.put(serviceName, serviceURL);
+                }
             }
         }
         return servicesMap;

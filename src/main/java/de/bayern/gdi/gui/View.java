@@ -18,9 +18,13 @@
 
 package de.bayern.gdi.gui;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -47,7 +51,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -78,19 +81,16 @@ public class View {
     private static final int FULLSIZE = 100;
 
     private static final double EIGHTY_PERCENT_OF = 0.8;
+    private static final double THIRTHY_PERCENT = 33.33D;
+    private static final double THIRTHE_PERCENT_OF = 0.33D;
     private static final int MIN_WINDOWHEIGHT = 480;
     private static final int MIN_WINDOWWIDTH = 640;
+    private static final int MIN_FIELDWIDTH = 150;
 
-    private static final int FIRST_COLUMN = ONE;
-    private static final int SECOND_COLUMN = TWO;
-    private static final int THIRD_COLUMN = THREE;
-    private static final int FOURTH_COLUMN = FOUR;
-    private static final int FIFTH_COLUMN = FIVE;
-    private static final int SIXTH_COLUMN = SIX;
-    private static final int SEVENTH_COLUMN = SEVEN;
-    private static final int EIGTH_COLUMN = EIGHT;
-    private static final int NINETH_COLUMN = NINE;
-    private static final int MAX_COLUMN = NINETH_COLUMN;
+    private static final int FIRST_COLUMN = ZERO;
+    private static final int SECOND_COLUMN = ONE;
+    private static final int THIRD_COLUMN = TWO;
+    private static final int MAX_COLUMN = THIRD_COLUMN;
 
 
     private static final int FIRST_ROW = ONE;
@@ -103,6 +103,9 @@ public class View {
     private static final int EIGHT_ROW = EIGHT;
     private static final int NINETH_ROW = NINE;
     private static final int MAX_ROW = NINETH_ROW;
+
+    private static final Logger log
+            = Logger.getLogger(View.class.getName());
 
     //private static final String INITALBBOX
     //        = "-131.13151509433965,46.60532747661736,"+
@@ -187,9 +190,13 @@ public class View {
 
     private GridPane attributeGridPane;
 
-    private WMSMap wmsMap;
+    private WMSMapFX wmsMapFX;
+
+    private WMSMapSwing wmsMapSwing;
 
     private Group mapGroup;
+
+    private VBox serviceVBox;
 
     /**
      * Constructor.
@@ -212,17 +219,10 @@ public class View {
         this.prgrmLayout = new BorderPane();
 
         this.grid = new GridPane();
-        for (int i = 0; i < MAX_COLUMN; i++) {
-            ColumnConstraints column = new ColumnConstraints();
-            column.setPercentWidth((MAX_COLUMN / FULLSIZE) / FULLSIZE);
-            grid.getColumnConstraints().add(column);
-        }
 
-        for (int i = 0; i < MAX_ROW; i++) {
-            RowConstraints row = new RowConstraints();
-            row.setPercentHeight((MAX_ROW / FULLSIZE) / FULLSIZE);
-            grid.getRowConstraints().add(row);
-        }
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(THIRTHY_PERCENT);
+        grid.getColumnConstraints().add(column);
 
         this.grid.setAlignment(Pos.BASELINE_LEFT);
         this.grid.setHgap(GRID_HGAP);
@@ -258,9 +258,11 @@ public class View {
         this.serviceAuthenticationFieldsBox.setSpacing(columnWidth / TWO);
         this.serviceUserLabel = new Label("User:");
         this.serviceUser = new TextField();
+        this.serviceUser.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUserLabel.setLabelFor(this.serviceUser);
         this.servicePWLabel = new Label("Password:");
         this.servicePW = new TextField();
+        this.servicePW.setMinWidth(MIN_FIELDWIDTH);
         this.servicePWLabel.setLabelFor(this.servicePW);
         this.serviceAuthenticationLabelsBox.getChildren()
                 .addAll(
@@ -277,33 +279,11 @@ public class View {
         this.serviceChooseBox.setAlignment(Pos.BOTTOM_RIGHT);
         this.serviceChooseBox.getChildren().add(this.serviceChooseButton);
 
-
         //Adding to the Layout
-        this.grid.add(this.serviceSearch,
-                FIRST_COLUMN,
-                FIRST_ROW);
-        this.grid.add(this.serviceList,
-                FIRST_COLUMN,
-                SECOND_ROW);
-        this.grid.add(this.serviceURLLabel,
-                FIRST_ROW,
-                THIRD_ROW);
-        this.grid.add(this.serviceURLfield,
-                FIRST_COLUMN,
-                FOURTH_ROW);
-        this.grid.add(this.serviceChooseBox,
-                FIRST_COLUMN,
-                FIFTH_ROW);
-        this.grid.add(this.serviceUseAuthenticationCBX,
-                FIRST_COLUMN,
-                SIXTH_ROW);
-        this.grid.add(this.serviceAuthenticationLabelsBox,
-                FIRST_COLUMN,
-                SEVENTH_ROW);
-        this.grid.add(this.serviceAuthenticationFieldsBox,
-                FIRST_COLUMN,
-                EIGHT_ROW);
-
+        this.grid.addColumn(FIRST_COLUMN, this.serviceSearch, this
+                .serviceList, this.serviceURLLabel, this.serviceURLfield,
+                this.serviceChooseBox, this.serviceUseAuthenticationCBX, this
+                        .serviceAuthenticationFieldsBox);
 
         //Menubar
         this.menubar = new MenuBar();
@@ -332,7 +312,8 @@ public class View {
         this.typeComboBox = new ComboBox();
         this.attributeScrollPane = new ScrollPane();
         this.attributeGridPane = new GridPane();
-        this.wmsMap = new WMSMap();
+        //this.wmsMapFX = new WMSMapFX();
+        this.wmsMapSwing = new WMSMapSwing();
         this.mapGroup = new Group();
     }
 
@@ -345,7 +326,8 @@ public class View {
                 this.typeComboBox,
                 this.attributeScrollPane,
                 this.attributeGridPane,
-                this.wmsMap,
+                //this.wmsMapFX,
+                this.wmsMapSwing,
                 this.mapGroup);
     }
 
@@ -356,6 +338,10 @@ public class View {
     public void show(Stage stage) {
         stage.setTitle("GDI-BY Downloadclient");
         stage.setScene(scene);
+        Rectangle2D primaryScreenBounds =
+                Screen.getPrimary().getVisualBounds();
+        stage.setWidth(primaryScreenBounds.getWidth());
+        stage.setHeight(primaryScreenBounds.getHeight());
         stage.show();
     }
 
@@ -410,20 +396,22 @@ public class View {
 
         this.attributeScrollPane.setContent(this.attributeGridPane);
         this.grid.getChildren().remove(this.attributeScrollPane);
-        this.grid.add(this.attributeScrollPane,
-                SECOND_COLUMN,
-                SECOND_ROW);
+
         attributeScrollPane.setFitToWidth(true);
         this.attributesFilledButton.setText("All Attributes Filled");
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
         this.attributesFilledBox.getChildren().removeAll(
                 this.attributesFilledBox.getChildren()
         );
-        //this.attributesFilledBox.getChildren().add(this.serviceChooseButton);
         this.grid.getChildren().remove(this.attributesFilledBox);
+        this.grid.getChildren().remove(this.typeComboBox);
+        this.grid.addColumn(SECOND_COLUMN, this.typeComboBox);
+        this.grid.add(this.attributeScrollPane,
+                SECOND_COLUMN,
+                FIRST_ROW);
         this.grid.add(this.attributesFilledBox,
                 SECOND_COLUMN,
-                THIRD_ROW);
+                SECOND_ROW);
     }
 
     /**.
@@ -432,17 +420,32 @@ public class View {
      * @param wmsName the WMS Name
      */
     public void setWMSMap(String wmsUrl, String wmsName) {
-        this.wmsMap = new WMSMap(wmsUrl,
+        URL url = null;
+        try {
+            url = new URL(wmsUrl);
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        this.wmsMapSwing = new WMSMapSwing(url,
+                (int) this.serviceList.getWidth(),
+                (int) this.serviceList.getHeight());
+        this.mapGroup.getChildren().clear();
+        this.mapGroup.getChildren().add(this.wmsMapSwing);
+        /*
+        this.wmsMapFX = new WMSMapFX(wmsUrl,
                 wmsName,
                 INITALBBOX,
                 (int) serviceList.getWidth(),
                 (int) serviceList.getWidth());
         this.mapGroup.getChildren().clear();
-        this.mapGroup.getChildren().add(this.wmsMap);
+        this.mapGroup.getChildren().add(this.wmsMapFX);
+        */
         this.grid.getChildren().remove(this.mapGroup);
+        this.grid.addColumn(THIRD_COLUMN, new Label());
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
-                SECOND_ROW);
+                FIRST_ROW);
+
     }
     /**
      * gets the service List entries.
@@ -472,6 +475,16 @@ public class View {
         this.statusBar.getChildren().add(statusText);
     }
 
+    /**
+     * sets the Service URL Text.
+     * @param urlText the URL Text
+     */
+    public void setServiceURLText(String urlText) {
+        TextField tf = getServiceURLfield();
+        tf.clear();
+        tf.setText(urlText);
+        setServiceURLfield(tf);
+    }
     /**
      * sets the content of the select list for the services.
      * @param items the items
@@ -945,15 +958,15 @@ public class View {
      * gets the WMS Map.
      * @return WMS Map
      */
-    public WMSMap getWmsMap() {
-        return wmsMap;
+    public WMSMapSwing getWmsSwingMap() {
+        return wmsMapSwing;
     }
 
     /**
      * sets the WMS Map.
      * @param wmsMap WMS Map
      */
-    public void setWmsMap(WMSMap wmsMap) {
-        this.wmsMap = wmsMap;
+    public void setWmsSwingMap(WMSMapSwing wmsMap) {
+        this.wmsMapSwing = wmsMap;
     }
 }

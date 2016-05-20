@@ -18,8 +18,8 @@
 package de.bayern.gdi.utils;
 
 import java.io.FilterInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /** CountingInputStream counts the number of bytes piped
  *  through the parent stream.
