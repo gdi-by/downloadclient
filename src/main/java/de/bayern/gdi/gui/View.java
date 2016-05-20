@@ -452,7 +452,7 @@ public class View {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        this.wmsMapSwing = new WMSMapSwing(url, wmsName);
+        this.wmsMapSwing = new WMSMapSwing(url);
         this.mapGroup.getChildren().clear();
         this.mapGroup.getChildren().add(this.wmsMapSwing);
         /*
