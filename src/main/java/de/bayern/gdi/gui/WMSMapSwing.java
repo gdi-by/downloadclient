@@ -20,6 +20,7 @@ package de.bayern.gdi.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -302,5 +303,13 @@ public class WMSMapSwing extends Parent {
                 swingNode.setContent(panel);
             }
         });
+    }
+
+    /**
+     * return the Bounds of the Map
+     * @return the Bounds of the Map
+     */
+    public Rectangle getBounds() {
+        return this.mapNode.getContent().getBounds();
     }
 }
