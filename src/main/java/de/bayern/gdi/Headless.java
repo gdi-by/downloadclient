@@ -23,9 +23,13 @@ import de.bayern.gdi.services.WebService;
 
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.XML;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.w3c.dom.Document;
 
 /**
  * The command line tool.
@@ -51,10 +55,29 @@ public class Headless {
     }
 
     /**
-     * @param args the command line arguments
+     * @param settings The path to the settings file.
+     * @param args The command line arguments.
+     * @return Non zero if the operation fails.
      */
-    public static void main(String [] args) {
+    public static int main(String settings, String [] args) {
         log.info("Running in headless mode");
+
+        File settingsFile = settings != null
+            ? new File(settings)
+            : new File(
+                new File(System.getProperty("user.home", "~")),
+                    "settings.xml");
+
+        log.info("Using settings file: " + settingsFile);
+
+        Document settingsDoc = XML.getDocument(settingsFile);
+
+        if (settingsDoc == null) {
+            log.log(
+                Level.SEVERE, "Cannot find settings file: " + settingsFile);
+            return 1;
+        }
+
         //There could be a Service Handler for each Service that deals
         //with command line arguments and/or a stored XML File
         String userName = null;
@@ -79,6 +102,7 @@ public class Headless {
                 log.log(Level.SEVERE, "Could not determine Service Type");
                 break;
         }
+        return 0;
     }
 }
 
