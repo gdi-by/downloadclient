@@ -154,6 +154,9 @@ public class View {
 
     private Button serviceChooseButton;
 
+
+    private Button downloadButton;
+
     private CheckBox serviceUseAuthenticationCBX;
 
     private HBox serviceAuthenticationLabelsBox;
@@ -315,6 +318,8 @@ public class View {
         //this.wmsMapFX = new WMSMapFX();
         this.wmsMapSwing = new WMSMapSwing();
         this.mapGroup = new Group();
+        this.downloadButton = new Button();
+
     }
 
     /**
@@ -328,7 +333,8 @@ public class View {
                 this.attributeGridPane,
                 //this.wmsMapFX,
                 this.wmsMapSwing,
-                this.mapGroup);
+                this.mapGroup,
+                this.downloadButton);
     }
 
     /**
@@ -445,7 +451,10 @@ public class View {
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 FIRST_ROW);
-
+        this.downloadButton.setText("Download");
+        this.grid.add(this.downloadButton,
+                THIRD_COLUMN,
+                SECOND_ROW);
     }
     /**
      * gets the service List entries.
@@ -968,5 +977,21 @@ public class View {
      */
     public void setWmsSwingMap(WMSMapSwing wmsMap) {
         this.wmsMapSwing = wmsMap;
+    }
+
+    /**
+     * gets the Downloadbutton.
+     * @return the Downloadbutton
+     */
+    public Button getDownloadButton() {
+        return downloadButton;
+    }
+
+    /**
+     * sets the Downloadbutton.
+     * @param downloadButton the button
+     */
+    public void setDownloadButton(Button downloadButton) {
+        this.downloadButton = downloadButton;
     }
 }

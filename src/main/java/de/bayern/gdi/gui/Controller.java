@@ -97,6 +97,8 @@ public class Controller {
                 setOnAction(new AttributesFilledEventHandler());
         view.getServiceList().
                 setOnMouseClicked(new MouseClickedOnServiceList());
+        view.getDownloadButton().
+                setOnAction(new DownloadButtonEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -258,6 +260,17 @@ public class Controller {
         @Override
         public void handle(ActionEvent e) {
             view.reset();
+        }
+    }
+
+    /**
+     * Event Handler for Downloading.
+     */
+    private class DownloadButtonEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            //NADA
         }
     }
 
