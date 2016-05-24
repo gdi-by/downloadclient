@@ -17,13 +17,25 @@
  */
 package de.bayern.gdi.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Holds a key/value pair for a parameter.
  */
+@XmlRootElement(name = "Parameter")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Parameter {
 
+    @XmlElement(name = "Name")
     private String key;
+    @XmlElement(name = "Wert")
     private String value;
+
+    public Parameter() {
+    }
 
     public Parameter(String key, String value) {
         this.key = key;
@@ -56,5 +68,10 @@ public class Parameter {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "[Parameter: key = \"" + key + "\" value = \"" + value + "\"]";
     }
 }

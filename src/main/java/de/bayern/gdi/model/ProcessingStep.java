@@ -19,13 +19,24 @@ package de.bayern.gdi.model;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * One step in a process sequence.
  */
+@XmlRootElement(name = "Verarbeitungsschritt")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingStep {
 
+    @XmlElement(name = "Name")
     private String name;
 
+    @XmlElementWrapper(name = "Parameters")
+    @XmlElement(name = "Parameter")
     private ArrayList<Parameter> parameters;
 
     public ProcessingStep() {
@@ -57,6 +68,21 @@ public class ProcessingStep {
      */
     public void setParameters(ArrayList<Parameter> parameters) {
         this.parameters = parameters;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[processing step: ");
+        sb.append("name = \"").append(name).append("\" ");
+        sb.append(" parameters: [");
+        for (int i = 0, n = parameters.size(); i < n; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(parameters.get(i));
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }
 

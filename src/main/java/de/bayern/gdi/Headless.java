@@ -64,6 +64,8 @@ public class Headless {
             return 1;
         }
 
+        System.out.println(dls);
+
         // TODO: Convert DownloadStep into
         //       sequence of processor jobs.
         //
