@@ -127,6 +127,7 @@ public class Controller {
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getTypes());
                 case WFSTwo:
+                    //TODO - Bring sotredQueires and Types together!
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getStoredQueries());
                 case Atom:
