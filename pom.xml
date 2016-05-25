@@ -19,6 +19,47 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <!-- merges META-INF/services/ entries instead of overwriting -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <!-- merges META-INF/javax.media.jai.registryFile.jai entries instead of overwriting -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/javax.media.jai.registryFile.jai</resource>
+                </transformer>
+                <!-- merges META-INF/registryFile.jai entries instead of overwriting -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/registryFile.jai</resource>
+                </transformer>
+                <!-- merges META-INF/registryFile.jaiext entries instead of overwriting -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/registryFile.jaiext</resource>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.15</version>
         <executions>
@@ -100,6 +141,11 @@
       <version>4.5.2</version>
     </dependency>
     <dependency>
+      <groupId>net.java.dev.jai-imageio</groupId>
+      <artifactId>jai-imageio-core-standalone</artifactId>
+      <version>1.2-pre-dr-b04-2014-09-13</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
@@ -157,6 +203,15 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+    </repository>
+    <repository>
+      <releases />
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>mygrid-repository</id>
+      <name>myGrid Repository</name>
+      <url>http://www.mygrid.org.uk/maven/repository</url>
     </repository>
   </repositories>
 </project>

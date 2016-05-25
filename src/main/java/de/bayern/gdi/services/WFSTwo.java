@@ -104,7 +104,7 @@ public class WFSTwo extends WebService {
                             this.userName, this.password));
             }
             InputStream is = conn.getInputStream();
-        /*
+            /*
             final BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is));
             String line = null;
@@ -112,7 +112,7 @@ public class WFSTwo extends WebService {
                 System.out.println(line);
             }
             reader.close();
-*/
+            */
             InputSource xml = new InputSource(is);
             Object parsed = parser.parse(xml);
             WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;

@@ -30,27 +30,40 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
+@XmlRootElement(name = "DownloadSchritt")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DownloadStep {
 
     private static final Logger log
         = Logger.getLogger(DownloadStep.class.getName());
 
+    @XmlElement(name = "ServiceTyp")
     private String serviceType;
 
+    @XmlElement(name = "URL")
     private String serviceURL;
 
-    private String dataSet;
+    @XmlElement(name = "DownloadPfad")
+    private String path;
 
-    @XmlElementWrapper(name = "processingSteps")
-    @XmlElement(name = "processingStep")
+    @XmlElement(name = "Dataset")
+    private String dataset;
+
+    @XmlElementWrapper(name = "Verarbeitungskette")
+    @XmlElement(name = "Verarbeitungsschritt")
     private ArrayList<ProcessingStep> processingSteps;
 
+    @XmlElementWrapper(name = "Parameters")
+    @XmlElement(name = "Parameter")
     private ArrayList<Parameter> parameters;
 
     public DownloadStep() {
@@ -60,6 +73,20 @@ public class DownloadStep {
      * @param file The file to load data from.
      */
     public DownloadStep(File file) {
+    }
+
+    /**
+     * @return the dataset
+     */
+    public String getDataset() {
+        return dataset;
+    }
+
+    /**
+     * @param dataset the dataset to set
+     */
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
     }
 
     public ArrayList<ProcessingStep> getProcessingSteps() {
@@ -116,15 +143,40 @@ public class DownloadStep {
     /**
      * @return the dataSet
      */
-    public String getDataSet() {
-        return dataSet;
+    public String getPath() {
+        return path;
     }
 
     /**
-     * @param dataSet the dataSet to set
+     * @param path the path to set
      */
-    public void setDataSet(String dataSet) {
-        this.dataSet = dataSet;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[DownloadStep:\n");
+        sb.append("\tserviceType: \"").append(serviceType).append("\"\n");
+        sb.append("\tserviceURL: \"").append(serviceURL).append("\"\n");
+        sb.append("\tdataset: \"").append(dataset).append("\"\n");
+        sb.append("\tpath: \"").append(path).append("\"\n");
+        sb.append("\tparameters: ");
+        for (int i = 0, n = parameters.size(); i < n; i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(parameters.get(i));
+        }
+        sb.append("]\n");
+        sb.append("\tprocessing steps:\n");
+        for (int i = 0, n = processingSteps.size(); i < n; i++) {
+            sb.append("\t\t");
+            sb.append(processingSteps.get(i));
+            sb.append('\n');
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
     /**

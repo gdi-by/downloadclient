@@ -10,7 +10,7 @@ Do not use it by now! :-)
 
 ## Bundle
 
-    $ mvn clean package assembly:single
+    $ mvn clean package
 
 ## Run
 To start with UI:
@@ -23,7 +23,7 @@ To start in headless mode:
 
 If you have built the single assembly version:
 
-    $ java -jar target/downloadclient-1.0-SNAPSHOT-jar-with-dependencies.jar
+    $ java -jar target/downloadclient-1.0-SNAPSHOT.jar
 
 ## License
 
