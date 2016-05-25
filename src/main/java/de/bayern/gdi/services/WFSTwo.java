@@ -84,37 +84,9 @@ public class WFSTwo extends WebService {
         this.userName = userName;
         this.password = password;
         this.requestMethods = new ArrayList();
-        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
-                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
-        Parser parser = new Parser(configuration);
-        URLConnection conn = null;
         try {
             URL url = new URL(this.serviceURL);
-            if (url.toString().toLowerCase().startsWith("https")) {
-                HttpsURLConnection con
-                    = (HttpsURLConnection)url.openConnection();
-                conn = (URLConnection) con;
-            }  else {
-                conn = url.openConnection();
-            }
-            if (StringUtils.getBase64EncAuth(
-                this.userName, this.password) != null) {
-                conn.setRequestProperty("Authorization", "Basic "
-                        + StringUtils.getBase64EncAuth(
-                            this.userName, this.password));
-            }
-            InputStream is = conn.getInputStream();
-            /*
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-            reader.close();
-            */
-            InputSource xml = new InputSource(is);
-            Object parsed = parser.parse(xml);
+            Object parsed = this.getParsedObject(url);
             WFSCapabilitiesType caps = (WFSCapabilitiesType) parsed;
             OperationsMetadataType om = caps.getOperationsMetadata();
             for (int i = 0; i < om.getOperation().size(); i++) {
@@ -125,9 +97,7 @@ public class WFSTwo extends WebService {
             this.wfsOne = new WFSOne(this.serviceURL,
                     this.userName, this.password);
         } catch (RuntimeException
-                | IOException
-                | SAXException
-                | ParserConfigurationException e) {
+                | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
@@ -186,18 +156,44 @@ public class WFSTwo extends WebService {
         return storedQueries;
     }
 
+    private Object getParsedObject(URL url) {
+        Object parsed = null;
+        try {
+            org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
+                    new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
+            Parser parser = new Parser(configuration);
+            URLConnection conn = null;
+            if (url.toString().toLowerCase().startsWith("https")) {
+                HttpsURLConnection con
+                        = (HttpsURLConnection) url.openConnection();
+                conn = (URLConnection) con;
+            } else {
+                conn = url.openConnection();
+            }
+            if (StringUtils.getBase64EncAuth(
+                    this.userName, this.password) != null) {
+                conn.setRequestProperty("Authorization", "Basic "
+                        + StringUtils.getBase64EncAuth(
+                        this.userName, this.password));
+            }
+            InputStream is = conn.getInputStream();
+            InputSource xml = new InputSource(is);
+            parsed = parser.parse(xml);
+        } catch (IOException
+                | SAXException
+                | ParserConfigurationException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return parsed;
+    }
+
     private EList<StoredQueryDescriptionType> getDescribeStoredQueries() {
         String describeStroedQueriesURL =
                 setURLRequest("DescribeStoredQueries");
-        org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
-                new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
-        Parser parser = new Parser(configuration);
         EList<StoredQueryDescriptionType> storedQueryDescription = null;
         try {
-            URL url = new URL(describeStroedQueriesURL);
-            InputSource xml = new InputSource(url.openStream());
-            Object parsed = parser.parse(xml);
-
+            Object parsed
+                    = this.getParsedObject(new URL(describeStroedQueriesURL));
             DescribeStoredQueriesResponseType storedQueriesType =
                     (DescribeStoredQueriesResponseType) parsed;
             storedQueryDescription =
