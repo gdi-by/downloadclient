@@ -140,6 +140,8 @@ public class View {
 
     private GridPane grid;
 
+    private Label catalagueServiceNameLabel;
+
     private HBox serviceChooseBox;
 
     private ListView<String> serviceList;
@@ -153,7 +155,6 @@ public class View {
     private TextField serviceURLfield;
 
     private Button serviceChooseButton;
-
 
     private Button downloadButton;
 
@@ -181,6 +182,9 @@ public class View {
 
     private MenuItem quitMenuItem;
 
+
+    private MenuItem saveMenuItem;
+
     private Menu optionsMenu;
 
     private ComboBox typeComboBox;
@@ -199,7 +203,7 @@ public class View {
 
     private Group mapGroup;
 
-    private VBox serviceVBox;
+    private VBox serviceListVBox;
 
     /**
      * Constructor.
@@ -282,6 +286,8 @@ public class View {
         this.serviceChooseBox.setAlignment(Pos.BOTTOM_RIGHT);
         this.serviceChooseBox.getChildren().add(this.serviceChooseButton);
 
+
+
         //Adding to the Layout
         this.grid.addColumn(FIRST_COLUMN, this.serviceSearch, this
                 .serviceList, this.serviceURLLabel, this.serviceURLfield,
@@ -293,8 +299,10 @@ public class View {
         this.optionsMenu = new Menu("Options");
         this.resetMenuItem = new MenuItem("Reset");
         this.quitMenuItem = new MenuItem("Quit");
+        this.saveMenuItem = new MenuItem("Save");
         this.optionsMenu.getItems().add(this.resetMenuItem);
         this.optionsMenu.getItems().add(this.quitMenuItem);
+        this.optionsMenu.getItems().add(this.saveMenuItem);
         this.menubar.getMenus().add(this.optionsMenu);
 
         //Statusbar
@@ -319,7 +327,7 @@ public class View {
         this.wmsMapSwing = new WMSMapSwing();
         this.mapGroup = new Group();
         this.downloadButton = new Button();
-
+        this.catalagueServiceNameLabel = new Label();
     }
 
     /**
@@ -335,6 +343,27 @@ public class View {
                 this.wmsMapSwing,
                 this.mapGroup,
                 this.downloadButton);
+    }
+
+    /**
+     * adds a service to the list.
+     * @param serviceName the Name of the Service
+     */
+    public void addServiceToList(String serviceName) {
+        ObservableList<String> items = this.serviceList.getItems();
+        items.add(serviceName);
+        this.serviceList.setItems(items);
+    }
+
+    /**
+     * set the CatalogueServiceName Label Text.
+     * @param text text of the label
+     */
+    public void setCatalagueServiceNameLabelText(String text) {
+        this.catalagueServiceNameLabel.setText(text);
+        this.grid.getChildren().remove(this.catalagueServiceNameLabel);
+        this.grid.add(this.catalagueServiceNameLabel, FIRST_COLUMN,
+                SEVENTH_ROW);
     }
 
     /**
@@ -494,21 +523,6 @@ public class View {
         tf.setText(urlText);
         setServiceURLfield(tf);
     }
-    /**
-     * sets the content of the select list for the services.
-     * @param items the items
-     */
-    public void setServiceList(ObservableList<String> items) {
-        this.setServiceListEntries(items);
-    }
-
-    /**
-     * sets the service List.
-     * @param serviceList the service list
-     */
-    public void setServiceList(ListView<String> serviceList) {
-        this.serviceList = serviceList;
-    }
 
     /**
      * returns the select list for services.
@@ -524,14 +538,6 @@ public class View {
      */
     public TextField getServiceSearch() {
         return serviceSearch;
-    }
-
-    /**
-     * sets the service search field.
-     * @param serviceSearch the service search field
-     */
-    public void setServiceSearch(TextField serviceSearch) {
-        this.serviceSearch = serviceSearch;
     }
 
     /**
@@ -559,35 +565,11 @@ public class View {
     }
 
     /**
-     * sets the Choose Service button.
-     * @param serviceChooseButton the Choose Service Button
-     */
-    public void setServiceChooseButton(Button serviceChooseButton) {
-        this.serviceChooseButton = serviceChooseButton;
-    }
-
-    /**
-     * gets the url Label.
-     * @return the url Label
-     */
-    public Label getServiceURLLabel() {
-        return serviceURLLabel;
-    }
-
-    /**
      * gets the Password field.
      * @return the password field
      */
     public TextField getServicePW() {
         return servicePW;
-    }
-
-    /**
-     * sets the Password field.
-     * @param servicePW the password field
-     */
-    public void setServicePW(TextField servicePW) {
-        this.servicePW = servicePW;
     }
 
     /**
@@ -599,28 +581,11 @@ public class View {
     }
 
     /**
-     * sets the serviceUser Field.
-     * @param serviceUser the serviceUser Field
-     */
-    public void setServiceUser(TextField serviceUser) {
-        this.serviceUser = serviceUser;
-    }
-
-    /**
      * gets the use authentication checkbox.
      * @return the use authentication checkbox
      */
     public CheckBox getServiceUseAuthenticationCBX() {
         return serviceUseAuthenticationCBX;
-    }
-
-    /**
-     * sets the use authentication checkbox.
-     * @param serviceUseAuthenticationCBX the use authentication checkbox
-     */
-    public void setServiceUseAuthenticationCBX(
-            CheckBox serviceUseAuthenticationCBX) {
-        this.serviceUseAuthenticationCBX = serviceUseAuthenticationCBX;
     }
 
     /**
@@ -632,223 +597,11 @@ public class View {
     }
 
     /**
-     * sets the scene.
-     * @param scene the scene
-     */
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    /**
-     * gets the box around the choose service button.
-     * @return box around choose service button
-     */
-    public HBox getServiceChooseBox() {
-        return serviceChooseBox;
-    }
-
-    /**
-     * set the box around the choose service button.
-     * @param serviceChooseBox box around choose service button
-     */
-    public void setServiceChooseBox(HBox serviceChooseBox) {
-        this.serviceChooseBox = serviceChooseBox;
-    }
-
-    /**
-     * gets the initial heigth of the scene.
-     * @return initial height of the scene
-     */
-    public int getSceneHeight() {
-        return sceneHeight;
-    }
-
-    /**
-     * gets teh initial width of the scene.
-     * @return initial width of the scene
-     */
-    public int getSceneWidth() {
-        return sceneWidth;
-    }
-
-    /**
-     * gets the width of a column on the scene.
-     * @return the width of a column on the scene
-     */
-    public int getColumnWidth() {
-        return columnWidth;
-    }
-
-    /**
-     * gets the count of columns on the grid.
-     * @return count of columnns on the grid
-     */
-    public int getMaxColumn() {
-        return MAX_COLUMN;
-    }
-
-    /**
-     * gets the number ob rows on the grid.
-     * @return number of rows on the grid
-     */
-    public int getMaxRow() {
-        return MAX_ROW;
-    }
-
-    /**
-     * gets the main grid of.
-     * @return the main grid
-     */
-    public GridPane getGrid() {
-        return grid;
-    }
-
-    /**
-     * sets the main Grid.
-     * @param grid the main Grid
-     */
-    public void setGrid(GridPane grid) {
-        this.grid = grid;
-    }
-
-    /**
-     * gets the box for service authentication labels.
-     * @return box for service authentication labels
-     */
-    public HBox getServiceAuthenticationLabelsBox() {
-        return serviceAuthenticationLabelsBox;
-    }
-
-    /**
-     * sets the box for service authentication labels.
-     * @param serviceAuthenticationLabelsBox box for service authentication
-     *                                       labels
-     */
-    public void setServiceAuthenticationLabelsBox(
-            HBox serviceAuthenticationLabelsBox) {
-        this.serviceAuthenticationLabelsBox = serviceAuthenticationLabelsBox;
-    }
-
-    /**
-     * gets the box for service authentication fields.
-     * @return the box for service authentication fileds
-     */
-    public HBox getServiceAuthenticationFieldsBox() {
-        return serviceAuthenticationFieldsBox;
-    }
-
-    /**
-     * sets the box for service authentication fields.
-     * @param serviceAuthenticationFieldsBox the box for service authentication
-     *                                       fields
-     */
-    public void setServiceAuthenticationFieldsBox(
-            HBox serviceAuthenticationFieldsBox) {
-        this.serviceAuthenticationFieldsBox = serviceAuthenticationFieldsBox;
-    }
-
-    /**
-     * label of the service url field.
-     * @param serviceURLLabel label of the service url field
-     */
-    public void setServiceURLLabel(Label serviceURLLabel) {
-        this.serviceURLLabel = serviceURLLabel;
-    }
-
-    /**
-     * gets the service user label.
-     * @return service user label
-     */
-    public Label getServiceUserLabel() {
-        return serviceUserLabel;
-    }
-
-    /**
-     * sets the service user label.
-     * @param serviceUserLabel service user label
-     */
-    public void setServiceUserLabel(Label serviceUserLabel) {
-        this.serviceUserLabel = serviceUserLabel;
-    }
-
-    /**
-     * gets the service password label.
-     * @return service password label
-     */
-    public Label getServicePWLabel() {
-        return servicePWLabel;
-    }
-
-    /**
-     * sets the service password label.
-     * @param servicePWLabel service password label
-     */
-    public void setServicePWLabel(Label servicePWLabel) {
-        this.servicePWLabel = servicePWLabel;
-    }
-
-    /**
-     * gets the statusbar.
-     * @return the statusbar
-     */
-    public VBox getStatusBar() {
-        return statusBar;
-    }
-
-    /**
-     * sets the statusbar.
-     * @param statusBar the statusbar
-     */
-    public void setStatusBar(VBox statusBar) {
-        this.statusBar = statusBar;
-    }
-
-    /**
-     * gets the menu bar.
-     * @return the menu bar
-     */
-    public MenuBar getMenubar() {
-        return menubar;
-    }
-
-    /**
-     * sets the menu bar.
-     * @param menubar the menu bar
-     */
-    public void setMenubar(MenuBar menubar) {
-        this.menubar = menubar;
-    }
-
-    /**
-     * sets gets the programs border pane layout.
-     * @return border pane layout
-     */
-    public BorderPane getPrgrmLayout() {
-        return prgrmLayout;
-    }
-
-    /**
-     * sets the programms border pane layout.
-     * @param prgrmLayout border pane layout
-     */
-    public void setPrgrmLayout(BorderPane prgrmLayout) {
-        this.prgrmLayout = prgrmLayout;
-    }
-
-    /**
      * gets the reset programm menu item.
      * @return reset programm menu item
      */
     public MenuItem getResetMenuItem() {
         return resetMenuItem;
-    }
-
-    /**
-     * sets the reset programm menu item.
-     * @param resetMenuItem reset program menu item
-     */
-    public void setResetMenuItem(MenuItem resetMenuItem) {
-        this.resetMenuItem = resetMenuItem;
     }
 
     /**
@@ -860,75 +613,11 @@ public class View {
     }
 
     /**
-     * sets the quit program menu item.
-     * @param quitMenuItem quit program menu item
-     */
-    public void setQuitMenuItem(MenuItem quitMenuItem) {
-        this.quitMenuItem = quitMenuItem;
-    }
-
-    /**
-     * gets the options menu point.
-     * @return the options menu point
-     */
-    public Menu getOptionsMenu() {
-        return optionsMenu;
-    }
-
-    /**
-     * sets the options menu point.
-     * @param optionsMenu the options menu point
-     */
-    public void setOptionsMenu(Menu optionsMenu) {
-        this.optionsMenu = optionsMenu;
-    }
-
-    /**
      * Gets the Combo Box for Types.
      * @return Combobox of Types
      */
     public ComboBox getTypeComboBox() {
         return typeComboBox;
-    }
-
-    /**
-     * sets the Combobox of types.
-     * @param typeComboBox the combobox
-     */
-    public void setTypeComboBox(ComboBox typeComboBox) {
-        this.typeComboBox = typeComboBox;
-    }
-
-    /**
-     * gets the Attribute Pane.
-     * @return the Attribute Pane
-     */
-    public ScrollPane getAttributeScrollPane() {
-        return attributeScrollPane;
-    }
-
-    /**
-     * sets the Attribute Pane.
-     * @param attributePane the Attribute Pane
-     */
-    public void setAttributeScrollPane(ScrollPane attributePane) {
-        this.attributeScrollPane = attributePane;
-    }
-
-    /**
-     * gets the Box for the Attributes Button.
-     * @return the box for the attributes button
-     */
-    public HBox getAttributesFilledBox() {
-        return attributesFilledBox;
-    }
-
-    /**
-     * sets the Box for the Attributes Button.
-     * @param attributesFilledBox the Box for the Atributes Button
-     */
-    public void setAttributesFilledBox(HBox attributesFilledBox) {
-        this.attributesFilledBox = attributesFilledBox;
     }
 
     /**
@@ -940,43 +629,11 @@ public class View {
     }
 
     /**
-     * sets the attributesFilledButton.
-     * @param attributesFilledButton the Attributes Filled Button
-     */
-    public void setAttributesFilledButton(Button attributesFilledButton) {
-        this.attributesFilledButton = attributesFilledButton;
-    }
-
-    /**
      * gets the group with the Attributes in.
      * @return the group with the attributes in
      */
     public GridPane getAttributeGridPane() {
         return attributeGridPane;
-    }
-
-    /**
-     * sets the group with the attributes in.
-     * @param attributeGridPane group with the attributes in
-     */
-    public void setAttributeGridPane(GridPane attributeGridPane) {
-        this.attributeGridPane = attributeGridPane;
-    }
-
-    /**
-     * gets the WMS Map.
-     * @return WMS Map
-     */
-    public WMSMapSwing getWmsSwingMap() {
-        return wmsMapSwing;
-    }
-
-    /**
-     * sets the WMS Map.
-     * @param wmsMap WMS Map
-     */
-    public void setWmsSwingMap(WMSMapSwing wmsMap) {
-        this.wmsMapSwing = wmsMap;
     }
 
     /**
@@ -987,11 +644,12 @@ public class View {
         return downloadButton;
     }
 
+
     /**
-     * sets the Downloadbutton.
-     * @param downloadButton the button
+     * gets the save menu item.
+     * @return save menu item
      */
-    public void setDownloadButton(Button downloadButton) {
-        this.downloadButton = downloadButton;
+    public MenuItem getSaveMenuItem() {
+        return saveMenuItem;
     }
 }

@@ -2,7 +2,7 @@
     <catalogues>
         <catalog>
             <name>CSW GDI-BY</name>
-            <url>http://geoportal.bayern.de/csw/gdi?</url>
+            <url>http://geoportal.bayern.de/csw/gdi?service=CSW&amp;request=GetCapabilities</url>
         </catalog>
     </catalogues>
     <wms>
