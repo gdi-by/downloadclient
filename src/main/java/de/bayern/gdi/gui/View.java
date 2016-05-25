@@ -298,11 +298,11 @@ public class View {
         this.menubar = new MenuBar();
         this.optionsMenu = new Menu("Options");
         this.resetMenuItem = new MenuItem("Reset");
-        this.quitMenuItem = new MenuItem("Quit");
         this.saveMenuItem = new MenuItem("Save");
+        this.quitMenuItem = new MenuItem("Quit");
         this.optionsMenu.getItems().add(this.resetMenuItem);
-        this.optionsMenu.getItems().add(this.quitMenuItem);
         this.optionsMenu.getItems().add(this.saveMenuItem);
+        this.optionsMenu.getItems().add(this.quitMenuItem);
         this.menubar.getMenus().add(this.optionsMenu);
 
         //Statusbar
