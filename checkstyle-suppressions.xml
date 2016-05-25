@@ -9,4 +9,6 @@
             files="src/main/resources/sql/.*"/>
   <suppress checks="Javadoc.*"
             files="src/test"/>
+  <suppress checks="HeaderCheck"
+	  files="src/resources/messages.*\.properties"/>
 </suppressions>
