@@ -137,7 +137,7 @@ public class CatalogService {
             result = mdMetadataNL.item(i);
             String serviceName = null;
             String serviceURL = null;
-            for(int j = 0; j < result.getChildNodes().getLength(); j++) {
+            for (int j = 0; j < result.getChildNodes().getLength(); j++) {
                 Node outerNode;
                 outerNode = result.getChildNodes().item(j);
                 //Node nameNode =
@@ -177,7 +177,7 @@ public class CatalogService {
                                             .getChildNodes();
                                     for(int m = 0; m < to.getLength(); m++) {
                                         if(to.item(m).getNodeName().equals
-                                                ("gmd:MD_DigitalTransferOptions")) {
+                                          ("gmd:MD_DigitalTransferOptions")) {
                                             FUUUUUUUU
                                         }
                                     }
@@ -193,7 +193,7 @@ public class CatalogService {
             }
             System.out.println(serviceName);
             System.out.println(serviceURL);
-            if(serviceName != null && serviceURL != null ) {
+            if (serviceName != null && serviceURL != null) {
                 map.put(serviceName, serviceURL);
             }
         }
