@@ -27,6 +27,7 @@ import de.bayern.gdi.utils.ServiceChecker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -83,6 +84,8 @@ public class Controller {
         this.dataBean = dataBean;
         this.view = new View();
         this.view.setServiceListEntries(this.dataBean.getServicesAsList());
+        this.view.setCatalagueServiceNameLabelText("Catalogue: " + this.dataBean
+                .getCatalogService().getProviderName());
 
         // Register Event Handler
         view.getQuitMenuItem().
@@ -99,6 +102,8 @@ public class Controller {
                 setOnMouseClicked(new MouseClickedOnServiceList());
         view.getDownloadButton().
                 setOnAction(new DownloadButtonEventHandler());
+        view.getSaveMenuItem().
+                setOnAction(new SaveMenuItemEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -173,6 +178,16 @@ public class Controller {
             String value = newVal.toUpperCase();
             ObservableList<String> subentries
                     = FXCollections.observableArrayList();
+            Map<String, String> catalog = dataBean.getCatalogService()
+                    .getServicesByFilter(newVal);
+            Iterator<Map.Entry<String, String>> it =
+                    catalog.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                view.addServiceToList((String) pair.getKey());
+                dataBean.addServiceToList((String) pair.getKey(), (String)
+                        pair.getValue());
+            }
             for (Object entry : view.getServiceList().getItems()) {
                 boolean match = true;
                 String entryText = (String) entry;
@@ -234,6 +249,18 @@ public class Controller {
             for (Node n:view.getAttributeGridPane().getChildren()) {
                 System.out.println(n.toString());
             }
+        }
+    }
+
+
+    /**
+     * Event handler for clicking "Save".
+     */
+    private class SaveMenuItemEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            //NADA
         }
     }
 

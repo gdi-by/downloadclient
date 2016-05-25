@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.WebService;
 
 import de.bayern.gdi.utils.ServiceSetting;
@@ -43,7 +44,6 @@ public class DataBean extends Observable {
     private Map<String , String> namePwMap = null;
     private ServiceSetting serviceSetting = null;
     private Map<String, String> services;
-    private Map<String, String> catalogues;
     private WebService webService;
     private ArrayList<String> serviceTypes;
     private Map<String, String> attributes;
@@ -51,6 +51,8 @@ public class DataBean extends Observable {
     private String wmsName;
     private String userName;
     private String password;
+
+    private CatalogService catalogService;
 
     /**
      * Constructor.
@@ -60,7 +62,8 @@ public class DataBean extends Observable {
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
         this.services = this.serviceSetting.getServices();
-        this.catalogues = this.serviceSetting.getCatalogues();
+        this.catalogService = new CatalogService(this.serviceSetting
+                .getCatalogueURL());
         this.webService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
@@ -91,6 +94,14 @@ public class DataBean extends Observable {
         return serviceNames;
     }
 
+    /**
+     * Adds a Service to the list.
+     * @param serviceName the Name of the Service
+     * @param serviceURL the URL of the Service
+     */
+    public void addServiceToList(String serviceName, String serviceURL) {
+        this.services.put(serviceName, serviceURL);
+    }
     /**
      * Returns the Service URL for a given Service Name.
      * @param serviceName name of a Service
@@ -250,5 +261,9 @@ public class DataBean extends Observable {
      */
     public String getBase64EncAuth() {
         return StringUtils.getBase64EncAuth(this.userName, this.password);
+    }
+
+    public CatalogService getCatalogService() {
+        return catalogService;
     }
 }

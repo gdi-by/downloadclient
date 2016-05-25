@@ -162,6 +162,11 @@
       <version>${geotools.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.geotools.xsd</groupId>
+      <artifactId>gt-xsd-csw</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-api</artifactId>
       <version>${geotools.version}</version>

@@ -20,10 +20,13 @@ package de.bayern.gdi.utils;
 
 import java.io.InputStream;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -64,6 +67,30 @@ public class ServiceSetting {
     }
 
     /**
+     * gets the Catalogue URL as String.
+     * @return catalogue URL as String
+     */
+    public String getCatalogue() {
+        Iterator it = this.getCatalogues().entrySet().iterator();
+        Map.Entry pair = (Map.Entry)it.next();
+        return (String) pair.getValue();
+
+    }
+
+    /**
+     * gets teh catalogue URL.
+     * @return The catalogue URL
+     */
+    public URL getCatalogueURL() {
+        URL url = null;
+        try {
+            url = new URL(getCatalogue());
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return url;
+    }
+    /**
      * returns a map of Strings with service Names und URLS.
      * @return Map of Strings with <Name, URL> of Services
      */
@@ -75,7 +102,7 @@ public class ServiceSetting {
      * returns a map of Strings with catalogue Names and URLS.
      * @return Map of Strings with <Name, URL> of Catalogs
      */
-    public Map<String, String> getCatalogues() {
+    private Map<String, String> getCatalogues() {
         return this.catalogues;
     }
 
@@ -147,17 +174,6 @@ public class ServiceSetting {
         InputStream stream = classLoader.getResourceAsStream(fileName);
 
         return stream;
-        /*
-        File file = null;
-        try {
-            System.out.println("Try to open: "
-                            + classLoader.getResource(fileName).toURI());
-            file = new File(classLoader.getResource(fileName).toURI());
-        } catch (NullPointerException | URISyntaxException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return file;
-        */
     }
 
 }
