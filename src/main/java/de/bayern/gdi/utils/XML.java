@@ -136,6 +136,11 @@ public class XML {
         return doc;
     }
 
+    /**
+     * TODO.
+     * @param xmlString TODO
+     * @return TODO
+     */
     public static final Document getDocument(String xmlString) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document document = null;
