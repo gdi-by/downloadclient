@@ -23,10 +23,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -53,6 +51,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import de.bayern.gdi.utils.I18n;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -207,14 +207,11 @@ public class View {
 
     private VBox serviceListVBox;
 
-    private ResourceBundle myResources;
-
     /**
      * Constructor.
      */
     public View() {
-        myResources = ResourceBundle.getBundle("messages", new Locale("de"));
-
+        log.log(Level.INFO, "Using locale '" + I18n.getLocale() + "'.");
 
         //Calculate Screen Bounds
         Rectangle2D primaryScreenBounds =
@@ -302,10 +299,10 @@ public class View {
 
         //Menubar
         this.menubar = new MenuBar();
-        this.optionsMenu = new Menu(myResources.getString("menu.options"));
-        this.resetMenuItem = new MenuItem(myResources.getString("menu.reset"));
-        this.saveMenuItem = new MenuItem(myResources.getString("menu.save"));
-        this.quitMenuItem = new MenuItem(myResources.getString("menu.quit"));
+        this.optionsMenu = new Menu(I18n.getMsg("menu.options"));
+        this.resetMenuItem = new MenuItem(I18n.getMsg("menu.reset"));
+        this.saveMenuItem = new MenuItem(I18n.getMsg("menu.save"));
+        this.quitMenuItem = new MenuItem(I18n.getMsg("menu.quit"));
         this.optionsMenu.getItems().add(this.resetMenuItem);
         this.optionsMenu.getItems().add(this.saveMenuItem);
         this.optionsMenu.getItems().add(this.quitMenuItem);

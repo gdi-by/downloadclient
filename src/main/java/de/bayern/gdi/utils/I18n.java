@@ -17,30 +17,56 @@
  */
 package de.bayern.gdi.utils;
 
-//import java.util.Locale;
-//import java.util.MissingResourceException;
-//import java.util.ResourceBundle;
+import java.util.Locale;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /** Providing convenience methods for internationalisation.
  *
- * Using a singleton.
+ * Using a singleton -- with unsynchronised access to the instance.
  */
-
-public class I18n {
+public final class I18n {
     /**
      */
-    private static final class InstanceHolder {
-    static final I18n INSTANCE = new I18n();
-  }
+    private static class Holder {
+        private static final I18n INSTANCE = new I18n();
 
-  private I18n() {
-  }
+    }
 
-  public static I18n getInstance() {
-    return InstanceHolder.INSTANCE;
-  }
+   // private static final Logger log
+   //     = Logger.getLogger(FileResponseHandler.class.getName());
 
+    /** Avoiding more instances. */
+    private I18n() {
+    }
+
+    public static I18n getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    /** Return translation if found, otherwise key.
+     *
+     * @param key to be translated
+     * @return translated key or key if no translation is found
+    */
+    public static String getMsg(String key) {
+        /** ResourceBundle caches according to documentation. */
+        ResourceBundle messages =  ResourceBundle.getBundle("messages");
+        try {
+            return messages.getString(key);
+        } catch (MissingResourceException exc) {
+            return key;
+        }
+    }
+
+    /** Returns the locale of the resource bundle.
+     *
+     * @return Locale used.
+     */
+    public static Locale getLocale() {
+         ResourceBundle messages =  ResourceBundle.getBundle("messages");
+        return messages.getLocale();
+    }
 }
-
-// vim:set ts=4 sw=4 si et sta sts=4 fenc=utf8 :
-
