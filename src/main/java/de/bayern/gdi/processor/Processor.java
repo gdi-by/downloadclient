@@ -43,6 +43,8 @@ public class Processor implements Runnable {
         }
     };
 
+    private static Processor instance;
+
     private Deque<Job> jobs;
     private boolean done;
 
@@ -52,6 +54,19 @@ public class Processor implements Runnable {
 
     public Processor(Collection<Job> jobs) {
         this.jobs = new ArrayDeque<Job>(jobs);
+    }
+
+    /** Returns a singleton processor started as a separate thread.
+     * @return The processor.
+     */
+    public static synchronized Processor getInstance() {
+        if (instance == null) {
+            instance = new Processor();
+            Thread thread = new Thread(instance);
+            thread.setDaemon(true);
+            thread.start();
+        }
+        return instance;
     }
 
     /** quit the main loop og this processor. */
