@@ -23,8 +23,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -201,10 +203,14 @@ public class View {
 
     private VBox serviceVBox;
 
+    private ResourceBundle myResources;
+
     /**
      * Constructor.
      */
     public View() {
+        myResources = ResourceBundle.getBundle("messages", new Locale("de"));
+
 
         //Calculate Screen Bounds
         Rectangle2D primaryScreenBounds =
@@ -290,9 +296,9 @@ public class View {
 
         //Menubar
         this.menubar = new MenuBar();
-        this.optionsMenu = new Menu("Options");
-        this.resetMenuItem = new MenuItem("Reset");
-        this.quitMenuItem = new MenuItem("Quit");
+        this.optionsMenu = new Menu(myResources.getString("menu.options"));
+        this.resetMenuItem = new MenuItem(myResources.getString("menu.reset"));
+        this.quitMenuItem = new MenuItem(myResources.getString("menu.quit"));
         this.optionsMenu.getItems().add(this.resetMenuItem);
         this.optionsMenu.getItems().add(this.quitMenuItem);
         this.menubar.getMenus().add(this.optionsMenu);
