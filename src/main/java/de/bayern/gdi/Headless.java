@@ -23,6 +23,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
 
 /**
  * The command line tool.
@@ -64,11 +67,22 @@ public class Headless {
             return 1;
         }
 
-        System.out.println(dls);
+        log.info("Download configuration: " + dls);
 
-        // TODO: Convert DownloadStep into
-        //       sequence of processor jobs.
-        //
+        JobList jobs = DownloadStepConverter.convert(dls);
+
+        Processor processor = new Processor();
+        Thread thread = new Thread(processor);
+        thread.start();
+        processor.addJob(jobs);
+        processor.addJob(Processor.QUIT);
+
+        try {
+            thread.join();
+        } catch (InterruptedException ie) {
+            return 1;
+        }
+
         return 0;
     }
 }

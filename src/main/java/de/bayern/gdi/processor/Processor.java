@@ -34,6 +34,15 @@ public class Processor implements Runnable {
 
     private static final long WAIT_TIME = 1000;
 
+    /** Add this job to shutdown the processor after
+     *  finishing all previous jobs.
+     */
+    public static final Job QUIT = new Job() {
+        @Override
+        public void run() throws JobExecutionException {
+        }
+    };
+
     private Deque<Job> jobs;
     private boolean done;
 
@@ -75,6 +84,9 @@ public class Processor implements Runnable {
                     break;
                 }
                 job = this.jobs.poll();
+            }
+            if (job == QUIT) {
+                break;
             }
             try {
                 job.run();

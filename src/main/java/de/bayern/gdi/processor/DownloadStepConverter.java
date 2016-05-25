@@ -15,42 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.bayern.gdi.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import de.bayern.gdi.model.DownloadStep;
 
+/** Make DownloadStep configurations suitable for the download processor. */
+public class DownloadStepConverter {
 
-/**
- * JobList is a job of a sequence of depended jobs.
- */
-public class JobList implements Job {
-
-    private static final Logger log
-        = Logger.getLogger(JobList.class.getName());
-
-    private List<Job> jobs;
-
-    public JobList() {
-        jobs = new ArrayList<Job>();
+    private DownloadStepConverter() {
     }
 
     /**
-     * Add a job to this job list.
-     * @param job The job to be added.
+     * Converts a DownloadStep into a sequence of jobs for the processor.
+     * @param dls DownloadStep the configuration to be converted.
+     * @return A job list for the download processor.
      */
-    public void add(Job job) {
-        jobs.add(job);
-    }
-
-    @Override
-    public void run() throws JobExecutionException {
-        log.info("Executing job list");
-        for (Job job: jobs) {
-            job.run();
-        }
+    public static JobList convert(DownloadStep dls) {
+        // TODO: Implement me!
+        return new JobList();
     }
 }
-
