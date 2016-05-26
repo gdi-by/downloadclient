@@ -250,7 +250,7 @@ public class View {
         this.serviceSearch = new TextField();
 
         //URL Label
-        this.serviceURLLabel = new Label("URL:");
+        this.serviceURLLabel = new Label(I18n.getMsg("URL:"));
 
         //URL Field
         this.serviceURLfield = new TextField();
@@ -312,7 +312,7 @@ public class View {
         //Statusbar
         this.statusBar = new VBox();
         statusBar.setStyle("-fx-background-color: gainsboro");
-        final Text statusText = new Text("Ready");
+        final Text statusText = new Text(I18n.getMsg("gui.ready"));
         statusBar.getChildren().add(statusText);
 
         //Setting everything
@@ -375,7 +375,7 @@ public class View {
      * shows the current stage.
      */
     public void show(Stage stage) {
-        stage.setTitle("GDI-BY Downloadclient");
+        stage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
         stage.setScene(scene);
         Rectangle2D primaryScreenBounds =
                 Screen.getPrimary().getVisualBounds();
@@ -437,7 +437,8 @@ public class View {
         this.grid.getChildren().remove(this.attributeScrollPane);
 
         attributeScrollPane.setFitToWidth(true);
-        this.attributesFilledButton.setText("All Attributes Filled");
+        this.attributesFilledButton.setText(
+                I18n.getMsg("gui.all_attributes_filled"));
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
         this.attributesFilledBox.getChildren().removeAll(
                 this.attributesFilledBox.getChildren()
@@ -484,7 +485,7 @@ public class View {
         this.grid.add(this.mapGroup,
                 THIRD_COLUMN,
                 FIRST_ROW);
-        this.downloadButton.setText("Download");
+        this.downloadButton.setText(I18n.getMsg("gui.download"));
         this.grid.add(this.downloadButton,
                 THIRD_COLUMN,
                 SECOND_ROW);
