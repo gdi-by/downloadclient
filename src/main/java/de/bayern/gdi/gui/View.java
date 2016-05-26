@@ -142,7 +142,7 @@ public class View {
 
     private GridPane grid;
 
-    private Label catalagueServiceNameLabel;
+    private Label catalogueServiceNameLabel;
 
     private HBox serviceChooseBox;
 
@@ -331,7 +331,7 @@ public class View {
         this.wmsMapSwing = new WMSMapSwing();
         this.mapGroup = new Group();
         this.downloadButton = new Button();
-        this.catalagueServiceNameLabel = new Label();
+        this.catalogueServiceNameLabel = new Label();
     }
 
     /**
@@ -363,10 +363,10 @@ public class View {
      * set the CatalogueServiceName Label Text.
      * @param text text of the label
      */
-    public void setCatalagueServiceNameLabelText(String text) {
-        this.catalagueServiceNameLabel.setText(text);
-        this.grid.getChildren().remove(this.catalagueServiceNameLabel);
-        this.grid.add(this.catalagueServiceNameLabel, FIRST_COLUMN,
+    public void setCatalogueServiceNameLabelText(String text) {
+        this.catalogueServiceNameLabel.setText(text);
+        this.grid.getChildren().remove(this.catalogueServiceNameLabel);
+        this.grid.add(this.catalogueServiceNameLabel, FIRST_COLUMN,
                 SEVENTH_ROW);
     }
 

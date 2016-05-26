@@ -84,7 +84,7 @@ public class Controller {
         this.dataBean = dataBean;
         this.view = new View();
         this.view.setServiceListEntries(this.dataBean.getServicesAsList());
-        this.view.setCatalagueServiceNameLabelText("Catalogue: " + this.dataBean
+        this.view.setCatalogueServiceNameLabelText("Catalogue: " + this.dataBean
                 .getCatalogService().getProviderName());
 
         // Register Event Handler
