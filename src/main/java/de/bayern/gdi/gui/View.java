@@ -257,7 +257,8 @@ public class View {
         this.serviceURLLabel.setLabelFor(this.serviceURLfield);
 
         //Checkbox for authentication
-        this.serviceUseAuthenticationCBX = new CheckBox("Use Authentication");
+        this.serviceUseAuthenticationCBX =
+            new CheckBox(I18n.getMsg("gui.use_auth"));
 
         //Basic Auth Stuff
         this.serviceAuthenticationLabelsBox = new HBox(0);
@@ -266,11 +267,11 @@ public class View {
         this.serviceAuthenticationFieldsBox = new HBox(0);
         this.serviceAuthenticationFieldsBox.setAlignment(Pos.BASELINE_LEFT);
         this.serviceAuthenticationFieldsBox.setSpacing(columnWidth / TWO);
-        this.serviceUserLabel = new Label("User:");
+        this.serviceUserLabel = new Label(I18n.getMsg("gui.user:"));
         this.serviceUser = new TextField();
         this.serviceUser.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUserLabel.setLabelFor(this.serviceUser);
-        this.servicePWLabel = new Label("Password:");
+        this.servicePWLabel = new Label(I18n.getMsg("gui.password:"));
         this.servicePW = new TextField();
         this.servicePW.setMinWidth(MIN_FIELDWIDTH);
         this.servicePWLabel.setLabelFor(this.servicePW);
@@ -284,7 +285,7 @@ public class View {
 
         //Choose Serive Button
         this.serviceChooseButton = new Button();
-        this.serviceChooseButton.setText("Choose Service");
+        this.serviceChooseButton.setText(I18n.getMsg("gui.choose_service"));
         this.serviceChooseBox = new HBox(BUTTONBOX_SIZE);
         this.serviceChooseBox.setAlignment(Pos.BOTTOM_RIGHT);
         this.serviceChooseBox.getChildren().add(this.serviceChooseButton);
