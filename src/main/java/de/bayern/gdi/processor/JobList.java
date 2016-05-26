@@ -41,7 +41,7 @@ public class JobList implements Job {
      * Add a job to this job list.
      * @param job The job to be added.
      */
-    public void add(Job job) {
+    public void addJob(Job job) {
         jobs.add(job);
     }
 

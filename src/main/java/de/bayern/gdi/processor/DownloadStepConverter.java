@@ -17,12 +17,41 @@
  */
 package de.bayern.gdi.processor;
 
+import java.io.File;
+
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.utils.StringUtils;
 
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
     private DownloadStepConverter() {
+    }
+
+    private static String wfsURL(
+        String url, String typeName, String version,
+        Integer count, Integer maxFeatures,
+        String bbox
+    ) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(url)
+            .append('?')
+            .append("service=wfs&")
+            .append("request=GetFeature&")
+            .append("typeNames=")
+                .append(StringUtils.urlEncode(typeName)).append('&')
+            .append("version=").append(StringUtils.urlEncode(version));
+
+        if (count != null) {
+            sb.append("&count=").append(count);
+        }
+        if (maxFeatures != null) {
+            sb.append("&maxFeatures=").append(maxFeatures);
+        }
+        if (bbox != null) {
+            sb.append("&bbox=").append(StringUtils.urlEncode(bbox));
+        }
+        return sb.toString();
     }
 
     /**
@@ -31,7 +60,30 @@ public class DownloadStepConverter {
      * @return A job list for the download processor.
      */
     public static JobList convert(DownloadStep dls) {
-        // TODO: Implement me!
-        return new JobList();
+        JobList jl = new JobList();
+
+        String url = wfsURL(
+            dls.getServiceURL(),
+            dls.getDataset(),
+            dls.getServiceType(),
+            null, // TODO: count from parameters.
+            null, // TODO: maxFeatures from parameters.
+            null); // TODO: bbox from parameters.
+
+        String user = null; // TODO: From parameters.
+        String password = null; // TODO: From parameters.
+
+        File path = new File(dls.getPath());
+        if (path.isDirectory()) {
+            // TODO: Make file unique.
+            path = new File(path, "download.gml");
+        }
+
+        FileDownloadJob fdj = new FileDownloadJob(url, path, user, password);
+        jl.addJob(fdj);
+
+        // TODO: Add checking job
+        // TODO: Add transformation job.
+        return jl;
     }
 }

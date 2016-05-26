@@ -154,6 +154,20 @@ public class DownloadStep {
         this.path = path;
     }
 
+    /**
+     * Finds a value for a given parameter key.
+     * @param key The key.
+     * @return The value if found else null.
+     */
+    public String findParameter(String key) {
+        for (Parameter p: this.parameters) {
+            if (p.getKey().equals(key)) {
+                return p.getValue();
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[DownloadStep:\n");
