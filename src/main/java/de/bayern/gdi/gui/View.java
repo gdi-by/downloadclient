@@ -250,7 +250,7 @@ public class View {
         this.serviceSearch = new TextField();
 
         //URL Label
-        this.serviceURLLabel = new Label(I18n.getMsg("URL:"));
+        this.serviceURLLabel = new Label(I18n.getMsg("gui.url") + ":");
 
         //URL Field
         this.serviceURLfield = new TextField();
@@ -267,11 +267,11 @@ public class View {
         this.serviceAuthenticationFieldsBox = new HBox(0);
         this.serviceAuthenticationFieldsBox.setAlignment(Pos.BASELINE_LEFT);
         this.serviceAuthenticationFieldsBox.setSpacing(columnWidth / TWO);
-        this.serviceUserLabel = new Label(I18n.getMsg("gui.user:"));
+        this.serviceUserLabel = new Label(I18n.getMsg("gui.user") + ":");
         this.serviceUser = new TextField();
         this.serviceUser.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUserLabel.setLabelFor(this.serviceUser);
-        this.servicePWLabel = new Label(I18n.getMsg("gui.password:"));
+        this.servicePWLabel = new Label(I18n.getMsg("gui.password") + ":");
         this.servicePW = new TextField();
         this.servicePW.setMinWidth(MIN_FIELDWIDTH);
         this.servicePWLabel.setLabelFor(this.servicePW);
@@ -312,7 +312,7 @@ public class View {
         //Statusbar
         this.statusBar = new VBox();
         statusBar.setStyle("-fx-background-color: gainsboro");
-        final Text statusText = new Text(I18n.getMsg("gui.ready"));
+        final Text statusText = new Text(I18n.getMsg("status.ready"));
         statusBar.getChildren().add(statusText);
 
         //Setting everything

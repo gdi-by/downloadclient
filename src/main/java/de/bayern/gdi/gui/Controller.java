@@ -23,6 +23,7 @@ import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
 
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 
 import java.util.ArrayList;
@@ -77,15 +78,16 @@ public class Controller {
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
     /**
-     * Creates the Conroller.
+     * Creates the Controller.
      * @param dataBean the model
      */
     public Controller(DataBean dataBean) {
         this.dataBean = dataBean;
         this.view = new View();
         this.view.setServiceListEntries(this.dataBean.getServicesAsList());
-        this.view.setCatalogueServiceNameLabelText("Catalogue: " + this.dataBean
-                .getCatalogService().getProviderName());
+        this.view.setCatalogueServiceNameLabelText(
+                I18n.getMsg("gui.catalogue") + ": "
+                + this.dataBean.getCatalogService().getProviderName());
 
         // Register Event Handler
         view.getQuitMenuItem().
@@ -366,22 +368,22 @@ public class Controller {
                             log.log(Level.WARNING, "Could not determine "
                                     + "Service Type" , st);
                             Platform.runLater(() -> {
-                                view.setStatusBarText("Could not determine "
-                                        + "Service Type");
+                                view.setStatusBarText(
+                                    I18n.getMsg("status.no-service-type"));
                             });
                         } else {
                             switch (st) {
                                 case Atom:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found Atom "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.atom"));
                                     });
                                     ws = new Atom(serviceURL);
                                     break;
                                 case WFSOne:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found WFSOne "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.wfsone"));
                                     });
                                     ws = new WFSOne(serviceURL, dataBean
                                             .getUserName(), dataBean
@@ -389,8 +391,8 @@ public class Controller {
                                     break;
                                 case WFSTwo:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found WFSTwo "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.wfstwo"));
                                     });
                                     ws = new WFSTwo(serviceURL, dataBean
                                             .getUserName(), dataBean
@@ -400,8 +402,8 @@ public class Controller {
                                     log.log(Level.WARNING,
                                         "Could not determine URL" , st);
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Could not "
-                                                + "determine URL");
+                                        view.setStatusBarText(
+                                                I18n.getMsg("status.no-url"));
                                     });
                                     break;
                             }
@@ -414,11 +416,11 @@ public class Controller {
                             ChooseTypeEventHandler chooseType
                                     = new ChooseTypeEventHandler();
                             chooseType.handle(e);
-                            view.setStatusBarText("Ready");
+                            view.setStatusBarText(I18n.getMsg("status.ready"));
                         });
                     } else {
                         Platform.runLater(() -> {
-                            view.setStatusBarText("Could not determine URL");
+                            view.setStatusBarText(I18n.getMsg("status.no-url"));
                         });
                     }
                     view.getScene().setCursor(Cursor.DEFAULT);
@@ -426,7 +428,7 @@ public class Controller {
                 }
             };
                 Thread th = new Thread(task);
-                view.setStatusBarText("Calling Service to get Infos");
+                view.setStatusBarText(I18n.getMsg("status.calling-service"));
                 th.setDaemon(true);
                 th.start();
         }
@@ -441,14 +443,14 @@ public class Controller {
         public void handle(WindowEvent e) {
             Alert closeConfirmation = new Alert(
                     Alert.AlertType.CONFIRMATION,
-                    "Are you sure you want to exit?"
+                    I18n.getMsg("gui.want-to-quit")
             );
             Button exitButton
                     = (Button) closeConfirmation.getDialogPane().lookupButton(
                         ButtonType.OK
                     );
-            exitButton.setText("Exit");
-            closeConfirmation.setHeaderText("Confirm Exit");
+            exitButton.setText(I18n.getMsg("gui.exit"));
+            closeConfirmation.setHeaderText(I18n.getMsg("gui.confirm-exit"));
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
             closeConfirmation.initOwner(dataBean.getPrimaryStage());
 
