@@ -25,6 +25,8 @@ import java.util.ResourceBundle;
 /** Providing convenience methods for internationalisation.
  *
  * Using a singleton -- with unsynchronised access to the instance.
+ *
+ * @author Bernhard E. Reiter (bernhard.reiter@intevation.de)
  */
 public final class I18n {
     /**
