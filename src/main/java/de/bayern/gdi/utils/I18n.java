@@ -29,15 +29,11 @@ import java.util.ResourceBundle;
  * @author Bernhard E. Reiter (bernhard.reiter@intevation.de)
  */
 public final class I18n {
-    /**
-     */
-    private static class Holder {
-        private static final I18n INSTANCE = new I18n();
 
-    }
+    private static final I18n INSTANCE = new I18n();
 
    // private static final Logger log
-   //     = Logger.getLogger(FileResponseHandler.class.getName());
+   //     = Logger.getLogger(I18n.class.getName());
    // later use log.info() or similiar
 
     /** Avoiding more instances. */
@@ -45,7 +41,12 @@ public final class I18n {
     }
 
     public static I18n getInstance() {
-        return Holder.INSTANCE;
+        return INSTANCE;
+    }
+
+    private static ResourceBundle getBundle() {
+        // ResourceBundle caches according to documentation.
+        return ResourceBundle.getBundle("messages");
     }
 
     /** Return translation if found, otherwise key.
@@ -54,10 +55,8 @@ public final class I18n {
      * @return translated key or key if no translation is found
     */
     public static String getMsg(String key) {
-        /** ResourceBundle caches according to documentation. */
-        ResourceBundle messages =  ResourceBundle.getBundle("messages");
         try {
-            return messages.getString(key);
+            return getBundle().getString(key);
         } catch (MissingResourceException exc) {
             return key;
         }
@@ -68,7 +67,6 @@ public final class I18n {
      * @return Locale used.
      */
     public static Locale getLocale() {
-         ResourceBundle messages =  ResourceBundle.getBundle("messages");
-        return messages.getLocale();
+        return getBundle().getLocale();
     }
 }

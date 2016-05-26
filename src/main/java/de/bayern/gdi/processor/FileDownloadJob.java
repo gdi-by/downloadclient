@@ -41,13 +41,18 @@ public class FileDownloadJob
 
     private String url;
     private File file;
+    private String user;
+    private String password;
 
     public FileDownloadJob() {
     }
 
-    public FileDownloadJob(String url, File file) {
+    public FileDownloadJob(
+        String url, File file, String user, String password) {
         this.url = url;
         this.file = file;
+        this.user = user;
+        this.password = password;
     }
 
     @Override
