@@ -211,7 +211,7 @@ public class View {
      * Constructor.
      */
     public View() {
-        log.log(Level.INFO, "Using locale '" + I18n.getLocale() + "'.");
+        log.info("Using locale '" + I18n.getLocale() + "'.");
 
         //Calculate Screen Bounds
         Rectangle2D primaryScreenBounds =

@@ -18,7 +18,6 @@
 package de.bayern.gdi.utils;
 
 import java.util.Locale;
-//import java.util.logging.Level;
 //import java.util.logging.Logger;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -37,6 +36,7 @@ public final class I18n {
 
    // private static final Logger log
    //     = Logger.getLogger(FileResponseHandler.class.getName());
+   // later use log.info() or similiar
 
     /** Avoiding more instances. */
     private I18n() {
