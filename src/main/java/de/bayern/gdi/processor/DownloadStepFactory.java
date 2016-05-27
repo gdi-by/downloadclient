@@ -18,17 +18,17 @@
 
 package de.bayern.gdi.processor;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import de.bayern.gdi.gui.DataBean;
 import de.bayern.gdi.gui.View;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.WebService;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -67,20 +67,17 @@ public class DownloadStepFactory {
 
             //DownloadStep step = new DownloadStep();
             String serviceURL = bean.getWebService().getServiceURL();
-            serviceURL = serviceURL.substring(0,serviceURL.lastIndexOf("?"));
+            serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
             //step.setServiceURL(bean.getWebService().getServiceURL());
             WebService.Type serviceType =
                     bean.getWebService().getServiceType();
             //step.setServiceType(bean.getWebService().getServiceType());
             //step.setPath(savePath);
-            ArrayList<Parameter> parameters = new ArrayList<>();
             Map<String, String> paramMap = bean.getAttributes();
-            Iterator paramMapIT = paramMap.entrySet().iterator();
-            while (paramMapIT.hasNext()) {
-                Map.Entry pair = (Map.Entry) paramMapIT.next();
+            ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
+            for (Map.Entry<String, String> entry: paramMap.entrySet()) {
                 Parameter param = new Parameter(
-                        (String) pair.getKey(),
-                        (String) pair.getValue());
+                    entry.getKey(), entry.getValue());
                 parameters.add(param);
             }
             //step.setParameters(parameters);
