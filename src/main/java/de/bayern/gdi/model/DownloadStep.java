@@ -176,7 +176,8 @@ public class DownloadStep {
         sb.append("\tdataset: \"").append(dataset).append("\"\n");
         sb.append("\tpath: \"").append(path).append("\"\n");
         sb.append("\tparameters: ");
-        for (int i = 0, n = parameters.size(); i < n; i++) {
+        for (int i = 0,
+            n = parameters != null ? parameters.size() : 0; i < n; i++) {
             if (i > 0) {
                 sb.append(", ");
             }
@@ -184,7 +185,9 @@ public class DownloadStep {
         }
         sb.append("]\n");
         sb.append("\tprocessing steps:\n");
-        for (int i = 0, n = processingSteps.size(); i < n; i++) {
+        for (int i = 0,
+            n = processingSteps != null ? processingSteps.size() : 0;
+            i < n; i++) {
             sb.append("\t\t");
             sb.append(processingSteps.get(i));
             sb.append('\n');
