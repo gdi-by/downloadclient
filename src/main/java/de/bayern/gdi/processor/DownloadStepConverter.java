@@ -54,6 +54,19 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
+    private static Integer toInteger(String value)
+    throws ConverterException {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException nfe) {
+            throw new ConverterException(
+                "\"" + value + "\" is not an integer.", nfe);
+        }
+    }
+
     /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
      * @param dls DownloadStep the configuration to be converted.
@@ -67,9 +80,9 @@ public class DownloadStepConverter {
             dls.getServiceURL(),
             dls.getDataset(),
             dls.getServiceType(),
-            null, // TODO: count from parameters.
-            null, // TODO: maxFeatures from parameters.
-            null); // TODO: bbox from parameters.
+            toInteger(dls.findParameter("count")),
+            toInteger(dls.findParameter("maxFeatures")),
+            dls.findParameter("bbox"));
 
         String user = null; // TODO: From parameters.
         String password = null; // TODO: From parameters.
