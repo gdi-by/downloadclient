@@ -314,6 +314,7 @@ public class Controller {
             DownloadStep ds = dsf.getStep(view, dataBean, savePath);
             try {
                 ds.write(configFile);
+
             } catch (IOException ex) {
                 log.log(Level.WARNING, ex.getMessage() , ex);
             }

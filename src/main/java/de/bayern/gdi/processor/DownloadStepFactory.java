@@ -95,11 +95,14 @@ public class DownloadStepFactory {
             switch (serviceType) {
                 case WFSOne:
                     serviceTypeStr = "WFS1";
+                    break;
                 case WFSTwo:
                     //TODO Check between BASIC and SIMPLE
                     serviceTypeStr = "WFS2_SIMPLE";
+                    break;
                 case Atom:
                     serviceTypeStr = "ATOM";
+                    break;
                 default:
             }
             DownloadStep step = new DownloadStep(dataset,
