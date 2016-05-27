@@ -224,7 +224,6 @@ public class DownloadStepConverter {
 
         createProcessings(dls, jl, wd);
 
-
         return jl;
     }
 }
