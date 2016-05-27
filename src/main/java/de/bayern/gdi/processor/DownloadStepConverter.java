@@ -19,13 +19,36 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
+    private static final Log log =
+        LogFactory.getLog(DownloadStepConverter.class);
+
+
     private DownloadStepConverter() {
+    }
+
+    private static final String[][] WFS_TABLE = {
+        {"WFS2_SIMPLE", "2.0"},
+        {"WFS2", "2.0"},
+        {"WFS", "1.0"}
+    };
+
+    private static String findWFSVersion(String wfs) {
+        wfs = wfs.toUpperCase();
+        for (String []pair: WFS_TABLE) {
+            if (wfs.equals(pair[0])) {
+                return pair[1];
+            }
+        }
+        return "1.0";
     }
 
     private static String wfsURL(
@@ -40,7 +63,8 @@ public class DownloadStepConverter {
             .append("request=GetFeature&")
             .append("typeNames=")
                 .append(StringUtils.urlEncode(typeName)).append('&')
-            .append("version=").append(StringUtils.urlEncode(version));
+            .append("version=")
+                .append(StringUtils.urlEncode(findWFSVersion(version)));
 
         if (count != null) {
             sb.append("&count=").append(count);
@@ -83,6 +107,8 @@ public class DownloadStepConverter {
             toInteger(dls.findParameter("count")),
             toInteger(dls.findParameter("maxFeatures")),
             dls.findParameter("bbox"));
+
+        log.info("url: " + url);
 
         String user = null; // TODO: From parameters.
         String password = null; // TODO: From parameters.
