@@ -92,7 +92,8 @@ public class DownloadStep {
         this(dataset,
                 parameters,
                 serviceType.toString(),
-                serviceURL,path,
+                serviceURL,
+                path,
                 processingSteps);
     }
 

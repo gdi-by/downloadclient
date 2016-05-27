@@ -310,8 +310,8 @@ public class Controller {
                     DownloadStepFactory dsf = DownloadStepFactory.getInstance();
                     DownloadStep ds = dsf.getStep(view, dataBean, savePath);
                     JobList jl = DownloadStepConverter.convert(ds);
-                    Processor p = new Processor(jl.getJobList());
-                    p.run();
+                    Processor p = Processor.getInstance();
+                    p.addJob(jl);
                     return 0;
                 }
             };

@@ -18,7 +18,6 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.gui.Start;
-import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.utils.StringUtils;
 
 /**

@@ -44,13 +44,24 @@ public class DownloadStepFactory {
 
     }
 
+    /**
+     * gets the instance of the Factory.
+     * @return DownloadstepFactory
+     */
     public static synchronized DownloadStepFactory getInstance() {
         if (DownloadStepFactory.instance == null) {
-            DownloadStepFactory.instance = new DownloadStepFactory ();
+            DownloadStepFactory.instance = new DownloadStepFactory();
         }
         return DownloadStepFactory.instance;
     }
 
+    /**
+     * gets Downloadstep from Frontend.
+     * @param view the view
+     * @param bean the databean
+     * @param savePath the save path
+     * @return downloadStep
+     */
     public DownloadStep getStep(View view, DataBean bean, String savePath) {
         try {
 
