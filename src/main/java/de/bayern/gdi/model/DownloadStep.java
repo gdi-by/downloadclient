@@ -241,7 +241,7 @@ public class DownloadStep {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             JAXBContext context = JAXBContext.newInstance(DownloadStep.class);
             Marshaller m = context.createMarshaller();
-            // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             m.marshal(this, bos);
             bos.flush();
