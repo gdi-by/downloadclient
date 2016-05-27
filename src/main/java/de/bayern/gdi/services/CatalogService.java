@@ -126,7 +126,6 @@ public class CatalogService {
     public Map<String, String> getServicesByFilter(String filter) {
         Map<String, String> map = new HashMap<>();
         if (filter.length() > MIN_SEARCHLENGTH) {
-            System.out.println("Search for: " + filter);
             URL requestURL = setURLRequestAndSearch(filter);
             /* FIXME - WHEN TRYING TO USE IMPLEMENTED STUFF EXCEPTION RISES:
             java.lang.NoSuchMethodException:
@@ -185,7 +184,7 @@ public class CatalogService {
                             numberOfRecordsMatched);
                     String characterStringExpression =
                             "//*[local-name()='CharacterString']";
-                    for(int i = 0; i < numberOfRecordsMatched; i++) {
+                    for (int i = 0; i < numberOfRecordsMatched; i++) {
                         Node identificationN = identificationNL.item(i);
                         Node transferoptinN = transferoptionsNL.item(i);
                         String titleExpression =
@@ -193,19 +192,18 @@ public class CatalogService {
                         Node titlteNode = (Node) XML.xpath(identificationN,
                                 titleExpression,
                                 XPathConstants.NODE, context);
-                        Node titleCharStringNode = XML.getChildWithName
-                                (titlteNode, "gco:CharacterString");
-                        String title= titleCharStringNode.getTextContent();
-                        Node digitalTransferOptionsNode = XML.getChildWithName
-                                (transferoptinN,
+                        Node titleCharStringNode = XML.getChildWithName(
+                                titlteNode, "gco:CharacterString");
+                        String title = titleCharStringNode.getTextContent();
+                        Node digitalTransferOptionsNode = XML.getChildWithName(
+                                        transferoptinN,
                                         "gmd:MD_DigitalTransferOptions");
-                        Node onLineNode = XML.getChildWithName
-                                (digitalTransferOptionsNode, "gmd:onLine");
-
-                        Node onlineRessourceNode = XML.getChildWithName
-                                (onLineNode, "gmd:CI_OnlineResource");
-                        Node linkageNode = XML.getChildWithName
-                                (onlineRessourceNode,
+                        Node onLineNode = XML.getChildWithName(
+                                digitalTransferOptionsNode, "gmd:onLine");
+                        Node onlineRessourceNode = XML.getChildWithName(
+                                onLineNode, "gmd:CI_OnlineResource");
+                        Node linkageNode = XML.getChildWithName(
+                                onlineRessourceNode,
                                         "gmd:linkage");
                         Node urlNode = XML.getChildWithName(linkageNode,
                                 "gmd:URL");
@@ -221,7 +219,7 @@ public class CatalogService {
     }
 
     private String makeCapabiltiesURL(String url) {
-        if(url.endsWith("?")) {
+        if (url.endsWith("?")) {
             url = url + "service=wfs&request=GetCapabilities";
         }
         return url;

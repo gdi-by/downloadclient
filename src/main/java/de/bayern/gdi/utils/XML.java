@@ -104,10 +104,22 @@ public class XML {
         return getDocument(url, null, null);
     }
 
+    /**
+     * returns the first childnode with the given name.
+     * @param node Node to search in
+     * @param nodeName Name to search for
+     * @return the child node, NULL if nothing found
+     */
     public static Node getChildWithName(Node node, String nodeName) {
         return getChildWithName(node.getChildNodes(), nodeName);
     }
 
+    /**
+     * returns the first childnode with the given name.
+     * @param nl Nodelist to search in
+     * @param nodeName Name to search for
+     * @return the child node, NULL if nothing found
+     */
     public static Node getChildWithName(NodeList nl, String nodeName) {
         Node retNode = null;
         for (int i = 0; i < nl.getLength(); i++) {
