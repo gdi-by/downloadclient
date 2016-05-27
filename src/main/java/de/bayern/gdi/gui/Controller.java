@@ -278,6 +278,7 @@ public class Controller {
                 if (downloadFile == null) {
                     return;
                 }
+                ds.setPath(downloadFile.toString());
                 JobList jl = DownloadStepConverter.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
