@@ -18,10 +18,6 @@
 
 package de.bayern.gdi.services;
 
-import com.sun.org.apache.xml.internal.dtm.ref.DTMNodeList;
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.StringUtils;
-import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -31,19 +27,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
-import net.opengis.cat.csw20.CapabilitiesType;
-import net.opengis.ows10.ServiceProviderType;
+
 import org.geotools.csw.CSWConfiguration;
 import org.geotools.xml.Parser;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.XML;
+import de.bayern.gdi.utils.NamespaceContextMap;
+
+import net.opengis.cat.csw20.CapabilitiesType;
+import net.opengis.ows10.ServiceProviderType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -162,14 +166,14 @@ public class CatalogService {
                 //System.out.println("More than one Result found");
                 String identificationExpression =
                         "//*[local-name()='identificationInfo']";
-                DTMNodeList identificationNL = (DTMNodeList) XML.xpath(
+                NodeList identificationNL = (NodeList) XML.xpath(
                         searchResultsNode,
                         identificationExpression,
                         XPathConstants.NODESET, context);
                 //System.out.println(identificationNL.getLength());
                 String transferoptionsExprssion =
                         "//*[local-name()='transferOptions']";
-                DTMNodeList transferoptionsNL = (DTMNodeList) XML.xpath(
+                NodeList transferoptionsNL = (NodeList) XML.xpath(
                         searchResultsNode,
                         transferoptionsExprssion,
                         XPathConstants.NODESET, context);
