@@ -46,6 +46,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -100,6 +102,21 @@ public class XML {
      */
     public static Document getDocument(URL url) {
         return getDocument(url, null, null);
+    }
+
+    public static Node getChildWithName(Node node, String nodeName) {
+        return getChildWithName(node.getChildNodes(), nodeName);
+    }
+
+    public static Node getChildWithName(NodeList nl, String nodeName) {
+        Node retNode = null;
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node curNode = nl.item(i);
+            if (curNode.getNodeName().equals(nodeName)) {
+                return curNode;
+            }
+        }
+        return retNode;
     }
 
     /**

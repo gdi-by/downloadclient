@@ -179,6 +179,36 @@ public class CatalogService {
                     log.log(Level.INFO, "Found " + numberOfRecordsMatched
                             + " Entries in the Catalog",
                             numberOfRecordsMatched);
+                    String characterStringExpression =
+                            "//*[local-name()='CharacterString']";
+                    for(int i = 0; i < numberOfRecordsMatched; i++) {
+                        Node identificationN = identificationNL.item(i);
+                        Node transferoptinN = transferoptionsNL.item(i);
+                        String titleExpression =
+                                "//*[local-name()='title']";
+                        Node titlteNode = (Node) XML.xpath(identificationN,
+                                titleExpression,
+                                XPathConstants.NODE, context);
+                        Node titleCharStringNode = XML.getChildWithName
+                                (titlteNode, "gco:CharacterString");
+                        String title= titleCharStringNode.getTextContent();
+                        Node digitalTransferOptionsNode = XML.getChildWithName
+                                (transferoptinN,
+                                        "gmd:MD_DigitalTransferOptions");
+                        Node onLineNode = XML.getChildWithName
+                                (digitalTransferOptionsNode, "gmd:onLine");
+
+                        Node onlineRessourceNode = XML.getChildWithName
+                                (onLineNode, "gmd:CI_OnlineResource");
+                        Node linkageNode = XML.getChildWithName
+                                (onlineRessourceNode,
+                                        "gmd:linkage");
+                        Node urlNode = XML.getChildWithName(linkageNode,
+                                "gmd:URL");
+                        String url = urlNode.getTextContent();
+                        url = makeCapabiltiesURL(url);
+                        map.put(title, url);
+                    }
                 }
             }
 
@@ -186,6 +216,12 @@ public class CatalogService {
         return map;
     }
 
+    private String makeCapabiltiesURL(String url) {
+        if(url.endsWith("?")) {
+            url = url + "service=wfs&request=GetCapabilities";
+        }
+        return url;
+    }
     private URL setURLRequestAndSearch(String search) {
         URL newURL = null;
         try {
