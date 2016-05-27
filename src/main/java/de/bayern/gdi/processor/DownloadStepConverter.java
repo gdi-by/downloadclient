@@ -74,6 +74,9 @@ public class DownloadStepConverter {
     private static String encodeParameters(ArrayList<Parameter> parameters) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
+            if (p.getKey().equals("user") || p.getKey().equals("password")) {
+                continue;
+            }
             if (sb.length() > 0) {
                 sb.append('&');
             }
@@ -97,6 +100,8 @@ public class DownloadStepConverter {
           .append("request=GetFeature&")
           .append("version=")
               .append(StringUtils.urlEncode(version));
+
+        // TODO: handle namespaces?!
 
         if (queryType.equals("STOREDQUERY_ID")) {
             sb.append("&STOREDQUERY_ID=")
@@ -123,19 +128,6 @@ public class DownloadStepConverter {
         }
         */
         return sb.toString();
-    }
-
-    private static Integer toInteger(String value)
-    throws ConverterException {
-        if (value == null) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException nfe) {
-            throw new ConverterException(
-                "\"" + value + "\" is not an integer.", nfe);
-        }
     }
 
     /**
