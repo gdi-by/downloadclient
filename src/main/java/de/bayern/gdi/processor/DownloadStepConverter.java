@@ -96,7 +96,7 @@ public class DownloadStepConverter {
         FileDownloadJob fdj = new FileDownloadJob(url, path, user, password);
         jl.addJob(fdj);
 
-        // TODO: Add checking job
+        jl.addJob(new GMLCheckJob(path));
         // TODO: Add transformation job.
         return jl;
     }
