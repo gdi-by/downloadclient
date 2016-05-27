@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Make DownloadStep configurations suitable for the download processor. */
@@ -156,6 +157,42 @@ public class DownloadStepConverter {
         return count < MAX_TRIES && path.mkdirs() ? path : null;
     }
 
+    private static final String OGR2OGR
+        = System.getProperty("ogr2ogr", "ogr2ogr");
+
+    private static void createProcessings(
+        DownloadStep dls,
+        JobList jl,
+        File wd) throws ConverterException {
+
+        for (ProcessingStep ps: dls.getProcessingSteps()) {
+            if (ps.getName().equals("toShape")) {
+                ArrayList<String> params = new ArrayList<String>();
+
+                params.add("-f");
+                params.add("ESRI Shapefile");
+                params.add("download.shp");
+                params.add("download.gml");
+
+                for (Parameter p: ps.getParameters()) {
+                    if (p.getKey().equals("EPSG")) {
+                        params.add("-t_srs");
+                        params.add(p.getValue());
+                    }
+                    // TODO: Handle more parameters.
+                }
+
+                ExternalProcessJob epj = new ExternalProcessJob(
+                    OGR2OGR,
+                    wd,
+                    params.toArray(new String[params.size()]));
+
+                jl.addJob(epj);
+            }
+            // TODO: Implement more steps.
+        }
+    }
+
 
     /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
@@ -184,7 +221,10 @@ public class DownloadStepConverter {
         jl.addJob(fdj);
 
         jl.addJob(new GMLCheckJob(gml));
-        // TODO: Add transformation job.
+
+        createProcessings(dls, jl, wd);
+
+
         return jl;
     }
 }
