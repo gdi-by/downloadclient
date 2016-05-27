@@ -45,7 +45,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     private InputStream wrap(InputStream in) {
         return this.wrapFactory != null
-            ? this.wrap(in)
+            ? this.wrapFactory.wrap(in)
             : in;
     }
 
