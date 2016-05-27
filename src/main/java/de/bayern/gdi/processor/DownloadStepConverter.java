@@ -37,8 +37,8 @@ public class DownloadStepConverter {
 
     private static final String[][] WFS_TABLE = {
         {"WFS2_SIMPLE", "2.0"},
-        {"WFS2", "2.0"},
-        {"WFS", "1.0"}
+        {"WFS2", "2.0.0"},
+        {"WFS", "1.1.0"}
     };
 
     private static String findWFSVersion(String wfs) {
@@ -48,7 +48,7 @@ public class DownloadStepConverter {
                 return pair[1];
             }
         }
-        return "1.0";
+        return wfs;
     }
 
     private static String wfsURL(
