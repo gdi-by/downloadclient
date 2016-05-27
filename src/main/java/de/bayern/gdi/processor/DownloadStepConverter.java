@@ -18,7 +18,9 @@
 package de.bayern.gdi.processor;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -130,6 +132,31 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
+    private static final SimpleDateFormat DF_FORMAT
+        = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    private static final int MAX_TRIES = 1000;
+
+    private static final String PREFIX = "gdibydl-";
+
+    // XXX: This is pontentially racy!!!
+    private static File createWorkingDir(File parent) {
+
+        Date now = new Date();
+
+        String dir = PREFIX + DF_FORMAT.format(now);
+        File path = new File(parent, dir);
+        int count = 0;
+        while (count < MAX_TRIES && path.exists()) {
+            ++count;
+            dir = PREFIX + DF_FORMAT.format(now) + "-" + count;
+            path = new File(parent, dir);
+        }
+
+        return count < MAX_TRIES && path.mkdirs() ? path : null;
+    }
+
+
     /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
      * @param dls DownloadStep the configuration to be converted.
@@ -148,15 +175,15 @@ public class DownloadStepConverter {
         String password = dls.findParameter("password");
 
         File path = new File(dls.getPath());
-        if (path.isDirectory()) {
-            // TODO: Make file unique.
-            path = new File(path, "download.gml");
-        }
+        File wd = createWorkingDir(
+            path.isDirectory() ? path : path.getParentFile());
 
-        FileDownloadJob fdj = new FileDownloadJob(url, path, user, password);
+        File gml = new File(wd, "download.gml");
+        log.info("Download to file \"" + gml + "\"");
+        FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
 
-        jl.addJob(new GMLCheckJob(path));
+        jl.addJob(new GMLCheckJob(gml));
         // TODO: Add transformation job.
         return jl;
     }
