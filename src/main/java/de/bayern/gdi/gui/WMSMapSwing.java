@@ -314,4 +314,6 @@ public class WMSMapSwing extends Parent {
     public Rectangle getBounds() {
         return this.mapNode.getContent().getBounds();
     }
+
+    //TODO - Destructor for Swing Item with Maplayer Dispose
 }

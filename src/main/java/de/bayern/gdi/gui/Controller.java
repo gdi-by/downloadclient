@@ -100,6 +100,7 @@ public class Controller {
                 setOnAction(new ChooseTypeEventHandler());
         view.getAttributesFilledButton().
                 setOnAction(new AttributesFilledEventHandler());
+        //FIXME - Not only on Click, but everytime
         view.getServiceList().
                 setOnMouseClicked(new MouseClickedOnServiceList());
         view.getDownloadButton().

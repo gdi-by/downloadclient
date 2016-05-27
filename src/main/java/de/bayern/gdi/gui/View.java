@@ -263,15 +263,17 @@ public class View {
         //Basic Auth Stuff
         this.serviceAuthenticationLabelsBox = new HBox(0);
         this.serviceAuthenticationLabelsBox.setAlignment(Pos.BASELINE_LEFT);
-        this.serviceAuthenticationLabelsBox.setSpacing(columnWidth * TWO);
+        this.serviceAuthenticationLabelsBox.setSpacing(columnWidth / TWO);
         this.serviceAuthenticationFieldsBox = new HBox(0);
         this.serviceAuthenticationFieldsBox.setAlignment(Pos.BASELINE_LEFT);
         this.serviceAuthenticationFieldsBox.setSpacing(columnWidth / TWO);
         this.serviceUserLabel = new Label(I18n.getMsg("gui.user") + ":");
+        this.serviceUserLabel.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUser = new TextField();
         this.serviceUser.setMinWidth(MIN_FIELDWIDTH);
         this.serviceUserLabel.setLabelFor(this.serviceUser);
         this.servicePWLabel = new Label(I18n.getMsg("gui.password") + ":");
+        this.servicePWLabel.setMinWidth(MIN_FIELDWIDTH);
         this.servicePW = new TextField();
         this.servicePW.setMinWidth(MIN_FIELDWIDTH);
         this.servicePWLabel.setLabelFor(this.servicePW);
@@ -293,10 +295,15 @@ public class View {
 
 
         //Adding to the Layout
-        this.grid.addColumn(FIRST_COLUMN, this.serviceSearch, this
-                .serviceList, this.serviceURLLabel, this.serviceURLfield,
-                this.serviceChooseBox, this.serviceUseAuthenticationCBX, this
-                        .serviceAuthenticationFieldsBox);
+        this.grid.addColumn(FIRST_COLUMN,
+                this.serviceSearch,
+                this.serviceList,
+                this.serviceURLLabel,
+                this.serviceURLfield,
+                this.serviceChooseBox,
+                this.serviceUseAuthenticationCBX,
+                this.serviceAuthenticationLabelsBox,
+                this.serviceAuthenticationFieldsBox);
 
         //Menubar
         this.menubar = new MenuBar();
@@ -366,8 +373,9 @@ public class View {
     public void setCatalogueServiceNameLabelText(String text) {
         this.catalogueServiceNameLabel.setText(text);
         this.grid.getChildren().remove(this.catalogueServiceNameLabel);
-        this.grid.add(this.catalogueServiceNameLabel, FIRST_COLUMN,
-                SEVENTH_ROW);
+        this.grid.add(this.catalogueServiceNameLabel,
+                FIRST_COLUMN,
+                EIGHT_ROW);
     }
 
     /**

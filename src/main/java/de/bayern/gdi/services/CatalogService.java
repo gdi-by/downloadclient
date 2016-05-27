@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.services;
 
+import com.sun.org.apache.xml.internal.dtm.ref.DTMNodeList;
+import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 import java.io.IOException;
@@ -30,14 +32,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathConstants;
 import net.opengis.cat.csw20.CapabilitiesType;
 import net.opengis.ows10.ServiceProviderType;
 import org.geotools.csw.CSWConfiguration;
 import org.geotools.xml.Parser;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -46,11 +50,16 @@ import org.xml.sax.SAXException;
  */
 public class CatalogService {
 
-    private URL catalogURL;
-    private String userName;
-    private String password;
+    private static final String CSW_NAMESPACE =
+            "http://www.opengis.net/cat/csw/2.0.2";
+    private static final String GMD_NAMESPACE =
+            "http://www.isotc211.org/2005/gmd";
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
+    private URL catalogURL;
+    private String userName;
+    private static final int MIN_SEARCHLENGTH = 2;
+    private String password;
     private ServiceProviderType serviceProvider;
 
     /**
@@ -111,91 +120,68 @@ public class CatalogService {
      * @return Map of Service Names and URLs
      */
     public Map<String, String> getServicesByFilter(String filter) {
-        System.out.println("Search for: " + filter);
         Map<String, String> map = new HashMap<>();
-        URL requestURL = setURLRequestAndSearch(filter);
-        /* FIXME - WHEN TRYING TO USE IMPLEMENTED STUFF EXCEPTION RISES:
-        java.lang.NoSuchMethodException:
-        net.opengis.cat.csw20.impl.Csw20FactoryImpl.createAbstractRecordType()
-        Use this piece of code to retrieve expected Excpetion
-        Object parsed = this.getParsedObject(requestURL);
-        GetRecordsResponseType records = (GetRecordsResponseType) parsed;
-        SearchResultsType searchResults = records.getSearchResults();
-        for (AbstractRecordType recordType : searchResults.getAbstractRecord
-                ()) {
-            System.out.println(recordType.toString());
-        }
-        */
-
-        Document xml = XML.getDocument(requestURL,
-                this.userName,
-                this.password);
-        NodeList mdMetadataNL = xml.getElementsByTagName("gmd:MD_Metadata");
-        Node result;
-        //TODO - Implement Handling when Returned Set is empty
-        for (int i = 0; i < /*mdMetadataNL.getLength()*/ 1; i++) {
-            result = mdMetadataNL.item(i);
-            String serviceName = null;
-            String serviceURL = null;
-            for (int j = 0; j < result.getChildNodes().getLength(); j++) {
-                Node outerNode;
-                outerNode = result.getChildNodes().item(j);
-                //Node nameNode =
-                //if(nameNode != null) {
-                //    serviceName = nameNode.getTextContent();
-                //}
-                /*
-                if(outerNode.getNodeName().equals
-                        ("gmd:metadataStandardName")) {
-                    //System.out.println("Name Node Found!");
-                    //System.out.println("Name Node Found!");
-                    //System.out.println(outerNode.getNodeName());
-                    NodeList nameNL = outerNode.getChildNodes();
-                    for(int k = 0; k < nameNL.getLength(); k++) {
-                        if(nameNL.item(k).getNodeName().equals
-                                ("gco:CharacterString")) {
-                            Node nameNode = nameNL.item(k);
-                            //System.out.println(nameNode.getTextContent());
-                            serviceName = nameNode.getTextContent();
-                        }
-                    }
-
-                }*/
-                /*
-                if(outerNode.getNodeName().equals
-                        ("gmd:distributionInfo")) {
-                    NodeList distrInfoNL = outerNode.getChildNodes();
-                    for(int k = 0; k < distrInfoNL.getLength(); k++ ) {
-                        if(distrInfoNL.item(k).getNodeName().equals
-                                ("gmd:MD_Distribution")) {
-                            NodeList mdDistrNL = distrInfoNL.item(k)
-                                    .getChildNodes();
-                            for(int l = 0; l < mdDistrNL.getLength(); l++) {
-                                if(mdDistrNL.item(l).getNodeName().equals
-                                        ("gmd:transferOptions")) {
-                                    NodeList to = mdDistrNL.item(l)
-                                            .getChildNodes();
-                                    for(int m = 0; m < to.getLength(); m++) {
-                                        if(to.item(m).getNodeName().equals
-                                          ("gmd:MD_DigitalTransferOptions")) {
-                                            FUUUUUUUU
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }*/
-                //Node urlNode = getURLNode(outerNode);
-                //if(urlNode != null) {
-                //    serviceURL =urlNode.getTextContent();
-                //}
+        if (filter.length() > MIN_SEARCHLENGTH) {
+            System.out.println("Search for: " + filter);
+            URL requestURL = setURLRequestAndSearch(filter);
+            /* FIXME - WHEN TRYING TO USE IMPLEMENTED STUFF EXCEPTION RISES:
+            java.lang.NoSuchMethodException:
+            net.opengis.cat.csw20.impl.Csw20FactoryImpl
+                .createAbstractRecordType()
+            Use this piece of code to retrieve expected Excpetion
+            Object parsed = this.getParsedObject(requestURL);
+            GetRecordsResponseType records = (GetRecordsResponseType) parsed;
+            SearchResultsType searchResults = records.getSearchResults();
+            for (AbstractRecordType recordType : searchResults.getAbstractRecord
+                    ()) {
+                System.out.println(recordType.toString());
             }
-            System.out.println(serviceName);
-            System.out.println(serviceURL);
-            if (serviceName != null && serviceURL != null) {
-                map.put(serviceName, serviceURL);
+            */
+
+            Document xml = XML.getDocument(requestURL,
+                    this.userName,
+                    this.password);
+            String searchResultExpression =
+                    "//*[local-name()='SearchResults']";
+            NamespaceContext context = new NamespaceContextMap(
+                    "csw", CSW_NAMESPACE,
+                    "gmd", GMD_NAMESPACE);
+            Node searchResultsNode = (Node) XML.xpath(xml,
+                    searchResultExpression,
+                    XPathConstants.NODE, context);
+            NamedNodeMap searchResultsNodeAttributes =
+                    searchResultsNode.getAttributes();
+            Node searchResultsNodeAttributesRecordsMatchedItem =
+                    searchResultsNodeAttributes.getNamedItem(
+                            "numberOfRecordsMatched");
+            int numberOfRecordsMatched =
+                    Integer.parseInt(
+                            searchResultsNodeAttributesRecordsMatchedItem
+                    .getTextContent());
+            if (numberOfRecordsMatched > 0) {
+                //System.out.println("More than one Result found");
+                String identificationExpression =
+                        "//*[local-name()='identificationInfo']";
+                DTMNodeList identificationNL = (DTMNodeList) XML.xpath(
+                        searchResultsNode,
+                        identificationExpression,
+                        XPathConstants.NODESET, context);
+                //System.out.println(identificationNL.getLength());
+                String transferoptionsExprssion =
+                        "//*[local-name()='transferOptions']";
+                DTMNodeList transferoptionsNL = (DTMNodeList) XML.xpath(
+                        searchResultsNode,
+                        transferoptionsExprssion,
+                        XPathConstants.NODESET, context);
+                //System.out.println(transferoptionsNL.getLength());
+                if (identificationNL.getLength() == transferoptionsNL
+                        .getLength()) {
+                    log.log(Level.INFO, "Found " + numberOfRecordsMatched
+                            + " Entries in the Catalog",
+                            numberOfRecordsMatched);
+                }
             }
+
         }
         return map;
     }
@@ -207,11 +193,11 @@ public class CatalogService {
                     "GetCapabilities", "GetRecords"
                             + "&version=2.0.2"
                             + "&namespace=xmlns"
-                            + "(csw=http://www.opengis.net/cat/csw/2.0.2),"
-                            + "xmlns(gmd=http://www.isotc211.org/2005/gmd)"
+                            + "(csw=" + CSW_NAMESPACE + "),"
+                            + "xmlns(gmd=" + GMD_NAMESPACE + ")"
                             + "&resultType=results"
                             + "&outputFormat=application/xml"
-                            + "&outputSchema=http://www.isotc211.org/2005/gmd"
+                            + "&outputSchema=" + GMD_NAMESPACE
                             + "&startPosition=1"
                             + "&maxRecords=20"
                             + "&typeNames=csw:Record"
