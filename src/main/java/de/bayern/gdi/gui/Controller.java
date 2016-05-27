@@ -19,6 +19,7 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.DownloadStepFactory;
 import de.bayern.gdi.processor.JobList;
@@ -30,6 +31,7 @@ import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -101,6 +103,8 @@ public class Controller {
                 setOnAction(new DownloadButtonEventHandler());
         view.getSaveMenuItem().
                 setOnAction(new SaveMenuItemEventHandler());
+        view.getLoadMenuItem().
+                setOnAction(new LoadMenuItemEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -249,6 +253,39 @@ public class Controller {
         }
     }
 
+    /**
+     * Event handler for clicking "Save".
+     */
+    private class LoadMenuItemEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            FileChooser configFileChooser = new FileChooser();
+            configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
+
+            File configFile = configFileChooser.showOpenDialog(
+                    dataBean.getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
+            try {
+                DownloadStep ds = DownloadStep.read(configFile);
+                FileChooser downloadFileChooser = new FileChooser();
+                downloadFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+                downloadFileChooser.setInitialDirectory(new File(ds.getPath()));
+                File downloadFile = downloadFileChooser.showSaveDialog(
+                        dataBean.getPrimaryStage());
+                if (downloadFile == null) {
+                    return;
+                }
+                JobList jl = DownloadStepConverter.convert(ds);
+                Processor p = Processor.getInstance();
+                p.addJob(jl);
+            } catch (IOException | ConverterException ex) {
+                log.log(Level.WARNING, ex.getMessage() , ex);
+            }
+        }
+    }
 
     /**
      * Event handler for clicking "Save".
@@ -257,7 +294,28 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //NADA
+            FileChooser downloadFileChooser = new FileChooser();
+            downloadFileChooser.setTitle(I18n.getMsg("gui.save-file"));
+            File downloadFile = downloadFileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (downloadFile == null) {
+                return;
+            }
+            FileChooser configFileChooser = new FileChooser();
+            configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+            File configFile = configFileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
+            String savePath = downloadFile.getPath();
+            DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+            DownloadStep ds = dsf.getStep(view, dataBean, savePath);
+            try {
+                ds.write(configFile);
+            } catch (IOException ex) {
+                log.log(Level.WARNING, ex.getMessage() , ex);
+            }
         }
     }
 

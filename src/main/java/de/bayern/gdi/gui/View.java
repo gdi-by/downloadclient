@@ -184,6 +184,7 @@ public class View {
 
     private MenuItem quitMenuItem;
 
+    private MenuItem loadMenuItem;
 
     private MenuItem saveMenuItem;
 
@@ -311,8 +312,10 @@ public class View {
         this.resetMenuItem = new MenuItem(I18n.getMsg("menu.reset"));
         this.saveMenuItem = new MenuItem(I18n.getMsg("menu.save"));
         this.quitMenuItem = new MenuItem(I18n.getMsg("menu.quit"));
+        this.loadMenuItem = new MenuItem(I18n.getMsg("menu.load"));
         this.optionsMenu.getItems().add(this.resetMenuItem);
         this.optionsMenu.getItems().add(this.saveMenuItem);
+        this.optionsMenu.getItems().add(this.loadMenuItem);
         this.optionsMenu.getItems().add(this.quitMenuItem);
         this.menubar.getMenus().add(this.optionsMenu);
 
@@ -664,5 +667,13 @@ public class View {
      */
     public MenuItem getSaveMenuItem() {
         return saveMenuItem;
+    }
+
+    /**
+     * gets the load menu item.
+     * @return load menu item.
+     */
+    public MenuItem getLoadMenuItem() {
+        return loadMenuItem;
     }
 }
