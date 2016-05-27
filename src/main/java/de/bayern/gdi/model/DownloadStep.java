@@ -83,32 +83,7 @@ public class DownloadStep {
         this.path = path;
         this.processingSteps = processingSteps;
     }
-    public DownloadStep(String dataset,
-                        ArrayList<Parameter> parameters,
-                        WebService.Type serviceType,
-                        String serviceURL,
-                        String path,
-                        ArrayList<ProcessingStep> processingSteps) {
-        this(dataset,
-                parameters,
-                serviceType.toString(),
-                serviceURL,
-                path,
-                processingSteps);
-    }
 
-    public DownloadStep(String dataset,
-                        ArrayList<Parameter> parameters,
-                        WebService.Type serviceType,
-                        String serviceURL,
-                        String path) {
-        this(dataset,
-                parameters,
-                serviceType.toString(),
-                serviceURL,
-                path,
-                new ArrayList<ProcessingStep>());
-    }
 
     public DownloadStep(String dataset,
                         ArrayList<Parameter> parameters,

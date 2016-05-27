@@ -67,6 +67,7 @@ public class DownloadStepFactory {
 
             //DownloadStep step = new DownloadStep();
             String serviceURL = bean.getWebService().getServiceURL();
+            serviceURL = serviceURL.substring(0,serviceURL.lastIndexOf("?"));
             //step.setServiceURL(bean.getWebService().getServiceURL());
             WebService.Type serviceType =
                     bean.getWebService().getServiceType();
@@ -89,9 +90,21 @@ public class DownloadStepFactory {
             //step.setDataset(dataset);
             ArrayList<ProcessingStep> processingSteps = new ArrayList<>();
             //step.setProcessingSteps(processingSteps);
+            //System.out.println(serviceType.toString());
+            String serviceTypeStr = null;
+            switch (serviceType) {
+                case WFSOne:
+                    serviceTypeStr = "WFS1";
+                case WFSTwo:
+                    //TODO Check between BASIC and SIMPLE
+                    serviceTypeStr = "WFS2_SIMPLE";
+                case Atom:
+                    serviceTypeStr = "ATOM";
+                default:
+            }
             DownloadStep step = new DownloadStep(dataset,
                     parameters,
-                    serviceType,
+                    serviceTypeStr,
                     serviceURL,
                     savePath,
                     processingSteps);
