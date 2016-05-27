@@ -58,8 +58,9 @@ public class DownloadStepConverter {
      * Converts a DownloadStep into a sequence of jobs for the processor.
      * @param dls DownloadStep the configuration to be converted.
      * @return A job list for the download processor.
+     * @throws ConverterException If the conversion went wrong.
      */
-    public static JobList convert(DownloadStep dls) {
+    public static JobList convert(DownloadStep dls) throws ConverterException {
         JobList jl = new JobList();
 
         String url = wfsURL(
