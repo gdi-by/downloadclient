@@ -18,49 +18,43 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.DownloadStepFactory;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
-
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javafx.application.Platform;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.concurrent.Task;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
-
 import org.opengis.feature.type.AttributeType;
 
 
@@ -301,7 +295,29 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //NADA
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save File");
+            //fileChooser.getExtensionFilters().addAll();
+            File selectedFile = fileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (selectedFile == null) {
+                return;
+            }
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    String savePath = selectedFile.getPath();
+                    DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+                    DownloadStep ds = dsf.getStep(view, dataBean, savePath);
+                    JobList jl = DownloadStepConverter.convert(ds);
+                    Processor p = new Processor(jl.getJobList());
+                    p.run();
+                    return 0;
+                }
+            };
+            Thread th = new Thread(task);
+            th.setDaemon(true);
+            th.start();
         }
     }
 
@@ -428,10 +444,10 @@ public class Controller {
                     return 0;
                 }
             };
-                Thread th = new Thread(task);
-                view.setStatusBarText(I18n.getMsg("status.calling-service"));
-                th.setDaemon(true);
-                th.start();
+            Thread th = new Thread(task);
+            view.setStatusBarText(I18n.getMsg("status.calling-service"));
+            th.setDaemon(true);
+            th.start();
         }
     }
 

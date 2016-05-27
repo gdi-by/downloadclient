@@ -52,5 +52,13 @@ public class JobList implements Job {
             job.run();
         }
     }
+
+    /**
+     * Returns the List of Jobs.
+     * @return list of Jobs
+     */
+    public List<Job> getJobList() {
+        return this.jobs;
+    }
 }
 

@@ -52,6 +52,7 @@ public class DataBean extends Observable {
     private String userName;
     private String password;
 
+
     private CatalogService catalogService;
 
     /**

@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.model;
 
+import de.bayern.gdi.services.WebService;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -67,6 +68,58 @@ public class DownloadStep {
     private ArrayList<Parameter> parameters;
 
     public DownloadStep() {
+    }
+
+    public DownloadStep(String dataset,
+                        ArrayList<Parameter> parameters,
+                        String serviceType,
+                        String serviceURL,
+                        String path,
+                        ArrayList<ProcessingStep> processingSteps) {
+        this.dataset = dataset;
+        this.parameters = parameters;
+        this.serviceType = serviceType;
+        this.serviceURL = serviceURL;
+        this.path = path;
+        this.processingSteps = processingSteps;
+    }
+    public DownloadStep(String dataset,
+                        ArrayList<Parameter> parameters,
+                        WebService.Type serviceType,
+                        String serviceURL,
+                        String path,
+                        ArrayList<ProcessingStep> processingSteps) {
+        this(dataset,
+                parameters,
+                serviceType.toString(),
+                serviceURL,path,
+                processingSteps);
+    }
+
+    public DownloadStep(String dataset,
+                        ArrayList<Parameter> parameters,
+                        WebService.Type serviceType,
+                        String serviceURL,
+                        String path) {
+        this(dataset,
+                parameters,
+                serviceType.toString(),
+                serviceURL,
+                path,
+                new ArrayList<ProcessingStep>());
+    }
+
+    public DownloadStep(String dataset,
+                        ArrayList<Parameter> parameters,
+                        String serviceType,
+                        String serviceURL,
+                        String path) {
+        this(dataset,
+                parameters,
+                serviceType,
+                serviceURL,
+                path,
+                new ArrayList<ProcessingStep>());
     }
 
     /**
@@ -124,6 +177,13 @@ public class DownloadStep {
      */
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
+    }
+
+    /**
+     * @param serviceType the serviceType to set
+     */
+    public void setServiceType(WebService.Type serviceType) {
+        this.setServiceType(serviceType.toString());
     }
 
     /**
