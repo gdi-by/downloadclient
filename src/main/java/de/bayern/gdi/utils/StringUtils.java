@@ -17,12 +17,20 @@
  */
 package de.bayern.gdi.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.codec.binary.Base64;
 
 /**
  * Common string operations.
  */
 public class StringUtils {
+
+    private static final Logger log
+        = Logger.getLogger(StringUtils.class.getName());
 
     private StringUtils() {
     }
@@ -39,6 +47,30 @@ public class StringUtils {
         }
         String auth = user + ":" + password;
         return new String(Base64.encodeBase64(auth.getBytes()));
+    }
+
+    /**
+     * URL-encodes a given string in UTF-8.
+     * @param s The string to encode.
+     * @return The encodes string.
+     */
+    public static String urlEncode(String s) {
+        return urlEncode(s, "UTF-8");
+    }
+
+    /**
+     * URL-encodes a given string in a given encoding.
+     * @param s The string to encode.
+     * @param enc The encoding to use.
+     * @return The encodes string.
+     */
+    public static String urlEncode(String s, String enc) {
+        try {
+            return URLEncoder.encode(s, enc);
+        } catch (UnsupportedEncodingException e) {
+            log.log(Level.SEVERE, "encoding problem", e);
+        }
+        return s;
     }
 
     /**

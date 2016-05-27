@@ -41,7 +41,7 @@ public class JobList implements Job {
      * Add a job to this job list.
      * @param job The job to be added.
      */
-    public void add(Job job) {
+    public void addJob(Job job) {
         jobs.add(job);
     }
 
@@ -51,6 +51,14 @@ public class JobList implements Job {
         for (Job job: jobs) {
             job.run();
         }
+    }
+
+    /**
+     * Returns the List of Jobs.
+     * @return list of Jobs
+     */
+    public List<Job> getJobList() {
+        return this.jobs;
     }
 }
 

@@ -18,47 +18,45 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.ConverterException;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.DownloadStepFactory;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
-
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javafx.application.Platform;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.concurrent.Task;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
-
 import org.opengis.feature.type.AttributeType;
 
 
@@ -76,13 +74,16 @@ public class Controller {
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
     /**
-     * Creates the Conroller.
+     * Creates the Controller.
      * @param dataBean the model
      */
     public Controller(DataBean dataBean) {
         this.dataBean = dataBean;
         this.view = new View();
         this.view.setServiceListEntries(this.dataBean.getServicesAsList());
+        this.view.setCatalogueServiceNameLabelText(
+                I18n.getMsg("gui.catalogue") + ": "
+                + this.dataBean.getCatalogService().getProviderName());
 
         // Register Event Handler
         view.getQuitMenuItem().
@@ -95,10 +96,15 @@ public class Controller {
                 setOnAction(new ChooseTypeEventHandler());
         view.getAttributesFilledButton().
                 setOnAction(new AttributesFilledEventHandler());
+        //FIXME - Not only on Click, but everytime
         view.getServiceList().
                 setOnMouseClicked(new MouseClickedOnServiceList());
         view.getDownloadButton().
                 setOnAction(new DownloadButtonEventHandler());
+        view.getSaveMenuItem().
+                setOnAction(new SaveMenuItemEventHandler());
+        view.getLoadMenuItem().
+                setOnAction(new LoadMenuItemEventHandler());
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -173,6 +179,16 @@ public class Controller {
             String value = newVal.toUpperCase();
             ObservableList<String> subentries
                     = FXCollections.observableArrayList();
+            Map<String, String> catalog = dataBean.getCatalogService()
+                    .getServicesByFilter(newVal);
+            Iterator<Map.Entry<String, String>> it =
+                    catalog.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                view.addServiceToList((String) pair.getKey());
+                dataBean.addServiceToList((String) pair.getKey(), (String)
+                        pair.getValue());
+            }
             for (Object entry : view.getServiceList().getItems()) {
                 boolean match = true;
                 String entryText = (String) entry;
@@ -238,6 +254,74 @@ public class Controller {
     }
 
     /**
+     * Event handler for clicking "Save".
+     */
+    private class LoadMenuItemEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            FileChooser configFileChooser = new FileChooser();
+            configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
+
+            File configFile = configFileChooser.showOpenDialog(
+                    dataBean.getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
+            try {
+                DownloadStep ds = DownloadStep.read(configFile);
+                FileChooser downloadFileChooser = new FileChooser();
+                downloadFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+                downloadFileChooser.setInitialDirectory(new File(ds.getPath()));
+                File downloadFile = downloadFileChooser.showSaveDialog(
+                        dataBean.getPrimaryStage());
+                if (downloadFile == null) {
+                    return;
+                }
+                ds.setPath(downloadFile.toString());
+                JobList jl = DownloadStepConverter.convert(ds);
+                Processor p = Processor.getInstance();
+                p.addJob(jl);
+            } catch (IOException | ConverterException ex) {
+                log.log(Level.WARNING, ex.getMessage() , ex);
+            }
+        }
+    }
+
+    /**
+     * Event handler for clicking "Save".
+     */
+    private class SaveMenuItemEventHandler
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            FileChooser downloadFileChooser = new FileChooser();
+            downloadFileChooser.setTitle(I18n.getMsg("gui.save-file"));
+            File downloadFile = downloadFileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (downloadFile == null) {
+                return;
+            }
+            FileChooser configFileChooser = new FileChooser();
+            configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+            File configFile = configFileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
+            String savePath = downloadFile.getPath();
+            DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+            DownloadStep ds = dsf.getStep(view, dataBean, savePath);
+            try {
+                ds.write(configFile);
+
+            } catch (IOException ex) {
+                log.log(Level.WARNING, ex.getMessage() , ex);
+            }
+        }
+    }
+
+    /**
      * Event Handler for the Quit Programm Menu Entry.
      */
     private class QuitMenuItemEventHandler
@@ -271,7 +355,29 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            //NADA
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save File");
+            //fileChooser.getExtensionFilters().addAll();
+            File selectedFile = fileChooser.showSaveDialog(
+                    dataBean.getPrimaryStage());
+            if (selectedFile == null) {
+                return;
+            }
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    String savePath = selectedFile.getPath();
+                    DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+                    DownloadStep ds = dsf.getStep(view, dataBean, savePath);
+                    JobList jl = DownloadStepConverter.convert(ds);
+                    Processor p = Processor.getInstance();
+                    p.addJob(jl);
+                    return 0;
+                }
+            };
+            Thread th = new Thread(task);
+            th.setDaemon(true);
+            th.start();
         }
     }
 
@@ -339,22 +445,22 @@ public class Controller {
                             log.log(Level.WARNING, "Could not determine "
                                     + "Service Type" , st);
                             Platform.runLater(() -> {
-                                view.setStatusBarText("Could not determine "
-                                        + "Service Type");
+                                view.setStatusBarText(
+                                    I18n.getMsg("status.no-service-type"));
                             });
                         } else {
                             switch (st) {
                                 case Atom:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found Atom "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.atom"));
                                     });
                                     ws = new Atom(serviceURL);
                                     break;
                                 case WFSOne:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found WFSOne "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.wfsone"));
                                     });
                                     ws = new WFSOne(serviceURL, dataBean
                                             .getUserName(), dataBean
@@ -362,8 +468,8 @@ public class Controller {
                                     break;
                                 case WFSTwo:
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Found WFSTwo "
-                                                + "Service");
+                                        view.setStatusBarText(
+                                            I18n.getMsg("status.type.wfstwo"));
                                     });
                                     ws = new WFSTwo(serviceURL, dataBean
                                             .getUserName(), dataBean
@@ -373,8 +479,8 @@ public class Controller {
                                     log.log(Level.WARNING,
                                         "Could not determine URL" , st);
                                     Platform.runLater(() -> {
-                                        view.setStatusBarText("Could not "
-                                                + "determine URL");
+                                        view.setStatusBarText(
+                                                I18n.getMsg("status.no-url"));
                                     });
                                     break;
                             }
@@ -387,21 +493,21 @@ public class Controller {
                             ChooseTypeEventHandler chooseType
                                     = new ChooseTypeEventHandler();
                             chooseType.handle(e);
-                            view.setStatusBarText("Ready");
+                            view.setStatusBarText(I18n.getMsg("status.ready"));
                         });
                     } else {
                         Platform.runLater(() -> {
-                            view.setStatusBarText("Could not determine URL");
+                            view.setStatusBarText(I18n.getMsg("status.no-url"));
                         });
                     }
                     view.getScene().setCursor(Cursor.DEFAULT);
                     return 0;
                 }
             };
-                Thread th = new Thread(task);
-                view.setStatusBarText("Calling Service to get Infos");
-                th.setDaemon(true);
-                th.start();
+            Thread th = new Thread(task);
+            view.setStatusBarText(I18n.getMsg("status.calling-service"));
+            th.setDaemon(true);
+            th.start();
         }
     }
 
@@ -414,14 +520,14 @@ public class Controller {
         public void handle(WindowEvent e) {
             Alert closeConfirmation = new Alert(
                     Alert.AlertType.CONFIRMATION,
-                    "Are you sure you want to exit?"
+                    I18n.getMsg("gui.want-to-quit")
             );
             Button exitButton
                     = (Button) closeConfirmation.getDialogPane().lookupButton(
                         ButtonType.OK
                     );
-            exitButton.setText("Exit");
-            closeConfirmation.setHeaderText("Confirm Exit");
+            exitButton.setText(I18n.getMsg("gui.exit"));
+            closeConfirmation.setHeaderText(I18n.getMsg("gui.confirm-exit"));
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
             closeConfirmation.initOwner(dataBean.getPrimaryStage());
 

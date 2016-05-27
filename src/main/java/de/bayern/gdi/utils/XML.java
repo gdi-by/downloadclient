@@ -19,37 +19,35 @@
 package de.bayern.gdi.utils;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Map;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
 import javax.xml.stream.events.XMLEvent;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
-
 import org.w3c.dom.Document;
-
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -97,6 +95,92 @@ public class XML {
         return document;
     }
 
+    /**
+     * Gets an XML Document from a remote location.
+     * @param url the URL
+     * @return and XML Document
+     */
+    public static Document getDocument(URL url) {
+        return getDocument(url, null, null);
+    }
+
+    /**
+     * returns the first childnode with the given name.
+     * @param node Node to search in
+     * @param nodeName Name to search for
+     * @return the child node, NULL if nothing found
+     */
+    public static Node getChildWithName(Node node, String nodeName) {
+        return getChildWithName(node.getChildNodes(), nodeName);
+    }
+
+    /**
+     * returns the first childnode with the given name.
+     * @param nl Nodelist to search in
+     * @param nodeName Name to search for
+     * @return the child node, NULL if nothing found
+     */
+    public static Node getChildWithName(NodeList nl, String nodeName) {
+        Node retNode = null;
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node curNode = nl.item(i);
+            if (curNode.getNodeName().equals(nodeName)) {
+                return curNode;
+            }
+        }
+        return retNode;
+    }
+
+    /**
+     * Gets an XML Document from a remote location.
+     * @param url the URL
+     * @param userName the Username {NULL if none needed}
+     * @param password the Password {NULLL if none needed}
+     * @return an XML Document
+     */
+    public static Document getDocument(URL url, String userName, String
+            password) {
+        Document doc = null;
+        try {
+            URLConnection conn = null;
+            if (url.toString().toLowerCase().startsWith("https")) {
+                HttpsURLConnection con
+                        = (HttpsURLConnection) url.openConnection();
+                conn = (URLConnection) con;
+            } else {
+                conn = url.openConnection();
+            }
+            if (StringUtils.getBase64EncAuth(
+                    userName, password) != null) {
+                conn.setRequestProperty("Authorization", "Basic "
+                        + StringUtils.getBase64EncAuth(
+                        userName, password));
+            }
+            //String xmlStr = streamToString(conn.getInputStream());
+            //doc = getDocument(xmlStr);
+            doc = getDocument(conn.getInputStream());
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return doc;
+    }
+
+    /**
+     * TODO.
+     * @param xmlString TODO
+     * @return TODO
+     */
+    public static final Document getDocument(String xmlString) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document document = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            document = builder.parse(xmlString);
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return document;
+    }
     /**
      * Creates a new XPath without a namespace context.
      * @return the new XPath.
@@ -253,4 +337,15 @@ public class XML {
         }
         return null;
     }
+
+    private static String streamToString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        return sb.toString();
+    }
+
 }

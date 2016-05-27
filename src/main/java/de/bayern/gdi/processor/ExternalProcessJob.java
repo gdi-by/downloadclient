@@ -28,16 +28,16 @@ import java.util.List;
  * Starts an external process with optional arguments and
  * an optional working directory.
  */
-public class ExternalProcess implements Job {
+public class ExternalProcessJob implements Job {
 
     private String command;
     private File workingDir;
     private String [] arguments;
 
-    public ExternalProcess() {
+    public ExternalProcessJob() {
     }
 
-    public ExternalProcess(
+    public ExternalProcessJob(
         String command, File workingDir, String [] arguments) {
 
         this.command = command;

@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.I18n;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -159,7 +161,7 @@ public class WMSMapSwing extends Parent {
             this.wmsLayers = new ComboBox(layerList);
             this.layerLabel = new Label();
             this.layerLabel.setLabelFor(this.wmsLayers);
-            this.layerLabel.setText("Layer: ");
+            this.layerLabel.setText(I18n.getMsg("gui.layer") + ": ");
             this.mapNode = new SwingNode();
             this.add(this.layerLabel);
             this.add(this.wmsLayers);
@@ -312,4 +314,6 @@ public class WMSMapSwing extends Parent {
     public Rectangle getBounds() {
         return this.mapNode.getContent().getBounds();
     }
+
+    //TODO - Destructor for Swing Item with Maplayer Dispose
 }

@@ -21,6 +21,7 @@ package de.bayern.gdi.gui;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
+import de.bayern.gdi.utils.I18n;
 
 import java.io.IOException;
 
@@ -164,7 +165,7 @@ public class WMSMapFX extends Parent {
         this.iw = new ImageView();
         this.epsgField = new TextField(this.spacialRefSystem);
         this.boundingBoxField = new TextField(this.outerBBOX);
-        this.updateImageButton = new Button("Update Image");
+        this.updateImageButton = new Button(I18n.getMsg("gui.update-image"));
         vBox = new VBox();
         this.addEventHandler(MouseEvent.MOUSE_RELEASED, new
                 OnMouseReleasedEvent());

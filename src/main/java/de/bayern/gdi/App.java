@@ -89,8 +89,7 @@ public class App {
         }
 
         // Its kind of complicated to start a javafx application from
-        // another class. Thank god for StackExchange:
-        // http://stackoverflow.com/a/25909862
+        // another class. See http://stackoverflow.com/a/25909862
         new Thread() {
             @Override
             public void run() {

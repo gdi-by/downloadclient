@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
@@ -69,7 +70,16 @@ public class Headless {
 
         log.info("Download configuration: " + dls);
 
-        JobList jobs = DownloadStepConverter.convert(dls);
+        JobList jobs;
+        try {
+            jobs = DownloadStepConverter.convert(dls);
+        } catch (ConverterException ce) {
+            log.log(
+                Level.SEVERE,
+                "Creating download jobs failed",
+                ce);
+            return 1;
+        }
 
         Processor processor = new Processor();
         Thread thread = new Thread(processor);
