@@ -60,7 +60,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
 
     private InputStream wrap(InputStream in) {
         return this.wrapFactory != null
-            ? this.wrap(in)
+            ? this.wrapFactory.wrap(in)
             : in;
     }
 

@@ -103,12 +103,13 @@ public class FileDownloadJob
     }
 
     @Override
-    public void run() {
+    public void run() throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);
         } catch (MalformedURLException e) {
-            return;
+            throw new JobExecutionException(
+                "bad URL \"" + this.urlString + "\"", e);
         }
 
         WrapInputStreamFactory wrapFactory
@@ -122,10 +123,8 @@ public class FileDownloadJob
         try {
             HttpGet httpget = new HttpGet(this.urlString);
             httpclient.execute(httpget, responseHandler);
-            // TODO: Do something with file loaded.
         } catch (IOException ioe) {
-            log.log(Level.SEVERE,
-                "Download failed: " + ioe.getLocalizedMessage(), ioe);
+            throw new JobExecutionException("Download failed", ioe);
         } finally {
             try {
                 httpclient.close();
