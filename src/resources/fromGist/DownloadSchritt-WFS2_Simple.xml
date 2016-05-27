@@ -25,7 +25,7 @@
 <DownloadSchritt>
     <ServiceTyp>WFS2_SIMPLE</ServiceTyp>
     <URL>http://geoserv.weichand.de:8080/geoserver/wfs</URL>
-    <Dataset>GemeindeByGemeindeschluesselEpsg31468x</Dataset>
+    <Dataset>GemeindeByGemeindeschluesselEpsg31468</Dataset>
     <Parameters>
         <Parameter>
             <Name>gemeindeschluessel</Name>
