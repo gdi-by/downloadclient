@@ -99,7 +99,7 @@ public class FileDownloadJob
     }
 
     @Override
-    public void run() throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);
@@ -130,5 +130,6 @@ public class FileDownloadJob
                         + ioe.getLocalizedMessage(), ioe);
             }
         }
+        p.broadcastMessage("Download finished.");
     }
 }

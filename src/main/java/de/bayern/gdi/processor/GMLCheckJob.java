@@ -47,9 +47,9 @@ public class GMLCheckJob implements Job {
     }
 
     @Override
-    public void run() throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException {
         log.info("Checking: \"" + this.file + "\"");
-        if (!file.exists() || !file.canRead()) {
+        if (!file.isFile() || !file.canRead()) {
             throw new JobExecutionException(
                 "file \"" + file + "\" is not accessible.");
         }
@@ -64,5 +64,6 @@ public class GMLCheckJob implements Job {
             throw new JobExecutionException(
                 "processing file \"" + this.file + "\" failed.", e);
         }
+        p.broadcastMessage("GML check passed.");
     }
 }

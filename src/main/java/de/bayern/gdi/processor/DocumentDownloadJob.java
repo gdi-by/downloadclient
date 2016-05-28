@@ -56,7 +56,7 @@ public class DocumentDownloadJob
     }
 
     @Override
-    public void run() {
+    public void run(Processor p) throws JobExecutionException {
         // TODO: Do more fancy stuff like e.g. auth.
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
@@ -70,8 +70,7 @@ public class DocumentDownloadJob
             Document doc = httpclient.execute(httpget, responseHandler);
             // TODO: Do something with document loaded.
         } catch (IOException ioe) {
-            log.log(Level.SEVERE,
-                "Download failed: " + ioe.getLocalizedMessage(), ioe);
+            throw new JobExecutionException("Download failed", ioe);
         } finally {
             try {
                 httpclient.close();

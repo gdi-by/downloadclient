@@ -17,18 +17,24 @@
  */
 package de.bayern.gdi.processor;
 
-/**
- * Job implements a job to be run by a processor.
+import java.util.EventListener;
+
+/** Implementors of this interface recieve async messages
+ *  from a Processor.
  */
-public interface Job {
+public interface ProcessorListener extends EventListener {
 
     /**
-     * Run the job.
-     * @param p The processor which run this job.
-     * @throws JobExecutionException if the job execution failed.
+     * Called if an exception was thrown during job execution.
+     * @param pe The event. pe.getException() returns the
+     * thrown exception.
      */
-    void run(Processor p) throws JobExecutionException;
+    void recievedException(ProcessorEvent pe);
+
+    /**
+     * Called if a message was sent during job execution.
+     * @param pe The event. pe.getMessage() returns the
+     * message.
+     */
+    void recievedMessage(ProcessorEvent pe);
 }
-
-
-

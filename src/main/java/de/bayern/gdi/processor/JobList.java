@@ -46,10 +46,10 @@ public class JobList implements Job {
     }
 
     @Override
-    public void run() throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException {
         log.info("Executing job list");
         for (Job job: jobs) {
-            job.run();
+            job.run(p);
         }
     }
 
