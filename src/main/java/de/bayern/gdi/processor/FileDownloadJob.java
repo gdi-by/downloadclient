@@ -85,10 +85,6 @@ public class FileDownloadJob
 
         context.setCredentialsProvider(credsProv);
 
-        //var authCache = new org.apache.http.impl.client.BasicAuthCache();
-        //var basicAuth = new org.apache.http.impl.auth.BasicScheme();
-        //var target    = new org.apache.http.HttpHost(host, port);
-
         BasicAuthCache authCache = new BasicAuthCache();
         BasicScheme basicAuth = new BasicScheme();
         HttpHost target = new HttpHost(url.getHost(), url.getPort());
