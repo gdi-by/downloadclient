@@ -51,6 +51,8 @@ public class FileDownloadJob
     private String user;
     private String password;
 
+    private Processor processor;
+
     public FileDownloadJob() {
     }
 
@@ -64,8 +66,8 @@ public class FileDownloadJob
 
     @Override
     public void bytesCounted(long count) {
-        //TODO: Forward to UI.
-        log.log(Level.INFO, "bytes downloaded: " + count);
+        String message = "bytes downloaded: " + count;
+        processor.broadcastMessage(message);
     }
 
     private CloseableHttpClient getClient(URL url) {
@@ -100,6 +102,16 @@ public class FileDownloadJob
 
     @Override
     public void run(Processor p) throws JobExecutionException {
+        Processor old = this.processor;
+        this.processor = p;
+        try {
+            innerRun(p);
+        } finally {
+            this.processor = old;
+        }
+    }
+
+    private void innerRun(Processor p) throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);

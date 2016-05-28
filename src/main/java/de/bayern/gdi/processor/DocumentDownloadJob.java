@@ -42,6 +42,8 @@ public class DocumentDownloadJob
 
     private String url;
 
+    private Processor processor;
+
     public DocumentDownloadJob() {
     }
 
@@ -51,12 +53,22 @@ public class DocumentDownloadJob
 
     @Override
     public void bytesCounted(long count) {
-        //TODO: Forward to UI.
-        log.log(Level.INFO, "bytes downloaded: " + count);
+        String message = "bytes downloaded: " + count;
+        processor.broadcastMessage(message);
     }
 
     @Override
     public void run(Processor p) throws JobExecutionException {
+        Processor old = this.processor;
+        this.processor = p;
+        try {
+            innerRun(p);
+        } finally {
+            this.processor = old;
+        }
+    }
+
+    private void innerRun(Processor p) throws JobExecutionException {
         // TODO: Do more fancy stuff like e.g. auth.
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
