@@ -497,6 +497,7 @@ public class View {
                 THIRD_COLUMN,
                 FIRST_ROW);
         this.downloadButton.setText(I18n.getMsg("gui.download"));
+        this.grid.getChildren().remove(this.downloadButton);
         this.grid.add(this.downloadButton,
                 THIRD_COLUMN,
                 SECOND_ROW);
