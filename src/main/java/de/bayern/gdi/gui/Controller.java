@@ -582,8 +582,9 @@ public class Controller {
         public void receivedException(ProcessorEvent pe) {
             Platform.runLater(() -> {
                 view.setStatusBarText(
-                    I18n.getMsg("status.error")
-                    + ": " + pe.getException().getLocalizedMessage());
+                    I18n.format(
+                        "status.error",
+                        pe.getException().getLocalizedMessage()));
             });
         }
 
