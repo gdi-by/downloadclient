@@ -18,18 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.processor.ConverterException;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.DownloadStepFactory;
-import de.bayern.gdi.processor.JobList;
-import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.WFSOne;
-import de.bayern.gdi.services.WFSTwo;
-import de.bayern.gdi.services.WebService;
-import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.ServiceChecker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +27,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.opengis.feature.type.AttributeType;
+
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.processor.ConverterException;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.DownloadStepFactory;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.WFSOne;
+import de.bayern.gdi.services.WFSTwo;
+import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.ServiceChecker;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -57,7 +63,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
-import org.opengis.feature.type.AttributeType;
 
 
 /**
@@ -109,6 +114,8 @@ public class Controller {
         // Register Listener
         view.getServiceSearch().textProperty().
                 addListener(new SearchServiceListChangeListener());
+
+        Processor.getInstance().addListener(new DownloadListener());
 
         // stage overrides
         this.dataBean.getPrimaryStage().
@@ -565,6 +572,26 @@ public class Controller {
                     }
                 }
             }
+        }
+    }
+
+    /** Keeps track of download progression and errors. */
+    private class DownloadListener implements ProcessorListener {
+
+        @Override
+        public void receivedException(ProcessorEvent pe) {
+            Platform.runLater(() -> {
+                view.setStatusBarText(
+                    I18n.getMsg("status.error")
+                    + ": " + pe.getException().getLocalizedMessage());
+            });
+        }
+
+        @Override
+        public void receivedMessage(ProcessorEvent pe) {
+            Platform.runLater(() -> {
+                view.setStatusBarText(pe.getMessage());
+            });
         }
     }
 }

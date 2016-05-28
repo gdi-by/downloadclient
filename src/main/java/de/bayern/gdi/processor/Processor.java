@@ -111,7 +111,7 @@ public class Processor implements Runnable {
     public void broadcastException(JobExecutionException jee) {
         ProcessorEvent pe = new ProcessorEvent(this, jee);
         for (ProcessorListener pl: listeners) {
-            pl.recievedException(pe);
+            pl.receivedException(pe);
         }
     }
 
@@ -121,7 +121,7 @@ public class Processor implements Runnable {
     public void broadcastMessage(String message) {
         ProcessorEvent pe = new ProcessorEvent(this, message);
         for (ProcessorListener pl: listeners) {
-            pl.recievedMessage(pe);
+            pl.receivedMessage(pe);
         }
     }
 

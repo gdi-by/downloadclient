@@ -29,12 +29,12 @@ public interface ProcessorListener extends EventListener {
      * @param pe The event. pe.getException() returns the
      * thrown exception.
      */
-    void recievedException(ProcessorEvent pe);
+    void receivedException(ProcessorEvent pe);
 
     /**
      * Called if a message was sent during job execution.
      * @param pe The event. pe.getMessage() returns the
      * message.
      */
-    void recievedMessage(ProcessorEvent pe);
+    void receivedMessage(ProcessorEvent pe);
 }
