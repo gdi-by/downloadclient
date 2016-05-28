@@ -105,7 +105,7 @@ public class Processor implements Runnable {
         notify();
     }
 
-    /** Broadcasts a exception to all listeners.
+    /** Broadcasts an exception to all listeners.
      * @param jee The exception to broadcast.
      */
     public void broadcastException(JobExecutionException jee) {
