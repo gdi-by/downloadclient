@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Document;
+
 import de.bayern.gdi.utils.XML;
 
 /**
@@ -32,6 +34,12 @@ public class GMLCheckJob implements Job {
 
     private static final Logger log
         = Logger.getLogger(GMLCheckJob.class.getName());
+
+    private static final long SCREENING_THESHOLD = 4096;
+
+    private static final String ERROR_MESSAGE
+        = "//*[local-name()='Exception']"
+        + "/*[local-name()='ExceptionText']/text()";
 
     private File file;
 
@@ -46,6 +54,18 @@ public class GMLCheckJob implements Job {
         this.file = file;
     }
 
+    private void checkForProblems() throws JobExecutionException {
+        Document doc = XML.getDocument(this.file);
+        if (doc == null) {
+            throw new JobExecutionException(
+                "File \"" + this.file + "\" not parsable.");
+        }
+        String message = XML.xpathString(doc, ERROR_MESSAGE, null);
+        if (message != null) {
+            throw new JobExecutionException("WFS problem: " + message);
+        }
+    }
+
     @Override
     public void run(Processor p) throws JobExecutionException {
         log.info("Checking: \"" + this.file + "\"");
@@ -54,16 +74,20 @@ public class GMLCheckJob implements Job {
                 "file \"" + file + "\" is not accessible.");
         }
 
-        try {
-            String tag = XML.containsTags(this.file, EXCEPTION_INDICATORS);
-            if (tag != null) {
+        // If the document is large screen for
+        // indicators of ExceptionReport first to avoid
+        // building a large in memory DOM.
+        if (file.length() > SCREENING_THESHOLD) {
+            try {
+                if (XML.containsTags(this.file, EXCEPTION_INDICATORS) == null) {
+                    return;
+                }
+            } catch (XMLStreamException | IOException e) {
                 throw new JobExecutionException(
-                    "Exception indicator found: \"" + tag + "\"");
+                    "processing file \"" + this.file + "\" failed.", e);
             }
-        } catch (XMLStreamException | IOException e) {
-            throw new JobExecutionException(
-                "processing file \"" + this.file + "\" failed.", e);
         }
+        checkForProblems();
         p.broadcastMessage("GML check passed.");
     }
 }

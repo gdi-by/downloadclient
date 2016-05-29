@@ -583,7 +583,7 @@ public class Controller {
                 view.setStatusBarText(
                     I18n.format(
                         "status.error",
-                        pe.getException().getLocalizedMessage()));
+                        pe.getException().getMessage()));
             });
         }
 
