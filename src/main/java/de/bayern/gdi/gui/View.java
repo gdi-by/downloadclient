@@ -21,7 +21,6 @@ package de.bayern.gdi.gui;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -433,13 +432,11 @@ public class View {
             this.attributeGridPane.getRowConstraints().add(row);
         }
 
-        Iterator it = attributes.entrySet().iterator();
         int i = 0;
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            TextField tf = new TextField(pair.getValue().toString());
+        for (Map.Entry<String, String> entry: attributes.entrySet()) {
+            TextField tf = new TextField(entry.getValue());
             this.attributeGridPane.add(tf, ONE, i);
-            Label l = new Label((String) pair.getKey());
+            Label l = new Label(entry.getKey());
             this.attributeGridPane.add(l, ZERO, i);
             i++;
         }
