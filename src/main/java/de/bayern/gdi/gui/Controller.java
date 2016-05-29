@@ -575,23 +575,36 @@ public class Controller {
     }
 
     /** Keeps track of download progression and errors. */
-    private class DownloadListener implements ProcessorListener {
+    private class DownloadListener implements ProcessorListener, Runnable {
+
+        private String message;
+
+        private synchronized void setMessage(String message) {
+            this.message = message;
+        }
+
+        private synchronized String getMessage() {
+            return this.message;
+        }
+
+        @Override
+        public void run() {
+            view.setStatusBarText(getMessage());
+        }
 
         @Override
         public void receivedException(ProcessorEvent pe) {
-            Platform.runLater(() -> {
-                view.setStatusBarText(
-                    I18n.format(
-                        "status.error",
-                        pe.getException().getMessage()));
-            });
+            setMessage(
+                I18n.format(
+                "status.error",
+                pe.getException().getMessage()));
+            Platform.runLater(this);
         }
 
         @Override
         public void receivedMessage(ProcessorEvent pe) {
-            Platform.runLater(() -> {
-                view.setStatusBarText(pe.getMessage());
-            });
+            setMessage(pe.getMessage());
+            Platform.runLater(this);
         }
     }
 }
