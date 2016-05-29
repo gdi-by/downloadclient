@@ -39,9 +39,10 @@ import javafx.stage.Stage;
  */
 public class DataBean extends Observable {
 
-    private Stage primaryStage = null;
-    private Map<String , String> namePwMap = null;
-    private ServiceSetting serviceSetting = null;
+    private Stage primaryStage;
+
+    private Map<String, String> namePwMap;
+    private ServiceSetting serviceSetting;
     private Map<String, String> services;
     private WebService webService;
     private ArrayList<String> serviceTypes;

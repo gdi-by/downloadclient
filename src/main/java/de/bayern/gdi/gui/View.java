@@ -401,7 +401,7 @@ public class View {
     public void setTypes(ArrayList<String> types) {
         ObservableList<String> options =
                 FXCollections.observableArrayList(types);
-        this.typeComboBox.getItems().removeAll(this.typeComboBox.getItems());
+        this.typeComboBox.getItems().retainAll();
         this.typeComboBox.setItems(options);
         this.grid.getChildren().remove(this.typeComboBox);
         this.grid.add(this.typeComboBox,
@@ -448,9 +448,7 @@ public class View {
         this.attributesFilledButton.setText(
                 I18n.getMsg("gui.all_attributes_filled"));
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
-        this.attributesFilledBox.getChildren().removeAll(
-                this.attributesFilledBox.getChildren()
-        );
+        this.attributesFilledBox.getChildren().retainAll();
         this.grid.getChildren().remove(this.attributesFilledBox);
         this.grid.getChildren().remove(this.typeComboBox);
         this.grid.addColumn(SECOND_COLUMN, this.typeComboBox);

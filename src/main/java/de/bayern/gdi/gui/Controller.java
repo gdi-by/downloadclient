@@ -219,7 +219,7 @@ public class Controller {
         implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            Map map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<String, String>();
             if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
                     != null) {
                 String choosenType =

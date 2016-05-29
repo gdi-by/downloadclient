@@ -86,7 +86,7 @@ public class WFSOne extends WebService {
         this.userName = userName;
         this.password = password;
 
-        Map connectionParameters = new HashMap();
+        Map<String, String> connectionParameters = new HashMap<>();
 
         if (StringUtils.getBase64EncAuth(
             this.userName, this.password) != null) {
@@ -100,7 +100,7 @@ public class WFSOne extends WebService {
 
         try {
             this.data = DataStoreFinder.getDataStore(connectionParameters);
-            this.types = new ArrayList();
+            this.types = new ArrayList<String>();
             String[] typeNames = this.data.getTypeNames();
 
             for (String tName : typeNames) {
@@ -125,7 +125,7 @@ public class WFSOne extends WebService {
      * @return the attributes
      */
     public Map<String, String> getAttributes(String type) {
-        ArrayList<AttributeType> attributes = new ArrayList();
+        ArrayList<AttributeType> attributes = new ArrayList<>();
         Map<String, String> map = new HashMap<String, String>();
         try {
             SimpleFeatureType schema = this.data.getSchema(type);
