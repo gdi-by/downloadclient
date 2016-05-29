@@ -138,10 +138,12 @@ public class Controller {
                 case WFSOne:
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getTypes());
+                    break;
                 case WFSTwo:
                     //TODO - Bring sotredQueires and Types together!
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getStoredQueries());
+                    break;
                 case Atom:
                 default:
             }
@@ -229,9 +231,11 @@ public class Controller {
                     case WFSOne:
                         map = dataBean.getWebService()
                                         .getAttributes(choosenType);
+                        break;
                     case WFSTwo:
                         map = dataBean.getWebService()
                                 .getParameters(choosenType);
+                        break;
                     case Atom:
                     default:
                 }
