@@ -80,6 +80,8 @@ public class GMLCheckJob implements Job {
         if (file.length() > SCREENING_THESHOLD) {
             try {
                 if (XML.containsTags(this.file, EXCEPTION_INDICATORS) == null) {
+                    // No indicators no cry ...
+                    p.broadcastMessage(I18n.getMsg("gml.check.passed"));
                     return;
                 }
             } catch (XMLStreamException | IOException e) {
@@ -88,7 +90,6 @@ public class GMLCheckJob implements Job {
             }
         }
         checkForProblems();
-
         p.broadcastMessage(I18n.getMsg("gml.check.passed"));
     }
 }
