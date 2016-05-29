@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -188,13 +187,9 @@ public class Controller {
                     = FXCollections.observableArrayList();
             Map<String, String> catalog = dataBean.getCatalogService()
                     .getServicesByFilter(newVal);
-            Iterator<Map.Entry<String, String>> it =
-                    catalog.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                view.addServiceToList((String) pair.getKey());
-                dataBean.addServiceToList((String) pair.getKey(), (String)
-                        pair.getValue());
+            for (Map.Entry<String, String> entry: catalog.entrySet()) {
+                view.addServiceToList(entry.getKey());
+                dataBean.addServiceToList(entry.getKey(), entry.getValue());
             }
             for (Object entry : view.getServiceList().getItems()) {
                 boolean match = true;
