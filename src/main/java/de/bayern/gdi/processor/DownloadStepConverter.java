@@ -21,9 +21,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
@@ -33,9 +32,8 @@ import de.bayern.gdi.utils.StringUtils;
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
-    private static final Log log =
-        LogFactory.getLog(DownloadStepConverter.class);
-
+    private static final Logger log
+        = Logger.getLogger(FileDownloadJob.class.getName());
 
     private DownloadStepConverter() {
     }
@@ -205,7 +203,7 @@ public class DownloadStepConverter {
 
         String url = wfsURL(dls);
 
-        log.info("url: " + url);
+        log.log(Level.INFO, "url: " + url);
 
         //XXX: Alternative ways of getting the credentials?
         String user = dls.findParameter("user");
@@ -216,7 +214,7 @@ public class DownloadStepConverter {
             path.isDirectory() ? path : path.getParentFile());
 
         File gml = new File(wd, "download.gml");
-        log.info("Download to file \"" + gml + "\"");
+        log.log(Level.INFO, "Download to file \"" + gml + "\"");
         FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
 

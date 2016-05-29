@@ -37,6 +37,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** FileDownloadJob is a job to download features from a service. */
@@ -51,6 +52,8 @@ public class FileDownloadJob
     private String user;
     private String password;
 
+    private Processor processor;
+
     public FileDownloadJob() {
     }
 
@@ -64,8 +67,8 @@ public class FileDownloadJob
 
     @Override
     public void bytesCounted(long count) {
-        //TODO: Forward to UI.
-        log.log(Level.INFO, "bytes downloaded: " + count);
+        String message = I18n.format("file.download.bytes", count);
+        processor.broadcastMessage(message);
     }
 
     private CloseableHttpClient getClient(URL url) {
@@ -85,10 +88,6 @@ public class FileDownloadJob
 
         context.setCredentialsProvider(credsProv);
 
-        //var authCache = new org.apache.http.impl.client.BasicAuthCache();
-        //var basicAuth = new org.apache.http.impl.auth.BasicScheme();
-        //var target    = new org.apache.http.HttpHost(host, port);
-
         BasicAuthCache authCache = new BasicAuthCache();
         BasicScheme basicAuth = new BasicScheme();
         HttpHost target = new HttpHost(url.getHost(), url.getPort());
@@ -103,13 +102,23 @@ public class FileDownloadJob
     }
 
     @Override
-    public void run() throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException {
+        Processor old = this.processor;
+        this.processor = p;
+        try {
+            download();
+        } finally {
+            this.processor = old;
+        }
+    }
+
+    private void download() throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);
         } catch (MalformedURLException e) {
             throw new JobExecutionException(
-                "bad URL \"" + this.urlString + "\"", e);
+                I18n.format("file.download.bad.url", this.urlString));
         }
 
         WrapInputStreamFactory wrapFactory
@@ -120,19 +129,23 @@ public class FileDownloadJob
 
         CloseableHttpClient httpclient = getClient(url);
 
+        this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
+
         try {
             HttpGet httpget = new HttpGet(this.urlString);
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
-            throw new JobExecutionException("Download failed", ioe);
+            throw new JobExecutionException(
+                I18n.getMsg("file.download.failed"), ioe);
         } finally {
             try {
                 httpclient.close();
             } catch (IOException ioe) {
+                // Only log this.
                 log.log(Level.SEVERE,
-                    "Closing HTTP client failed: "
-                        + ioe.getLocalizedMessage(), ioe);
+                    "Closing HTTP client failed: " + ioe.getMessage(), ioe);
             }
         }
+        this.processor.broadcastMessage(I18n.getMsg("file.download.finished"));
     }
 }

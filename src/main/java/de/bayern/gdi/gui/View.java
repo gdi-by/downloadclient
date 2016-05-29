@@ -21,7 +21,6 @@ package de.bayern.gdi.gui;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -402,7 +401,7 @@ public class View {
     public void setTypes(ArrayList<String> types) {
         ObservableList<String> options =
                 FXCollections.observableArrayList(types);
-        this.typeComboBox.getItems().removeAll(this.typeComboBox.getItems());
+        this.typeComboBox.getItems().retainAll();
         this.typeComboBox.setItems(options);
         this.grid.getChildren().remove(this.typeComboBox);
         this.grid.add(this.typeComboBox,
@@ -433,13 +432,11 @@ public class View {
             this.attributeGridPane.getRowConstraints().add(row);
         }
 
-        Iterator it = attributes.entrySet().iterator();
         int i = 0;
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            TextField tf = new TextField(pair.getValue().toString());
+        for (Map.Entry<String, String> entry: attributes.entrySet()) {
+            TextField tf = new TextField(entry.getValue());
             this.attributeGridPane.add(tf, ONE, i);
-            Label l = new Label((String) pair.getKey());
+            Label l = new Label(entry.getKey());
             this.attributeGridPane.add(l, ZERO, i);
             i++;
         }
@@ -451,9 +448,7 @@ public class View {
         this.attributesFilledButton.setText(
                 I18n.getMsg("gui.all_attributes_filled"));
         this.attributesFilledButton.setAlignment(Pos.BOTTOM_RIGHT);
-        this.attributesFilledBox.getChildren().removeAll(
-                this.attributesFilledBox.getChildren()
-        );
+        this.attributesFilledBox.getChildren().retainAll();
         this.grid.getChildren().remove(this.attributesFilledBox);
         this.grid.getChildren().remove(this.typeComboBox);
         this.grid.addColumn(SECOND_COLUMN, this.typeComboBox);
@@ -497,6 +492,7 @@ public class View {
                 THIRD_COLUMN,
                 FIRST_ROW);
         this.downloadButton.setText(I18n.getMsg("gui.download"));
+        this.grid.getChildren().remove(this.downloadButton);
         this.grid.add(this.downloadButton,
                 THIRD_COLUMN,
                 SECOND_ROW);

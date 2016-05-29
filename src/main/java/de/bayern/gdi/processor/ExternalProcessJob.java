@@ -20,9 +20,10 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.bayern.gdi.utils.I18n;
 
 /**
  * Starts an external process with optional arguments and
@@ -65,7 +66,7 @@ public class ExternalProcessJob implements Job {
      *         if the external proccess could not be started.
      */
     @Override
-    public void run() throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException {
         ProcessBuilder builder = new ProcessBuilder(commandList());
         if (this.workingDir != null) {
             builder.directory(this.workingDir);
@@ -77,7 +78,7 @@ public class ExternalProcessJob implements Job {
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             throw new JobExecutionException(
-                "Starting external process failed.", e);
+                I18n.getMsg("external.process.failed"), e);
         }
     }
 }

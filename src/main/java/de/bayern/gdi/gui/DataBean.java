@@ -26,7 +26,6 @@ import de.bayern.gdi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
@@ -40,9 +39,10 @@ import javafx.stage.Stage;
  */
 public class DataBean extends Observable {
 
-    private Stage primaryStage = null;
-    private Map<String , String> namePwMap = null;
-    private ServiceSetting serviceSetting = null;
+    private Stage primaryStage;
+
+    private Map<String, String> namePwMap;
+    private ServiceSetting serviceSetting;
     private Map<String, String> services;
     private WebService webService;
     private ArrayList<String> serviceTypes;
@@ -87,10 +87,8 @@ public class DataBean extends Observable {
     public ObservableList<String> getServicesAsList() {
         ObservableList<String> serviceNames =
                 FXCollections.observableArrayList();
-        Iterator it = this.services.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            serviceNames.add((String) pair.getKey());
+        for (String name: this.services.keySet()) {
+            serviceNames.add(name);
         }
         return serviceNames;
     }
@@ -122,14 +120,6 @@ public class DataBean extends Observable {
      */
     public Stage getPrimaryStage() {
         return primaryStage;
-    }
-
-    private void printStringMap(Map<String, String> map) {
-        Iterator it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
-        }
     }
 
     /**

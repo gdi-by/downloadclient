@@ -69,7 +69,7 @@ public class DebugWFSTwo {
 
     private ArrayList<String> storedQueires() {
 
-        ArrayList<String> als = new ArrayList();
+        ArrayList<String> als = new ArrayList<>();
         org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration configuration =
                 new org.geotools.wfs.v2_0.WFSCapabilitiesConfiguration();
         Parser parser = new Parser(configuration);

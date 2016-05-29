@@ -18,27 +18,32 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.opengis.feature.type.AttributeType;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.DownloadStepFactory;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -57,7 +62,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
-import org.opengis.feature.type.AttributeType;
 
 
 /**
@@ -110,6 +114,8 @@ public class Controller {
         view.getServiceSearch().textProperty().
                 addListener(new SearchServiceListChangeListener());
 
+        Processor.getInstance().addListener(new DownloadListener());
+
         // stage overrides
         this.dataBean.getPrimaryStage().
                 setOnCloseRequest(new ConfirmCloseEventHandler());
@@ -132,10 +138,12 @@ public class Controller {
                 case WFSOne:
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getTypes());
+                    break;
                 case WFSTwo:
                     //TODO - Bring sotredQueires and Types together!
                     dataBean.setServiceTypes(
                             dataBean.getWebService().getStoredQueries());
+                    break;
                 case Atom:
                 default:
             }
@@ -181,13 +189,9 @@ public class Controller {
                     = FXCollections.observableArrayList();
             Map<String, String> catalog = dataBean.getCatalogService()
                     .getServicesByFilter(newVal);
-            Iterator<Map.Entry<String, String>> it =
-                    catalog.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                view.addServiceToList((String) pair.getKey());
-                dataBean.addServiceToList((String) pair.getKey(), (String)
-                        pair.getValue());
+            for (Map.Entry<String, String> entry: catalog.entrySet()) {
+                view.addServiceToList(entry.getKey());
+                dataBean.addServiceToList(entry.getKey(), entry.getValue());
             }
             for (Object entry : view.getServiceList().getItems()) {
                 boolean match = true;
@@ -215,7 +219,7 @@ public class Controller {
         implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            Map map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<String, String>();
             if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
                     != null) {
                 String choosenType =
@@ -227,9 +231,11 @@ public class Controller {
                     case WFSOne:
                         map = dataBean.getWebService()
                                         .getAttributes(choosenType);
+                        break;
                     case WFSTwo:
                         map = dataBean.getWebService()
                                 .getParameters(choosenType);
+                        break;
                     case Atom:
                     default:
                 }
@@ -565,6 +571,40 @@ public class Controller {
                     }
                 }
             }
+        }
+    }
+
+    /** Keeps track of download progression and errors. */
+    private class DownloadListener implements ProcessorListener, Runnable {
+
+        private String message;
+
+        private synchronized void setMessage(String message) {
+            this.message = message;
+        }
+
+        private synchronized String getMessage() {
+            return this.message;
+        }
+
+        @Override
+        public void run() {
+            view.setStatusBarText(getMessage());
+        }
+
+        @Override
+        public void receivedException(ProcessorEvent pe) {
+            setMessage(
+                I18n.format(
+                "status.error",
+                pe.getException().getMessage()));
+            Platform.runLater(this);
+        }
+
+        @Override
+        public void receivedMessage(ProcessorEvent pe) {
+            setMessage(pe.getMessage());
+            Platform.runLater(this);
         }
     }
 }

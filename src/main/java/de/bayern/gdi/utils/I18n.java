@@ -17,8 +17,8 @@
  */
 package de.bayern.gdi.utils;
 
+import java.text.MessageFormat;
 import java.util.Locale;
-//import java.util.logging.Logger;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -30,18 +30,17 @@ import java.util.ResourceBundle;
  */
 public final class I18n {
 
-    private static final I18n INSTANCE = new I18n();
-
-   // private static final Logger log
-   //     = Logger.getLogger(I18n.class.getName());
-   // later use log.info() or similiar
+    /** Inner class to implicit synchronize the instance access. */
+    private static final class Holder {
+        static final I18n INSTANCE = new I18n();
+    }
 
     /** Avoiding more instances. */
     private I18n() {
     }
 
     public static I18n getInstance() {
-        return INSTANCE;
+        return Holder.INSTANCE;
     }
 
     private static ResourceBundle getBundle() {
@@ -49,17 +48,40 @@ public final class I18n {
         return ResourceBundle.getBundle("messages");
     }
 
-    /** Return translation if found, otherwise key.
+    /**
+     * Return translation if found, otherwise key.
      *
      * @param key to be translated
      * @return translated key or key if no translation is found
-    */
+     */
     public static String getMsg(String key) {
         try {
             return getBundle().getString(key);
-        } catch (MissingResourceException exc) {
+        } catch (MissingResourceException mre) {
             return key;
         }
+    }
+
+
+    /**
+     * Returns a formatted translation or the key if translation
+     * is missing.
+     * @param key The key to be translated.
+     * @param args The arguments for the formatting.
+     * @return The formatted translation.
+     */
+    public static String format(String key, Object ... args) {
+        ResourceBundle bundle = getBundle();
+        String tmpl;
+        try {
+            tmpl = bundle.getString(key);
+        } catch (MissingResourceException mre) {
+            return key;
+        }
+
+        MessageFormat mf = new MessageFormat(tmpl, bundle.getLocale());
+
+        return mf.format(args, new StringBuffer(), null).toString();
     }
 
     /** Returns the locale of the resource bundle.

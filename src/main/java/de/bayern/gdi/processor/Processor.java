@@ -20,7 +20,8 @@ package de.bayern.gdi.processor;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
-
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class Processor implements Runnable {
      */
     public static final Job QUIT = new Job() {
         @Override
-        public void run() throws JobExecutionException {
+        public void run(Processor p) throws JobExecutionException {
         }
     };
 
@@ -48,8 +49,11 @@ public class Processor implements Runnable {
     private Deque<Job> jobs;
     private boolean done;
 
+    private List<ProcessorListener> listeners;
+
     public Processor() {
         this.jobs = new ArrayDeque<Job>();
+        this.listeners = new CopyOnWriteArrayList<ProcessorListener>();
     }
 
     public Processor(Collection<Job> jobs) {
@@ -69,6 +73,24 @@ public class Processor implements Runnable {
         return instance;
     }
 
+    /**
+     * Adds a listener to the list of listeners.
+     * @param listener The listener to add.
+     */
+    public void addListener(ProcessorListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    /**
+     * Removes a listener from the list of listeners.
+     * @param listener The listener to remove.
+     */
+    public void removeListener(ProcessorListener listener) {
+        listeners.remove(listener);
+    }
+
     /** quit the main loop og this processor. */
     public synchronized void quit() {
         this.done = true;
@@ -81,6 +103,26 @@ public class Processor implements Runnable {
     public synchronized void addJob(Job job) {
         this.jobs.add(job);
         notify();
+    }
+
+    /** Broadcasts an exception to all listeners.
+     * @param jee The exception to broadcast.
+     */
+    public void broadcastException(JobExecutionException jee) {
+        ProcessorEvent pe = new ProcessorEvent(this, jee);
+        for (ProcessorListener pl: listeners) {
+            pl.receivedException(pe);
+        }
+    }
+
+    /** Broadcasts a message to all listeners.
+     * @param message The message to broadcast.
+     */
+    public void broadcastMessage(String message) {
+        ProcessorEvent pe = new ProcessorEvent(this, message);
+        for (ProcessorListener pl: listeners) {
+            pl.receivedMessage(pe);
+        }
     }
 
     @Override
@@ -104,9 +146,10 @@ public class Processor implements Runnable {
                 break;
             }
             try {
-                job.run();
+                job.run(this);
             } catch (JobExecutionException jee) {
                 log.log(Level.SEVERE, jee.getMessage(), jee);
+                broadcastException(jee);
             }
         }
     }

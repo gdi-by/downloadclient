@@ -83,7 +83,7 @@ public class WFSTwo extends WebService {
         this.serviceURL = serviceURL;
         this.userName = userName;
         this.password = password;
-        this.requestMethods = new ArrayList();
+        this.requestMethods = new ArrayList<String>();
         try {
             URL url = new URL(this.serviceURL);
             Object parsed = this.getParsedObject(url);
@@ -145,7 +145,7 @@ public class WFSTwo extends WebService {
      */
     @Override
     public ArrayList<String> getStoredQueries() {
-        ArrayList<String> storedQueries = new ArrayList();
+        ArrayList<String> storedQueries = new ArrayList<>();
         EList<StoredQueryDescriptionType> storedQueryDescription =
                 getDescribeStoredQueries();
         for (Iterator it = storedQueryDescription.iterator(); it.hasNext();) {
