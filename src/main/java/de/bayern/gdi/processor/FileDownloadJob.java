@@ -37,6 +37,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** FileDownloadJob is a job to download features from a service. */
@@ -66,7 +67,7 @@ public class FileDownloadJob
 
     @Override
     public void bytesCounted(long count) {
-        String message = "bytes downloaded: " + count;
+        String message = I18n.format("file.download.bytes", count);
         processor.broadcastMessage(message);
     }
 
@@ -105,19 +106,19 @@ public class FileDownloadJob
         Processor old = this.processor;
         this.processor = p;
         try {
-            innerRun(p);
+            download();
         } finally {
             this.processor = old;
         }
     }
 
-    private void innerRun(Processor p) throws JobExecutionException {
+    private void download() throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);
         } catch (MalformedURLException e) {
             throw new JobExecutionException(
-                "bad URL \"" + this.urlString + "\"", e);
+                I18n.format("file.download.bad.url", this.urlString));
         }
 
         WrapInputStreamFactory wrapFactory
@@ -128,20 +129,23 @@ public class FileDownloadJob
 
         CloseableHttpClient httpclient = getClient(url);
 
+        this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
+
         try {
             HttpGet httpget = new HttpGet(this.urlString);
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
-            throw new JobExecutionException("Download failed", ioe);
+            throw new JobExecutionException(
+                I18n.getMsg("file.download.failed"), ioe);
         } finally {
             try {
                 httpclient.close();
             } catch (IOException ioe) {
+                // Only log this.
                 log.log(Level.SEVERE,
-                    "Closing HTTP client failed: "
-                        + ioe.getLocalizedMessage(), ioe);
+                    "Closing HTTP client failed: " + ioe.getMessage(), ioe);
             }
         }
-        p.broadcastMessage("Download finished.");
+        this.processor.broadcastMessage(I18n.getMsg("file.download.finished"));
     }
 }
