@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import java.util.logging.Level;
@@ -71,24 +70,24 @@ public class ServiceSetting {
      * @return catalogue URL as String
      */
     public String getCatalogue() {
-        Iterator it = this.getCatalogues().entrySet().iterator();
-        Map.Entry pair = (Map.Entry)it.next();
-        return (String) pair.getValue();
-
+        for (String value: this.getCatalogues().values()) {
+            return value;
+        }
+        return null;
     }
 
     /**
-     * gets teh catalogue URL.
+     * gets the catalogue URL.
      * @return The catalogue URL
      */
     public URL getCatalogueURL() {
-        URL url = null;
         try {
-            url = new URL(getCatalogue());
+            String cat = getCatalogue();
+            return cat != null ? new URL(cat) : null;
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return url;
+        return null;
     }
     /**
      * returns a map of Strings with service Names und URLS.
@@ -111,9 +110,10 @@ public class ServiceSetting {
      * @return the WMS url
      */
     public String getWMSUrl() {
-        Iterator it = this.wms.entrySet().iterator();
-        Map.Entry pair = (Map.Entry)it.next();
-        return (String) pair.getValue();
+        for (String url: this.wms.values()) {
+            return url;
+        }
+        return null;
     }
 
     /**
@@ -121,9 +121,10 @@ public class ServiceSetting {
      * @return the WMS Name
      */
     public String getWMSName() {
-        Iterator it = this.wms.entrySet().iterator();
-        Map.Entry pair = (Map.Entry)it.next();
-        return (String) pair.getKey();
+        for (String name: this.wms.keySet()) {
+            return name;
+        }
+        return null;
     }
 
     private void parseDocument(Document xmlDocument) {
