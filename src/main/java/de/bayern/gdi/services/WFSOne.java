@@ -42,7 +42,6 @@ import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 
-import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import org.opengis.feature.Feature;
@@ -188,8 +187,6 @@ public class WFSOne extends WebService {
 
         FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
                 GeoTools.getDefaultHints());
-
-        Object polygon = JTS.toGeometry(outerBBOX);
 
         Filter filter = ff.bbox(
                 ff.property(geomName),
