@@ -58,7 +58,7 @@ public class GMLCheckJob implements Job {
                 I18n.format("gml.check.parsing.failed", this.file));
         }
         String message = XML.xpathString(doc, ERROR_MESSAGE, null);
-        if (message != null) {
+        if (message != null && !message.isEmpty()) {
             throw new JobExecutionException(
                 I18n.format("gml.check.wfs.problem", message));
         }
