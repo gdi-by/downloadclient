@@ -163,7 +163,13 @@ public class DownloadStepConverter {
         JobList jl,
         File wd) throws ConverterException {
 
-        for (ProcessingStep ps: dls.getProcessingSteps()) {
+        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
+
+        if (steps == null) {
+            return;
+        }
+
+        for (ProcessingStep ps: steps) {
             if (ps.getName().equals("toShape")) {
                 ArrayList<String> params = new ArrayList<String>();
 

@@ -19,7 +19,6 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,13 +61,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     @Override
     protected void download() throws JobExecutionException {
-        URL url;
-        try {
-            url = new URL(this.urlString);
-        } catch (MalformedURLException e) {
-            throw new JobExecutionException(
-                I18n.format("file.download.bad.url", this.urlString));
-        }
+        URL url = toURL(this.urlString);;
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);

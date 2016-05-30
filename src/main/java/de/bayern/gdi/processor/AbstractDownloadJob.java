@@ -17,12 +17,14 @@
  */
 package de.bayern.gdi.processor;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
+import de.bayern.gdi.utils.I18n;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob
@@ -69,5 +71,20 @@ public abstract class AbstractDownloadJob
      * the download.
      */
     protected abstract void download() throws JobExecutionException;
+
+    /**
+     * Converts a string into an URL.
+     * @param urlString The string.
+     * @return an URL.
+     * @throws JobExecutionException If the URL is not valid.
+     */
+    protected static URL toURL(String urlString) throws JobExecutionException {
+        try {
+            return new URL(urlString);
+        } catch (MalformedURLException mue) {
+            throw new JobExecutionException(
+                I18n.format("file.download.bad.url", urlString));
+        }
+    }
 }
 
