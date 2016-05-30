@@ -29,21 +29,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
-import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** FileDownloadJob is a job to download features from a service. */
-public class FileDownloadJob
-    implements Job, CountingInputStream.CountListener {
+public class FileDownloadJob extends AbstractDownloadJob {
 
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
 
     private String urlString;
     private File file;
-    private String user;
-    private String password;
 
     private Processor processor;
 
@@ -52,10 +48,9 @@ public class FileDownloadJob
 
     public FileDownloadJob(
         String urlString, File file, String user, String password) {
+        super(user, password);
         this.urlString = urlString;
         this.file = file;
-        this.user = user;
-        this.password = password;
     }
 
     @Override
@@ -64,18 +59,9 @@ public class FileDownloadJob
         processor.broadcastMessage(message);
     }
 
-    @Override
-    public void run(Processor p) throws JobExecutionException {
-        Processor old = this.processor;
-        this.processor = p;
-        try {
-            download();
-        } finally {
-            this.processor = old;
-        }
-    }
 
-    private void download() throws JobExecutionException {
+    @Override
+    protected void download() throws JobExecutionException {
         URL url;
         try {
             url = new URL(this.urlString);
@@ -90,8 +76,7 @@ public class FileDownloadJob
         FileResponseHandler responseHandler
             = new FileResponseHandler(this.file, wrapFactory);
 
-        CloseableHttpClient httpclient
-            = HTTP.getClient(url, this.user, this.password);
+        CloseableHttpClient httpclient = getClient(url);
 
         this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
 
