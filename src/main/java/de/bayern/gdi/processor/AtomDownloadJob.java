@@ -19,6 +19,8 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +34,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.WrapInputStreamFactory;
 import de.bayern.gdi.utils.XML;
 
 /** AtomDownloadJob is a job to download things from a ATOM service. */
@@ -46,7 +51,8 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private String variation;
     private File workingDir;
 
-    private long total;
+    private long currentCount;
+    private long totalCount;
 
     private Processor processor;
 
@@ -68,7 +74,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
     @Override
     public void bytesCounted(long count) {
-        this.total += count;
+        this.currentCount = count;
     }
 
     private Document getDocument(String urlString)
@@ -121,6 +127,63 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         return "dat";
     }
 
+    private static final int TEN = 10;
+
+    private static int places(int n) {
+        int places = 1;
+        for (int value = TEN; n > value; value *= TEN) {
+            places++;
+        }
+        return places;
+    }
+
+    /** Stores a file location to down from and to. */
+    private static class DLFile {
+
+        /** Destination location of the file. */
+        File file;
+        /** The url to download from. */
+        URL url;
+        /** The number of tries yet. */
+        int tries;
+
+        DLFile(File file, URL url) {
+            this.file = file;
+            this.url = url;
+        }
+    }
+
+    private boolean downloadFile(DLFile dlf) throws JobExecutionException {
+
+        log.log(Level.INFO, "Downloading '" + dlf.url + "' to '" + dlf.file);
+        this.currentCount = 0;
+
+        CloseableHttpClient client = getClient(dlf.url);
+        HttpGet httpget = new HttpGet(dlf.url.toString());
+
+        WrapInputStreamFactory wrapFactory
+            = CountingInputStream.createWrapFactory(this);
+
+        try {
+            FileResponseHandler frh
+                = new FileResponseHandler(dlf.file, wrapFactory);
+            client.execute(httpget, frh);
+            return true;
+        } catch (IOException ioe) {
+            return false;
+        } finally {
+            this.totalCount += this.currentCount;
+            try {
+                client.close();
+            } catch (IOException ioe) {
+                log.log(Level.SEVERE, "close client failed", ioe);
+            }
+        }
+    }
+
+    private static final int MAX_TRIES = 5;
+    private static final long FAIL_SLEEP = 30 * 1000;
+
     @Override
     protected void download() throws JobExecutionException {
         Document ds = getDocument(this.dataset);
@@ -131,7 +194,9 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         NodeList nl = (NodeList)XML.xpath(
             ds, XPATH_LINKS, XPathConstants.NODESET, nsm, vars);
 
-        log.log(Level.INFO, "" + nl.getLength());
+        ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
+
+        String format = "%0" + places(nl.getLength()) + "d.%s";
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Node node = nl.item(i);
             NamedNodeMap attributes = node.getAttributes();
@@ -141,8 +206,43 @@ public class AtomDownloadJob extends AbstractDownloadJob {
                 continue;
             }
             String ext = minetypeToExt(type.getTextContent());
-            String url = href.getTextContent();
-            log.log(Level.INFO, ext + " " + url);
+            URL url = toURL(href.getTextContent());
+            File file = new File(
+                this.workingDir, String.format(format, i, ext));
+            files.add(new DLFile(file, url));
+        }
+
+        int failed = 0;
+
+        for (;;) {
+            for (int i = 0; i < files.size();) {
+                DLFile file = files.get(i);
+                if (downloadFile(file)) {
+                    files.remove(i);
+                } else {
+                    if (++file.tries < MAX_TRIES) {
+                        i++;
+                    } else {
+                        failed++;
+                        files.remove(i);
+                    }
+                }
+            }
+            if (files.isEmpty()) {
+                break;
+            }
+            try {
+                Thread.sleep(FAIL_SLEEP);
+            } catch (InterruptedException ie) {
+                break;
+            }
+        }
+
+        log.log(Level.INFO, "Bytes downloaded: " + this.totalCount);
+
+        if (failed > 0) {
+            throw new JobExecutionException(
+                "Number downloads failed: " + failed);
         }
     }
 }
