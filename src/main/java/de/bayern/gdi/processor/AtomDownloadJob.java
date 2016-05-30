@@ -17,11 +17,14 @@
  */
 package de.bayern.gdi.processor;
 
+import java.io.File;
+
 /** AtomDownloadJob is a job to download things from a ATOM service. */
 public class AtomDownloadJob extends AbstractDownloadJob {
 
     private String dataset;
     private String variation;
+    private File workingDir;
 
     private long total;
 
@@ -33,12 +36,14 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     public AtomDownloadJob(
         String dataset,
         String variation,
+        File workingDir,
         String user,
         String password
     ) {
         super(user, password);
         this.dataset = dataset;
         this.variation = variation;
+        this.workingDir = workingDir;
     }
 
     @Override
