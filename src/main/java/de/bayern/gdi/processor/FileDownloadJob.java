@@ -24,19 +24,12 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
@@ -71,36 +64,6 @@ public class FileDownloadJob
         processor.broadcastMessage(message);
     }
 
-    private CloseableHttpClient getClient(URL url) {
-
-        if (this.password == null || this.user == null) {
-            return HttpClients.createDefault();
-        }
-
-        UsernamePasswordCredentials defaultCreds
-            = new UsernamePasswordCredentials(this.user, this.password);
-
-        HttpClientContext context = HttpClientContext.create();
-        BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
-
-        credsProv.setCredentials(
-            new AuthScope(url.getHost(), url.getPort()), defaultCreds);
-
-        context.setCredentialsProvider(credsProv);
-
-        BasicAuthCache authCache = new BasicAuthCache();
-        BasicScheme basicAuth = new BasicScheme();
-        HttpHost target = new HttpHost(url.getHost(), url.getPort());
-
-        authCache.put(target, basicAuth);
-        context.setAuthCache(authCache);
-
-        return HttpClients
-            .custom()
-            .setDefaultCredentialsProvider(credsProv)
-            .build();
-    }
-
     @Override
     public void run(Processor p) throws JobExecutionException {
         Processor old = this.processor;
@@ -127,7 +90,8 @@ public class FileDownloadJob
         FileResponseHandler responseHandler
             = new FileResponseHandler(this.file, wrapFactory);
 
-        CloseableHttpClient httpclient = getClient(url);
+        CloseableHttpClient httpclient
+            = HTTP.getClient(url, this.user, this.password);
 
         this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
 
