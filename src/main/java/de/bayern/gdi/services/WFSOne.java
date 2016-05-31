@@ -63,8 +63,6 @@ public class WFSOne extends WebService {
     private static final Logger log
             = Logger.getLogger(WFSOne.class.getName());
 
-    private String serviceURL;
-
     private ArrayList<String> types;
     private DataStore data;
 
