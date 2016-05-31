@@ -160,7 +160,7 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * The Basic WFSTwo Prefix
+     * The Basic WFSTwo Prefix.
      * @return Basic WFSTwo Prefix
      */
     public static String getBasicPrefix() {
@@ -168,7 +168,7 @@ public class WFSTwo extends WebService {
     }
 
     /**
-     * The Simple WFSTwo Prefix
+     * The Simple WFSTwo Prefix.
      * @return Simple WFSTwo Prefix
      */
     public static String getSimplePrefix() {

@@ -141,20 +141,20 @@ public class Controller {
                     break;
                 case WFSTwo:
                     WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
-                    ArrayList<String> WFSTwoServices = new ArrayList<>();
+                    ArrayList<String> wfstwoServices = new ArrayList<>();
                     ArrayList<String> storedQuieres = dataBean
                         .getWebService().getStoredQueries();
                     for (String str: storedQuieres) {
                         str = wfstwo.getSimplePrefix() + " " + str;
-                        WFSTwoServices.add(str);
+                        wfstwoServices.add(str);
                     }
                     ArrayList<String> types = dataBean
                             .getWebService().getTypes();
-                    for(String str: types) {
+                    for (String str: types) {
                         str = wfstwo.getBasicPrefix() + " " + str;
-                        WFSTwoServices.add(str);
+                        wfstwoServices.add(str);
                     }
-                    dataBean.setServiceTypes(WFSTwoServices);
+                    dataBean.setServiceTypes(wfstwoServices);
                     break;
                 case Atom:
                 default:
