@@ -19,12 +19,10 @@
 package de.bayern.gdi.utils;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -84,15 +82,29 @@ public class XML {
      * @return the loaded XML document of null if there was an error.
      */
     public static Document getDocument(InputStream input) {
+        return getDocument(input, null);
+    }
+
+    /**
+     * Loads an XML document from an input stream.
+     * @param input the input stream.
+     * @param namespaceAware Load namespace aware?
+     * @return the loaded XML document of null if there was an error.
+     */
+    public static Document getDocument(
+        InputStream input, Boolean namespaceAware
+    ) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
+        if (namespaceAware != null) {
+            factory.setNamespaceAware(namespaceAware);
+        }
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(input);
+            return builder.parse(input);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return document;
+        return null;
     }
 
     /**
@@ -337,15 +349,4 @@ public class XML {
         }
         return null;
     }
-
-    private static String streamToString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
-        }
-        return sb.toString();
-    }
-
 }

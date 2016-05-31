@@ -19,107 +19,41 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** FileDownloadJob is a job to download features from a service. */
-public class FileDownloadJob
-    implements Job, CountingInputStream.CountListener {
-
-    private static final Logger log
-        = Logger.getLogger(FileDownloadJob.class.getName());
+public class FileDownloadJob extends AbstractDownloadJob {
 
     private String urlString;
     private File file;
-    private String user;
-    private String password;
-
-    private Processor processor;
 
     public FileDownloadJob() {
     }
 
     public FileDownloadJob(
         String urlString, File file, String user, String password) {
+        super(user, password);
         this.urlString = urlString;
         this.file = file;
-        this.user = user;
-        this.password = password;
     }
 
     @Override
     public void bytesCounted(long count) {
-        String message = I18n.format("file.download.bytes", count);
-        processor.broadcastMessage(message);
-    }
-
-    private CloseableHttpClient getClient(URL url) {
-
-        if (this.password == null || this.user == null) {
-            return HttpClients.createDefault();
-        }
-
-        UsernamePasswordCredentials defaultCreds
-            = new UsernamePasswordCredentials(this.user, this.password);
-
-        HttpClientContext context = HttpClientContext.create();
-        BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
-
-        credsProv.setCredentials(
-            new AuthScope(url.getHost(), url.getPort()), defaultCreds);
-
-        context.setCredentialsProvider(credsProv);
-
-        BasicAuthCache authCache = new BasicAuthCache();
-        BasicScheme basicAuth = new BasicScheme();
-        HttpHost target = new HttpHost(url.getHost(), url.getPort());
-
-        authCache.put(target, basicAuth);
-        context.setAuthCache(authCache);
-
-        return HttpClients
-            .custom()
-            .setDefaultCredentialsProvider(credsProv)
-            .build();
+        broadcastMessage(I18n.format("file.download.bytes", count));
     }
 
     @Override
-    public void run(Processor p) throws JobExecutionException {
-        Processor old = this.processor;
-        this.processor = p;
-        try {
-            download();
-        } finally {
-            this.processor = old;
-        }
-    }
-
-    private void download() throws JobExecutionException {
-        URL url;
-        try {
-            url = new URL(this.urlString);
-        } catch (MalformedURLException e) {
-            throw new JobExecutionException(
-                I18n.format("file.download.bad.url", this.urlString));
-        }
+    protected void download() throws JobExecutionException {
+        URL url = toURL(this.urlString);;
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
@@ -129,7 +63,7 @@ public class FileDownloadJob
 
         CloseableHttpClient httpclient = getClient(url);
 
-        this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
+        broadcastMessage(I18n.getMsg("file.download.start"));
 
         try {
             HttpGet httpget = new HttpGet(this.urlString);
@@ -138,14 +72,8 @@ public class FileDownloadJob
             throw new JobExecutionException(
                 I18n.getMsg("file.download.failed"), ioe);
         } finally {
-            try {
-                httpclient.close();
-            } catch (IOException ioe) {
-                // Only log this.
-                log.log(Level.SEVERE,
-                    "Closing HTTP client failed: " + ioe.getMessage(), ioe);
-            }
+            HTTP.closeGraceful(httpclient);
         }
-        this.processor.broadcastMessage(I18n.getMsg("file.download.finished"));
+        broadcastMessage(I18n.getMsg("file.download.finished"));
     }
 }

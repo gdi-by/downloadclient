@@ -19,8 +19,9 @@ To start with UI:
 
 To start in headless mode:
 
-    $ mvn exec:java -Dexec.args=-headless 
+    $ mvn exec:java -Dexec.args=-headless [download-steps.xml ...]
 
+With download-steps.xml being one or more download step files.
 If you have built the single assembly version:
 
     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar

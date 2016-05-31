@@ -59,6 +59,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
@@ -107,8 +108,11 @@ public class Controller {
                 setOnAction(new DownloadButtonEventHandler());
         view.getSaveMenuItem().
                 setOnAction(new SaveMenuItemEventHandler());
+        //TODO - Implement Loading Function
+        /*
         view.getLoadMenuItem().
                 setOnAction(new LoadMenuItemEventHandler());
+        */
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -140,9 +144,21 @@ public class Controller {
                             dataBean.getWebService().getTypes());
                     break;
                 case WFSTwo:
-                    //TODO - Bring sotredQueires and Types together!
-                    dataBean.setServiceTypes(
-                            dataBean.getWebService().getStoredQueries());
+                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
+                    ArrayList<String> wfstwoServices = new ArrayList<>();
+                    ArrayList<String> storedQuieres = dataBean
+                        .getWebService().getStoredQueries();
+                    for (String str: storedQuieres) {
+                        str = wfstwo.getSimplePrefix() + " " + str;
+                        wfstwoServices.add(str);
+                    }
+                    ArrayList<String> types = dataBean
+                            .getWebService().getTypes();
+                    for (String str: types) {
+                        str = wfstwo.getBasicPrefix() + " " + str;
+                        wfstwoServices.add(str);
+                    }
+                    dataBean.setServiceTypes(wfstwoServices);
                     break;
                 case Atom:
                 default:
@@ -233,8 +249,17 @@ public class Controller {
                                         .getAttributes(choosenType);
                         break;
                     case WFSTwo:
-                        map = dataBean.getWebService()
-                                .getParameters(choosenType);
+                        if (choosenType.startsWith(WFSTwo.getSimplePrefix())) {
+                            choosenType = choosenType.substring(WFSTwo
+                                    .getSimplePrefix().length() + 1);
+                            map.putAll(dataBean.getWebService()
+                                    .getParameters(choosenType));
+                        } else {
+                            choosenType = choosenType.substring(WFSTwo
+                                    .getBasicPrefix().length() + 1);
+                            map.putAll(dataBean.getWebService()
+                                    .getAttributes(choosenType));
+                        }
                         break;
                     case Atom:
                     default:
@@ -266,6 +291,12 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
+            /* TODO: Implent this function in a way so the configuration File
+             * fills the Frontend with the Informtaion. So all fields in the
+             * frontend should be filled with the Information from the config
+             * file, so you can check and verify your settings before clicking
+             * "download"
+             */
             FileChooser configFileChooser = new FileChooser();
             configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
 
@@ -361,18 +392,18 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save File");
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             //fileChooser.getExtensionFilters().addAll();
-            File selectedFile = fileChooser.showSaveDialog(
+            File selectedDir = dirChooser.showDialog(
                     dataBean.getPrimaryStage());
-            if (selectedFile == null) {
+            if (selectedDir == null) {
                 return;
             }
             Task task = new Task() {
                 @Override
                 protected Integer call() throws Exception {
-                    String savePath = selectedFile.getPath();
+                    String savePath = selectedDir.getPath();
                     DownloadStepFactory dsf = DownloadStepFactory.getInstance();
                     DownloadStep ds = dsf.getStep(view, dataBean, savePath);
                     JobList jl = DownloadStepConverter.convert(ds);

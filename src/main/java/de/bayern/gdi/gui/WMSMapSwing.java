@@ -56,6 +56,7 @@ import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.swing.JMapPane;
+import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
 import org.geotools.swing.action.PanAction;
@@ -98,6 +99,16 @@ public class WMSMapSwing extends Parent {
             = "ToolbarZoomOutButton";
 
     /**
+     * Initializes geotools localisation system with our default I18n locale.
+     * TODO: Buggy with org/geotools/gt-swing/14.3 (and probably also w 15.0.)
+     */
+    private static void initGeotoolsLocale() {
+        LocaleUtils.setLocale(I18n.getLocale());
+        //the next line for testing needs an additional import java.util.Locale;
+        //LocaleUtils.setLocale(Locale.ITALIAN);
+    }
+
+    /**
      * adds a node to this map.
      *
      * @param n the node
@@ -121,7 +132,7 @@ public class WMSMapSwing extends Parent {
      * Constructor.
      */
     public WMSMapSwing() {
-
+        initGeotoolsLocale();
     }
 
     /**
@@ -141,6 +152,7 @@ public class WMSMapSwing extends Parent {
      * @param mapURL The URL of the WMS Service
      */
     public WMSMapSwing(URL mapURL, int width, int heigth) {
+        initGeotoolsLocale();
         try {
             this.mapHeight = heigth;
             this.mapWidth = width;

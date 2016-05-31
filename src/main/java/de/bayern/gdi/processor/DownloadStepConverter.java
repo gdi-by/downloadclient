@@ -163,7 +163,13 @@ public class DownloadStepConverter {
         JobList jl,
         File wd) throws ConverterException {
 
-        for (ProcessingStep ps: dls.getProcessingSteps()) {
+        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
+
+        if (steps == null) {
+            return;
+        }
+
+        for (ProcessingStep ps: steps) {
             if (ps.getName().equals("toShape")) {
                 ArrayList<String> params = new ArrayList<String>();
 
@@ -191,6 +197,40 @@ public class DownloadStepConverter {
         }
     }
 
+    private static void createWfsDownload(
+        JobList jl,
+        File workingDir,
+        String user,
+        String password,
+        DownloadStep dls
+    ) throws ConverterException {
+        String url = wfsURL(dls);
+        log.log(Level.INFO, "url: " + url);
+
+        File gml = new File(workingDir, "download.gml");
+        log.log(Level.INFO, "Download to file \"" + gml + "\"");
+
+        FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
+        jl.addJob(fdj);
+        jl.addJob(new GMLCheckJob(gml));
+    }
+
+    private static void createAtomDownload(
+        JobList jl,
+        File workingDir,
+        String user,
+        String password,
+        DownloadStep dls
+    ) throws ConverterException {
+        String dataset = dls.getDataset();
+        String variation = dls.findParameter("VARIATION");
+        AtomDownloadJob job = new AtomDownloadJob(
+            dataset,
+            variation,
+            workingDir,
+            user, password);
+        jl.addJob(job);
+    }
 
     /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
@@ -201,26 +241,22 @@ public class DownloadStepConverter {
     public static JobList convert(DownloadStep dls) throws ConverterException {
         JobList jl = new JobList();
 
-        String url = wfsURL(dls);
-
-        log.log(Level.INFO, "url: " + url);
-
         //XXX: Alternative ways of getting the credentials?
         String user = dls.findParameter("user");
         String password = dls.findParameter("password");
 
         File path = new File(dls.getPath());
-        File wd = createWorkingDir(
-            path.isDirectory() ? path : path.getParentFile());
+        File workingDir = createWorkingDir(path.isDirectory()
+            ? path
+            : path.getParentFile());
 
-        File gml = new File(wd, "download.gml");
-        log.log(Level.INFO, "Download to file \"" + gml + "\"");
-        FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
-        jl.addJob(fdj);
+        if (dls.getServiceType().equals("ATOM")) {
+            createAtomDownload(jl, workingDir, user, password, dls);
+        } else {
+            createWfsDownload(jl, workingDir, user, password, dls);
+        }
 
-        jl.addJob(new GMLCheckJob(gml));
-
-        createProcessings(dls, jl, wd);
+        createProcessings(dls, jl, workingDir);
 
         return jl;
     }

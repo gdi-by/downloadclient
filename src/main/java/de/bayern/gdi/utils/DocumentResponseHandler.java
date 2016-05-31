@@ -35,12 +35,21 @@ import org.w3c.dom.Document;
 public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     private WrapInputStreamFactory wrapFactory;
+    private Boolean namespaceAware;
 
     public DocumentResponseHandler() {
     }
 
     public DocumentResponseHandler(WrapInputStreamFactory wrapFactory) {
         this.wrapFactory = wrapFactory;
+    }
+
+    /**
+     * Set the XML parse to be namespace aware or not.
+     * @param namespaceAware Should the parse be namespace aware?
+     */
+    public void setNamespaceAware(Boolean namespaceAware) {
+        this.namespaceAware = namespaceAware;
     }
 
     private InputStream wrap(InputStream in) {
@@ -61,6 +70,6 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         HttpEntity entity = response.getEntity();
         return entity == null
             ? null
-            : XML.getDocument(wrap(entity.getContent()));
+            : XML.getDocument(wrap(entity.getContent()), namespaceAware);
     }
 }

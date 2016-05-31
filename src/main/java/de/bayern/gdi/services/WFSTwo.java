@@ -72,6 +72,9 @@ public class WFSTwo extends WebService {
     private String password;
     private String userName;
 
+    private static final String BASIC_PREFIX = "(BASIC)";
+    private static final String SIMPLE_PREFIX = "(SIMPLE)";
+
     /**
      * Constructor.
      *
@@ -154,6 +157,22 @@ public class WFSTwo extends WebService {
             storedQueries.add(sqdt.getId());
         }
         return storedQueries;
+    }
+
+    /**
+     * The Basic WFSTwo Prefix.
+     * @return Basic WFSTwo Prefix
+     */
+    public static String getBasicPrefix() {
+        return BASIC_PREFIX;
+    }
+
+    /**
+     * The Simple WFSTwo Prefix.
+     * @return Simple WFSTwo Prefix
+     */
+    public static String getSimplePrefix() {
+        return SIMPLE_PREFIX;
     }
 
     private Object getParsedObject(URL url) {

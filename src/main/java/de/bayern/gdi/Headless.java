@@ -19,6 +19,7 @@ package de.bayern.gdi;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,51 +41,55 @@ public class Headless {
     }
 
     /**
-     * @param downloadConfig The path to the downloadConfig file.
      * @param args The command line arguments.
      * @return Non zero if the operation fails.
      */
-    public static int main(String downloadConfig, String [] args) {
+    public static int main(String [] args) {
         log.info("Running in headless mode");
 
-        File downloadConfigFile = downloadConfig != null
-            ? new File(downloadConfig)
-            : new File(
-                new File(System.getProperty("user.home", "~")),
-                    "downloadConfig.xml");
+        ArrayList<File> files = new ArrayList<>();
 
-        log.info("Using download config file: "
-            + downloadConfigFile);
-
-        DownloadStep dls;
-        try {
-            dls = DownloadStep.read(downloadConfigFile);
-        } catch (IOException ioe) {
-            log.log(
-                Level.SEVERE,
-                "Cannot find downloadConfig file: "
-                    + downloadConfigFile,
-                ioe);
-            return 1;
-        }
-
-        log.info("Download configuration: " + dls);
-
-        JobList jobs;
-        try {
-            jobs = DownloadStepConverter.convert(dls);
-        } catch (ConverterException ce) {
-            log.log(
-                Level.SEVERE,
-                "Creating download jobs failed",
-                ce);
-            return 1;
+        for (String arg: args) {
+            if (!arg.startsWith("-")) {
+                File file = new File(arg);
+                if (file.isFile() && file.canRead()) {
+                    files.add(file);
+                } else {
+                    log.log(
+                        Level.WARNING, "'" + arg + "' is not a readable file.");
+                }
+            }
         }
 
         Processor processor = new Processor();
         Thread thread = new Thread(processor);
         thread.start();
-        processor.addJob(jobs);
+
+        for (File file: files) {
+            DownloadStep dls;
+            try {
+                dls = DownloadStep.read(file);
+            } catch (IOException ioe) {
+                log.log(
+                    Level.WARNING,
+                    "Cannot load file: " + file, ioe);
+                continue;
+            }
+            log.info("Download steps: " + dls);
+            JobList jobs;
+
+            try {
+                jobs = DownloadStepConverter.convert(dls);
+            } catch (ConverterException ce) {
+                log.log(
+                    Level.WARNING,
+                    "Creating download jobs failed",
+                    ce);
+                continue;
+            }
+            processor.addJob(jobs);
+        }
+
         processor.addJob(Processor.QUIT);
 
         try {
