@@ -66,7 +66,6 @@ public class WFSTwo extends WebService {
     private static final Logger log
             = Logger.getLogger(WFSTwo.class.getName());
 
-    private String serviceURL;
     private ArrayList<String> requestMethods;
     private WFSOne wfsOne;
     private String password;
@@ -134,13 +133,6 @@ public class WFSTwo extends WebService {
         return null;
     }
 
-    /**
-     * @return the URL of the Service
-     * @inheritDoc
-     */
-    public String getServiceURL() {
-        return this.serviceURL;
-    }
 
     /**
      * @return the stored Queries

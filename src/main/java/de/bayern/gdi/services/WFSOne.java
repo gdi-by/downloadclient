@@ -217,14 +217,6 @@ public class WFSOne extends WebService {
     }
 
     /**
-     * gets the service URL.
-     * @return the service URL
-     */
-    public String getServiceURL() {
-        return this.serviceURL;
-    }
-
-    /**
      * gets the dataStore.
      * @return datastore
      */

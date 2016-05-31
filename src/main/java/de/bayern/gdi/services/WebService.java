@@ -43,9 +43,9 @@ public abstract class WebService implements ServiceSchema {
          */
         Atom
     }
-    private String serviceURL;
 
-    private String serviceType;
+    /** The URL of the service. */
+    protected String serviceURL;
 
     /**
      * Constructor.
@@ -84,5 +84,13 @@ public abstract class WebService implements ServiceSchema {
      */
     public Map<String, String> getParameters(String queryName) {
         return null;
+    }
+
+    /**
+     * gets the service URL.
+     * @return the service URL
+     */
+    public String getServiceURL() {
+        return this.serviceURL;
     }
 }
