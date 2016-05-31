@@ -245,14 +245,13 @@ public class Controller {
                                         .getAttributes(choosenType);
                         break;
                     case WFSTwo:
-                        WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
-                        if (choosenType.startsWith(wfstwo.getSimplePrefix())) {
-                            choosenType = choosenType.substring(wfstwo
+                        if (choosenType.startsWith(WFSTwo.getSimplePrefix())) {
+                            choosenType = choosenType.substring(WFSTwo
                                     .getSimplePrefix().length() + 1);
                             map.putAll(dataBean.getWebService()
                                     .getParameters(choosenType));
                         } else {
-                            choosenType = choosenType.substring(wfstwo
+                            choosenType = choosenType.substring(WFSTwo
                                     .getBasicPrefix().length() + 1);
                             map.putAll(dataBean.getWebService()
                                     .getAttributes(choosenType));

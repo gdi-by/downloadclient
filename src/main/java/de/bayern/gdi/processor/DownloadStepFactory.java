@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.services.WFSTwo;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -94,8 +95,15 @@ public class DownloadStepFactory {
                     serviceTypeStr = "WFS1";
                     break;
                 case WFSTwo:
-                    //TODO Check between BASIC and SIMPLE
-                    serviceTypeStr = "WFS2_SIMPLE";
+                    if (dataset.startsWith(WFSTwo.getSimplePrefix())) {
+                        serviceTypeStr = "WFS2_SIMPLE";
+                        dataset = dataset.substring(WFSTwo.getSimplePrefix()
+                                .length() + 1);
+                    } else {
+                        serviceTypeStr = "WFS2_BASIC";
+                        dataset = dataset.substring(WFSTwo.getBasicPrefix()
+                                .length() + 1);
+                    }
                     break;
                 case Atom:
                     serviceTypeStr = "ATOM";
