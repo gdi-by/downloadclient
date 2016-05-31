@@ -66,6 +66,26 @@ public abstract class AbstractDownloadJob
     }
 
     /**
+     * Broadcasts a message to a processor if set.
+     * @param message The message to broadcast.
+     */
+    protected void broadcastMessage(String message) {
+        if (this.processor != null) {
+            this.processor.broadcastMessage(message);
+        }
+    }
+
+    /**
+     * Broadcasts an exception to a processor if set.
+     * @param e The exception to broadcast.
+     */
+    protected void broadcastException(JobExecutionException e) {
+        if (this.processor != null) {
+            this.processor.broadcastException(e);
+        }
+    }
+
+    /**
      * Override this for the concrete download.
      * @throws JobExecutionException Something went wrong during
      * the download.

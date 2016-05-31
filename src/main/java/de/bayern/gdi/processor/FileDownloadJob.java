@@ -20,7 +20,6 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -34,13 +33,8 @@ import de.bayern.gdi.utils.WrapInputStreamFactory;
 /** FileDownloadJob is a job to download features from a service. */
 public class FileDownloadJob extends AbstractDownloadJob {
 
-    private static final Logger log
-        = Logger.getLogger(FileDownloadJob.class.getName());
-
     private String urlString;
     private File file;
-
-    private Processor processor;
 
     public FileDownloadJob() {
     }
@@ -54,10 +48,8 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     @Override
     public void bytesCounted(long count) {
-        String message = I18n.format("file.download.bytes", count);
-        processor.broadcastMessage(message);
+        broadcastMessage(I18n.format("file.download.bytes", count));
     }
-
 
     @Override
     protected void download() throws JobExecutionException {
@@ -71,7 +63,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
         CloseableHttpClient httpclient = getClient(url);
 
-        this.processor.broadcastMessage(I18n.getMsg("file.download.start"));
+        broadcastMessage(I18n.getMsg("file.download.start"));
 
         try {
             HttpGet httpget = new HttpGet(this.urlString);
@@ -82,6 +74,6 @@ public class FileDownloadJob extends AbstractDownloadJob {
         } finally {
             HTTP.closeGraceful(httpclient);
         }
-        this.processor.broadcastMessage(I18n.getMsg("file.download.finished"));
+        broadcastMessage(I18n.getMsg("file.download.finished"));
     }
 }

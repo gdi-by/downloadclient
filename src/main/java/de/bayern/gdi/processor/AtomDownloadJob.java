@@ -55,8 +55,6 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private long currentCount;
     private long totalCount;
 
-    private Processor processor;
-
     public AtomDownloadJob() {
     }
 
