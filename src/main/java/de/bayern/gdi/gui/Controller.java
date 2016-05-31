@@ -140,9 +140,21 @@ public class Controller {
                             dataBean.getWebService().getTypes());
                     break;
                 case WFSTwo:
-                    //TODO - Bring sotredQueires and Types together!
-                    dataBean.setServiceTypes(
-                            dataBean.getWebService().getStoredQueries());
+                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
+                    ArrayList<String> WFSTwoServices = new ArrayList<>();
+                    ArrayList<String> storedQuieres = dataBean
+                        .getWebService().getStoredQueries();
+                    for (String str: storedQuieres) {
+                        str = wfstwo.getSimplePrefix() + " " + str;
+                        WFSTwoServices.add(str);
+                    }
+                    ArrayList<String> types = dataBean
+                            .getWebService().getTypes();
+                    for(String str: types) {
+                        str = wfstwo.getBasicPrefix() + " " + str;
+                        WFSTwoServices.add(str);
+                    }
+                    dataBean.setServiceTypes(WFSTwoServices);
                     break;
                 case Atom:
                 default:
@@ -233,8 +245,18 @@ public class Controller {
                                         .getAttributes(choosenType);
                         break;
                     case WFSTwo:
-                        map = dataBean.getWebService()
-                                .getParameters(choosenType);
+                        WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
+                        if (choosenType.startsWith(wfstwo.getSimplePrefix())) {
+                            choosenType = choosenType.substring(wfstwo
+                                    .getSimplePrefix().length() + 1);
+                            map.putAll(dataBean.getWebService()
+                                    .getParameters(choosenType));
+                        } else {
+                            choosenType = choosenType.substring(wfstwo
+                                    .getBasicPrefix().length() + 1);
+                            map.putAll(dataBean.getWebService()
+                                    .getAttributes(choosenType));
+                        }
                         break;
                     case Atom:
                     default:
