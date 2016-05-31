@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSTwo;
 import java.util.ArrayList;
 import java.util.Map;
@@ -77,9 +78,11 @@ public class DownloadStepFactory {
             Map<String, String> paramMap = bean.getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
             for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-                Parameter param = new Parameter(
-                    entry.getKey(), entry.getValue());
-                parameters.add(param);
+                if(entry.getValue() != "" ) {
+                    Parameter param = new Parameter(
+                            entry.getKey(), entry.getValue());
+                    parameters.add(param);
+                }
             }
             //step.setParameters(parameters);
             String dataset = view.getTypeComboBox().getSelectionModel()
@@ -107,6 +110,8 @@ public class DownloadStepFactory {
                     break;
                 case Atom:
                     serviceTypeStr = "ATOM";
+                    Atom atom = (Atom) bean.getWebService();
+                    dataset = atom.getURLforType(dataset);
                     break;
                 default:
             }

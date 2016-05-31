@@ -40,6 +40,9 @@
             <name>(complex) INSPIRE Addresses</name>
             <url>http://demo.deegree.org/inspire-workspace/services/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
         </service>
-
+        <service>
+            <name>INSPIRE ATOM Demoserver</name>
+            <url>http://www.geodaten.bayern.de/inspire/dls/dop200.xml</url>
+        </service>
     </services>
 </settings>
