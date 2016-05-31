@@ -82,8 +82,9 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private Document getDocument(String urlString)
         throws JobExecutionException {
 
-        CloseableHttpClient client = getClient(toURL(urlString));
-        HttpGet httpget = new HttpGet(urlString);
+        URL url = toURL(urlString);
+        CloseableHttpClient client = getClient(url);
+        HttpGet httpget = getGetRequest(url);
 
         try {
             DocumentResponseHandler responseHandler
@@ -159,7 +160,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         this.currentCount = 0;
 
         CloseableHttpClient client = getClient(dlf.url);
-        HttpGet httpget = new HttpGet(dlf.url.toString());
+        HttpGet httpget = getGetRequest(dlf.url);
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
