@@ -37,6 +37,7 @@ import org.w3c.dom.NodeList;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 import de.bayern.gdi.utils.XML;
@@ -96,11 +97,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         } catch (IOException ioe) {
             throw new JobExecutionException("Download failed", ioe);
         } finally {
-            try {
-                client.close();
-            } catch (IOException ioe) {
-                log.log(Level.SEVERE, "Cannot close HTTP client.", ioe);
-            }
+            HTTP.closeGraceful(client);
         }
     }
 

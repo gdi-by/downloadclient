@@ -17,7 +17,10 @@
  */
 package de.bayern.gdi.utils;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -31,6 +34,9 @@ import org.apache.http.impl.client.HttpClients;
 
 /** Helper for HTTP. */
 public final class HTTP {
+
+    private static final Logger log
+        = Logger.getLogger(HTTP.class.getName());
 
     private HTTP() {
     }
@@ -71,5 +77,22 @@ public final class HTTP {
             .custom()
             .setDefaultCredentialsProvider(credsProv)
             .build();
+    }
+
+    /**
+     * Closes a client without throwing exceptions.
+     * @param client The client to close.
+     */
+    public static void closeGraceful(CloseableHttpClient client) {
+        if (client == null) {
+            return;
+        }
+        try {
+            client.close();
+        } catch (IOException ioe) {
+            // Only log this.
+            log.log(Level.SEVERE,
+                "Closing HTTP client failed: " + ioe.getMessage(), ioe);
+        }
     }
 }

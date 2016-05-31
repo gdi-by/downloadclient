@@ -20,7 +20,6 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.client.methods.HttpGet;
@@ -28,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
@@ -80,13 +80,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
             throw new JobExecutionException(
                 I18n.getMsg("file.download.failed"), ioe);
         } finally {
-            try {
-                httpclient.close();
-            } catch (IOException ioe) {
-                // Only log this.
-                log.log(Level.SEVERE,
-                    "Closing HTTP client failed: " + ioe.getMessage(), ioe);
-            }
+            HTTP.closeGraceful(httpclient);
         }
         this.processor.broadcastMessage(I18n.getMsg("file.download.finished"));
     }
