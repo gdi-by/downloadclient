@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeType;
 
@@ -48,8 +46,6 @@ public class WFSOne extends WebService {
     private String userName;
     private String password;
 
-    private FeatureSource<SimpleFeatureType, SimpleFeature>
-            source;
     /**
      * Constructor.
      * @param serviceURL the service URL
@@ -105,7 +101,6 @@ public class WFSOne extends WebService {
         Map<String, String> map = new HashMap<String, String>();
         try {
             SimpleFeatureType schema = this.data.getSchema(type);
-            this.source = this.data.getFeatureSource(type);
             attributes.addAll(schema.getTypes());
             for (AttributeType attribute: attributes) {
                 map.put(attribute.getName().toString(),
