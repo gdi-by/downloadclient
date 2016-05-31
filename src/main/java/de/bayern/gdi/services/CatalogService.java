@@ -189,15 +189,15 @@ public class CatalogService {
                             "//*[local-name()='CharacterString']";
                     for (int i = 0; i < numberOfRecordsMatched; i++) {
                         Node identificationN = identificationNL.item(i);
-                        Node svServiceIdN = XML.getChildWithName
-                                (identificationN,
+                        Node svServiceIdN = XML.getChildWithName(
+                                identificationN,
                                         "srv:SV_ServiceIdentification");
                         String serviceType = null;
                         if (svServiceIdN != null) {
-                            Node serviceTypeN = XML.getChildWithName
-                                    (svServiceIdN, "srv:serviceType");
-                            Node serviceTypeNameN = XML.getChildWithName
-                                    (serviceTypeN, "gco:LocalName");
+                            Node serviceTypeN = XML.getChildWithName(
+                                    svServiceIdN, "srv:serviceType");
+                            Node serviceTypeNameN = XML.getChildWithName(
+                                    serviceTypeN, "gco:LocalName");
                             if (serviceTypeNameN != null) {
                                 serviceType = serviceTypeNameN.getTextContent();
                             }
