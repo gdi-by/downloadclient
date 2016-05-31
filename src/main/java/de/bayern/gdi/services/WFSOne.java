@@ -18,42 +18,21 @@
 
 package de.bayern.gdi.services;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-import de.bayern.gdi.utils.StringUtils;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
-
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
-
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-
-import org.geotools.geometry.jts.ReferencedEnvelope;
-
-import org.opengis.feature.Feature;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.GeometryType;
 
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -139,82 +118,6 @@ public class WFSOne extends WebService {
     }
 
     /**
-     * Experimental Class to get the Bounds of a Type.
-     * @param outerBBOX the Outer Bounding Box
-     * @param typeName the Type Name
-     * @return the Bounds
-     */
-    public ReferencedEnvelope getBounds(Envelope outerBBOX,
-                                        String typeName) {
-        SimpleFeatureType schema = null;
-        ReferencedEnvelope bbox = null;
-        FeatureCollection<SimpleFeatureType, SimpleFeature>
-                features = null;
-        try {
-            schema = this.data.getSchema(typeName);
-            this.source = this.data.getFeatureSource(typeName);
-            bbox = source.getBounds();
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        System.out.println("Metadata Bounds:" + bbox);
-
-        // XXX: This is a bit cumbersome.
-        GeometryType gt = null;
-        System.out.println("types:");
-        for (AttributeType type: schema.getTypes()) {
-            System.out.println("\t'" + type + "'");
-            if (type instanceof GeometryType) {
-                gt = (GeometryType)type;
-            }
-        }
-
-        if (gt == null) {
-            log.log(Level.SEVERE, "No geometry found.");
-            return null;
-            //throw new Exception("No geometry found.");
-        }
-
-        String geomName = gt.getName().getLocalPart();
-
-        System.out.println("Using '" + geomName + "' as geometry column.");
-
-
-        // Step 5 - query
-
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(
-                GeoTools.getDefaultHints());
-
-        Filter filter = ff.bbox(
-                ff.property(geomName),
-                new ReferencedEnvelope(
-                        outerBBOX, bbox.getCoordinateReferenceSystem()));
-
-        Query query = new Query(typeName,
-                filter,
-                new String[]{geomName});
-        try {
-            features = source.getFeatures(query);
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return null;
-        }
-        ReferencedEnvelope bounds = new ReferencedEnvelope();
-        try (FeatureIterator<SimpleFeature> iterator = features.features()) {
-            int count = 0;
-            while (iterator.hasNext()) {
-                Feature feature = iterator.next();
-                ++count;
-                System.out.println(count + " " + feature.getBounds());
-                bounds.include(feature.getBounds());
-            }
-        }
-        System.out.println("Calculated Bounds:" + bounds);
-        return bounds;
-    }
-
-    /**
      * gets the dataStore.
      * @return datastore
      */
@@ -229,5 +132,4 @@ public class WFSOne extends WebService {
     public WebService.Type getServiceType() {
         return Type.WFSOne;
     }
-
 }
