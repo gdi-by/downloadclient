@@ -38,6 +38,7 @@ import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 import de.bayern.gdi.utils.XML;
@@ -73,6 +74,8 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
     @Override
     public void bytesCounted(long count) {
+        broadcastMessage(
+            I18n.format("atom.bytes.downloaded", this.totalCount + count));
         this.currentCount = count;
     }
 
@@ -89,11 +92,13 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
             Document document = client.execute(httpget, responseHandler);
             if (document == null) {
-                throw new JobExecutionException("Cannot parse as XML");
+                throw new JobExecutionException(
+                    I18n.format("atom.bad.xml", urlString));
             }
             return document;
         } catch (IOException ioe) {
-            throw new JobExecutionException("Download failed", ioe);
+            throw new JobExecutionException(
+                I18n.format("atom.bad.download", urlString), ioe);
         } finally {
             HTTP.closeGraceful(client);
         }
@@ -167,12 +172,8 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         } catch (IOException ioe) {
             return false;
         } finally {
+            HTTP.closeGraceful(client);
             this.totalCount += this.currentCount;
-            try {
-                client.close();
-            } catch (IOException ioe) {
-                log.log(Level.SEVERE, "close client failed", ioe);
-            }
         }
     }
 
@@ -208,6 +209,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         }
 
         int failed = 0;
+        int numFiles = files.size();
 
         for (;;) {
             for (int i = 0; i < files.size();) {
@@ -222,6 +224,11 @@ public class AtomDownloadJob extends AbstractDownloadJob {
                         files.remove(i);
                     }
                 }
+                broadcastMessage(
+                    I18n.format(
+                        "atom.downloaded.files",
+                        numFiles - failed - files.size(),
+                        files.size()));
             }
             if (files.isEmpty()) {
                 break;
@@ -237,7 +244,11 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
         if (failed > 0) {
             throw new JobExecutionException(
-                "Number downloads failed: " + failed);
+                I18n.format("atom.downloaded.failed",
+                    numFiles - failed, failed));
         }
+
+        broadcastMessage(
+            I18n.format("atom.downloaded.success", numFiles));
     }
 }
