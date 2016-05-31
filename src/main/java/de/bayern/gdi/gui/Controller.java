@@ -107,8 +107,11 @@ public class Controller {
                 setOnAction(new DownloadButtonEventHandler());
         view.getSaveMenuItem().
                 setOnAction(new SaveMenuItemEventHandler());
+        //TODO - Implement Loading Function
+        /*
         view.getLoadMenuItem().
                 setOnAction(new LoadMenuItemEventHandler());
+        */
 
         // Register Listener
         view.getServiceSearch().textProperty().
@@ -287,6 +290,12 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
+            /* TODO: Implent this function in a way so the configuration File
+             * fills the Frontend with the Informtaion. So all fields in the
+             * frontend should be filled with the Information from the config
+             * file, so you can check and verify your settings before clicking
+             * "download"
+             */
             FileChooser configFileChooser = new FileChooser();
             configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
 
