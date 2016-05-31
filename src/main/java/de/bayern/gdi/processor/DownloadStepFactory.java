@@ -78,7 +78,7 @@ public class DownloadStepFactory {
             Map<String, String> paramMap = bean.getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
             for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-                if(entry.getValue() != "" ) {
+                if (entry.getValue() != "") {
                     Parameter param = new Parameter(
                             entry.getKey(), entry.getValue());
                     parameters.add(param);

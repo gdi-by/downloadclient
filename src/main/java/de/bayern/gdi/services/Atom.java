@@ -45,9 +45,9 @@ public class Atom extends WebService {
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
     private ArrayList<String> types;
-    private Map<String,String> typesWithURLS;
+    private Map<String, String> typesWithURLS;
     private NamespaceContext nscontext;
-    private static final String ATTRIBUTENAME= "VARIATION";
+    private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
 
     /**
@@ -114,7 +114,12 @@ public class Atom extends WebService {
         return types;
     }
 
-    public String getURLforType(String type){
+    /**
+     * returns the URL for the selected Type.
+     * @param type the type
+     * @return URL
+     */
+    public String getURLforType(String type) {
         return (String) this.typesWithURLS.get(type);
     }
 
@@ -142,7 +147,7 @@ public class Atom extends WebService {
             Node cat = cL.item(i);
             NamedNodeMap catAttributes = cat.getAttributes();
             String epsg = null;
-            for(int j = 0; j < catAttributes.getLength(); j++) {
+            for (int j = 0; j < catAttributes.getLength(); j++) {
                 Node catAttr = catAttributes.item(j);
                 if (catAttr.getNodeName().equals("term")) {
                     epsg = catAttr.getTextContent();

@@ -46,7 +46,7 @@ public class DebugAtom {
      */
     public static void main(String[] args) {
         DebugAtom datom;
-        if(args.length > 1) {
+        if (args.length > 1) {
             datom = new DebugAtom(args[0], args[1], args[2]);
         } else {
             datom = new DebugAtom(args[0], null, null);
