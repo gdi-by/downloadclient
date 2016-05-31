@@ -59,6 +59,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.WindowEvent;
@@ -391,18 +392,18 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save File");
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             //fileChooser.getExtensionFilters().addAll();
-            File selectedFile = fileChooser.showSaveDialog(
+            File selectedDir = dirChooser.showDialog(
                     dataBean.getPrimaryStage());
-            if (selectedFile == null) {
+            if (selectedDir == null) {
                 return;
             }
             Task task = new Task() {
                 @Override
                 protected Integer call() throws Exception {
-                    String savePath = selectedFile.getPath();
+                    String savePath = selectedDir.getPath();
                     DownloadStepFactory dsf = DownloadStepFactory.getInstance();
                     DownloadStep ds = dsf.getStep(view, dataBean, savePath);
                     JobList jl = DownloadStepConverter.convert(ds);

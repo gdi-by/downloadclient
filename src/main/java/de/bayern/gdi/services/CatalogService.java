@@ -58,6 +58,9 @@ public class CatalogService {
             "http://www.opengis.net/cat/csw/2.0.2";
     private static final String GMD_NAMESPACE =
             "http://www.isotc211.org/2005/gmd";
+
+    private static final String ATOM_TYPE = "download";
+    private static final String WFS_TYPE = "OGC:WFS";
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
     private URL catalogURL;
@@ -186,30 +189,46 @@ public class CatalogService {
                             "//*[local-name()='CharacterString']";
                     for (int i = 0; i < numberOfRecordsMatched; i++) {
                         Node identificationN = identificationNL.item(i);
-                        Node transferoptinN = transferoptionsNL.item(i);
-                        String titleExpression =
-                                "//*[local-name()='title']";
-                        Node titlteNode = (Node) XML.xpath(identificationN,
-                                titleExpression,
-                                XPathConstants.NODE, context);
-                        Node titleCharStringNode = XML.getChildWithName(
-                                titlteNode, "gco:CharacterString");
-                        String title = titleCharStringNode.getTextContent();
-                        Node digitalTransferOptionsNode = XML.getChildWithName(
-                                        transferoptinN,
-                                        "gmd:MD_DigitalTransferOptions");
-                        Node onLineNode = XML.getChildWithName(
-                                digitalTransferOptionsNode, "gmd:onLine");
-                        Node onlineRessourceNode = XML.getChildWithName(
-                                onLineNode, "gmd:CI_OnlineResource");
-                        Node linkageNode = XML.getChildWithName(
-                                onlineRessourceNode,
-                                        "gmd:linkage");
-                        Node urlNode = XML.getChildWithName(linkageNode,
-                                "gmd:URL");
-                        String url = urlNode.getTextContent();
-                        url = makeCapabiltiesURL(url);
-                        map.put(title, url);
+                        Node svServiceIdN = XML.getChildWithName(
+                                identificationN,
+                                        "srv:SV_ServiceIdentification");
+                        String serviceType = null;
+                        if (svServiceIdN != null) {
+                            Node serviceTypeN = XML.getChildWithName(
+                                    svServiceIdN, "srv:serviceType");
+                            Node serviceTypeNameN = XML.getChildWithName(
+                                    serviceTypeN, "gco:LocalName");
+                            if (serviceTypeNameN != null) {
+                                serviceType = serviceTypeNameN.getTextContent();
+                            }
+                        }
+                        if (serviceType.contains(ATOM_TYPE)
+                                || serviceType.contains(WFS_TYPE)) {
+                            Node transferoptinN = transferoptionsNL.item(i);
+                            String titleExpression =
+                                    "//*[local-name()='title']";
+                            Node titlteNode = (Node) XML.xpath(identificationN,
+                                    titleExpression,
+                                    XPathConstants.NODE, context);
+                            Node titleCharStringNode = XML.getChildWithName(
+                                    titlteNode, "gco:CharacterString");
+                            String title = titleCharStringNode.getTextContent();
+                            Node digitalTransferOptionsNode = XML.
+                                    getChildWithName(transferoptinN,
+                                            "gmd:MD_DigitalTransferOptions");
+                            Node onLineNode = XML.getChildWithName(
+                                    digitalTransferOptionsNode, "gmd:onLine");
+                            Node onlineRessourceNode = XML.getChildWithName(
+                                    onLineNode, "gmd:CI_OnlineResource");
+                            Node linkageNode = XML.getChildWithName(
+                                    onlineRessourceNode,
+                                            "gmd:linkage");
+                            Node urlNode = XML.getChildWithName(linkageNode,
+                                    "gmd:URL");
+                            String url = urlNode.getTextContent();
+                            url = makeCapabiltiesURL(url, serviceType);
+                            map.put(title, url);
+                        }
                     }
                 }
             }
@@ -218,7 +237,7 @@ public class CatalogService {
         return map;
     }
 
-    private String makeCapabiltiesURL(String url) {
+    private String makeCapabiltiesURL(String url, String serviceType) {
         if (url.endsWith("?")) {
             url = url + "service=wfs&request=GetCapabilities";
         }

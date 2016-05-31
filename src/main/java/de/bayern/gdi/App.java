@@ -25,12 +25,6 @@ import de.bayern.gdi.utils.StringUtils;
  */
 public class App {
 
-    private static final String[] DOWNLOADS = {
-        "-d=",
-        "--download=",
-        "-download="
-    };
-
     private static final String[] HEADLESS = {
         "-h",
         "--headless",
@@ -61,16 +55,9 @@ public class App {
             "  -?|--help|-help: Print this message and exit.");
         System.out.println(
             "  -h|--headless|-headless: Start command line tool.");
-        System.out.println(
-            "  -d=|--download=|-download=xml: download configuration.");
         System.out.println("without options:");
         System.out.println("  Start as GUI application.");
         System.exit(0);
-    }
-
-
-    private static String downloadConfig(String[] args) {
-        return StringUtils.extractPostfix(args, DOWNLOADS);
     }
 
     /**
@@ -82,10 +69,8 @@ public class App {
             helpAndExit();
         }
 
-        String downloadConfig = downloadConfig(args);
-
         if (runHeadless(args)) {
-            System.exit(Headless.main(downloadConfig, args));
+            System.exit(Headless.main(args));
         }
 
         // Its kind of complicated to start a javafx application from
