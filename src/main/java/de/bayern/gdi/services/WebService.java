@@ -26,23 +26,6 @@ import java.util.Map;
  */
 
 public abstract class WebService implements ServiceSchema {
-    /**
-     * Types of Webservices.
-     */
-    public enum Type {
-        /**
-         * WFSOne Webservice.
-         */
-        WFSOne,
-        /**
-         * WFSTwo Webservice.
-         */
-        WFSTwo,
-        /**
-         * Atom Webservice.
-         */
-        Atom
-    }
 
     /** The URL of the service. */
     protected String serviceURL;

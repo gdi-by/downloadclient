@@ -124,7 +124,7 @@ public class WFSOne extends WebService {
      * @inheritDoc
      * @return the ServiceType
      */
-    public WebService.Type getServiceType() {
-        return Type.WFSOne;
+    public ServiceType getServiceType() {
+        return ServiceType.WFSOne;
     }
 }

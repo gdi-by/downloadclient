@@ -270,8 +270,7 @@ public class WFSTwo extends WebService {
      * @return the Type
      * @inheritDoc
      */
-    public WebService.Type getServiceType() {
-        return Type.WFSTwo;
+    public ServiceType getServiceType() {
+        return ServiceType.WFSTwo;
     }
-
 }

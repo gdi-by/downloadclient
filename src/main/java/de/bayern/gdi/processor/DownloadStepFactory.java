@@ -18,7 +18,6 @@
 
 package de.bayern.gdi.processor;
 
-import de.bayern.gdi.services.WFSTwo;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,7 +28,8 @@ import de.bayern.gdi.gui.View;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
-import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSTwo;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -70,7 +70,7 @@ public class DownloadStepFactory {
             String serviceURL = bean.getWebService().getServiceURL();
             serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
             //step.setServiceURL(bean.getWebService().getServiceURL());
-            WebService.Type serviceType =
+            ServiceType serviceType =
                     bean.getWebService().getServiceType();
             //step.setServiceType(bean.getWebService().getServiceType());
             //step.setPath(savePath);

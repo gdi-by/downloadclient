@@ -18,44 +18,20 @@
 
 package de.bayern.gdi.services;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 /**
- * @author Jochen Saalfeld (jochen@intevation.de)
+ * Types of Webservices.
  */
-public class Atom extends WebService {
-
+public enum ServiceType {
     /**
-     * @inheritDoc
-     * @return the URL of the Service
+     * WFSOne Webservice.
      */
-    public Atom(String serviceURL) {
-        this.serviceURL = serviceURL;
-    }
-
+    WFSOne,
     /**
-     * @inheritDoc
-     * @return the Types of the service
+     * WFSTwo Webservice.
      */
-    public ArrayList<String> getTypes() {
-        return null;
-    }
-
+    WFSTwo,
     /**
-     * @inheritDoc
-     * @param type the Type
-     * @return The Attributes of the Service
+     * Atom Webservice.
      */
-    public Map<String, String> getAttributes(String type) {
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     * @return the Type of the Service
-     */
-    public ServiceType getServiceType() {
-        return ServiceType.Atom;
-    }
+    Atom
 }
