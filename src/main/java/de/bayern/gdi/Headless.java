@@ -41,11 +41,10 @@ public class Headless {
     }
 
     /**
-     * @param downloadConfig The path to the downloadConfig file.
      * @param args The command line arguments.
      * @return Non zero if the operation fails.
      */
-    public static int main(String downloadConfig, String [] args) {
+    public static int main(String [] args) {
         log.info("Running in headless mode");
 
         ArrayList<File> files = new ArrayList<>();
