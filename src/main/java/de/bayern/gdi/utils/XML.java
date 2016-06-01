@@ -121,18 +121,20 @@ public class XML {
      * @param url the URL
      * @param userName the Username {NULL if none needed}
      * @param password the Password {NULLL if none needed}
+     * @param nameSpaceAware if namespace aware or not
      * @return an XML Document
      */
     public static Document getDocument(
         URL    url,
         String userName,
-        String password) {
+        String password,
+        boolean nameSpaceAware) {
 
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
             HttpGet request = HTTP.getGetRequest(url);
             DocumentResponseHandler handler = new DocumentResponseHandler();
-            handler.setNamespaceAware(true);
+            handler.setNamespaceAware(nameSpaceAware);
             return client.execute(request, handler);
         } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -140,6 +142,20 @@ public class XML {
             HTTP.closeGraceful(client);
         }
         return null;
+    }
+
+    /**
+     * Gets an XML Document from a remote location.
+     * @param url the URL
+     * @param userName the Username {NULL if none needed}
+     * @param password the Password {NULLL if none needed}
+     * @return an XML Document
+     */
+    public static Document getDocument(
+            URL    url,
+            String userName,
+            String password) {
+        return getDocument(url, userName, password, true);
     }
 
     /**
