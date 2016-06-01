@@ -31,8 +31,7 @@ import javax.xml.xpath.XPathConstants;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import de.bayern.gdi.utils.CountingInputStream;
@@ -118,6 +117,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         {"image/png", "png"},
         {"image/gif", "gif"},
         {"application/pdf", "pdf"},
+        {"text/csv", "csv"},
         {"text/xml", "xml"}
         // TODO: Add more.
     };
@@ -224,18 +224,33 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
         String format = "%0" + places(nl.getLength()) + "d.%s";
-        for (int i = 0, n = nl.getLength(); i < n; i++) {
-            Node node = nl.item(i);
-            NamedNodeMap attributes = node.getAttributes();
-            Node href = attributes.getNamedItem("href");
-            Node type = attributes.getNamedItem("type");
-            if (href == null || type == null) {
+        for (int i = 0, j = 0, n = nl.getLength(); i < n; i++) {
+            Element link = (Element)nl.item(i);
+            String href = link.getAttribute("href");
+            if (href.isEmpty()) {
                 continue;
             }
-            String ext = minetypeToExt(type.getTextContent());
-            URL dataURL = toURL(href.getTextContent());
-            File file = new File(
-                this.workingDir, String.format(format, i, ext));
+            URL dataURL = toURL(href);
+            String fileName;
+            // Service call?
+            if (dataURL.getQuery() != null) {
+                String type = link.getAttribute("type");
+                String ext = minetypeToExt(type);
+                fileName = String.format(format, j, ext);
+                j++;
+            } else { // Direct download.
+                // XXX: Do more to prevent directory traversals?
+                fileName = new File(dataURL.getPath())
+                    .getName().replaceAll("\\.+", ".");
+
+                if (fileName.isEmpty()) {
+                    String type = link.getAttribute("type");
+                    String ext = minetypeToExt(type);
+                    fileName = String.format(format, j, ext);
+                    j++;
+                }
+            }
+            File file = new File(this.workingDir, fileName);
             files.add(new DLFile(file, dataURL));
         }
 
