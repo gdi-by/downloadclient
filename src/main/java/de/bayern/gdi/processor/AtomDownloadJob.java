@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.client.methods.HttpGet;
@@ -49,6 +50,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private static final Logger log
         = Logger.getLogger(AtomDownloadJob.class.getName());
 
+    private String url;
     private String dataset;
     private String variation;
     private File workingDir;
@@ -60,6 +62,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     }
 
     public AtomDownloadJob(
+        String url,
         String dataset,
         String variation,
         File workingDir,
@@ -67,6 +70,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         String password
     ) {
         super(user, password);
+        this.url = url;
         this.dataset = dataset;
         this.variation = variation;
         this.workingDir = workingDir;
@@ -82,9 +86,9 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private Document getDocument(String urlString)
         throws JobExecutionException {
 
-        URL url = toURL(urlString);
-        CloseableHttpClient client = getClient(url);
-        HttpGet httpget = getGetRequest(url);
+        URL docURL = toURL(urlString);
+        CloseableHttpClient client = getClient(docURL);
+        HttpGet httpget = getGetRequest(docURL);
 
         try {
             DocumentResponseHandler responseHandler
@@ -181,15 +185,39 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private static final int MAX_TRIES = 5;
     private static final long FAIL_SLEEP = 30 * 1000;
 
+    private static final String DATASOURCE_XPATH
+        = "/atom:feed/atom:entry[atom:id/text()=$CODE]"
+        + "/atom:link[@type='application/atom+xml']/@href";
+
+    private static final NamespaceContext NAMESPACE_CONTEXT =
+        new NamespaceContextMap(
+        "atom", "http://www.w3.org/2005/Atom",
+        "inspire_dls", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0",
+        "georss", "http://www.georss.org/georss");
+
+    private String figureoutDatasource() throws JobExecutionException {
+        HashMap<String, String> vars = new HashMap<>();
+        vars.put("CODE", this.dataset);
+
+        String ds = (String)XML.xpath(getDocument(this.url),
+            DATASOURCE_XPATH, XPathConstants.STRING,
+            NAMESPACE_CONTEXT, vars);
+
+        if (ds == null || ds.isEmpty()) {
+            throw new JobExecutionException(
+                I18n.format("atom.dataset.not.found", this.dataset));
+        }
+        return ds;
+    }
+
     @Override
     protected void download() throws JobExecutionException {
-        Document ds = getDocument(this.dataset);
+        Document ds = getDocument(figureoutDatasource());
         HashMap<String, String> vars = new HashMap<>();
         vars.put("VARIATION", this.variation);
-        NamespaceContextMap nsm
-            = new NamespaceContextMap("atom", "http://www.w3.org/2005/Atom");
         NodeList nl = (NodeList)XML.xpath(
-            ds, XPATH_LINKS, XPathConstants.NODESET, nsm, vars);
+            ds, XPATH_LINKS, XPathConstants.NODESET,
+            NAMESPACE_CONTEXT, vars);
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
@@ -203,10 +231,10 @@ public class AtomDownloadJob extends AbstractDownloadJob {
                 continue;
             }
             String ext = minetypeToExt(type.getTextContent());
-            URL url = toURL(href.getTextContent());
+            URL dataURL = toURL(href.getTextContent());
             File file = new File(
                 this.workingDir, String.format(format, i, ext));
-            files.add(new DLFile(file, url));
+            files.add(new DLFile(file, dataURL));
         }
 
         int failed = 0;
