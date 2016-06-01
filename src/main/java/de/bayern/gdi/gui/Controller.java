@@ -46,6 +46,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
@@ -685,7 +686,7 @@ public class Controller {
                     }
                     if (serviceURL != null) {
                         //view.setStatusBarText("Check for Servicetype");
-                        WebService.Type st =
+                        ServiceType st =
                                 ServiceChecker.checkService(serviceURL,
                                         dataBean.getBase64EncAuth());
                         WebService ws = null;
