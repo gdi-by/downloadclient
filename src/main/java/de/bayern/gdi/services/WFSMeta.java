@@ -20,6 +20,8 @@ package de.bayern.gdi.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
 /** Stores meta data about WFS. */
 public class WFSMeta {
 
@@ -48,6 +50,8 @@ public class WFSMeta {
         public String defaultCRS;
         /** other CRSs. */
         public List<String> otherCRSs;
+        /** bbox. */
+        public ReferencedEnvelope bbox;
 
         public Feature() {
             otherCRSs = new ArrayList<>();
@@ -71,7 +75,8 @@ public class WFSMeta {
                 + "title: " + title + " "
                 + "abstract: " + abstractDescription + " "
                 + "defaultCRS: " + defaultCRS + " "
-                + "otherCRSs: " +  otherCRSs() + "}";
+                + "otherCRSs: " +  otherCRSs() + " "
+                + "bbox: " + bbox + " }";
         }
     }
 

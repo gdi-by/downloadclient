@@ -20,8 +20,13 @@ package de.bayern.gdi.services;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,6 +37,16 @@ import de.bayern.gdi.utils.XML;
 
 /** Extract meta data from a WFS. */
 public class WFSMetaExtractor {
+
+    private static final CoordinateReferenceSystem WGS84;
+
+    static {
+        try {
+            WGS84 = CRS.decode("EPSG:4326");
+        } catch (FactoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final String XPATH_TITLE
         = "//ows:ServiceIdentification/ows:Title/text()";
@@ -53,7 +68,62 @@ public class WFSMetaExtractor {
     private static final String XPATH_FEATURETYPES
         = "//wfs:FeatureTypeList/wfs:FeatureType";
 
+    private static final String XPATH_CORNERS
+        = "//*[substring(local-name(),"
+        + "string-length(local-name()) - string-length('Corner') +1)"
+        + "= 'Corner']/text()";
+
     private WFSMetaExtractor() {
+    }
+
+    private static double[] toDouble(String s) {
+        try {
+            String[] parts = s.split("[ \\t]+");
+            double[] x = new double[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                x[i] = Double.parseDouble(parts[i]);
+            }
+            return x;
+        } catch (NumberFormatException nfe) {
+            return new double[0];
+        }
+    }
+
+    private static ReferencedEnvelope getBounds(
+            Element feature, NamespaceContext nc) {
+
+        NodeList corners = (NodeList)
+            XML.xpath(feature, XPATH_CORNERS, XPathConstants.NODESET, nc);
+
+        int n = corners.getLength();
+        if (n == 0) {
+            return null;
+        }
+
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+
+        for (int i = 0; i < n; i++) {
+            double[] x = toDouble(corners.item(i).getTextContent());
+            if (x == null) {
+                return null;
+            }
+            if (x[0] < minX) {
+                minX = x[0];
+            }
+            if (x[0] > maxX) {
+                maxX = x[0];
+            }
+            if (x[1] < minY) {
+                minY = x[1];
+            }
+            if (x[1] > maxY) {
+                maxY = x[1];
+            }
+        }
+        return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
 
     /**
@@ -132,6 +202,8 @@ public class WFSMetaExtractor {
             for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }
+
+            feature.bbox = getBounds(el, nc);
 
             meta.features.add(feature);
         }
