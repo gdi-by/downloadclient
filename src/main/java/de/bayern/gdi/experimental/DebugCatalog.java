@@ -62,7 +62,7 @@ public class DebugCatalog {
                     this.password);
             System.out.println("Servicename: " + catalog.getProviderName());
             String first = "bayer";
-            String second ="baye";
+            String second = "baye";
             String third = "atom";
             String fourth = "wfs";
             printStringMap(catalog.getServicesByFilter(first));

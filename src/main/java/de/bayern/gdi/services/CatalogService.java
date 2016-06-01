@@ -146,38 +146,38 @@ public class CatalogService {
                 for (int i = 0; i < numberOfResults; i++) {
                     Node serviceN = servicesNL.item(i);
                     String nameExpr =
-                            "gmd:identificationInfo" +
-                                    "/srv:SV_ServiceIdentification" +
-                                    "/gmd:citation" +
-                                    "/gmd:CI_Citation" +
-                                    "/gmd:title" +
-                                    "/gco:CharacterString";
+                            "gmd:identificationInfo"
+                                    + "/srv:SV_ServiceIdentification"
+                                    + "/gmd:citation"
+                                    + "/gmd:CI_Citation"
+                                    + "/gmd:title"
+                                    + "/gco:CharacterString";
                     String serviceName = (String) XML.xpath(serviceN,
                             nameExpr,
                             XPathConstants.STRING, context);
 
                     String typeExpr =
-                            "gmd:identificationInfo" +
-                                    "/srv:SV_ServiceIdentification" +
-                                    "/srv:serviceTypeVersion" +
-                                    "/gco:CharacterString";
+                            "gmd:identificationInfo"
+                                    + "/srv:SV_ServiceIdentification"
+                                    + "/srv:serviceTypeVersion"
+                                    + "/gco:CharacterString";
                     String serviceType = (String) XML.xpath(serviceN,
                             typeExpr,
                             XPathConstants.STRING, context);
 
                     String urlExpr =
-                            "gmd:distributionInfo" +
-                                    "/gmd:MD_Distribution" +
-                                    "/gmd:transferOptions" +
-                                    "/gmd:MD_DigitalTransferOptions" +
-                                    "/gmd:onLine" +
-                                    "/gmd:CI_OnlineResource" +
-                                    "/gmd:linkage" +
-                                    "/gmd:URL";
+                            "gmd:distributionInfo"
+                                    + "/gmd:MD_Distribution"
+                                    + "/gmd:transferOptions"
+                                    + "/gmd:MD_DigitalTransferOptions"
+                                    + "/gmd:onLine"
+                                    + "/gmd:CI_OnlineResource"
+                                    + "/gmd:linkage"
+                                    + "/gmd:URL";
                     String serviceURL = (String) XML.xpath(serviceN,
                             urlExpr,
                             XPathConstants.STRING, context);
-                    if(serviceType.toUpperCase().contains("WFS")
+                    if (serviceType.toUpperCase().contains("WFS")
                             || serviceType.toUpperCase().contains("ATOM")
                             || serviceType.toUpperCase().contains("DOWNLOAD")) {
                         serviceURL = makeCapabiltiesURL(serviceURL,
@@ -192,13 +192,13 @@ public class CatalogService {
 
     private String makeCapabiltiesURL(String url, String type) {
         if (url.endsWith("?") && type.toUpperCase().contains("WFS")) {
-            return url + "service=wfs&version=" + getVersionOfType(type) +
-                    "&request=GetCapabilities";
+            return url + "service=wfs&version=" + getVersionOfType(type)
+                    + "&request=GetCapabilities";
         }
         if (!url.toUpperCase().contains("GETCAPABILITIES") && type
                 .toUpperCase().contains("WFS")) {
-            return url + "?service=wfs&version=" + getVersionOfType(type) +
-                    "request=GetCapabilities";
+            return url + "?service=wfs&version=" + getVersionOfType(type)
+                    + "request=GetCapabilities";
         }
         return url;
     }
