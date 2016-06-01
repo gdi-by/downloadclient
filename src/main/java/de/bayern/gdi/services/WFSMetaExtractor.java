@@ -122,6 +122,17 @@ public class WFSMetaExtractor {
                     = abstracts.item(0).getTextContent();
             }
 
+            NodeList defaultCRS = el.getElementsByTagName("DefaultCRS");
+            if (defaultCRS.getLength() > 0) {
+                feature.defaultCRS
+                    = defaultCRS.item(0).getTextContent();
+            }
+
+            NodeList otherCRSs = el.getElementsByTagName("OtherCRS");
+            for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
+                feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
+            }
+
             meta.features.add(feature);
         }
         return meta;

@@ -44,13 +44,34 @@ public class WFSMeta {
         public String title;
         /** abstract. */
         public String abstractDescription;
+        /** default CRS. */
+        public String defaultCRS;
+        /** other CRSs. */
+        public List<String> otherCRSs;
+
+        public Feature() {
+            otherCRSs = new ArrayList<>();
+        }
+
+        private String otherCRSs() {
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < otherCRSs.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(otherCRSs.get(i));
+            }
+            return sb.append("]").toString();
+        }
 
         @Override
         public String toString() {
             return "feature: { "
                 + "name: " + name + " "
                 + "title: " + title + " "
-                + "abstract: " + abstractDescription + " }";
+                + "abstract: " + abstractDescription + " "
+                + "defaultCRS: " + defaultCRS + " "
+                + "otherCRSs: " +  otherCRSs() + "}";
         }
     }
 
