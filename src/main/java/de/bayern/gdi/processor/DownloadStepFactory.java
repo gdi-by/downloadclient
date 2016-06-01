@@ -18,7 +18,10 @@
 
 package de.bayern.gdi.processor;
 
+
+import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.WFSTwo;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,7 +32,7 @@ import de.bayern.gdi.gui.View;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
-import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.services.ServiceType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -70,16 +73,18 @@ public class DownloadStepFactory {
             String serviceURL = bean.getWebService().getServiceURL();
             serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
             //step.setServiceURL(bean.getWebService().getServiceURL());
-            WebService.Type serviceType =
+            ServiceType serviceType =
                     bean.getWebService().getServiceType();
             //step.setServiceType(bean.getWebService().getServiceType());
             //step.setPath(savePath);
             Map<String, String> paramMap = bean.getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
             for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-                Parameter param = new Parameter(
-                    entry.getKey(), entry.getValue());
-                parameters.add(param);
+                if (!entry.getValue().equals("")) {
+                    Parameter param = new Parameter(
+                            entry.getKey(), entry.getValue());
+                    parameters.add(param);
+                }
             }
             //step.setParameters(parameters);
             String dataset = view.getTypeComboBox().getSelectionModel()
@@ -107,6 +112,8 @@ public class DownloadStepFactory {
                     break;
                 case Atom:
                     serviceTypeStr = "ATOM";
+                    Atom atom = (Atom) bean.getWebService();
+                    dataset = atom.getURLforType(dataset);
                     break;
                 default:
             }
