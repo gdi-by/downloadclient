@@ -23,12 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.HttpsURLConnection;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,6 +43,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -148,28 +151,21 @@ public class XML {
      * @param password the Password {NULLL if none needed}
      * @return an XML Document
      */
-    public static Document getDocument(URL url, String userName, String
-            password) {
+    public static Document getDocument(
+        URL    url,
+        String userName,
+        String password) {
+
+        CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
-            URLConnection conn = null;
-            if (url.toString().toLowerCase().startsWith("https")) {
-                HttpsURLConnection con
-                        = (HttpsURLConnection) url.openConnection();
-                conn = (URLConnection) con;
-            } else {
-                conn = url.openConnection();
-            }
-            if (StringUtils.getBase64EncAuth(
-                    userName, password) != null) {
-                conn.setRequestProperty("Authorization", "Basic "
-                        + StringUtils.getBase64EncAuth(
-                        userName, password));
-            }
-            //String xmlStr = streamToString(conn.getInputStream());
-            //doc = getDocument(xmlStr);
-            return getDocument(conn.getInputStream(), true);
-        } catch (IOException e) {
+            HttpGet request = HTTP.getGetRequest(url);
+            DocumentResponseHandler handler = new DocumentResponseHandler();
+            handler.setNamespaceAware(true);
+            return client.execute(request, handler);
+        } catch (IOException | URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            HTTP.closeGraceful(client);
         }
         return null;
     }
