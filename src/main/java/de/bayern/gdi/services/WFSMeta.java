@@ -36,6 +36,24 @@ public class WFSMeta {
         }
     }
 
+    /** feature. */
+    public static class Feature {
+        /** name. */
+        public String name;
+        /** title. */
+        public String title;
+        /** abstract. */
+        public String abstractDescription;
+
+        @Override
+        public String toString() {
+            return "feature: { "
+                + "name: " + name + " "
+                + "title: " + title + " "
+                + "abstract: " + abstractDescription + " }";
+        }
+    }
+
     /** title. */
     public String title;
     /** abstract. */
@@ -46,12 +64,14 @@ public class WFSMeta {
     public List<String> supportedConstraints;
     /** unsupported constraints. */
     public List<String> unsupportedConstraints;
-
+    /** features. */
+    public List<Feature> features;
 
     public WFSMeta() {
         operations = new ArrayList<>();
         supportedConstraints = new ArrayList<>();
         unsupportedConstraints = new ArrayList<>();
+        features = new ArrayList<>();
     }
 
     @Override
@@ -73,6 +93,11 @@ public class WFSMeta {
         sb.append("\tunsupported constraints: {\n");
         for (String c: unsupportedConstraints) {
             sb.append("\t\t").append(c).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tfeatures: {\n");
+        for (Feature f: features) {
+            sb.append("\t\t").append(f).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");

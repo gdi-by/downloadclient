@@ -50,6 +50,9 @@ public class WFSMetaExtractor {
         = "//ows:OperationsMetadata/ows:Constraint"
         + "[ows:DefaultValue/text()='FALSE']/@name";
 
+    private static final String XPATH_FEATURETYPES
+        = "//wfs:FeatureTypeList/wfs:FeatureType";
+
     private WFSMetaExtractor() {
     }
 
@@ -66,7 +69,8 @@ public class WFSMetaExtractor {
             throw new IOException("Cannot load capabilities document.");
         }
         NamespaceContextMap nc = new NamespaceContextMap(
-                "ows", "http://www.opengis.net/ows/1.1");
+                "ows", "http://www.opengis.net/ows/1.1",
+                "wfs", "http://www.opengis.net/wfs/2.0");
         WFSMeta meta = new WFSMeta();
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, nc);
         meta.abstractDescription
@@ -95,6 +99,31 @@ public class WFSMetaExtractor {
             meta.unsupportedConstraints.add(node.getTextContent());
         }
 
+        nl = (NodeList)XML.xpath(
+            capDoc, XPATH_FEATURETYPES, XPathConstants.NODESET, nc);
+        for (int i = 0, n = nl.getLength(); i < n; i++) {
+            Element el = (Element)nl.item(i);
+
+            WFSMeta.Feature feature = new WFSMeta.Feature();
+
+            NodeList names = el.getElementsByTagName("Name");
+            if (names.getLength() > 0) {
+                feature.name = names.item(0).getTextContent();
+            }
+
+            NodeList titles = el.getElementsByTagName("Title");
+            if (titles.getLength() > 0) {
+                feature.title = titles.item(0).getTextContent();
+            }
+
+            NodeList abstracts = el.getElementsByTagName("Abstract");
+            if (abstracts.getLength() > 0) {
+                feature.abstractDescription
+                    = abstracts.item(0).getTextContent();
+            }
+
+            meta.features.add(feature);
+        }
         return meta;
     }
 }
