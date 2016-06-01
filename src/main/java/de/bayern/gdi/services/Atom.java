@@ -167,7 +167,8 @@ public class Atom extends WebService {
     }
 
     private String makeAttributeValue(String id, String categoryTerm) {
-        categoryTerm = categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
+        categoryTerm =
+            categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
         categoryTerm = EPSG + categoryTerm;
         String attrVal = null;
         attrVal = id.substring(0,
