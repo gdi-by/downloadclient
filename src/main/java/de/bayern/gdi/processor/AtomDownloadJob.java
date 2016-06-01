@@ -160,7 +160,8 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
     private boolean downloadFile(DLFile dlf) throws JobExecutionException {
 
-        log.log(Level.INFO, "Downloading '" + dlf.url + "' to '" + dlf.file);
+        log.log(Level.INFO,
+            "Downloading '" + dlf.url + "' to '" + dlf.file + "'");
         this.currentCount = 0;
 
         CloseableHttpClient client = getClient(dlf.url);
@@ -186,7 +187,8 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private static final long FAIL_SLEEP = 30 * 1000;
 
     private static final String DATASOURCE_XPATH
-        = "/atom:feed/atom:entry[atom:id/text()=$CODE]"
+        = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
+        + " inspire_dls:spatial_dataset_identifier_code/text()=$CODE]"
         + "/atom:link[@type='application/atom+xml']/@href";
 
     private static final NamespaceContext NAMESPACE_CONTEXT =
