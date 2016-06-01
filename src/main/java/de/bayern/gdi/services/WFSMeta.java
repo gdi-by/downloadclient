@@ -42,9 +42,16 @@ public class WFSMeta {
     public String abstractDescription;
     /** operations. */
     public List<Operation> operations;
+    /** supported constraints. */
+    public List<String> supportedConstraints;
+    /** unsupported constraints. */
+    public List<String> unsupportedConstraints;
+
 
     public WFSMeta() {
         operations = new ArrayList<>();
+        supportedConstraints = new ArrayList<>();
+        unsupportedConstraints = new ArrayList<>();
     }
 
     @Override
@@ -56,6 +63,16 @@ public class WFSMeta {
         sb.append("\toperations: {\n");
         for (Operation op: operations) {
             sb.append("\t\t").append(op).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tsupported constraints: {\n");
+        for (String c: supportedConstraints) {
+            sb.append("\t\t").append(c).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tunsupported constraints: {\n");
+        for (String c: unsupportedConstraints) {
+            sb.append("\t\t").append(c).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");

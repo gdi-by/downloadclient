@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
@@ -40,6 +41,14 @@ public class WFSMetaExtractor {
 
     private static final String XPATH_OPERATIONS
         = "//ows:OperationsMetadata/ows:Operation";
+
+    private static final String XPATH_SUPPORTED_CONSTRAINTS
+        = "//ows:OperationsMetadata/ows:Constraint"
+        + "[ows:DefaultValue/text()='TRUE']/@name";
+
+    private static final String XPATH_UNSUPPORTED_CONSTRAINTS
+        = "//ows:OperationsMetadata/ows:Constraint"
+        + "[ows:DefaultValue/text()='FALSE']/@name";
 
     private WFSMetaExtractor() {
     }
@@ -65,13 +74,27 @@ public class WFSMetaExtractor {
 
         NodeList nl = (NodeList)XML.xpath(
             capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, nc);
-
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             WFSMeta.Operation operation = new WFSMeta.Operation();
             Element node = (Element)nl.item(i);
             operation.name = node.getAttribute("name");
             meta.operations.add(operation);
         }
+
+        nl = (NodeList)XML.xpath(
+            capDoc, XPATH_SUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+        for (int i = 0, n = nl.getLength(); i < n; i++) {
+            Node node = nl.item(i);
+            meta.supportedConstraints.add(node.getTextContent());
+        }
+
+        nl = (NodeList)XML.xpath(
+            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+        for (int i = 0, n = nl.getLength(); i < n; i++) {
+            Node node = nl.item(i);
+            meta.unsupportedConstraints.add(node.getTextContent());
+        }
+
         return meta;
     }
 }
