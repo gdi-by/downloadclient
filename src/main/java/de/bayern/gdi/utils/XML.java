@@ -66,14 +66,13 @@ public class XML {
      */
     public static Document getDocument(File fileName) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(fileName);
+            return builder.parse(fileName);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return document;
+        return null;
     }
 
     /**
@@ -133,14 +132,13 @@ public class XML {
      * @return the child node, NULL if nothing found
      */
     public static Node getChildWithName(NodeList nl, String nodeName) {
-        Node retNode = null;
         for (int i = 0; i < nl.getLength(); i++) {
             Node curNode = nl.item(i);
             if (curNode.getNodeName().equals(nodeName)) {
                 return curNode;
             }
         }
-        return retNode;
+        return null;
     }
 
     /**
@@ -152,7 +150,6 @@ public class XML {
      */
     public static Document getDocument(URL url, String userName, String
             password) {
-        Document doc = null;
         try {
             URLConnection conn = null;
             if (url.toString().toLowerCase().startsWith("https")) {
@@ -170,11 +167,11 @@ public class XML {
             }
             //String xmlStr = streamToString(conn.getInputStream());
             //doc = getDocument(xmlStr);
-            doc = getDocument(conn.getInputStream(), true);
+            return getDocument(conn.getInputStream(), true);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return doc;
+        return null;
     }
 
     /**
@@ -184,15 +181,15 @@ public class XML {
      */
     public static final Document getDocument(String xmlString) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(xmlString);
+            return builder.parse(xmlString);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return document;
+        return null;
     }
+
     /**
      * Creates a new XPath without a namespace context.
      * @return the new XPath.
