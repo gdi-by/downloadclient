@@ -170,7 +170,7 @@ public class XML {
             }
             //String xmlStr = streamToString(conn.getInputStream());
             //doc = getDocument(xmlStr);
-            doc = getDocument(conn.getInputStream());
+            doc = getDocument(conn.getInputStream(), true);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
