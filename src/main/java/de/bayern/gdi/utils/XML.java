@@ -47,8 +47,6 @@ import javax.xml.xpath.XPathVariableResolver;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -116,32 +114,6 @@ public class XML {
      */
     public static Document getDocument(URL url) {
         return getDocument(url, null, null);
-    }
-
-    /**
-     * returns the first childnode with the given name.
-     * @param node Node to search in
-     * @param nodeName Name to search for
-     * @return the child node, NULL if nothing found
-     */
-    public static Node getChildWithName(Node node, String nodeName) {
-        return getChildWithName(node.getChildNodes(), nodeName);
-    }
-
-    /**
-     * returns the first childnode with the given name.
-     * @param nl Nodelist to search in
-     * @param nodeName Name to search for
-     * @return the child node, NULL if nothing found
-     */
-    public static Node getChildWithName(NodeList nl, String nodeName) {
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node curNode = nl.item(i);
-            if (curNode.getNodeName().equals(nodeName)) {
-                return curNode;
-            }
-        }
-        return null;
     }
 
     /**
