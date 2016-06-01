@@ -18,6 +18,7 @@
 package de.bayern.gdi.utils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +26,8 @@ import java.util.logging.Logger;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -94,5 +97,31 @@ public final class HTTP {
             log.log(Level.SEVERE,
                 "Closing HTTP client failed: " + ioe.getMessage(), ioe);
         }
+    }
+
+    private static void configureProxy(HttpGet request, String proto) {
+        String proxy = System.getProperty(proto + ".proxyHost");
+        if (proxy != null) {
+            Integer port = Integer.getInteger(proto + ".proxyPort");
+            HttpHost proxyHost = new HttpHost(proxy, port, proto);
+            RequestConfig config = RequestConfig.custom()
+                .setProxy(proxyHost)
+                .build();
+            request.setConfig(config);
+        }
+    }
+
+    /**
+     * Returns a configured GET request.
+     * @param url The URL to browse.
+     * @return The GET requst object.
+     * @throws URISyntaxException If the URL is not valid.
+     */
+    public static HttpGet getGetRequest(URL url) throws URISyntaxException {
+        HttpGet request = new HttpGet(url.toURI());
+        configureProxy(request, url.getProtocol().equals("https")
+            ? "https"
+            : "http");
+        return request;
     }
 }

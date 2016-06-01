@@ -38,6 +38,7 @@ import org.w3c.dom.NodeList;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Atom extends WebService {
+
     private String serviceURL;
     private String username;
     private String password;
@@ -170,18 +171,9 @@ public class Atom extends WebService {
 
     /**
      * @inheritDoc
-     * @return the URL of the Service
-     */
-    public String getServiceURL() {
-        return this.serviceURL;
-    }
-
-    /**
-     * @inheritDoc
      * @return the Type of the Service
      */
-    public WebService.Type getServiceType() {
-        return Type.Atom;
+    public ServiceType getServiceType() {
+        return ServiceType.Atom;
     }
-
 }

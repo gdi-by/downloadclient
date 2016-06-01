@@ -60,5 +60,5 @@ interface ServiceSchema {
     /**
      * gets the ServiceType.
      */
-    WebService.Type getServiceType();
+    ServiceType getServiceType();
 }

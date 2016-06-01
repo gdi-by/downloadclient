@@ -18,8 +18,10 @@
 package de.bayern.gdi.processor;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import de.bayern.gdi.utils.CountingInputStream;
@@ -104,6 +106,22 @@ public abstract class AbstractDownloadJob
         } catch (MalformedURLException mue) {
             throw new JobExecutionException(
                 I18n.format("file.download.bad.url", urlString));
+        }
+    }
+
+    /**
+     * Creates a configured GET request.
+     * @param url The URL to browse.
+     * @return The GET request object.
+     * @throws JobExecutionException If the URL is not valid.
+     */
+    protected static HttpGet getGetRequest(URL url)
+        throws JobExecutionException {
+        try {
+            return HTTP.getGetRequest(url);
+        } catch (URISyntaxException use) {
+            throw new JobExecutionException(
+                I18n.format("file.download.bad.url", url));
         }
     }
 }

@@ -53,7 +53,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     @Override
     protected void download() throws JobExecutionException {
-        URL url = toURL(this.urlString);;
+        URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
@@ -66,7 +66,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
         broadcastMessage(I18n.getMsg("file.download.start"));
 
         try {
-            HttpGet httpget = new HttpGet(this.urlString);
+            HttpGet httpget = getGetRequest(url);
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
             throw new JobExecutionException(
