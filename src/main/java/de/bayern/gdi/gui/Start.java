@@ -23,10 +23,13 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.event.EventHandler;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -35,8 +38,8 @@ public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start = null;
-    private static final int WIDTH = 400;
-    private static final int HEIGHT = 300;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
 
 
     /**
@@ -88,6 +91,13 @@ public class Start extends Application {
             primaryStage.setTitle("Download Client");
             primaryStage.setScene(scene);
             primaryStage.show();
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent e) {
+                    Platform.exit();
+                    System.exit(0);
+                }
+            });
         } catch (IOException ioe) {
             System.out.println("Could not find UI description file.");
             System.out.println(ioe.getMessage());

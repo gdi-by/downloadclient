@@ -30,6 +30,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.stage.WindowEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -91,7 +92,10 @@ public class Controller {
      */
     @FXML protected void handleCloseApp(ActionEvent event) {
         Stage stage = (Stage) mainMenu.getScene().getWindow();
-        stage.close();
+        stage.fireEvent(new WindowEvent(
+            stage,
+            WindowEvent.WINDOW_CLOSE_REQUEST
+        ));
     }
 
     /**
