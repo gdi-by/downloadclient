@@ -18,9 +18,7 @@
 package de.bayern.gdi.services;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -40,6 +38,31 @@ public class WFSMeta {
         }
     }
 
+    /** field. */
+    public static class Field {
+        /** name. */
+        public String name;
+        /** type. */
+        public String type;
+
+        public Field() {
+        }
+
+        /**
+         * @param name name.
+         * @param type type.
+         */
+        public Field(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return "field: { name: " + name + " type: " + type + " }";
+        }
+    }
+
 
     /** feature. */
     public static class Feature {
@@ -56,11 +79,11 @@ public class WFSMeta {
         /** bbox. */
         public ReferencedEnvelope bbox;
         /** fields. */
-        public Map<String, String> fields;
+        public List<Field> fields;
 
         public Feature() {
             otherCRSs = new ArrayList<>();
-            fields = new LinkedHashMap<>();
+            fields = new ArrayList<>();
         }
 
         private String otherCRSs() {
@@ -76,14 +99,11 @@ public class WFSMeta {
 
         private String fields() {
             StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (Map.Entry<String, String> entry: this.fields.entrySet()) {
-                if (first) {
-                    first = false;
-                } else {
+            for (int i = 0; i < fields.size(); i++) {
+                if (i > 0) {
                     sb.append(", ");
                 }
-                sb.append(entry.getKey() + ": " + entry.getValue());
+                sb.append(fields.get(i));
             }
             return sb.toString();
         }
