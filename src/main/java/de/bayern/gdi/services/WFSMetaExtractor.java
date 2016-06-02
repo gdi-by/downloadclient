@@ -232,15 +232,12 @@ public class WFSMetaExtractor {
 
         WFSMeta.Operation op = meta.findOperation("DescribeFeatureType");
         if (op == null) {
-            System.out.println("DescribeFeatureType not supported.");
             return;
         }
 
         String urlString = op.get != null
             ? op.get + "?request=DescribeFeatureType"
             : capURLString.replace("GetCapabilities", "DescribeFeatureType");
-
-        System.out.println("DescribeFeatureType: " + urlString);
 
         Document dfDoc = XML.getDocument(new URL(urlString));
         if (dfDoc == null) {
@@ -257,7 +254,6 @@ public class WFSMetaExtractor {
                 dfDoc, XPATH_DF_ELEMENT,
                 XPathConstants.NODESET, NAMESPACES, vars);
             if (elements.getLength() == 0) {
-                System.out.println("Feature " + name + " not found.");
                 continue;
             }
             Element element = (Element)elements.item(0);
@@ -270,15 +266,12 @@ public class WFSMetaExtractor {
 
         WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
         if (op == null) {
-            System.out.println("DescribeStoredQueries not supported.");
             return;
         }
 
         String urlString = op.get != null
             ? op.get + "?request=DescribeStoredQueries"
             : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
-
-        System.out.println("DescribeStoredQueries: " + urlString);
 
         Document dsqDoc = XML.getDocument(new URL(urlString));
         if (dsqDoc == null) {
