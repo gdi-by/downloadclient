@@ -121,6 +121,39 @@ public class WFSMeta {
         }
     }
 
+    /** stored Query. */
+    public static class StoredQuery {
+        /** id. */
+        public String id;
+        /** title. */
+        public String title;
+        /** parameters. */
+        public ArrayList<Field> parameters;
+
+        public StoredQuery() {
+            parameters = new ArrayList<>();
+        }
+
+        private String parameters() {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < parameters.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(parameters.get(i));
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String toString() {
+            return "stored query: { "
+                + "id: " + id + " "
+                + "title: " + title + " "
+                + "parameters: " + parameters() + " }";
+        }
+    }
+
     /** title. */
     public String title;
     /** abstract. */
@@ -133,12 +166,15 @@ public class WFSMeta {
     public List<String> unsupportedConstraints;
     /** features. */
     public List<Feature> features;
+    /** stored queries. */
+    public List<StoredQuery> storedQueries;
 
     public WFSMeta() {
         operations = new ArrayList<>();
         supportedConstraints = new ArrayList<>();
         unsupportedConstraints = new ArrayList<>();
         features = new ArrayList<>();
+        storedQueries = new ArrayList<>();
     }
 
     /**
@@ -188,6 +224,11 @@ public class WFSMeta {
         sb.append("\tfeatures: {\n");
         for (Feature f: features) {
             sb.append("\t\t").append(f).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tstored queries: {\n");
+        for (StoredQuery sq: storedQueries) {
+            sb.append("\t\t").append(sq).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");

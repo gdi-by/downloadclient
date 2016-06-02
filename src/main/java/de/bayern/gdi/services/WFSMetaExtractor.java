@@ -92,6 +92,9 @@ public class WFSMetaExtractor {
     private static final String XPATH_TYPES
         = "//xsd:*[local-name()='simpleType' or local-name()='complexType']";
 
+    private static final String XPATH_STORED_QUERIES
+        = "//wfs:StoredQueryDescription";
+
     private WFSMetaExtractor() {
     }
 
@@ -283,8 +286,32 @@ public class WFSMetaExtractor {
                 "Cannot load DescribeStoredQueries document.");
         }
 
-        // TODO: Implement me!
+        NodeList storedQueriesDesc = (NodeList)XML.xpath(
+            dsqDoc, XPATH_STORED_QUERIES,
+            XPathConstants.NODESET, NAMESPACES);
 
+        String wfs = "http://www.opengis.net/wfs/2.0";
+
+        for (int i = 0, n = storedQueriesDesc.getLength(); i < n; i++) {
+            Element sqd = (Element)storedQueriesDesc.item(i);
+            WFSMeta.StoredQuery sq = new WFSMeta.StoredQuery();
+            sq.id = sqd.getAttribute("id");
+            NodeList titles = sqd.getElementsByTagNameNS(wfs, "Title");
+            if (titles.getLength() > 0) {
+                sq.title = titles.item(0).getTextContent();
+            }
+            NodeList parameters =
+                sqd.getElementsByTagNameNS(wfs, "Parameter");
+            for (int j = 0, m = parameters.getLength(); j < m; j++) {
+                Element parameter = (Element)parameters.item(j);
+                WFSMeta.Field p = new WFSMeta.Field(
+                    parameter.getAttribute("name"),
+                    parameter.getAttribute("type"));
+                sq.parameters.add(p);
+            }
+
+            meta.storedQueries.add(sq);
+        }
     }
 
     private static void parseCapabilites(String capURLString, WFSMeta meta)
