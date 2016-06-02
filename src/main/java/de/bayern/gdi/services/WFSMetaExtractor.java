@@ -47,6 +47,11 @@ public class WFSMetaExtractor {
             throw new RuntimeException(e);
         }
     }
+    private static final NamespaceContext NAMESPACES =
+        new NamespaceContextMap(
+            "ows", "http://www.opengis.net/ows/1.1",
+            "wfs", "http://www.opengis.net/wfs/2.0",
+            "xlink", "http://www.w3.org/1999/xlink");
 
     private static final String XPATH_TITLE
         = "//ows:ServiceIdentification/ows:Title/text()";
@@ -72,6 +77,9 @@ public class WFSMetaExtractor {
         = "//*[substring(local-name(),"
         + "string-length(local-name()) - string-length('Corner') +1)"
         + "= 'Corner']/text()";
+
+    private static final String XPATH_OPERATION_GET
+        = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
 
     private WFSMetaExtractor() {
     }
@@ -126,11 +134,6 @@ public class WFSMetaExtractor {
         return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
 
-    private static final NamespaceContext NAMESPACES =
-        new NamespaceContextMap(
-            "ows", "http://www.opengis.net/ows/1.1",
-            "wfs", "http://www.opengis.net/wfs/2.0");
-
     /**
      * Extracts meta information from a given capabilities path.
      * @param capURLString The URL of the capabilities document.
@@ -148,19 +151,49 @@ public class WFSMetaExtractor {
     private static void parseDescribeFeatures(
         String capURLString, WFSMeta meta) throws IOException {
 
-        if (!meta.isOperationSupported("DescribeFeatureType")) {
+        WFSMeta.Operation op = meta.findOperation("DescribeFeatureType");
+        if (op == null) {
+            System.out.println("DescribeFeatureType not supported.");
             return;
         }
+
+        String urlString = op.get != null
+            ? op.get + "?request=DescribeFeatureType"
+            : capURLString.replace("GetCapabilities", "DescribeFeatureType");
+
+        System.out.println("DescribeFeatureType: " + urlString);
+
+        Document dfDoc = XML.getDocument(new URL(urlString));
+        if (dfDoc == null) {
+            throw new IOException("Cannot load DescribeFeatureType document.");
+        }
+
         // TODO: Implement me!
     }
 
     private static void parseDescribeStoredQueries(
         String capURLString, WFSMeta meta) throws IOException {
 
-        if (!meta.isOperationSupported("DescribeStoredQueries")) {
+        WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
+        if (op == null) {
+            System.out.println("DescribeStoredQueries not supported.");
             return;
         }
+
+        String urlString = op.get != null
+            ? op.get + "?request=DescribeStoredQueries"
+            : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
+
+        System.out.println("DescribeStoredQueries: " + urlString);
+
+        Document dsqDoc = XML.getDocument(new URL(urlString));
+        if (dsqDoc == null) {
+            throw new IOException(
+                "Cannot load DescribeStoredQueries document.");
+        }
+
         // TODO: Implement me!
+
     }
 
     private static void parseCapabilites(String capURLString, WFSMeta meta)
@@ -182,6 +215,8 @@ public class WFSMetaExtractor {
             WFSMeta.Operation operation = new WFSMeta.Operation();
             Element node = (Element)nl.item(i);
             operation.name = node.getAttribute("name");
+            operation.get = XML.xpathString(
+                node, XPATH_OPERATION_GET, NAMESPACES);
             meta.operations.add(operation);
         }
 

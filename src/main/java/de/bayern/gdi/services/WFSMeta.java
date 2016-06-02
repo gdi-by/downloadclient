@@ -106,12 +106,21 @@ public class WFSMeta {
      * @return true if operation is supported false otherwise.
      */
     public boolean isOperationSupported(String name) {
+        return findOperation(name) != null;
+    }
+
+    /**
+     * Find an operation by name.
+     * @param name The name of the operation.
+     * @return The operation if found null otherwise.
+     */
+    public Operation findOperation(String name) {
         for (Operation op: this.operations) {
             if (op.name.equals(name)) {
-                return true;
+                return op;
             }
         }
-        return false;
+        return null;
     }
 
     @Override
