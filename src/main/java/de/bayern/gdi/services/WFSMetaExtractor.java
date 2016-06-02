@@ -126,6 +126,11 @@ public class WFSMetaExtractor {
         return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
 
+    private static final NamespaceContext NAMESPACES =
+        new NamespaceContextMap(
+            "ows", "http://www.opengis.net/ows/1.1",
+            "wfs", "http://www.opengis.net/wfs/2.0");
+
     /**
      * Extracts meta information from a given capabilities path.
      * @param capURLString The URL of the capabilities document.
@@ -138,16 +143,13 @@ public class WFSMetaExtractor {
         if (capDoc == null) {
             throw new IOException("Cannot load capabilities document.");
         }
-        NamespaceContextMap nc = new NamespaceContextMap(
-                "ows", "http://www.opengis.net/ows/1.1",
-                "wfs", "http://www.opengis.net/wfs/2.0");
         WFSMeta meta = new WFSMeta();
-        meta.title = XML.xpathString(capDoc, XPATH_TITLE, nc);
+        meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
-            = XML.xpathString(capDoc, XPATH_ABSTRACT, nc);
+            = XML.xpathString(capDoc, XPATH_ABSTRACT, NAMESPACES);
 
         NodeList nl = (NodeList)XML.xpath(
-            capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             WFSMeta.Operation operation = new WFSMeta.Operation();
             Element node = (Element)nl.item(i);
@@ -156,21 +158,23 @@ public class WFSMetaExtractor {
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_SUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_SUPPORTED_CONSTRAINTS,
+            XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Node node = nl.item(i);
             meta.supportedConstraints.add(node.getTextContent());
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS,
+            XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Node node = nl.item(i);
             meta.unsupportedConstraints.add(node.getTextContent());
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_FEATURETYPES, XPathConstants.NODESET, nc);
+            capDoc, XPATH_FEATURETYPES, XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Element el = (Element)nl.item(i);
 
@@ -203,7 +207,7 @@ public class WFSMetaExtractor {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }
 
-            feature.bbox = getBounds(el, nc);
+            feature.bbox = getBounds(el, NAMESPACES);
 
             meta.features.add(feature);
         }
