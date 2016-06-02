@@ -17,7 +17,6 @@
  */
 package de.bayern.gdi.model;
 
-import de.bayern.gdi.services.WebService;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,15 +35,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import de.bayern.gdi.services.ServiceType;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 @XmlRootElement(name = "DownloadSchritt")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DownloadStep {
-
-    private static final Logger log
-        = Logger.getLogger(DownloadStep.class.getName());
 
     @XmlElement(name = "ServiceTyp")
     private String serviceType;
@@ -158,7 +155,7 @@ public class DownloadStep {
     /**
      * @param serviceType the serviceType to set
      */
-    public void setServiceType(WebService.Type serviceType) {
+    public void setServiceType(ServiceType serviceType) {
         this.setServiceType(serviceType.toString());
     }
 

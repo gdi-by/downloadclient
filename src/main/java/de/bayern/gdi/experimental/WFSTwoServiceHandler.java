@@ -48,6 +48,5 @@ public class WFSTwoServiceHandler {
         this.password = password;
         this.ws = new WFSTwo(this.serviceURL, this.userName, this.password);
         typeName = this.ws.getTypes().get(0);
-        System.out.println(ws.getBounds(BBOX, typeName));
     }
 }

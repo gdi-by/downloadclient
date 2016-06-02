@@ -18,36 +18,19 @@
 
 package de.bayern.gdi.services;
 
-import java.io.IOException;
-import java.io.InputStream;
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
-
-import org.geotools.csw.CSWConfiguration;
-import org.geotools.xml.Parser;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import de.bayern.gdi.utils.StringUtils;
-import de.bayern.gdi.utils.XML;
-import de.bayern.gdi.utils.NamespaceContextMap;
-
-import net.opengis.cat.csw20.CapabilitiesType;
-import net.opengis.ows10.ServiceProviderType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -58,13 +41,20 @@ public class CatalogService {
             "http://www.opengis.net/cat/csw/2.0.2";
     private static final String GMD_NAMESPACE =
             "http://www.isotc211.org/2005/gmd";
+    private static final String OWS_NAMESPACE =
+            "http://www.opengis.net/ows";
+    private static final String SRV_NAMESPACE =
+            "http://www.isotc211.org/2005/srv";
+    private static final String GCO_NAMESPACE =
+            "http://www.isotc211.org/2005/gco";
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
     private URL catalogURL;
     private String userName;
     private static final int MIN_SEARCHLENGTH = 2;
     private String password;
-    private ServiceProviderType serviceProvider;
+    private String providerName;
+    private NamespaceContext context;
 
     /**
      * Constructor.
@@ -105,9 +95,21 @@ public class CatalogService {
         this.catalogURL = url;
         this.userName = userName;
         this.password = password;
-        Object parsed = getParsedObject(this.catalogURL);
-        CapabilitiesType servciceCapType = (CapabilitiesType) parsed;
-        this.serviceProvider = servciceCapType.getServiceProvider();
+        this.context = new NamespaceContextMap(
+                "csw", CSW_NAMESPACE,
+                "gmd", GMD_NAMESPACE,
+                "ows", OWS_NAMESPACE,
+                "srv", SRV_NAMESPACE,
+                "gco", GCO_NAMESPACE);
+        Document xml = XML.getDocument(this.catalogURL,
+                this.userName,
+                this.password);
+        String getProviderExpr = "//ows:ServiceIdentification/ows:Title";
+        Node providerNameNode = (Node) XML.xpath(xml,
+                getProviderExpr,
+                XPathConstants.NODE,
+                context);
+        this.providerName = providerNameNode.getTextContent();
     }
 
     /**
@@ -115,7 +117,7 @@ public class CatalogService {
      * @return Name of the service Provider
      */
     public String getProviderName() {
-        return this.serviceProvider.getProviderName();
+        return this.providerName;
     }
 
     /**
@@ -127,102 +129,83 @@ public class CatalogService {
         Map<String, String> map = new HashMap<>();
         if (filter.length() > MIN_SEARCHLENGTH) {
             URL requestURL = setURLRequestAndSearch(filter);
-            /* FIXME - WHEN TRYING TO USE IMPLEMENTED STUFF EXCEPTION RISES:
-            java.lang.NoSuchMethodException:
-            net.opengis.cat.csw20.impl.Csw20FactoryImpl
-                .createAbstractRecordType()
-            Use this piece of code to retrieve expected Excpetion
-            Object parsed = this.getParsedObject(requestURL);
-            GetRecordsResponseType records = (GetRecordsResponseType) parsed;
-            SearchResultsType searchResults = records.getSearchResults();
-            for (AbstractRecordType recordType : searchResults.getAbstractRecord
-                    ()) {
-                System.out.println(recordType.toString());
-            }
-            */
-
             Document xml = XML.getDocument(requestURL,
                     this.userName,
                     this.password);
-            String searchResultExpression =
-                    "//*[local-name()='SearchResults']";
-            NamespaceContext context = new NamespaceContextMap(
-                    "csw", CSW_NAMESPACE,
-                    "gmd", GMD_NAMESPACE);
-            Node searchResultsNode = (Node) XML.xpath(xml,
-                    searchResultExpression,
-                    XPathConstants.NODE, context);
-            NamedNodeMap searchResultsNodeAttributes =
-                    searchResultsNode.getAttributes();
-            Node searchResultsNodeAttributesRecordsMatchedItem =
-                    searchResultsNodeAttributes.getNamedItem(
-                            "numberOfRecordsMatched");
-            int numberOfRecordsMatched =
-                    Integer.parseInt(
-                            searchResultsNodeAttributesRecordsMatchedItem
-                    .getTextContent());
-            if (numberOfRecordsMatched > 0) {
-                //System.out.println("More than one Result found");
-                String identificationExpression =
-                        "//*[local-name()='identificationInfo']";
-                NodeList identificationNL = (NodeList) XML.xpath(
-                        searchResultsNode,
-                        identificationExpression,
-                        XPathConstants.NODESET, context);
-                //System.out.println(identificationNL.getLength());
-                String transferoptionsExprssion =
-                        "//*[local-name()='transferOptions']";
-                NodeList transferoptionsNL = (NodeList) XML.xpath(
-                        searchResultsNode,
-                        transferoptionsExprssion,
-                        XPathConstants.NODESET, context);
-                //System.out.println(transferoptionsNL.getLength());
-                if (identificationNL.getLength() == transferoptionsNL
-                        .getLength()) {
-                    log.log(Level.INFO, "Found " + numberOfRecordsMatched
-                            + " Entries in the Catalog",
-                            numberOfRecordsMatched);
-                    String characterStringExpression =
-                            "//*[local-name()='CharacterString']";
-                    for (int i = 0; i < numberOfRecordsMatched; i++) {
-                        Node identificationN = identificationNL.item(i);
-                        Node transferoptinN = transferoptionsNL.item(i);
-                        String titleExpression =
-                                "//*[local-name()='title']";
-                        Node titlteNode = (Node) XML.xpath(identificationN,
-                                titleExpression,
-                                XPathConstants.NODE, context);
-                        Node titleCharStringNode = XML.getChildWithName(
-                                titlteNode, "gco:CharacterString");
-                        String title = titleCharStringNode.getTextContent();
-                        Node digitalTransferOptionsNode = XML.getChildWithName(
-                                        transferoptinN,
-                                        "gmd:MD_DigitalTransferOptions");
-                        Node onLineNode = XML.getChildWithName(
-                                digitalTransferOptionsNode, "gmd:onLine");
-                        Node onlineRessourceNode = XML.getChildWithName(
-                                onLineNode, "gmd:CI_OnlineResource");
-                        Node linkageNode = XML.getChildWithName(
-                                onlineRessourceNode,
-                                        "gmd:linkage");
-                        Node urlNode = XML.getChildWithName(linkageNode,
-                                "gmd:URL");
-                        String url = urlNode.getTextContent();
-                        url = makeCapabiltiesURL(url);
-                        map.put(title, url);
+            String numberOfResultsExpr =
+                    "//csw:SearchResults/@numberOfRecordsMatched";
+            Double numberOfResults = (Double) XML.xpath(xml,
+                    numberOfResultsExpr,
+                    XPathConstants.NUMBER, this.context);
+            String nodeListOfServicesExpr =
+                    "//csw:SearchResults//gmd:MD_Metadata";
+            NodeList servicesNL = (NodeList) XML.xpath(xml,
+                    nodeListOfServicesExpr,
+                    XPathConstants.NODESET, this.context);
+            if (numberOfResults.intValue() == servicesNL.getLength()) {
+                for (int i = 0; i < numberOfResults; i++) {
+                    Node serviceN = servicesNL.item(i);
+                    String nameExpr =
+                            "gmd:identificationInfo"
+                                    + "/srv:SV_ServiceIdentification"
+                                    + "/gmd:citation"
+                                    + "/gmd:CI_Citation"
+                                    + "/gmd:title"
+                                    + "/gco:CharacterString";
+                    String serviceName = (String) XML.xpath(serviceN,
+                            nameExpr,
+                            XPathConstants.STRING, context);
+
+                    String typeExpr =
+                            "gmd:identificationInfo"
+                                    + "/srv:SV_ServiceIdentification"
+                                    + "/srv:serviceTypeVersion"
+                                    + "/gco:CharacterString";
+                    String serviceType = (String) XML.xpath(serviceN,
+                            typeExpr,
+                            XPathConstants.STRING, context);
+
+                    String urlExpr =
+                            "gmd:distributionInfo"
+                                    + "/gmd:MD_Distribution"
+                                    + "/gmd:transferOptions"
+                                    + "/gmd:MD_DigitalTransferOptions"
+                                    + "/gmd:onLine"
+                                    + "/gmd:CI_OnlineResource"
+                                    + "/gmd:linkage"
+                                    + "/gmd:URL";
+                    String serviceURL = (String) XML.xpath(serviceN,
+                            urlExpr,
+                            XPathConstants.STRING, context);
+                    if (serviceType.toUpperCase().contains("WFS")
+                            || serviceType.toUpperCase().contains("ATOM")
+                            || serviceType.toUpperCase().contains("DOWNLOAD")) {
+                        serviceURL = makeCapabiltiesURL(serviceURL,
+                                serviceType);
+                        map.put(serviceName, serviceURL);
                     }
                 }
             }
-
         }
         return map;
     }
 
-    private String makeCapabiltiesURL(String url) {
-        if (url.endsWith("?")) {
-            url = url + "service=wfs&request=GetCapabilities";
+    private String makeCapabiltiesURL(String url, String type) {
+        if (url.endsWith("?") && type.toUpperCase().contains("WFS")) {
+            return url + "service=wfs&version=" + getVersionOfType(type)
+                    + "&request=GetCapabilities";
+        }
+        if (!url.toUpperCase().contains("GETCAPABILITIES") && type
+                .toUpperCase().contains("WFS")) {
+            return url + "?service=wfs&version=" + getVersionOfType(type)
+                    + "request=GetCapabilities";
         }
         return url;
+    }
+
+    private String getVersionOfType(String type) {
+        String versionNumber = type.substring(type.lastIndexOf(" ") + 1);
+        return versionNumber;
     }
     private URL setURLRequestAndSearch(String search) {
         URL newURL = null;
@@ -249,34 +232,4 @@ public class CatalogService {
         return newURL;
     }
 
-    private Object getParsedObject(URL url) {
-        Object parsed = null;
-        try {
-            CSWConfiguration configuration =
-                    new CSWConfiguration();
-            Parser parser = new Parser(configuration);
-            URLConnection conn = null;
-            if (url.toString().toLowerCase().startsWith("https")) {
-                HttpsURLConnection con
-                        = (HttpsURLConnection) url.openConnection();
-                conn = (URLConnection) con;
-            } else {
-                conn = url.openConnection();
-            }
-            if (StringUtils.getBase64EncAuth(
-                    this.userName, this.password) != null) {
-                conn.setRequestProperty("Authorization", "Basic "
-                        + StringUtils.getBase64EncAuth(
-                        this.userName, this.password));
-            }
-            InputStream is = conn.getInputStream();
-            InputSource xml = new InputSource(is);
-            parsed = parser.parse(xml);
-        } catch (IOException
-                | SAXException
-                | ParserConfigurationException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return parsed;
-    }
 }

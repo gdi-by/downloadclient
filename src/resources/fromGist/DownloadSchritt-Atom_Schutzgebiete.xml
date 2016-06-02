@@ -1,0 +1,12 @@
+<DownloadSchritt>
+    <ServiceTyp>ATOM</ServiceTyp>    
+    <URL>http://www.lfu.bayern.de/gdi/dls/schutzgebiete.xml</URL>    
+    <Dataset>http://www.lfu.bayern.de/gdi/dls/schutzgebiete.DEBY_3A6C9B7D-5BBA-4089-A94D-83CFCF18F206.xml</Dataset>
+    <Parameters>
+        <Parameter>            
+            <Name>VARIATION</Name>            
+            <Wert>DEBY_3A6C9B7D-5BBA-4089-A94D-83CFCF18F206_EPSG31468_SHP</Wert>
+        </Parameter>
+    </Parameters>
+    <DownloadPfad>/tmp/20160601_132550/gdibydl-atom-schutzgebiete</DownloadPfad>
+</DownloadSchritt>

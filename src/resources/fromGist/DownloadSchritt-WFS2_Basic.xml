@@ -39,5 +39,5 @@
             <Wert>5500000,4500000,5500500,4500500,urn:ogc:def:crs:EPSG::31468</Wert>
         </Parameter>
     </Parameters>
-    <DownloadPfad>/tmp/</DownloadPfad>
+    <DownloadPfad>/tmp/gdibydl-WFS2-BASIC</DownloadPfad>
 </DownloadSchritt>
