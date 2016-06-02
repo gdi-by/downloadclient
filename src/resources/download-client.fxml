@@ -21,7 +21,7 @@
       </MenuBar>
       <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
          <items>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="140.0" SplitPane.resizableWithParent="false">
                <children>
                   <VBox layoutX="37.0" layoutY="147.0" prefHeight="398.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -103,82 +103,98 @@
                               <Insets bottom="5.0" left="15.0" right="15.0" />
                            </VBox.margin>
                         </ComboBox>
-                        <StackPane prefHeight="337.0" prefWidth="396.0" VBox.vgrow="ALWAYS">
-                           <children>
-                              <VBox fx:id="basicWFSContainer" prefHeight="200.0" prefWidth="100.0">
-                                 <children>
-                                    <Group fx:id="mapNodeWFS">
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </VBox.margin>
-                                    </Group>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                        <SplitPane dividerPositions="0.7" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+                           <items>
+                              <ScrollPane prefViewportHeight="314.0" prefViewportWidth="590.0">
+                                 <content>
+                                    <StackPane prefHeight="337.0">
                                        <children>
-                                          <Label text="Datenformat">
-                                             <HBox.margin>
-                                                <Insets bottom="5.0" left="15.0" right="39.0" top="5.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <ComboBox fx:id="dataformatChooser" onAction="#handleDataformatSelect" prefWidth="150.0" />
+                                          <VBox fx:id="basicWFSContainer">
+                                             <children>
+                                                <Group fx:id="mapNodeWFS">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </VBox.margin>
+                                                </Group>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                   <children>
+                                                      <Label text="Datenformat">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="39.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <ComboBox fx:id="dataformatChooser" onAction="#handleDataformatSelect" prefWidth="150.0" />
+                                                   </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                   <children>
+                                                      <Label text="ReferenzSystem">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="15.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <ComboBox fx:id="referenceSystemChooser" onAction="#handleReferenceSystemSelect" prefWidth="150.0" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <VBox fx:id="simpleWFSContainer" prefHeight="200.0" prefWidth="100.0" />
+                                          <VBox fx:id="atomContainer" prefHeight="200.0" prefWidth="100.0">
+                                             <children>
+                                                <Group fx:id="mapNodeAtom">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </VBox.margin>
+                                                </Group>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Label text="Label" />
+                                                   </children>
+                                                </HBox>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Label text="Label" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
                                        </children>
-                                    </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                    </StackPane>
+                                 </content>
+                              </ScrollPane>
+                              <ScrollPane prefViewportHeight="159.0" prefViewportWidth="590.0">
+                                 <content>
+                                    <VBox fx:id="chainContainer" minWidth="-Infinity" prefHeight="128.0" prefWidth="574.0">
                                        <children>
-                                          <Label text="ReferenzSystem">
-                                             <HBox.margin>
-                                                <Insets bottom="5.0" left="15.0" right="15.0" top="5.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <ComboBox fx:id="referenceSystemChooser" onAction="#handleReferenceSystemSelect" prefWidth="150.0" />
+                                          <CheckBox fx:id="chkChain" mnemonicParsing="false" text="Weiterverarbeitung">
+                                             <VBox.margin>
+                                                <Insets left="15.0" top="5.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <VBox fx:id="containerChain" prefHeight="103.0" prefWidth="574.0">
+                                             <children>
+                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Label text="Verarbeitungskette">
+                                                         <font>
+                                                            <Font name="System Bold" size="13.0" />
+                                                         </font>
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <Button fx:id="addChainItem" mnemonicParsing="false" onAction="#handleAddChainItem" text="Add" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
                                        </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                              <VBox fx:id="simpleWFSContainer" prefHeight="200.0" prefWidth="100.0" />
-                              <VBox fx:id="atomContainer" prefHeight="200.0" prefWidth="100.0">
-                                 <children>
-                                    <Group fx:id="mapNodeAtom">
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </VBox.margin>
-                                    </Group>
-                                    <HBox prefHeight="100.0" prefWidth="200.0">
-                                       <children>
-                                          <Label text="Label" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="100.0" prefWidth="200.0">
-                                       <children>
-                                          <Label text="Label" />
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </StackPane>
-                        <Separator prefWidth="200.0">
-                           <VBox.margin>
-                              <Insets top="5.0" />
-                           </VBox.margin>
-                        </Separator>
-                        <CheckBox fx:id="chkChain" mnemonicParsing="false" text="Weiterverarbeitung">
-                           <VBox.margin>
-                              <Insets left="15.0" top="5.0" />
-                           </VBox.margin>
-                        </CheckBox>
-                        <VBox fx:id="containerChain" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <Label text="Verarbeitungskette">
-                                 <VBox.margin>
-                                    <Insets left="15.0" top="5.0" />
-                                 </VBox.margin>
-                                 <font>
-                                    <Font name="System Bold" size="13.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </VBox>
-                        <HBox minHeight="-Infinity" prefHeight="53.0" prefWidth="590.0">
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                           </items>
+                        </SplitPane>
+                        <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="54.0" prefWidth="590.0" VBox.vgrow="NEVER">
                            <children>
                               <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="134.0" text="Download starten" textAlignment="CENTER">
                                  <HBox.margin>

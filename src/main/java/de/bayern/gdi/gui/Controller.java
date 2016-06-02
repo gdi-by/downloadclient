@@ -63,11 +63,13 @@ import de.bayern.gdi.utils.ServiceChecker;
  */
 public class Controller {
 
-    private static final int MAP_WIDTH = 300;
+    private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
 
     // DataBean
     private DataBean dataBean;
+
+    private UIFactory factory;
 
     @FXML private MenuItem menuCloseApp;
     @FXML private MenuBar mainMenu;
@@ -82,6 +84,7 @@ public class Controller {
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
+    @FXML private VBox chainContainer;
     @FXML private Group mapNodeWFS;
     @FXML private Group mapNodeAtom;
 
@@ -189,6 +192,15 @@ public class Controller {
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
         System.out.println("Format select...");
+    }
+
+    /**
+     * Handle the dataformat selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleAddChainItem(ActionEvent event) {
+        factory.addChainAttribute(this.dataBean, chainContainer);
     }
 
     /**
@@ -374,6 +386,7 @@ public class Controller {
      * @param dataBean the model
      */
     public Controller() {
+        this.factory = new UIFactory();
 /*
         //this.dataBean = dataBean;
         //this.view = new View();
