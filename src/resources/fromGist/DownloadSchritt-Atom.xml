@@ -36,5 +36,5 @@
             <Wert>DEBY_be02ca29-8fb8-3751-be64-2272385bfe33_EPSG31468</Wert>
         </Parameter>
     </Parameters>
-    <DownloadPfad>/tmp/</DownloadPfad>
+    <DownloadPfad>/tmp/gdibydl-atom</DownloadPfad>
 </DownloadSchritt>

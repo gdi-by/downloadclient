@@ -18,15 +18,14 @@
 package de.bayern.gdi.processor;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Make DownloadStep configurations suitable for the download processor. */
@@ -131,29 +130,6 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static final SimpleDateFormat DF_FORMAT
-        = new SimpleDateFormat("yyyyMMddHHmmss");
-
-    private static final int MAX_TRIES = 1000;
-
-    private static final String PREFIX = "gdibydl-";
-
-    // XXX: This is pontentially racy!!!
-    private static File createWorkingDir(File parent) {
-
-        Date now = new Date();
-
-        String dir = PREFIX + DF_FORMAT.format(now);
-        File path = new File(parent, dir);
-        int count = 0;
-        while (count < MAX_TRIES && path.exists()) {
-            ++count;
-            dir = PREFIX + DF_FORMAT.format(now) + "-" + count;
-            path = new File(parent, dir);
-        }
-
-        return count < MAX_TRIES && path.mkdirs() ? path : null;
-    }
 
     private static final String OGR2OGR
         = System.getProperty("ogr2ogr", "ogr2ogr");
@@ -248,17 +224,24 @@ public class DownloadStepConverter {
         String password = dls.findParameter("password");
 
         File path = new File(dls.getPath());
-        File workingDir = createWorkingDir(path.isDirectory()
-            ? path
-            : path.getParentFile());
 
-        if (dls.getServiceType().equals("ATOM")) {
-            createAtomDownload(jl, workingDir, user, password, dls);
-        } else {
-            createWfsDownload(jl, workingDir, user, password, dls);
+        if (!path.exists()) {
+            if (!path.mkdirs()) {
+                throw new ConverterException(
+                    I18n.format("dls.converter.cant.create.dir", path));
+            }
+        } else if (!path.isDirectory()) {
+            throw new ConverterException(
+                I18n.format("dls.converter.not.dir", path));
         }
 
-        createProcessings(dls, jl, workingDir);
+        if (dls.getServiceType().equals("ATOM")) {
+            createAtomDownload(jl, path, user, password, dls);
+        } else {
+            createWfsDownload(jl, path, user, password, dls);
+        }
+
+        createProcessings(dls, jl, path);
 
         return jl;
     }

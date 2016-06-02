@@ -8,5 +8,5 @@
             <Wert>http://www.geodaten.bayern.de/opendata/DGM200.zip</Wert>
         </Parameter>
     </Parameters>
-    <DownloadPfad>/tmp/20160601_132755</DownloadPfad>
+    <DownloadPfad>/tmp/gdibydl-atom-dgm200</DownloadPfad>
 </DownloadSchritt>
