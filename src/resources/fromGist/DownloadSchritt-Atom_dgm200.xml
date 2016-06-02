@@ -1,0 +1,12 @@
+<DownloadSchritt>
+    <ServiceTyp>ATOM</ServiceTyp>    
+    <URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/4331d3ef-a12d-48be-a9b9-9597c2591448</URL>    
+    <Dataset>1d4ab890-27e7-3ebb-95ba-2d2ab8071871</Dataset>
+    <Parameters>
+        <Parameter>            
+            <Name>VARIATION</Name>            
+            <Wert>http://www.geodaten.bayern.de/opendata/DGM200.zip</Wert>
+        </Parameter>
+    </Parameters>
+    <DownloadPfad>/tmp/20160601_132755</DownloadPfad>
+</DownloadSchritt>

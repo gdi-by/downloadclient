@@ -223,8 +223,10 @@ public class DownloadStepConverter {
         DownloadStep dls
     ) throws ConverterException {
         String dataset = dls.getDataset();
+        String url = dls.getServiceURL();
         String variation = dls.findParameter("VARIATION");
         AtomDownloadJob job = new AtomDownloadJob(
+            url,
             dataset,
             variation,
             workingDir,

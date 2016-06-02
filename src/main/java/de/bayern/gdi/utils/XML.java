@@ -23,12 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.HttpsURLConnection;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,9 +43,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,14 +67,13 @@ public class XML {
      */
     public static Document getDocument(File fileName) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(fileName);
+            return builder.parse(fileName);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return document;
+        return null;
     }
 
     /**
@@ -117,30 +117,31 @@ public class XML {
     }
 
     /**
-     * returns the first childnode with the given name.
-     * @param node Node to search in
-     * @param nodeName Name to search for
-     * @return the child node, NULL if nothing found
+     * Gets an XML Document from a remote location.
+     * @param url the URL
+     * @param userName the Username {NULL if none needed}
+     * @param password the Password {NULLL if none needed}
+     * @param nameSpaceAware if namespace aware or not
+     * @return an XML Document
      */
-    public static Node getChildWithName(Node node, String nodeName) {
-        return getChildWithName(node.getChildNodes(), nodeName);
-    }
+    public static Document getDocument(
+        URL    url,
+        String userName,
+        String password,
+        boolean nameSpaceAware) {
 
-    /**
-     * returns the first childnode with the given name.
-     * @param nl Nodelist to search in
-     * @param nodeName Name to search for
-     * @return the child node, NULL if nothing found
-     */
-    public static Node getChildWithName(NodeList nl, String nodeName) {
-        Node retNode = null;
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node curNode = nl.item(i);
-            if (curNode.getNodeName().equals(nodeName)) {
-                return curNode;
-            }
+        CloseableHttpClient client = HTTP.getClient(url, userName, password);
+        try {
+            HttpGet request = HTTP.getGetRequest(url);
+            DocumentResponseHandler handler = new DocumentResponseHandler();
+            handler.setNamespaceAware(nameSpaceAware);
+            return client.execute(request, handler);
+        } catch (IOException | URISyntaxException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            HTTP.closeGraceful(client);
         }
-        return retNode;
+        return null;
     }
 
     /**
@@ -150,31 +151,11 @@ public class XML {
      * @param password the Password {NULLL if none needed}
      * @return an XML Document
      */
-    public static Document getDocument(URL url, String userName, String
-            password) {
-        Document doc = null;
-        try {
-            URLConnection conn = null;
-            if (url.toString().toLowerCase().startsWith("https")) {
-                HttpsURLConnection con
-                        = (HttpsURLConnection) url.openConnection();
-                conn = (URLConnection) con;
-            } else {
-                conn = url.openConnection();
-            }
-            if (StringUtils.getBase64EncAuth(
-                    userName, password) != null) {
-                conn.setRequestProperty("Authorization", "Basic "
-                        + StringUtils.getBase64EncAuth(
-                        userName, password));
-            }
-            //String xmlStr = streamToString(conn.getInputStream());
-            //doc = getDocument(xmlStr);
-            doc = getDocument(conn.getInputStream(), true);
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return doc;
+    public static Document getDocument(
+            URL    url,
+            String userName,
+            String password) {
+        return getDocument(url, userName, password, true);
     }
 
     /**
@@ -184,15 +165,15 @@ public class XML {
      */
     public static final Document getDocument(String xmlString) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document document = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(xmlString);
+            return builder.parse(xmlString);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return document;
+        return null;
     }
+
     /**
      * Creates a new XPath without a namespace context.
      * @return the new XPath.

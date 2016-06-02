@@ -79,7 +79,8 @@ public class Atom extends WebService {
         }
         this.mainDoc = XML.getDocument(url,
                 this.username,
-                this.password);
+                this.password,
+                false);
         this.nscontext = new NamespaceContextMap("",
                 "http://www.w3.org/2005/Atom");
     }
@@ -139,6 +140,11 @@ public class Atom extends WebService {
                 this.nscontext);
         Node entry = n.getParentNode();
         //Predefined in ATOM Service
+        String getId = "id";
+        String id = (String) XML.xpath(entry,
+                getId,
+                XPathConstants.STRING,
+                this.nscontext);
         String getCategories = "category";
         NodeList cL = (NodeList) XML.xpath(entry,
                 getCategories,
@@ -152,21 +158,25 @@ public class Atom extends WebService {
                 Node catAttr = catAttributes.item(j);
                 if (catAttr.getNodeName().equals("term")) {
                     epsg = catAttr.getTextContent();
-                    break;
+                    String attrVal = makeAttributeValue(id, epsg);
+                    attributes.put(ATTRIBUTENAME + String.valueOf(i), attrVal);
                 }
-            }
-            if (epsg != null) {
-                epsg = epsg.substring(epsg.lastIndexOf("/") + 1);
-                epsg = EPSG + epsg;
-                String attrVal = null;
-                attrVal = attributeURL.substring(0,
-                        attributeURL.lastIndexOf("."));
-                attrVal = attrVal.substring(attrVal.lastIndexOf(".") + 1,
-                        attrVal.length());
-                attributes.put(ATTRIBUTENAME, attrVal + "_" + epsg);
             }
         }
         return attributes;
+    }
+
+    private String makeAttributeValue(String id, String categoryTerm) {
+        categoryTerm =
+            categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
+        categoryTerm = EPSG + categoryTerm;
+        String attrVal = null;
+        attrVal = id.substring(0,
+                id.lastIndexOf("."));
+        attrVal = attrVal.substring(attrVal.lastIndexOf(".") + 1,
+                attrVal.length());
+        attrVal = attrVal + "_" + categoryTerm;
+        return attrVal;
     }
 
     /**
