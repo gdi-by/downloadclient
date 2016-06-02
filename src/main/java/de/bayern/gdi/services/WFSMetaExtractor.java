@@ -144,6 +144,11 @@ public class WFSMetaExtractor {
             throw new IOException("Cannot load capabilities document.");
         }
         WFSMeta meta = new WFSMeta();
+        parseCapabilites(capDoc, meta);
+        return meta;
+    }
+
+    private static void parseCapabilites(Document capDoc, WFSMeta meta) {
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
             = XML.xpathString(capDoc, XPATH_ABSTRACT, NAMESPACES);
@@ -211,6 +216,5 @@ public class WFSMetaExtractor {
 
             meta.features.add(feature);
         }
-        return meta;
     }
 }
