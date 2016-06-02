@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -30,8 +32,9 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
@@ -40,6 +43,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import de.bayern.gdi.processor.Processor;
@@ -58,6 +62,9 @@ import de.bayern.gdi.utils.ServiceChecker;
  */
 public class Controller {
 
+    private static final int MAP_WIDTH = 300;
+    private static final int MAP_HEIGHT = 250;
+
     // DataBean
     private DataBean dataBean;
 
@@ -70,7 +77,12 @@ public class Controller {
     @FXML private TextField serviceUser;
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
-    @FXML private ChoiceBox serviceTypeChooser;
+    @FXML private ComboBox serviceTypeChooser;
+    @FXML private VBox simpleWFSContainer;
+    @FXML private VBox basicWFSContainer;
+    @FXML private VBox atomContainer;
+    @FXML private Group mapNodeWFS;
+    @FXML private Group mapNodeAtom;
 
     /**
      * Handler to close the application.
@@ -80,6 +92,17 @@ public class Controller {
     @FXML protected void handleCloseApp(ActionEvent event) {
         Stage stage = (Stage) mainMenu.getScene().getWindow();
         stage.close();
+    }
+
+    /**
+     * Handle the service selection.
+     *
+     * @param event The mouse click event.
+     */
+    @FXML protected void handleServiceSelectButton(MouseEvent event) {
+        if (event.getButton().equals(MouseButton.PRIMARY)) {
+            chooseService();
+        }
     }
 
     /**
@@ -127,7 +150,6 @@ public class Controller {
             && event.getClickCount() > 1
         ) {
             chooseService();
-            System.out.println("doubleclick");
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
         ) {
@@ -140,10 +162,43 @@ public class Controller {
                 String url = dataBean.getServiceURL(serviceName);
                 this.serviceURL.setText(url);
             }
-            System.out.println("singleclick");
         }
     }
 
+    /**
+     * Handle the service type selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleServiceTypeSelect(ActionEvent event) {
+        String item =
+            this.serviceTypeChooser.
+                getSelectionModel().getSelectedItem().toString();
+        System.out.println("Selected: " + item);
+
+    }
+
+    /**
+     * Handle the dataformat selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleDataformatSelect(ActionEvent event) {
+        System.out.println("Format select...");
+    }
+
+    /**
+     * Handle the reference system selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
+        System.out.println("Refsys select...");
+    }
+
+    /**
+     * Use selection to request the service data and fill th UI.
+     */
     private void chooseService() {
         Task task = new Task() {
             @Override
@@ -170,7 +225,7 @@ public class Controller {
                 }
                 if (url != null) {
                     //view.setStatusBarText("Check for Servicetype");
-                    WebService.Type st =
+                    ServiceType st =
                             ServiceChecker.checkService(url,
                                     dataBean.getBase64EncAuth());
                     WebService ws = null;
@@ -278,8 +333,6 @@ public class Controller {
                 FXCollections.observableArrayList(dataBean.getServiceTypes());
             serviceTypeChooser.getItems().retainAll();
             serviceTypeChooser.setItems(options);
-
-//            view.setTypes(dataBean.getServiceTypes());
         }
     }
 
@@ -291,10 +344,24 @@ public class Controller {
     public void setDataBean(DataBean dataBean) {
         this.dataBean = dataBean;
         this.serviceList.setItems(this.dataBean.getServicesAsList());
+        URL url = null;
+        try {
+            url = new URL(this.dataBean.getWmsUrl());
+        } catch (MalformedURLException e) {
+        }
+        WMSMapSwing mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        WMSMapSwing mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+
+        this.mapNodeWFS.getChildren().add(mapWFS);
+        this.mapNodeAtom.getChildren().add(mapAtom);
+
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(true);
+        this.atomContainer.setVisible(false);
     }
 
-    // View
-    //private View view;
+    // view
+    //private view view;
 
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());

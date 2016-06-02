@@ -43,9 +43,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.application.Platform;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -175,8 +177,8 @@ public class WMSMapSwing extends Parent {
             this.layerLabel.setLabelFor(this.wmsLayers);
             this.layerLabel.setText(I18n.getMsg("gui.layer") + ": ");
             this.mapNode = new SwingNode();
-            this.add(this.layerLabel);
-            this.add(this.wmsLayers);
+            //this.add(this.layerLabel);
+            //this.add(this.wmsLayers);
             this.add(this.mapNode);
             this.getChildren().add(vBox);
             this.wmsLayers.setOnAction(new SelectLayer());
@@ -253,8 +255,13 @@ public class WMSMapSwing extends Parent {
                 mapPane.addMouseListener(new MouseAdapter() {
 
                     @Override
-                    public void mousePressed(MouseEvent e) {
+                    public void mouseEntered(MouseEvent e) {
                         mapPane.requestFocusInWindow();
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                            }
+                        });
                     }
                 });
 
@@ -268,49 +275,50 @@ public class WMSMapSwing extends Parent {
 
                         sb.toString()));
 
+
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
 
                 JButton btn;
+                JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
 
-                btn = new JButton(new NoToolAction(mapPane));
-                btn.setName(TOOLBAR_POINTER_BUTTON_NAME);
-                toolBar.add(btn);
-                cursorToolGrp.add(btn);
+                tbtn = new JToggleButton(new NoToolAction(mapPane));
+                tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                toolBar.add(tbtn);
+                cursorToolGrp.add(tbtn);
 
-                btn = new JButton(new ZoomInAction(mapPane));
-                btn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
-                toolBar.add(btn);
-                cursorToolGrp.add(btn);
+                tbtn = new JToggleButton(new ZoomInAction(mapPane));
+                tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
+                toolBar.add(tbtn);
+                cursorToolGrp.add(tbtn);
 
-                btn = new JButton(new ZoomOutAction(mapPane));
-                btn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
-                toolBar.add(btn);
-                cursorToolGrp.add(btn);
-
-                toolBar.addSeparator();
-
-                btn = new JButton(new PanAction(mapPane));
-                btn.setName(TOOLBAR_PAN_BUTTON_NAME);
-                toolBar.add(btn);
-                cursorToolGrp.add(btn);
+                tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+                tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
+                toolBar.add(tbtn);
+                cursorToolGrp.add(tbtn);
 
                 toolBar.addSeparator();
 
-                btn = new JButton(new InfoAction(mapPane));
-                btn.setName(TOOLBAR_INFO_BUTTON_NAME);
-                toolBar.add(btn);
+                tbtn = new JToggleButton(new PanAction(mapPane));
+                tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
+                toolBar.add(tbtn);
+                cursorToolGrp.add(tbtn);
+
+                toolBar.addSeparator();
+
+                tbtn = new JToggleButton(new InfoAction(mapPane));
+                tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
+                toolBar.add(tbtn);
+                cursorToolGrp.add(tbtn);
 
                 toolBar.addSeparator();
 
                 btn = new JButton(new ResetAction(mapPane));
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
-
                 panel.add(toolBar, "grow");
-
                 panel.add(mapPane, "grow");
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
