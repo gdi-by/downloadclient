@@ -18,22 +18,35 @@
 
 package de.bayern.gdi.gui;
 
-import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.opengis.feature.type.AttributeType;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.stage.WindowEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.processor.ConverterException;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.DownloadStepFactory;
-import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
@@ -45,97 +58,253 @@ import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.WindowEvent;
-
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Controller {
 
+    private static final int MAP_WIDTH = 300;
+    private static final int MAP_HEIGHT = 250;
+
     // DataBean
     private DataBean dataBean;
 
-    // View
-    private View view;
+    @FXML private MenuItem menuCloseApp;
+    @FXML private MenuBar mainMenu;
+    @FXML private ListView serviceList;
+    @FXML private TextField searchField;
+    @FXML private TextField serviceURL;
+    @FXML private CheckBox serviceAuthenticationCbx;
+    @FXML private TextField serviceUser;
+    @FXML private TextField servicePW;
+    @FXML private Label statusBarText;
+    @FXML private ComboBox serviceTypeChooser;
+    @FXML private VBox simpleWFSContainer;
+    @FXML private VBox basicWFSContainer;
+    @FXML private VBox atomContainer;
+    @FXML private Group mapNodeWFS;
+    @FXML private Group mapNodeAtom;
 
-    private static final Logger log
-            = Logger.getLogger(Controller.class.getName());
     /**
-     * Creates the Controller.
-     * @param dataBean the model
+     * Handler to close the application.
+     *
+     * @param event The event.
      */
-    public Controller(DataBean dataBean) {
-        this.dataBean = dataBean;
-        this.view = new View();
-        this.view.setServiceListEntries(this.dataBean.getServicesAsList());
-        this.view.setCatalogueServiceNameLabelText(
-                I18n.getMsg("gui.catalogue") + ": "
-                + this.dataBean.getCatalogService().getProviderName());
+    @FXML protected void handleCloseApp(ActionEvent event) {
+        Stage stage = (Stage) mainMenu.getScene().getWindow();
+        stage.fireEvent(new WindowEvent(
+            stage,
+            WindowEvent.WINDOW_CLOSE_REQUEST
+        ));
+    }
 
-        // Register Event Handler
-        view.getQuitMenuItem().
-                setOnAction(new QuitMenuItemEventHandler());
-        view.getResetMenuItem().
-                setOnAction(new ResetMenuItemEventHandler());
-        view.getServiceChooseButton().
-                setOnAction(new ServiceChooseButtonEventHandler());
-        view.getTypeComboBox().
-                setOnAction(new ChooseTypeEventHandler());
-        view.getAttributesFilledButton().
-                setOnAction(new AttributesFilledEventHandler());
-        //FIXME - Not only on Click, but everytime
-        view.getServiceList().
-                setOnMouseClicked(new MouseClickedOnServiceList());
-        view.getDownloadButton().
-                setOnAction(new DownloadButtonEventHandler());
-        view.getSaveMenuItem().
-                setOnAction(new SaveMenuItemEventHandler());
-        //TODO - Implement Loading Function
-        /*
-        view.getLoadMenuItem().
-                setOnAction(new LoadMenuItemEventHandler());
-        */
+    /**
+     * Handle the service selection.
+     *
+     * @param event The mouse click event.
+     */
+    @FXML protected void handleServiceSelectButton(MouseEvent event) {
+        if (event.getButton().equals(MouseButton.PRIMARY)) {
+            chooseService();
+        }
+    }
 
-        // Register Listener
-        view.getServiceSearch().textProperty().
-                addListener(new SearchServiceListChangeListener());
+    /**
+     * Handle search and filter the service list.
+     *
+     * @param event the event
+     */
+    @FXML protected void handleSearch(KeyEvent event) {
+        String currentText = this.searchField.getText();
+        if ("".equals(currentText) || currentText == null) {
+            this.dataBean.reset();
+            this.serviceList.setItems(this.dataBean.getServicesAsList());
+        }
+        String searchValue = currentText.toUpperCase();
+        ObservableList<String> subentries
+                = FXCollections.observableArrayList();
+        if (currentText.length() > 2) {
+            Map<String, String> catalog = dataBean.getCatalogService()
+                    .getServicesByFilter(currentText);
+            for (Map.Entry<String, String> entry: catalog.entrySet()) {
+                dataBean.addCatalogServiceToList(
+                    entry.getKey(), entry.getValue());
+            }
+        }
+        ObservableList<String> all = this.dataBean.getServicesAsList();
+        for (String entry : all) {
+            boolean match = true;
+            if (!entry.toUpperCase().contains(searchValue)) {
+                match = false;
+            }
+            if (match) {
+                subentries.add(entry);
+            }
+        }
+        this.serviceList.setItems(subentries);
+    }
 
-        Processor.getInstance().addListener(new DownloadListener());
+    /**
+     * Handle the service selection.
+     *
+     * @param event The mouse click event.
+     */
+    @FXML protected void handleServiceSelect(MouseEvent event) {
+        if (event.getButton().equals(MouseButton.PRIMARY)
+            && event.getClickCount() > 1
+        ) {
+            chooseService();
+        } else if (event.getButton().equals(MouseButton.PRIMARY)
+            && event.getClickCount() == 1
+        ) {
+            if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
+                    != null
+            ) {
+                String serviceName =
+                    this.serviceList.getSelectionModel().
+                        getSelectedItems().get(0).toString();
+                String url = dataBean.getServiceURL(serviceName);
+                this.serviceURL.setText(url);
+            }
+        }
+    }
 
-        // stage overrides
-        this.dataBean.getPrimaryStage().
-                setOnCloseRequest(new ConfirmCloseEventHandler());
+    /**
+     * Handle the service type selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleServiceTypeSelect(ActionEvent event) {
+        String item =
+            this.serviceTypeChooser.
+                getSelectionModel().getSelectedItem().toString();
+        System.out.println("Selected: " + item);
 
     }
 
     /**
-     * shows the view.
+     * Handle the dataformat selection.
+     *
+     * @param event The event
      */
-    public void show() {
-        view.show(dataBean.getPrimaryStage());
+    @FXML protected void handleDataformatSelect(ActionEvent event) {
+        System.out.println("Format select...");
     }
 
     /**
-     * sets the Service Types.
+     * Handle the reference system selection.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
+        System.out.println("Refsys select...");
+    }
+
+    /**
+     * Use selection to request the service data and fill th UI.
+     */
+    private void chooseService() {
+        Task task = new Task() {
+            @Override
+            protected Integer call() throws Exception {
+                serviceURL.getScene().setCursor(Cursor.WAIT);
+                String url = null;
+                String username = null;
+                String password = null;
+                if (serviceList.getSelectionModel().getSelectedItems().get(0)
+                        != null) {
+                    String serviceName =
+                            serviceList.
+                                getSelectionModel().
+                                    getSelectedItems().get(0).toString();
+                    url = dataBean.getServiceURL(serviceName);
+                } else {
+                    url = serviceURL.getText();
+                }
+                if (serviceAuthenticationCbx.isSelected()) {
+                    username = serviceUser.getText();
+                    dataBean.setUsername(username);
+                    password = servicePW.getText();
+                    dataBean.setPassword(password);
+                }
+                if (url != null) {
+                    //view.setStatusBarText("Check for Servicetype");
+                    ServiceType st =
+                            ServiceChecker.checkService(url,
+                                    dataBean.getBase64EncAuth());
+                    WebService ws = null;
+                    //Check for null, since switch breaks on a null value
+                    if (st == null) {
+                        log.log(Level.WARNING, "Could not determine "
+                                + "Service Type" , st);
+                        Platform.runLater(() -> {
+                            statusBarText.setText(
+                                I18n.getMsg("status.no-service-type"));
+                        });
+                    } else {
+                        switch (st) {
+                            case Atom:
+                                Platform.runLater(() -> {
+                                    statusBarText.setText(
+                                        I18n.getMsg("status.type.atom"));
+                                });
+                                ws = new Atom(url);
+                                break;
+                            case WFSOne:
+                                Platform.runLater(() -> {
+                                    statusBarText.setText(
+                                        I18n.getMsg("status.type.wfsone"));
+                                });
+                                ws = new WFSOne(url, dataBean
+                                        .getUserName(), dataBean
+                                        .getPassword());
+                                break;
+                            case WFSTwo:
+                                Platform.runLater(() -> {
+                                    statusBarText.setText(
+                                        I18n.getMsg("status.type.wfstwo"));
+                                });
+                                ws = new WFSTwo(url, dataBean
+                                        .getUserName(), dataBean
+                                        .getPassword());
+                                break;
+                            default:
+                                log.log(Level.WARNING,
+                                    "Could not determine URL" , st);
+                                Platform.runLater(() -> {
+                                    statusBarText.setText(
+                                            I18n.getMsg("status.no-url"));
+                                });
+                                break;
+                        }
+                    }
+                    dataBean.setWebService(ws);
+                    Platform.runLater(() -> {
+                        setServiceTypes();
+                        serviceTypeChooser.
+                                getSelectionModel().select(0);
+                        /*ChooseTypeEventHandler chooseType
+                                = new ChooseTypeEventHandler();
+                        chooseType.handle(e);*/
+                        statusBarText.setText(I18n.getMsg("status.ready"));
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        statusBarText.setText(I18n.getMsg("status.no-url"));
+                    });
+                }
+                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                return 0;
+            }
+        };
+        Thread th = new Thread(task);
+        statusBarText.setText(I18n.getMsg("status.calling-service"));
+        th.setDaemon(true);
+        th.start();
+    }
+
+    /**
+     * Sets the Service Types.
      */
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
@@ -164,23 +333,144 @@ public class Controller {
                 case Atom:
                 default:
             }
-            view.setTypes(dataBean.getServiceTypes());
+            ObservableList<String> options =
+                FXCollections.observableArrayList(dataBean.getServiceTypes());
+            serviceTypeChooser.getItems().retainAll();
+            serviceTypeChooser.setItems(options);
+        }
+    }
+
+    /**
+     * Set the DataBean and fill the UI with initial data objects.
+     *
+     * @param dataBean  The DataBean object.
+     */
+    public void setDataBean(DataBean dataBean) {
+        this.dataBean = dataBean;
+        this.serviceList.setItems(this.dataBean.getServicesAsList());
+        URL url = null;
+        try {
+            url = new URL(this.dataBean.getWmsUrl());
+        } catch (MalformedURLException e) {
+        }
+        WMSMapSwing mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        WMSMapSwing mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+
+        this.mapNodeWFS.getChildren().add(mapWFS);
+        this.mapNodeAtom.getChildren().add(mapAtom);
+
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(true);
+        this.atomContainer.setVisible(false);
+    }
+
+    // view
+    //private view view;
+
+    private static final Logger log
+            = Logger.getLogger(Controller.class.getName());
+    /**
+     * Creates the Controller.
+     * @param dataBean the model
+     */
+    public Controller() {
+/*
+        //this.dataBean = dataBean;
+        //this.view = new View();
+        //this.view.setServiceListEntries(this.dataBean.getServicesAsList());
+        //this.view.setCatalogueServiceNameLabelText(
+        //        I18n.getMsg("gui.catalogue") + ": "
+        //        + this.dataBean.getCatalogService().getProviderName());
+
+        // Register Event Handler
+        /*view.getQuitMenuItem().
+                setOnAction(new QuitMenuItemEventHandler());
+        view.getResetMenuItem().
+                setOnAction(new ResetMenuItemEventHandler());
+        view.getServiceChooseButton().
+                setOnAction(new ServiceChooseButtonEventHandler());
+        view.getTypeComboBox().
+                setOnAction(new ChooseTypeEventHandler());
+        view.getAttributesFilledButton().
+                setOnAction(new AttributesFilledEventHandler());
+        //FIXME - Not only on Click, but everytime
+        view.getServiceList().
+                setOnMouseClicked(new MouseClickedOnServiceList());
+        view.getDownloadButton().
+                setOnAction(new DownloadButtonEventHandler());
+        view.getSaveMenuItem().
+                setOnAction(new SaveMenuItemEventHandler());
+        //TODO - Implement Loading Function
+        /*
+        view.getLoadMenuItem().
+                setOnAction(new LoadMenuItemEventHandler());
+
+        // Register Listener
+        view.getServiceSearch().textProperty().
+                addListener(new SearchServiceListChangeListener());
+*/
+        Processor.getInstance().addListener(new DownloadListener());
+
+        // stage overrides
+//        this.dataBean.getPrimaryStage().
+//                setOnCloseRequest(new ConfirmCloseEventHandler());
+
+    }
+
+    /**
+     * shows the view.
+     *
+    public void show() {
+    //    view.show(dataBean.getPrimaryStage());
+    }
+
+    /**
+     * sets the Service Types.
+     *
+    public void setServiceTypes() {
+        if (dataBean.isWebServiceSet()) {
+            switch (dataBean.getWebService().getServiceType()) {
+                case WFSOne:
+                    dataBean.setServiceTypes(
+                            dataBean.getWebService().getTypes());
+                    break;
+                case WFSTwo:
+                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
+                    ArrayList<String> wfstwoServices = new ArrayList<>();
+                    ArrayList<String> storedQuieres = dataBean
+                        .getWebService().getStoredQueries();
+                    for (String str: storedQuieres) {
+                        str = wfstwo.getSimplePrefix() + " " + str;
+                        wfstwoServices.add(str);
+                    }
+                    ArrayList<String> types = dataBean
+                            .getWebService().getTypes();
+                    for (String str: types) {
+                        str = wfstwo.getBasicPrefix() + " " + str;
+                        wfstwoServices.add(str);
+                    }
+                    dataBean.setServiceTypes(wfstwoServices);
+                    break;
+                case Atom:
+                default:
+            }
+//            view.setTypes(dataBean.getServiceTypes());
         }
     }
 
     /**
      * sets the Service Types Attributes.
      * @param map the Map of Attributes
-     */
+     *
     public void setServiceAttributes(Map<String, String> map) {
         if (dataBean.isWebServiceSet()) {
-            view.setAttributes(map);
+  //          view.setAttributes(map);
             setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
         }
     }
 
     private void setWMSMap(String wmsUrl, String wmsName) {
-        view.setWMSMap(wmsUrl, wmsName);
+  //      view.setWMSMap(wmsUrl, wmsName);
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++
@@ -189,40 +479,33 @@ public class Controller {
 
     /**
      * listener for changes in search field, so the list can be searched.
-     */
-    private class SearchServiceListChangeListener
-            implements ChangeListener {
-        @Override
-        public void changed(ObservableValue observable, Object oldVal,
-                            Object newVal) {
-            searchServiceList((String) oldVal, (String) newVal);
+     *
+    @FXML
+    protected void searchServiceList(String oldVal, String newVal) {
+        if (oldVal != null && (newVal.length() < oldVal.length())) {
+//            view.getServiceList().setItems(view.getServiceListEntries());
         }
-        public void searchServiceList(String oldVal, String newVal) {
-            if (oldVal != null && (newVal.length() < oldVal.length())) {
-                view.getServiceList().setItems(view.getServiceListEntries());
-            }
-            String value = newVal.toUpperCase();
-            ObservableList<String> subentries
-                    = FXCollections.observableArrayList();
-            Map<String, String> catalog = dataBean.getCatalogService()
-                    .getServicesByFilter(newVal);
-            for (Map.Entry<String, String> entry: catalog.entrySet()) {
-                view.addServiceToList(entry.getKey());
-                dataBean.addServiceToList(entry.getKey(), entry.getValue());
-            }
-            for (Object entry : view.getServiceList().getItems()) {
-                boolean match = true;
-                String entryText = (String) entry;
-                if (!entryText.toUpperCase().contains(value)) {
-                    match = false;
-                    break;
-                }
-                if (match) {
-                    subentries.add(entryText);
-                }
-            }
-            view.getServiceList().setItems(subentries);
+        String value = newVal.toUpperCase();
+        ObservableList<String> subentries
+                = FXCollections.observableArrayList();
+        Map<String, String> catalog = dataBean.getCatalogService()
+                .getServicesByFilter(newVal);
+        for (Map.Entry<String, String> entry: catalog.entrySet()) {
+//            view.addServiceToList(entry.getKey());
+            dataBean.addServiceToList(entry.getKey(), entry.getValue());
         }
+//        for (Object entry : view.getServiceList().getItems()) {
+            boolean match = true;
+            String entryText = (String) entry;
+            if (!entryText.toUpperCase().contains(value)) {
+                match = false;
+                break;
+            }
+            if (match) {
+                subentries.add(entryText);
+            }
+        }
+//        view.getServiceList().setItems(subentries);
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++
@@ -231,18 +514,18 @@ public class Controller {
 
     /**
      * Event Handler for choosing a type.
-     */
+     *
     private class ChooseTypeEventHandler
         implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
             Map<String, String> map = new HashMap<String, String>();
-            if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
-                    != null) {
-                String choosenType =
-                        view.getTypeComboBox().getSelectionModel()
-                        .getSelectedItem()
-                        .toString();
+//            if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
+//                    != null) {
+//                String choosenType =
+//                        view.getTypeComboBox().getSelectionModel()
+//                        .getSelectedItem()
+//                        .toString();
                 ArrayList <AttributeType> attributes = null;
                 switch (dataBean.getWebService().getServiceType()) {
                     case WFSOne:
@@ -273,7 +556,7 @@ public class Controller {
 
     /**
      * Class for handling stuff if Attributes are filled.
-     */
+     *
     private class AttributesFilledEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -287,7 +570,7 @@ public class Controller {
 
     /**
      * Event handler for clicking "Save".
-     */
+     *
     private class LoadMenuItemEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -297,7 +580,7 @@ public class Controller {
              * frontend should be filled with the Information from the config
              * file, so you can check and verify your settings before clicking
              * "download"
-             */
+             *
             FileChooser configFileChooser = new FileChooser();
             configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
 
@@ -328,7 +611,7 @@ public class Controller {
 
     /**
      * Event handler for clicking "Save".
-     */
+     *
     private class SaveMenuItemEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -361,7 +644,7 @@ public class Controller {
 
     /**
      * Event Handler for the Quit Programm Menu Entry.
-     */
+     *
     private class QuitMenuItemEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -377,7 +660,7 @@ public class Controller {
 
     /**
      * Event Handler for resetting the programm.
-     */
+     *
     private class ResetMenuItemEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -388,7 +671,7 @@ public class Controller {
 
     /**
      * Event Handler for Downloading.
-     */
+     *
     private class DownloadButtonEventHandler
             implements EventHandler<ActionEvent> {
         @Override
@@ -421,7 +704,7 @@ public class Controller {
 
     /**
      * Event Handler for the choose Service Button.
-     */
+     *
     private class ServiceChooseButtonEventHandler implements
             EventHandler<ActionEvent> {
 
@@ -551,7 +834,7 @@ public class Controller {
 
     /**
      * Event Handler for closing the Application.
-     */
+     *
     private class ConfirmCloseEventHandler implements
             EventHandler<WindowEvent> {
         @Override
@@ -579,7 +862,7 @@ public class Controller {
 
     /**
      *  Eventhandler for mouse events on map.
-     */
+     *
     private class MouseClickedOnServiceList
             implements EventHandler<MouseEvent> {
         @Override
@@ -605,7 +888,7 @@ public class Controller {
             }
         }
     }
-
+*/
     /** Keeps track of download progression and errors. */
     private class DownloadListener implements ProcessorListener, Runnable {
 
@@ -621,7 +904,7 @@ public class Controller {
 
         @Override
         public void run() {
-            view.setStatusBarText(getMessage());
+            //view.setStatusBarText(getMessage());
         }
 
         @Override

@@ -18,11 +18,18 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Application;
-
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.event.EventHandler;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -31,6 +38,9 @@ public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start = null;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
+
 
     /**
      * waits for the javafx application to startup.
@@ -67,12 +77,41 @@ public class Start extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        try {
+            ClassLoader classLoader = Start.class.getClassLoader();
+            URL url = classLoader.getResource("download-client.fxml");
+            System.out.println(url);
+            FXMLLoader fxmlLoader = new FXMLLoader(url);
+            Parent root = fxmlLoader.load();
+            Scene scene = new Scene(root, WIDTH, HEIGHT);
+            DataBean dataBean = new DataBean(primaryStage);
+            Controller controller = fxmlLoader.getController();
+            controller.setDataBean(dataBean);
+
+            primaryStage.setTitle("Download Client");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent e) {
+                    Platform.exit();
+                    System.exit(0);
+                }
+            });
+        } catch (IOException ioe) {
+            System.out.println("Could not find UI description file.");
+            System.out.println(ioe.getMessage());
+            System.out.println(ioe.getCause());
+            for (StackTraceElement element : ioe.getStackTrace()) {
+                System.out.println(element.toString());
+            }
+        }
+
         // session scope /application scope Beans initialisieren!
         // muss von Controller zu Controller weitergegeben werden
-        DataBean dataBean = new DataBean(primaryStage);
         // Ersten Controller aufrufen
-        Controller c = new Controller(dataBean);
-        c.show();
+//        Controller c = new Controller(dataBean);
+//        c.show();
     }
 
 

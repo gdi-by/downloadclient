@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.embed.swing.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="622.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bayern.gdi.gui.Controller">
+   <children>
+      <MenuBar fx:id="mainMenu">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="menuCloseApp" mnemonicParsing="false" onAction="#handleCloseApp" text="Close" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
+         <items>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <VBox layoutX="37.0" layoutY="147.0" prefHeight="398.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <TextField fx:id="searchField" onKeyReleased="#handleSearch" scaleShape="false" VBox.vgrow="NEVER">
+                           <opaqueInsets>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <ListView fx:id="serviceList" onMouseClicked="#handleServiceSelect" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </ListView>
+                        <Label text="URL:" VBox.vgrow="NEVER">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="serviceURL">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Button fx:id="serviceSelection" alignment="CENTER_RIGHT" mnemonicParsing="false" onMouseClicked="#handleServiceSelectButton" text="Dienst wählen">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="50.0" right="10.0" top="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Separator prefWidth="200.0" />
+                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="Dienst zugriffsgeschützt">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <Label text="Kennung:">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="serviceUser">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Label text="Passwort:">
+                           <VBox.margin>
+                              <Insets left="10.0" right="10.0" top="3.0" />
+                           </VBox.margin>
+                        </Label>
+                        <PasswordField fx:id="servicePW">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </PasswordField>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <VBox layoutX="78.0" layoutY="99.0" prefHeight="398.0" prefWidth="416.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Label text="Datensatz auswählen:">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ComboBox fx:id="serviceTypeChooser" minHeight="-Infinity" onAction="#handleServiceTypeSelect" prefHeight="26.0" prefWidth="322.0">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="15.0" right="15.0" />
+                           </VBox.margin>
+                        </ComboBox>
+                        <StackPane prefHeight="337.0" prefWidth="396.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox fx:id="basicWFSContainer" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Group fx:id="mapNodeWFS">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Group>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                       <children>
+                                          <Label text="Datenformat">
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="15.0" right="39.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <ComboBox fx:id="dataformatChooser" onAction="#handleDataformatSelect" prefWidth="150.0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                       <children>
+                                          <Label text="ReferenzSystem">
+                                             <HBox.margin>
+                                                <Insets bottom="5.0" left="15.0" right="15.0" top="5.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <ComboBox fx:id="referenceSystemChooser" onAction="#handleReferenceSystemSelect" prefWidth="150.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox fx:id="simpleWFSContainer" prefHeight="200.0" prefWidth="100.0" />
+                              <VBox fx:id="atomContainer" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Group fx:id="mapNodeAtom">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Group>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label text="Label" />
+                                       </children>
+                                    </HBox>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Label text="Label" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </StackPane>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <CheckBox fx:id="chkChain" mnemonicParsing="false" text="Weiterverarbeitung">
+                           <VBox.margin>
+                              <Insets left="15.0" top="5.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <VBox fx:id="containerChain" prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label text="Verarbeitungskette">
+                                 <VBox.margin>
+                                    <Insets left="15.0" top="5.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="13.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <HBox minHeight="-Infinity" prefHeight="53.0" prefWidth="590.0">
+                           <children>
+                              <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="134.0" text="Download starten" textAlignment="CENTER">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" prefHeight="44.0" prefWidth="186.0" text="Download-Konfiguration speichern" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" right="15.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </items>
+      </SplitPane>
+      <HBox prefHeight="25.0" prefWidth="693.0" style="-fx-background-color: gainsboro;">
+         <children>
+            <Label fx:id="statusBarText" text="Ready">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="15.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+   </children>
+</VBox>
