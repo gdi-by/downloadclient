@@ -138,17 +138,40 @@ public class WFSMetaExtractor {
      * @throws IOException If something went wrong.
      */
     public static WFSMeta parse(String capURLString) throws IOException {
+        WFSMeta meta = new WFSMeta();
+        parseCapabilites(capURLString, meta);
+        parseDescribeFeatures(capURLString, meta);
+        parseDescribeStoredQueries(capURLString, meta);
+        return meta;
+    }
+
+    private static void parseDescribeFeatures(
+        String capURLString, WFSMeta meta) throws IOException {
+
+        if (!meta.isOperationSupported("DescribeFeatureType")) {
+            return;
+        }
+        // TODO: Implement me!
+    }
+
+    private static void parseDescribeStoredQueries(
+        String capURLString, WFSMeta meta) throws IOException {
+
+        if (!meta.isOperationSupported("DescribeStoredQueries")) {
+            return;
+        }
+        // TODO: Implement me!
+    }
+
+    private static void parseCapabilites(String capURLString, WFSMeta meta)
+        throws IOException {
+
         URL capURL = new URL(capURLString);
         Document capDoc = XML.getDocument(capURL);
         if (capDoc == null) {
             throw new IOException("Cannot load capabilities document.");
         }
-        WFSMeta meta = new WFSMeta();
-        parseCapabilites(capDoc, meta);
-        return meta;
-    }
 
-    private static void parseCapabilites(Document capDoc, WFSMeta meta) {
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
             = XML.xpathString(capDoc, XPATH_ABSTRACT, NAMESPACES);

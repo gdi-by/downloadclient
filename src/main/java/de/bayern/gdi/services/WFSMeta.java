@@ -100,6 +100,20 @@ public class WFSMeta {
         features = new ArrayList<>();
     }
 
+    /**
+     * Is operation supported?
+     * @param name The name of the operation.
+     * @return true if operation is supported false otherwise.
+     */
+    public boolean isOperationSupported(String name) {
+        for (Operation op: this.operations) {
+            if (op.name.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("WFSMeta {\n");
