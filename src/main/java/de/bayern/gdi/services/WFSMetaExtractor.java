@@ -19,6 +19,7 @@ package de.bayern.gdi.services;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
@@ -51,7 +52,8 @@ public class WFSMetaExtractor {
         new NamespaceContextMap(
             "ows", "http://www.opengis.net/ows/1.1",
             "wfs", "http://www.opengis.net/wfs/2.0",
-            "xlink", "http://www.w3.org/1999/xlink");
+            "xlink", "http://www.w3.org/1999/xlink",
+            "xsd", "http://www.w3.org/2001/XMLSchema");
 
     private static final String XPATH_TITLE
         = "//ows:ServiceIdentification/ows:Title/text()";
@@ -80,6 +82,9 @@ public class WFSMetaExtractor {
 
     private static final String XPATH_OPERATION_GET
         = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
+
+    private static final String XPATH_DF_ELEMENT
+        = "//xsd:element[@name=$NAME]";
 
     private WFSMetaExtractor() {
     }
@@ -148,6 +153,11 @@ public class WFSMetaExtractor {
         return meta;
     }
 
+    private static String stripNS(String ns) {
+        int idx = ns.lastIndexOf(':');
+        return idx >= 0 ? ns.substring(idx + 1) : ns;
+    }
+
     private static void parseDescribeFeatures(
         String capURLString, WFSMeta meta) throws IOException {
 
@@ -168,7 +178,21 @@ public class WFSMetaExtractor {
             throw new IOException("Cannot load DescribeFeatureType document.");
         }
 
-        // TODO: Implement me!
+        for (WFSMeta.Feature feature: meta.features) {
+            HashMap<String, String> vars = new HashMap<>();
+            String name = stripNS(feature.name);
+            vars.put("NAME", name);
+            NodeList elements = (NodeList)XML.xpath(
+                dfDoc, XPATH_DF_ELEMENT,
+                XPathConstants.NODESET, NAMESPACES, vars);
+            if (elements.getLength() == 0) {
+                System.out.println("Feature " + name + " not found.");
+                continue;
+            }
+            Element element = (Element)elements.item(0);
+            System.out.println(name + ": " + element.getAttribute("type"));
+            // TODO: Resolve by type.
+        }
     }
 
     private static void parseDescribeStoredQueries(

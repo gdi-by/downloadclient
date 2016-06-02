@@ -18,7 +18,9 @@
 package de.bayern.gdi.services;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -34,9 +36,10 @@ public class WFSMeta {
 
         @Override
         public String toString() {
-            return "operation: { name: " + name + " }";
+            return "operation: { name: " + name + " get: " + get + " }";
         }
     }
+
 
     /** feature. */
     public static class Feature {
@@ -52,9 +55,12 @@ public class WFSMeta {
         public List<String> otherCRSs;
         /** bbox. */
         public ReferencedEnvelope bbox;
+        /** fields. */
+        public Map<String, String> fields;
 
         public Feature() {
             otherCRSs = new ArrayList<>();
+            fields = new LinkedHashMap<>();
         }
 
         private String otherCRSs() {
@@ -68,6 +74,20 @@ public class WFSMeta {
             return sb.append("]").toString();
         }
 
+        private String fields() {
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (Map.Entry<String, String> entry: this.fields.entrySet()) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(", ");
+                }
+                sb.append(entry.getKey() + ": " + entry.getValue());
+            }
+            return sb.toString();
+        }
+
         @Override
         public String toString() {
             return "feature: { "
@@ -76,7 +96,8 @@ public class WFSMeta {
                 + "abstract: " + abstractDescription + " "
                 + "defaultCRS: " + defaultCRS + " "
                 + "otherCRSs: " +  otherCRSs() + " "
-                + "bbox: " + bbox + " }";
+                + "bbox: " + bbox + " "
+                + "fields: " + fields() + " }";
         }
     }
 
