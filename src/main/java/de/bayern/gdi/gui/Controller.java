@@ -87,6 +87,14 @@ public class Controller {
     @FXML private VBox chainContainer;
     @FXML private Group mapNodeWFS;
     @FXML private Group mapNodeAtom;
+    @FXML private TextField basicX1;
+    @FXML private TextField basicY1;
+    @FXML private TextField basicX2;
+    @FXML private TextField basicY2;
+    @FXML private TextField atomX1;
+    @FXML private TextField atomY1;
+    @FXML private TextField atomX2;
+    @FXML private TextField atomY2;
 
     /**
      * Handler to close the application.
@@ -366,7 +374,9 @@ public class Controller {
         } catch (MalformedURLException e) {
         }
         WMSMapSwing mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
         WMSMapSwing mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);
         this.mapNodeAtom.getChildren().add(mapAtom);

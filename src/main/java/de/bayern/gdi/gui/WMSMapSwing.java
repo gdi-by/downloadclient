@@ -45,6 +45,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import javax.swing.BorderFactory;
@@ -98,6 +99,10 @@ public class WMSMapSwing extends Parent {
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
+    private TextField coordinateX1;
+    private TextField coordinateY1;
+    private TextField coordinateX2;
+    private TextField coordinateY2;
 
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -215,6 +220,26 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * Set TextFields to display the selected coordinates.
+     *
+     * @param x1 X1
+     * @param y1 Y1
+     * @param x2 X2
+     * @param y2 Y2
+     */
+    public void setCoordinateDisplay(
+        TextField x1,
+        TextField y1,
+        TextField x2,
+        TextField y2
+    ) {
+        this.coordinateX1 = x1;
+        this.coordinateY1 = y1;
+        this.coordinateX2 = x2;
+        this.coordinateY2 = y2;
+    }
+
+    /**
      * Event Handler for the Layer Combobox.
      */
     private class SelectLayer
@@ -306,10 +331,20 @@ public class WMSMapSwing extends Parent {
                                     mapPane.setSelectedEnvelope(null);
                                     start = ev.getPoint();
                                     mapStartPos = ev.getWorldPos();
+                                    coordinateX1.setText(
+                                        String.valueOf(mapStartPos.getX()));
+                                    coordinateY1.setText(
+                                        String.valueOf(mapStartPos.getY()));
+                                    coordinateX2.setText("");
+                                    coordinateY2.setText("");
                                     clickCount++;
                                 } else if (clickCount == 1) {
                                     end = ev.getPoint();
                                     mapEndPos = ev.getWorldPos();
+                                    coordinateX2.setText(
+                                        String.valueOf(mapEndPos.getX()));
+                                    coordinateY2.setText(
+                                        String.valueOf(mapEndPos.getY()));
                                     Rectangle rect = new Rectangle();
                                     rect.setFrameFromDiagonal(start, end);
                                     mapPane.setDrawRect(rect);

@@ -230,7 +230,7 @@ public class CatalogService {
                             + "&elementSetName=full"
                             + "&constraintLanguage=CQL_TEXT"
                             + "&constraint_language_version=1.1.0"
-                            + "&constraint="+ constraintAnyText));
+                            + "&constraint=" + constraintAnyText));
         } catch (MalformedURLException | UnsupportedEncodingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
