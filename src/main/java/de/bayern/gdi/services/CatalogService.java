@@ -60,7 +60,8 @@ public class CatalogService {
 
     /**
      * Constructor.
-     * @param url String URL
+     *
+     * @param url      String URL
      * @param userName Username
      * @param password Password
      * @throws MalformedURLException
@@ -72,6 +73,7 @@ public class CatalogService {
 
     /**
      * Constructor.
+     *
      * @param url Stirng URL
      * @throws MalformedURLException When URL has bad format
      */
@@ -81,6 +83,7 @@ public class CatalogService {
 
     /**
      * Constructor.
+     *
      * @param url URL
      */
     public CatalogService(URL url) {
@@ -89,7 +92,8 @@ public class CatalogService {
 
     /**
      * Constructor.
-     * @param url URL
+     *
+     * @param url      URL
      * @param userName Username
      * @param password Password
      */
@@ -116,6 +120,7 @@ public class CatalogService {
 
     /**
      * gets the Name of the service Provider.
+     *
      * @return Name of the service Provider
      */
     public String getProviderName() {
@@ -124,6 +129,7 @@ public class CatalogService {
 
     /**
      * retrieves a Map of ServiceNames and URLs for a Filter-Word.
+     *
      * @param filter the Word to filter to
      * @return Map of Service Names and URLs
      */
@@ -135,7 +141,7 @@ public class CatalogService {
                     this.userName,
                     this.password);
             String numberOfResultsExpr =
-                    "//csw:SearchResults/@numberOfRecordsMatched";
+                    "//csw:SearchResults/@numberOfRecordsReturned";
             Double numberOfResults = (Double) XML.xpath(xml,
                     numberOfResultsExpr,
                     XPathConstants.NUMBER, this.context);
@@ -144,47 +150,61 @@ public class CatalogService {
             NodeList servicesNL = (NodeList) XML.xpath(xml,
                     nodeListOfServicesExpr,
                     XPathConstants.NODESET, this.context);
-            if (numberOfResults.intValue() == servicesNL.getLength()) {
-                for (int i = 0; i < numberOfResults; i++) {
-                    Node serviceN = servicesNL.item(i);
-                    String nameExpr =
-                            "gmd:identificationInfo"
-                                    + "/srv:SV_ServiceIdentification"
-                                    + "/gmd:citation"
-                                    + "/gmd:CI_Citation"
-                                    + "/gmd:title"
-                                    + "/gco:CharacterString";
-                    String serviceName = (String) XML.xpath(serviceN,
-                            nameExpr,
-                            XPathConstants.STRING, context);
+            for (int i = 0; i < numberOfResults; i++) {
+                Node serviceN = servicesNL.item(i);
+                String nameExpr =
+                        "gmd:identificationInfo"
+                                + "/srv:SV_ServiceIdentification"
+                                + "/gmd:citation"
+                                + "/gmd:CI_Citation"
+                                + "/gmd:title"
+                                + "/gco:CharacterString";
+                String serviceName = (String) XML.xpath(serviceN,
+                        nameExpr,
+                        XPathConstants.STRING, context);
 
-                    String typeExpr =
-                            "gmd:identificationInfo"
-                                    + "/srv:SV_ServiceIdentification"
-                                    + "/srv:serviceTypeVersion"
-                                    + "/gco:CharacterString";
-                    String serviceType = (String) XML.xpath(serviceN,
-                            typeExpr,
-                            XPathConstants.STRING, context);
+                String typeExpr =
+                        "gmd:identificationInfo"
+                                + "/srv:SV_ServiceIdentification"
+                                + "/srv:serviceType"
+                                + "/gco:LocalName";
+                String serviceType = (String) XML.xpath(serviceN,
+                        typeExpr,
+                        XPathConstants.STRING, context);
 
-                    String urlExpr =
-                            "gmd:distributionInfo"
-                                    + "/gmd:MD_Distribution"
-                                    + "/gmd:transferOptions"
-                                    + "/gmd:MD_DigitalTransferOptions"
-                                    + "/gmd:onLine"
-                                    + "/gmd:CI_OnlineResource"
-                                    + "/gmd:linkage"
-                                    + "/gmd:URL";
-                    String serviceURL = (String) XML.xpath(serviceN,
-                            urlExpr,
-                            XPathConstants.STRING, context);
-                    if (serviceType.toUpperCase().contains("WFS")
-                            || serviceType.toUpperCase().contains("ATOM")
-                            || serviceType.toUpperCase().contains("DOWNLOAD")) {
-                        serviceURL = makeCapabiltiesURL(serviceURL,
-                                serviceType);
-                        map.put(serviceName, serviceURL);
+                String urlExpr =
+                        "gmd:distributionInfo"
+                                + "/gmd:MD_Distribution"
+                                + "/gmd:transferOptions"
+                                + "/gmd:MD_DigitalTransferOptions"
+                                + "/gmd:onLine"
+                                + "/gmd:CI_OnlineResource"
+                                + "/gmd:linkage"
+                                + "/gmd:URL";
+                String serviceURL = (String) XML.xpath(serviceN,
+                        urlExpr,
+                        XPathConstants.STRING, context);
+                String serviceTypeVersionExpr =
+                        "gmd:identificationInfo"
+                                + "/srv:SV_ServiceIdentification"
+                                + "/srv:serviceTypeVersion"
+                                + "/gco:CharacterString";
+                String serviceTypeVersion = (String) XML.xpath(serviceN,
+                        serviceTypeVersionExpr,
+                        XPathConstants.STRING, context);
+                if (serviceType.toUpperCase().contains("DOWNLOAD")) {
+                    if (serviceTypeVersion.equals("")) {
+                        serviceTypeVersion = "ATOM";
+                    }
+                    if (serviceTypeVersion.toUpperCase().contains("WFS")
+                            || serviceTypeVersion.toUpperCase().contains("ATOM")
+                            || serviceTypeVersion.
+                                toUpperCase().contains("DOWNLOAD")) {
+                        if (!serviceName.equals("")) {
+                            serviceURL = makeCapabiltiesURL(serviceURL,
+                                    serviceTypeVersion);
+                            map.put(serviceName, serviceURL);
+                        }
                     }
                 }
             }
@@ -209,6 +229,7 @@ public class CatalogService {
         String versionNumber = type.substring(type.lastIndexOf(" ") + 1);
         return versionNumber;
     }
+
     private URL setURLRequestAndSearch(String search) {
         URL newURL = null;
         String constraintAnyText = "csw:AnyText Like '%"
