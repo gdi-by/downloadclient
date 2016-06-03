@@ -233,6 +233,14 @@ public class Atom {
         return this.serviceID;
     }
 
+    /**
+     * URL of the service.
+     * @return URL of the service
+     */
+    public String getURL() {
+        return this.serviceURL;
+    }
+
     private ArrayList<String> getCRS(String id) {
         ArrayList<String> crs = new ArrayList<>();
         String attributeURL = id;
