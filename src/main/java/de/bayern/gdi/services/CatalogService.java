@@ -20,8 +20,10 @@ package de.bayern.gdi.services;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -209,7 +211,10 @@ public class CatalogService {
     }
     private URL setURLRequestAndSearch(String search) {
         URL newURL = null;
+        String constraintAnyText = "csw:AnyText Like '%"
+                + search + "%'";
         try {
+            constraintAnyText = URLEncoder.encode(constraintAnyText, "UTF-8");
             newURL = new URL(this.catalogURL.toString().replace(
                     "GetCapabilities", "GetRecords"
                             + "&version=2.0.2"
@@ -225,8 +230,8 @@ public class CatalogService {
                             + "&elementSetName=full"
                             + "&constraintLanguage=CQL_TEXT"
                             + "&constraint_language_version=1.1.0"
-                            + "&constraint=csw:AnyText='" + search + "'"));
-        } catch (MalformedURLException e) {
+                            + "&constraint="+ constraintAnyText));
+        } catch (MalformedURLException | UnsupportedEncodingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return newURL;
