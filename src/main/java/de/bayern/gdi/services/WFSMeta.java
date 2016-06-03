@@ -31,10 +31,29 @@ public class WFSMeta {
         public String name;
         /** get. */
         public String get;
+        /** output formats. */
+        public ArrayList<String> outputFormats;
+
+        public Operation() {
+            this.outputFormats = new ArrayList<>();
+        }
+
+        private String outputFormats() {
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < outputFormats.size(); i++) {
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(outputFormats.get(i));
+            }
+            return sb.append("]").toString();
+        }
 
         @Override
         public String toString() {
-            return "operation: { name: " + name + " get: " + get + " }";
+            return "operation: { name: " + name + " "
+                + " get: " + get + " "
+                + " output formats: " + outputFormats() + " }";
         }
     }
 
