@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Verarbeitungskonfiguration für den Downloadclient der GDI-BY
+
+    Stand: 25.11.2015
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+
+<Verarbeitungskonfiguration>
+
+    <Formate>
+        <Format formattyp="vektor">
+            <MimeType>application/x-shapefile</MimeType>
+        </Format>
+        <Format formattyp="vektor">
+            <MimeType>application/gml+xml</MimeType>
+        </Format>
+        <Format formattyp="vektor">
+            <MimeType>application/vnd.google-earth.kml+xml</MimeType>
+        </Format>
+        <Format formattyp="raster">
+            <MimeType>image/tiff</MimeType>
+        </Format>
+        <Format formattyp="raster">
+            <MimeType>image/jp2</MimeType>
+        </Format>
+    </Formate>
+
+    <Eingabeelemente>
+
+        <Eingabeelement name="text" typ="TextField" />
+
+        <Eingabeelement name="crs" typ="ComboBox">
+            <Optionen>
+                <Option>
+                    <Title>DHDN/3-grad Gauss-Krüger Zone 3</Title>
+                    <Wert>EPSG:31467</Wert>
+                </Option>
+                <Option>
+                    <Title>DHDN/3-grad Gauss-Krüger Zone 4</Title>
+                    <Wert>EPSG:31468</Wert>
+                </Option>
+                <Option>
+                    <Title>DHDN/3-grad Gauss-Krüger Zone 5</Title>
+                    <Wert>EPSG:31469</Wert>
+                </Option>
+                <Option>
+                    <Title>ETRS89/UTM Zone 32N</Title>
+                    <Wert>EPSG:25832</Wert>
+                </Option>
+                <Option>
+                    <Title>ETRS89/UTM Zone 33N</Title>
+                    <Wert>EPSG:25833</Wert>
+                </Option>
+                <Option>
+                    <Title>WGS84 (Geographisch 2D)</Title>
+                    <Wert>EPSG:4326</Wert>
+                </Option>
+                <Option>
+                    <Title>ETRS89 (Geographisch 2D)</Title>
+                    <Wert>EPSG:4258</Wert>
+                </Option>
+                <Option>
+                    <Title>ETRS89 (LCC Europa)</Title>
+                    <Wert>EPSG:3034</Wert>
+                </Option>
+                <Option>
+                    <Title>WGS84 (Pseudo Mercator)</Title>
+                    <Wert>EPSG:3857</Wert>
+                </Option>
+            </Optionen>
+        </Eingabeelement>
+
+    </Eingabeelemente>
+
+
+    <Verarbeitungsschritte>
+
+        <Verarbeitungsschritt formattyp="vektor" name="toShape">
+            <Titel>Konvertierung nach ESRI-Shapefiles</Titel>
+            <Beschreibung>Konvertiert die heruntergeladenen Dateien in ESRI-Shapefiles</Beschreibung>
+            <Befehl>ogr2ogr</Befehl>
+            <ParameterSet>
+                <Parameter verpflichtend="true">
+                    -f 'ESRI Shapefile'
+                </Parameter>
+                <Parameter verpflichtend="false" eingabeelement="crs">
+                    -t_srs {EPSG}
+                </Parameter>
+                <Parameter verpflichtend="true">
+                    {ZIELDATEI}
+                </Parameter>
+                <Parameter verpflichtend="true">
+                    {QUELLDATEI}
+                </Parameter>
+            </ParameterSet>
+        </Verarbeitungsschritt>
+
+        <Verarbeitungsschritt formattyp="raster" name="toGeoTIFF">
+            <Titel>Konvertierung nach GeoTIFF</Titel>
+            <Beschreibung>Konvertiert die heruntergeladenen Dateien in ein GeoTIFF</Beschreibung>
+            <Befehl>gdal</Befehl>
+            <ParameterSet>
+                <Parameter verpflichtend="true">
+                    -of GTiff
+                </Parameter>
+                <Parameter verpflichtend="true">
+                    -r near
+                </Parameter>
+                <Parameter verpflichtend="false" eingabeelement="crs">
+                    -t_srs {EPSG}
+                </Parameter>
+                <Parameter verpflichtend="true">
+                    {QUELLDATEI}
+                </Parameter>
+                <Parameter verpflichtend="true">
+                    {ZIELDATEI}
+                </Parameter>
+            </ParameterSet>
+        </Verarbeitungsschritt>
+
+        <Verarbeitungsschritt formattyp="raster, vektor" name="sendmail">
+            <Titel>[MOCK] Per E-Mail verschicken</Titel>
+            <Beschreibung>[MOCK] Verschickt die heruntergeladenen Dateien per E-Mail</Beschreibung>
+            <Befehl>send_email.py</Befehl>
+            <ParameterSet>
+                <Parameter verpflichtend="true">
+                    -attachment {QUELLDATEI}
+                </Parameter>
+                <Parameter verpflichtend="true" eingabeelement="text">
+                    -to {TEXT}
+                </Parameter>
+            </ParameterSet>
+        </Verarbeitungsschritt>
+    </Verarbeitungsschritte>
+</Verarbeitungskonfiguration>
