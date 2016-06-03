@@ -87,6 +87,10 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATION_GET
         = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
 
+    private static final String XPATH_OPERATION_OUT_FORMATS
+        = "ows:Parameter[@name='outputFormat']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
     private static final String XPATH_DF_ELEMENT
         = "//xsd:element[@name=$NAME]";
 
@@ -336,6 +340,13 @@ public class WFSMetaExtractor {
             operation.name = node.getAttribute("name");
             operation.get = XML.xpathString(
                 node, XPATH_OPERATION_GET, NAMESPACES);
+
+            NodeList outs = (NodeList)XML.xpath(
+                node, XPATH_OPERATION_OUT_FORMATS,
+                XPathConstants.NODESET, NAMESPACES);
+            for (int j = 0, m = outs.getLength(); j < m; j++) {
+                operation.outputFormats.add(outs.item(j).getTextContent());
+            }
             meta.operations.add(operation);
         }
 
