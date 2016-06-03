@@ -19,7 +19,6 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.bayern.gdi.utils.Field;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /** Stores meta data about WFS. */

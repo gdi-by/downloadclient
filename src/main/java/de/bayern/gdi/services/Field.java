@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.services;
 
 /**
  * Created by jochen on 03.06.16.

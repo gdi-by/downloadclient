@@ -17,16 +17,16 @@
  */
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -35,10 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.XML;
-import de.bayern.gdi.utils.Field;
 
 /** Extract meta data from a WFS. */
 public class WFSMetaExtractor {

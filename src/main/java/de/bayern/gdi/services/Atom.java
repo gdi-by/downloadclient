@@ -18,7 +18,6 @@
 
 package de.bayern.gdi.services;
 
-import de.bayern.gdi.utils.Field;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
