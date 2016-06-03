@@ -222,14 +222,53 @@
                                                    </children>
                                                 </HBox>
                                                 <Separator prefWidth="200.0" />
-                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                <Label text="Beschreibung">
+                                                   <font>
+                                                      <Font name="System Bold" size="13.0" />
+                                                   </font>
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="15.0" top="5.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <Label fx:id="valueAtomDescr" prefHeight="31.0" prefWidth="540.0" text="description" wrapText="true" VBox.vgrow="ALWAYS">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="20.0" right="15.0" top="5.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label text="Label" />
+                                                      <Label fx:id="labelAtomVariation" minWidth="-Infinity" prefWidth="200.0" text="Varianten">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+                                                         </HBox.margin></Label>
+                                                      <ComboBox fx:id="atomVariationChooser" prefWidth="150.0" />
                                                    </children>
                                                 </HBox>
-                                                <HBox prefHeight="100.0" prefWidth="200.0">
+                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label text="Label" />
+                                                      <Label minWidth="-Infinity" prefWidth="200.0" text="Format">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="valueAtomFormat" text="format" wrapText="true">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
+                                                         </HBox.margin></Label>
+                                                   </children>
+                                                </HBox>
+                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                   <children>
+                                                      <Label prefWidth="200.0" text="Koordinatenreferenzsystem">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="valueAtomRefsys" prefHeight="21.0" prefWidth="40.0" text="refsys" wrapText="true" HBox.hgrow="ALWAYS">
+                                                         <HBox.margin>
+                                                            <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
+                                                         </HBox.margin>
+                                                      </Label>
                                                    </children>
                                                 </HBox>
                                              </children>
