@@ -19,9 +19,8 @@
 package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.utils.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -56,24 +55,17 @@ public class DebugAtom {
 
     private void go() {
         atom = new Atom(this.urlString, this.userName, this.password);
-        printArrayStringList(atom.getTypes());
-        printStringMap(atom.getAttributes(atom.getTypes().get(1)));
-        System.out.println(atom.getDescription(atom.getTypes().get(1)));
+        printFieldList(atom.getItems());
+        printFieldList(atom.getFields(atom.getItems().get(1)));
+        System.out.println(atom.getDescription(atom.getItems().get(1).type));
     }
 
 
 
-    private void printArrayStringList(ArrayList<String> als) {
-        for (String str : als) {
-            System.out.println(str);
+    private void printFieldList(ArrayList<Field> als) {
+        for (Field f : als) {
+            System.out.println(f.name + " : " + f.type);
         }
     }
 
-    private void printStringMap(Map<String, String> map)  {
-        Iterator it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
-        }
-    }
 }

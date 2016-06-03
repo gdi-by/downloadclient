@@ -19,7 +19,7 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import de.bayern.gdi.utils.Field;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /** Stores meta data about WFS. */
@@ -35,31 +35,6 @@ public class WFSMeta {
         @Override
         public String toString() {
             return "operation: { name: " + name + " get: " + get + " }";
-        }
-    }
-
-    /** field. */
-    public static class Field {
-        /** name. */
-        public String name;
-        /** type. */
-        public String type;
-
-        public Field() {
-        }
-
-        /**
-         * @param name name.
-         * @param type type.
-         */
-        public Field(String name, String type) {
-            this.name = name;
-            this.type = type;
-        }
-
-        @Override
-        public String toString() {
-            return "field: { name: " + name + " type: " + type + " }";
         }
     }
 

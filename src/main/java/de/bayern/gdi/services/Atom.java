@@ -18,13 +18,13 @@
 
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.utils.Field;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class Atom extends WebService {
+public class Atom {
 
     private String serviceURL;
     private String username;
@@ -45,11 +45,13 @@ public class Atom extends WebService {
     private Document mainDoc;
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
-    private ArrayList<String> types;
-    private Map<String, String> typesWithURLS;
+    private ArrayList<Field> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
+
+
+
 
     /**
      * @inheritDoc
@@ -69,7 +71,7 @@ public class Atom extends WebService {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
-        this.types = null;
+        this.items = null;
         URL url = null;
 
         try {
@@ -90,10 +92,9 @@ public class Atom extends WebService {
      * @inheritDoc
      * @return the Types of the service
      */
-    public ArrayList<String> getTypes() {
-        if (this.types == null) {
-            types = new ArrayList<>();
-            typesWithURLS = new HashMap<String, String>();
+    public ArrayList<Field> getItems() {
+        if (this.items == null) {
+            items = new ArrayList<>();
             String getEntriesQuery = "//entry";
             NodeList entries = (NodeList) XML.xpath(this.mainDoc,
                     getEntriesQuery,
@@ -107,34 +108,41 @@ public class Atom extends WebService {
                         getEntryTitle,
                         XPathConstants.NODE,
                         this.nscontext);
-                types.add(title.getTextContent());
+
                 Node id = (Node) XML.xpath(entry,
                         getEntryid,
                         XPathConstants.NODE,
                         this.nscontext);
-                typesWithURLS.put(title.getTextContent(), id.getTextContent());
+                Field f = new Field(id.getTextContent(), title.getTextContent
+                        ());
+                items.add(f);
             }
         }
-        return types;
+        return items;
     }
 
     /**
-     * returns the URL for the selected Type.
-     * @param type the type
+     * returns the URL for the selected item
+     * @param item the item
      * @return URL
      */
-    public String getURLforType(String type) {
-        return (String) this.typesWithURLS.get(type);
+    public String getURLforItem(String item) {
+        for(Field f: this.items) {
+            if(f.name == item) {
+                return f.type;
+            }
+        }
+        return null;
     }
 
     /**
      * @inheritDoc
-     * @param type the Type
-     * @return The Attributes of the Service
+     * @param item the item
+     * @return The Feilds of the item
      */
-    public Map<String, String> getAttributes(String type) {
-        Map<String, String> attributes = new HashMap<>();
-        String attributeURL = getURLforType(type);
+    public ArrayList<Field> getFields(Field item) {
+        ArrayList<Field> fields = new ArrayList<>();
+        String attributeURL = item.name;
         Node entry = getEntry(attributeURL);
         //Predefined in ATOM Service
         String getId = "id";
@@ -156,11 +164,12 @@ public class Atom extends WebService {
                 if (catAttr.getNodeName().equals("term")) {
                     epsg = catAttr.getTextContent();
                     String attrVal = makeAttributeValue(id, epsg);
-                    attributes.put(ATTRIBUTENAME + String.valueOf(i), attrVal);
+                    Field f = new Field(ATTRIBUTENAME, attrVal);
+                    fields.add(f);
                 }
             }
         }
-        return attributes;
+        return fields;
     }
 
     private String makeAttributeValue(String id, String categoryTerm) {
@@ -177,7 +186,7 @@ public class Atom extends WebService {
     }
 
     /**
-     * @inheritDoc
+     * returns the serviceType.
      * @return the Type of the Service
      */
     public ServiceType getServiceType() {
@@ -185,12 +194,13 @@ public class Atom extends WebService {
     }
 
     /**
-     * @param typeName The typeName.
+     * returns the description for an Item.
+     * @param item The typeName.
      * @return The description.
      */
-    public String getDescription(String typeName) {
+    public String getDescription(Field item) {
         String description = null;
-        String attributeURL = getURLforType(typeName);
+        String attributeURL = item.name;
         Node entry = getEntry(attributeURL);
         String summaryExpr = "summary";
         description = (String) XML.xpath(entry,

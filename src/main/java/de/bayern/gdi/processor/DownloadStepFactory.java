@@ -19,20 +19,17 @@
 package de.bayern.gdi.processor;
 
 
-import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.WFSTwo;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.bayern.gdi.gui.DataBean;
 import de.bayern.gdi.gui.View;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSTwo;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -112,8 +109,8 @@ public class DownloadStepFactory {
                     break;
                 case Atom:
                     serviceTypeStr = "ATOM";
-                    Atom atom = (Atom) bean.getWebService();
-                    dataset = atom.getURLforType(dataset);
+
+                    //dataset = atom.getURLforType(dataset);
                     break;
                 default:
             }

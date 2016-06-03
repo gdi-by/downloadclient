@@ -38,6 +38,7 @@ import org.w3c.dom.NodeList;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
+import de.bayern.gdi.utils.Field;
 
 /** Extract meta data from a WFS. */
 public class WFSMetaExtractor {
@@ -195,11 +196,11 @@ public class WFSMetaExtractor {
         return name2types;
     }
 
-    private static ArrayList<WFSMeta.Field> recursiveResolve(
+    private static ArrayList<Field> recursiveResolve(
         HashMap<String, Element> name2types,
         Element element
     ) {
-        ArrayList<WFSMeta.Field> list = new ArrayList<>();
+        ArrayList<Field> list = new ArrayList<>();
         ArrayDeque<Element> queue = new ArrayDeque<>();
 
         HashSet<String> visited = new HashSet<>();
@@ -214,7 +215,7 @@ public class WFSMetaExtractor {
             Element type = name2types.get(
                 stripNS(element.getAttribute("type")));
             if (type == null) {
-                list.add(new WFSMeta.Field(
+                list.add(new Field(
                     name,
                     element.getAttribute("type")));
             } else {
@@ -225,7 +226,7 @@ public class WFSMetaExtractor {
                 int n = children.getLength();
                 if (n == 0) {
                     // TODO: Do more ... list union etc.
-                    list.add(new WFSMeta.Field(
+                    list.add(new Field(
                         element.getAttribute("name"),
                         "Simple"));
                 } else {
@@ -309,7 +310,7 @@ public class WFSMetaExtractor {
                 sqd.getElementsByTagNameNS(wfs, "Parameter");
             for (int j = 0, m = parameters.getLength(); j < m; j++) {
                 Element parameter = (Element)parameters.item(j);
-                WFSMeta.Field p = new WFSMeta.Field(
+                Field p = new Field(
                     parameter.getAttribute("name"),
                     parameter.getAttribute("type"));
                 sq.parameters.add(p);

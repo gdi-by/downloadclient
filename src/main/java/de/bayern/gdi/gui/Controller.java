@@ -280,7 +280,7 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.atom"));
                                 });
-                                ws = new Atom(url);
+                                //ws = new Atom(url);
                                 break;
                             case WFSOne:
                                 Platform.runLater(() -> {
