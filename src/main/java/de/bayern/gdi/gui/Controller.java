@@ -34,11 +34,13 @@ import javafx.stage.WindowEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -71,12 +73,14 @@ public class Controller {
 
     private UIFactory factory;
 
-    @FXML private MenuItem menuCloseApp;
+    @FXML private Menu menuFile;
+    @FXML private MenuItem menuClose;
     @FXML private MenuBar mainMenu;
     @FXML private ListView serviceList;
     @FXML private TextField searchField;
     @FXML private TextField serviceURL;
     @FXML private CheckBox serviceAuthenticationCbx;
+    @FXML private CheckBox chkChain;
     @FXML private TextField serviceUser;
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
@@ -95,6 +99,14 @@ public class Controller {
     @FXML private TextField atomY1;
     @FXML private TextField atomX2;
     @FXML private TextField atomY2;
+    @FXML private Label labelURL;
+    @FXML private Label labelUser;
+    @FXML private Label labelPassword;
+    @FXML private Label labelSelectType;
+    @FXML private Label labelPostProcess;
+    @FXML private Button serviceSelection;
+    @FXML private Button buttonDownload;
+    @FXML private Button buttonSaveConfig;
 
     /**
      * Handler to close the application.
@@ -384,6 +396,24 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(true);
         this.atomContainer.setVisible(false);
+        applyI18n();
+    }
+
+    private void applyI18n() {
+        menuFile.setText(I18n.getMsg("menu.options"));
+        menuClose.setText(I18n.getMsg("menu.quit"));
+        labelURL.setText(I18n.getMsg("gui.url"));
+        labelUser.setText(I18n.getMsg("gui.user"));
+        labelPassword.setText(I18n.getMsg("gui.password"));
+        serviceSelection.setText(I18n.getMsg("gui.choose_service"));
+        serviceAuthenticationCbx.setText(I18n.getMsg("gui.use_auth"));
+        labelSelectType.setText(I18n.getMsg("gui.choose_type"));
+        statusBarText.setText(I18n.getMsg("status.ready"));
+        chkChain.setText(I18n.getMsg("gui.post_process"));
+        chkChain.setText(I18n.getMsg("gui.process_chain"));
+        labelPostProcess.setText(I18n.getMsg("gui.post_process"));
+        buttonDownload.setText(I18n.getMsg("gui.download"));
+        buttonSaveConfig.setText(I18n.getMsg("gui.save-conf"));
     }
 
     // view
