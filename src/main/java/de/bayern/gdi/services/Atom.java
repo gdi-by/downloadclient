@@ -187,6 +187,10 @@ public class Atom extends WebService {
         return ServiceType.Atom;
     }
 
+    /**
+     * @param typeName The typeName.
+     * @return The description.
+     */
     public String getDescription(String typeName) {
         String description = null;
         String attributeURL = getURLforType(typeName);
