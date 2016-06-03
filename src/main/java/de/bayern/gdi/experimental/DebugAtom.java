@@ -19,7 +19,6 @@
 package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.utils.Field;
 import java.util.ArrayList;
 
 /**
@@ -55,17 +54,10 @@ public class DebugAtom {
 
     private void go() {
         atom = new Atom(this.urlString, this.userName, this.password);
-        printFieldList(atom.getItems());
-        printFieldList(atom.getFields(atom.getItems().get(1)));
-        System.out.println(atom.getDescription(atom.getItems().get(1).type));
+        System.out.println("Title: " +atom.getTitle());
+        System.out.println("Subtitle: " + atom.getSubTitle());
+        System.out.println("ID: " + atom.getID());
+        ArrayList<Atom.Item> items = atom.getItems();
+        System.out.println(items.toString());
     }
-
-
-
-    private void printFieldList(ArrayList<Field> als) {
-        for (Field f : als) {
-            System.out.println(f.name + " : " + f.type);
-        }
-    }
-
 }
