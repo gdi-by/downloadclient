@@ -95,7 +95,19 @@ public class WFSMetaExtractor {
     private static final String XPATH_STORED_QUERIES
         = "//wfs:StoredQueryDescription";
 
-    private WFSMetaExtractor() {
+    private String user;
+    private String password;
+    private String capURLString;
+
+    public WFSMetaExtractor(String capURLString) {
+        this.capURLString = capURLString;
+    }
+
+    public WFSMetaExtractor(
+        String capURLString, String user, String password) {
+        this(capURLString);
+        this.user = user;
+        this.password = password;
     }
 
     private static double[] toDouble(String s) {
@@ -150,15 +162,14 @@ public class WFSMetaExtractor {
 
     /**
      * Extracts meta information from a given capabilities path.
-     * @param capURLString The URL of the capabilities document.
      * @return The extracted meta data.
      * @throws IOException If something went wrong.
      */
-    public static WFSMeta parse(String capURLString) throws IOException {
+    public WFSMeta parse() throws IOException {
         WFSMeta meta = new WFSMeta();
-        parseCapabilites(capURLString, meta);
-        parseDescribeFeatures(capURLString, meta);
-        parseDescribeStoredQueries(capURLString, meta);
+        parseCapabilites(meta);
+        parseDescribeFeatures(meta);
+        parseDescribeStoredQueries(meta);
         return meta;
     }
 
@@ -227,8 +238,16 @@ public class WFSMetaExtractor {
         return list;
     }
 
-    private static void parseDescribeFeatures(
-        String capURLString, WFSMeta meta) throws IOException {
+    private Document getDocument(String url) throws IOException {
+        Document doc = XML.getDocument(new URL(url), this.user, this.password);
+        if (doc != null) {
+            return doc;
+        }
+        throw new IOException("Cannot load document.");
+    }
+
+    private void parseDescribeFeatures(WFSMeta meta)
+        throws IOException {
 
         WFSMeta.Operation op = meta.findOperation("DescribeFeatureType");
         if (op == null) {
@@ -239,10 +258,7 @@ public class WFSMetaExtractor {
             ? op.get + "?request=DescribeFeatureType"
             : capURLString.replace("GetCapabilities", "DescribeFeatureType");
 
-        Document dfDoc = XML.getDocument(new URL(urlString));
-        if (dfDoc == null) {
-            throw new IOException("Cannot load DescribeFeatureType document.");
-        }
+        Document dfDoc = getDocument(urlString);
 
         HashMap<String, Element> name2types = buildTypeIndex(dfDoc);
 
@@ -261,8 +277,8 @@ public class WFSMetaExtractor {
         }
     }
 
-    private static void parseDescribeStoredQueries(
-        String capURLString, WFSMeta meta) throws IOException {
+    private void parseDescribeStoredQueries(WFSMeta meta)
+        throws IOException {
 
         WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
         if (op == null) {
@@ -273,11 +289,7 @@ public class WFSMetaExtractor {
             ? op.get + "?request=DescribeStoredQueries"
             : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
 
-        Document dsqDoc = XML.getDocument(new URL(urlString));
-        if (dsqDoc == null) {
-            throw new IOException(
-                "Cannot load DescribeStoredQueries document.");
-        }
+        Document dsqDoc = getDocument(urlString);
 
         NodeList storedQueriesDesc = (NodeList)XML.xpath(
             dsqDoc, XPATH_STORED_QUERIES,
@@ -307,14 +319,9 @@ public class WFSMetaExtractor {
         }
     }
 
-    private static void parseCapabilites(String capURLString, WFSMeta meta)
-        throws IOException {
+    private void parseCapabilites(WFSMeta meta) throws IOException {
 
-        URL capURL = new URL(capURLString);
-        Document capDoc = XML.getDocument(capURL);
-        if (capDoc == null) {
-            throw new IOException("Cannot load capabilities document.");
-        }
+        Document capDoc = getDocument(this.capURLString);
 
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
