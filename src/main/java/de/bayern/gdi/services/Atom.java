@@ -73,11 +73,11 @@ public class Atom {
         /**
          * default CRS.
          */
-        //public String defaultCRS;
+        public String defaultCRS;
         /**
          * other CRSs.
          */
-        //public List<String> otherCRSs;
+        public List<String> otherCRSs;
         /**
          * bbox.
          */
@@ -88,15 +88,22 @@ public class Atom {
         public List<Field> fields;
 
         public Item() {
-            //otherCRSs = new ArrayList<>();
+            otherCRSs = new ArrayList<>();
             fields = new ArrayList<>();
+            defaultCRS = null;
         }
         @Override
-        public String toString () {
+        public String toString() {
             String str = null;
             str += "title: " + title + "\n";
             str += "id: " + id + "\n";
             str += "description: " + description + "\n";
+            str += "CRS: " + defaultCRS;
+            str += "Other CRS:\n";
+            for (String crs: otherCRSs) {
+                str += "\t" + crs;
+            }
+            str += "Other Fields:\n";
             for (Field f: fields) {
                 str += "\t" + f.name + ": " + f.type + "\n";
             }
@@ -137,7 +144,8 @@ public class Atom {
         this.nscontext = new NamespaceContextMap(
                 "", "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
-                "inspire_dls", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
+                "inspire_dls",
+                "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
         items = new ArrayList<>();
         String getTitle = "//title";
         this.title = (String) XML.xpath(this.mainDoc,
@@ -163,7 +171,7 @@ public class Atom {
             Node entry = entries.item(i);
             String getEntryTitle = "title";
             String getEntryid = "id";
-            Node title = (Node) XML.xpath(entry,
+            Node titleN = (Node) XML.xpath(entry,
                     getEntryTitle,
                     XPathConstants.NODE,
                     this.nscontext);
@@ -178,40 +186,76 @@ public class Atom {
                     this.nscontext);
             Item it = new Item();
             it.id = id.getTextContent();
-            it.title = title.getTextContent();
+            it.title = titleN.getTextContent();
             it.description = description.getTextContent();
-                /*
-                it.defaultCRS
-                it.otherCRSs
-                */
+            it.otherCRSs = getCRS(it.id);
+            it.defaultCRS = it.otherCRSs.get(0);
             String bboxExpr = "//*[local-name()='polygon']";
             Node bbox = (Node) XML.xpath(entry,
                     bboxExpr,
                     XPathConstants.NODE,
                     this.nscontext);
             it.bbox = new ReferencedEnvelope();
+            //TODO: Calculate Bounding Box
             it.fields = getFieldForEntry(it.id);
             items.add(it);
         }
     }
     /**
-     * Items of the services
+     * Items of the services.
      * @return the Items of the service
      */
     public ArrayList<Item> getItems() {
         return this.items;
     }
 
+    /**
+     * returns the title of the service.
+     * @return title of the serivce
+     */
     public String getTitle() {
         return this.title;
     }
 
+    /**
+     * subtitle of the service.
+     * @return subtitle of the service.
+     */
     public String getSubTitle() {
         return this.subTitle;
     }
 
-    public String getID () {
+    /**
+     * id of the service.
+     * @return id of the serivce
+     */
+    public String getID() {
         return this.serviceID;
+    }
+
+    private ArrayList<String> getCRS(String id) {
+        ArrayList<String> crs = new ArrayList<>();
+        String attributeURL = id;
+        Node entry = getEntry(attributeURL);
+        //Predefined in ATOM Service
+        String getCategories = "category";
+        NodeList cL = (NodeList) XML.xpath(entry,
+                getCategories,
+                XPathConstants.NODESET,
+                this.nscontext);
+        for (int i = 0; i < cL.getLength(); i++) {
+            Node cat = cL.item(i);
+            NamedNodeMap catAttributes = cat.getAttributes();
+            String epsg = null;
+            for (int j = 0; j < catAttributes.getLength(); j++) {
+                Node catAttr = catAttributes.item(j);
+                if (catAttr.getNodeName().equals("label")) {
+                    epsg = catAttr.getTextContent();
+                    crs.add(epsg);
+                }
+            }
+        }
+        return crs;
     }
 
     private ArrayList<Field> getFieldForEntry(String id) {
@@ -235,14 +279,9 @@ public class Atom {
                 if (catAttr.getNodeName().equals("term")) {
                     epsg = catAttr.getTextContent();
                     attrVal = makeAttributeValue(id, epsg);
+                    Field f = new Field(ATTRIBUTENAME, attrVal);
+                    fields.add(f);
                 }
-                if (catAttr.getNodeName().equals("label")) {
-                    csr = catAttr.getTextContent();
-                }
-            }
-            if (attrVal != null && csr != null) {
-                Field f = new Field(csr, attrVal);
-                fields.add(f);
             }
         }
         return fields;

@@ -54,7 +54,7 @@ public class DebugAtom {
 
     private void go() {
         atom = new Atom(this.urlString, this.userName, this.password);
-        System.out.println("Title: " +atom.getTitle());
+        System.out.println("Title: " + atom.getTitle());
         System.out.println("Subtitle: " + atom.getSubTitle());
         System.out.println("ID: " + atom.getID());
         ArrayList<Atom.Item> items = atom.getItems();
