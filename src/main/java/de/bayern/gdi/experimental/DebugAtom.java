@@ -58,6 +58,7 @@ public class DebugAtom {
         atom = new Atom(this.urlString, this.userName, this.password);
         printArrayStringList(atom.getTypes());
         printStringMap(atom.getAttributes(atom.getTypes().get(1)));
+        System.out.println(atom.getDescription(atom.getTypes().get(1)));
     }
 
 

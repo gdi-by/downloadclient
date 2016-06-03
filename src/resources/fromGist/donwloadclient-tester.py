@@ -115,4 +115,3 @@ if  __name__ =='__main__':
     printxpath("//atom:feed/atom:entry/atom:link/@type", xml)
     printxpath("//atom:feed/atom:entry/atom:category/@term", xml)
     printxpath("//atom:feed/atom:entry/atom:link/@href", xml)
-    

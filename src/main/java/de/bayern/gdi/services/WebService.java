@@ -76,4 +76,13 @@ public abstract class WebService implements ServiceSchema {
     public String getServiceURL() {
         return this.serviceURL;
     }
+
+    /**
+     * @inheritDoc
+     * @param typeName the name of the Type
+     * @return The description
+     */
+    public String getDescription(String typeName) {
+        return null;
+    };
 }

@@ -186,4 +186,21 @@ public class Atom extends WebService {
     public ServiceType getServiceType() {
         return ServiceType.Atom;
     }
+
+    public String getDescription(String typeName) {
+        String description = null;
+        String attributeURL = getURLforType(typeName);
+        String getEntry = "//entry/link[@href='" + attributeURL + "']";
+        Node n = (Node) XML.xpath(this.mainDoc,
+                getEntry,
+                XPathConstants.NODE,
+                this.nscontext);
+        Node entry = n.getParentNode();
+        String summaryExpr = "summary";
+        description = (String) XML.xpath(entry,
+                summaryExpr,
+                XPathConstants.STRING,
+                this.nscontext);
+        return description;
+    }
 }
