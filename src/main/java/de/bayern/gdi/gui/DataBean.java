@@ -18,12 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.services.CatalogService;
-import de.bayern.gdi.services.WebService;
-
-import de.bayern.gdi.utils.ServiceSetting;
-import de.bayern.gdi.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +25,15 @@ import java.util.Observable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.stage.Stage;
+
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.CatalogService;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+//import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.ServiceSetting;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -45,7 +46,9 @@ public class DataBean extends Observable {
     private ServiceSetting serviceSetting;
     private Map<String, String> staticServices;
     private Map<String, String> catalogServices;
-    private WebService webService;
+    private ServiceType serviceType;
+    private Atom atomService;
+    private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
     private Map<String, String> attributes;
     private String wmsUrl;
@@ -67,7 +70,8 @@ public class DataBean extends Observable {
         this.catalogServices = new HashMap<String, String>();
         this.catalogService = new CatalogService(this.serviceSetting
                 .getCatalogueURL());
-        this.webService = null;
+        this.atomService = null;
+        this.wfsService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
         this.userName = null;
@@ -145,19 +149,52 @@ public class DataBean extends Observable {
     }
 
     /**
+     * Set the service type.
+     * @param type the service type
+     */
+    public void setServiceType(ServiceType type) {
+        this.serviceType = type;
+    }
+
+    /**
+     * Get the service type.
+     * @return the service type
+     */
+    public ServiceType getServiceType() {
+        return this.serviceType;
+    }
+
+    /**
      * gets the Webservice.
      * @return webservice
      */
-    public WebService getWebService() {
-        return webService;
+    public Atom getAtomService() {
+        return atomService;
+    }
+
+    /**
+     * Get the WFS service.
+     * @return the service
+     */
+    public WFSMeta getWFSService() {
+        return wfsService;
     }
 
     /**
      * sets the webservice.
      * @param webService webservice
      */
-    public void setWebService(WebService webService) {
-        this.webService = webService;
+    public void setAtomService(Atom webService) {
+        this.serviceType = ServiceType.Atom;
+        this.atomService = webService;
+    }
+
+    /**
+     * sets the webservice.
+     * @param webService webservice
+     */
+    public void setWFSService(WFSMeta webService) {
+        this.wfsService = webService;
     }
 
     /**
@@ -165,7 +202,8 @@ public class DataBean extends Observable {
      * @return true if webservice ist set; false if not set
      */
     public boolean isWebServiceSet() {
-        if (this.webService == null) {
+        if (this.atomService == null
+            && this.wfsService == null) {
             return false;
         }
         return true;

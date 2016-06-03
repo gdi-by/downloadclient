@@ -34,7 +34,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 
 //import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 
 /**
@@ -57,15 +56,11 @@ public class UIFactory {
      * @param container The container node
      *
      */
-    public void fillServiceType(
+    public void fillAtom(
         DataBean dataBean,
-        String type,
-        VBox container
+        VBox container,
+        String type
     ) {
-        WebService service = dataBean.getWebService();
-//        ServiceType type = service.getServiceType();
-//        System.out.println()
-
     }
 
     private void createSimpleWFS(
@@ -87,12 +82,13 @@ public class UIFactory {
         container.getChildren().add(descriptionHead);
         container.getChildren().add(description);
 
-        Map<String, String> attributes =
+/*        Map<String, String> attributes =
             dataBean.getWebService().getAttributes(type);
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
             HBox attributeItem = createAttributeItem(entry);
             container.getChildren().add(attributeItem);
         }
+        */
     }
 
     private HBox createAttributeItem(Map.Entry<String, String> item) {
@@ -119,7 +115,7 @@ public class UIFactory {
         ComboBox box = new ComboBox();
         // TODO add elements to box.
         TextField field = new TextField();
-        Button remove = new Button("remove");
+        Button remove = new Button(I18n.getMsg("gui.remove"));
         remove.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 ObservableList<Node> items = container.getChildren();

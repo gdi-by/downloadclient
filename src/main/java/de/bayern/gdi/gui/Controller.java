@@ -20,7 +20,7 @@ package de.bayern.gdi.gui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.stage.WindowEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -39,8 +38,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -48,11 +47,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
@@ -85,6 +86,7 @@ public class Controller {
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
     @FXML private ComboBox serviceTypeChooser;
+    @FXML private ComboBox atomVariationChooser;
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
@@ -104,9 +106,13 @@ public class Controller {
     @FXML private Label labelPassword;
     @FXML private Label labelSelectType;
     @FXML private Label labelPostProcess;
+    @FXML private Label valueAtomDescr;
+    @FXML private Label valueAtomFormat;
+    @FXML private Label valueAtomRefsys;
     @FXML private Button serviceSelection;
     @FXML private Button buttonDownload;
     @FXML private Button buttonSaveConfig;
+    @FXML private Button addChainItem;
 
     /**
      * Handler to close the application.
@@ -202,7 +208,7 @@ public class Controller {
             this.serviceTypeChooser.
                 getSelectionModel().getSelectedItem().toString();
         System.out.println("Selected: " + item);
-
+        chooseType(item);
     }
 
     /**
@@ -280,7 +286,8 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.atom"));
                                 });
-                                //ws = new Atom(url);
+                                Atom atom = new Atom(url);
+                                dataBean.setAtomService(atom);
                                 break;
                             case WFSOne:
                                 Platform.runLater(() -> {
@@ -310,7 +317,7 @@ public class Controller {
                                 break;
                         }
                     }
-                    dataBean.setWebService(ws);
+//                    dataBean.setWebService(ws);
                     Platform.runLater(() -> {
                         setServiceTypes();
                         serviceTypeChooser.
@@ -340,13 +347,13 @@ public class Controller {
      */
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
-            switch (dataBean.getWebService().getServiceType()) {
+            switch (dataBean.getServiceType()) {
                 case WFSOne:
-                    dataBean.setServiceTypes(
-                            dataBean.getWebService().getTypes());
-                    break;
+//                    dataBean.setServiceTypes(
+//                            dataBean.getWFSService());
+//                    break;
                 case WFSTwo:
-                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
+/*                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
                     ArrayList<String> wfstwoServices = new ArrayList<>();
                     ArrayList<String> storedQuieres = dataBean
                         .getWebService().getStoredQueries();
@@ -360,16 +367,55 @@ public class Controller {
                         str = wfstwo.getBasicPrefix() + " " + str;
                         wfstwoServices.add(str);
                     }
-                    dataBean.setServiceTypes(wfstwoServices);
+                    dataBean.setServiceTypes(wfstwoServices);*/
                     break;
                 case Atom:
+                    List<Atom.Item> items =
+                        dataBean.getAtomService().getItems();
+                    ObservableList<String> opts =
+                        FXCollections.observableArrayList();
+                    System.out.println("set Atom");
+                    for (Atom.Item item : items) {
+                        System.out.println(item.title);
+                        opts.add(item.title);
+                    }
+                    serviceTypeChooser.getItems().retainAll();
+                    serviceTypeChooser.setItems(opts);
+                    chooseType(opts.get(0));
                 default:
             }
-            ObservableList<String> options =
-                FXCollections.observableArrayList(dataBean.getServiceTypes());
-            serviceTypeChooser.getItems().retainAll();
-            serviceTypeChooser.setItems(options);
         }
+    }
+
+    private void chooseType(String data) {
+        ServiceType type = this.dataBean.getServiceType();
+        if (type == ServiceType.Atom) {
+            Atom service = this.dataBean.getAtomService();
+            List<Atom.Item> items = service.getItems();
+            for (Atom.Item item : items) {
+                if (item.title.equals(data)) {
+                    List<Field> fields = item.fields;
+                    ObservableList<String> list =
+                        FXCollections.observableArrayList();
+                    for (Field f : fields) {
+                        list.add(f.type);
+                    }
+                    this.atomVariationChooser.setItems(list);
+                    this.valueAtomDescr.setText(item.description);
+                    this.valueAtomFormat.setText(item.format);
+                    this.valueAtomRefsys.setText(item.defaultCRS);
+                }
+            }
+            this.simpleWFSContainer.setVisible(false);
+            this.basicWFSContainer.setVisible(false);
+            this.atomContainer.setVisible(true);
+        }
+/*        else if (type == ServiceType.WFSTwo) {
+            factory.fillAtom(this.dataBean, this.atomContainer);
+            this.simpleWFSContainer.setVisible(false);
+            this.basicWFSContainer.setVisible(false);
+            this.atomContainer.setVisible(true);
+        }*/
     }
 
     /**
@@ -414,6 +460,7 @@ public class Controller {
         labelPostProcess.setText(I18n.getMsg("gui.post_process"));
         buttonDownload.setText(I18n.getMsg("gui.download"));
         buttonSaveConfig.setText(I18n.getMsg("gui.save-conf"));
+        addChainItem.setText(I18n.getMsg("gui.add"));
     }
 
     // view

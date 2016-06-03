@@ -67,11 +67,15 @@ public class DownloadStepFactory {
         try {
 
             //DownloadStep step = new DownloadStep();
-            String serviceURL = bean.getWebService().getServiceURL();
+            ServiceType type = bean.getServiceType();
+//            String serviceURL = type == ServiceType.Atom ?
+//                bean.getAtomService().getURL() :
+//                bean.getWFSService().getUrl();
+            String serviceURL = "";
             serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
             //step.setServiceURL(bean.getWebService().getServiceURL());
             ServiceType serviceType =
-                    bean.getWebService().getServiceType();
+                    bean.getServiceType();
             //step.setServiceType(bean.getWebService().getServiceType());
             //step.setPath(savePath);
             Map<String, String> paramMap = bean.getAttributes();
