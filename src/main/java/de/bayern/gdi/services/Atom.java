@@ -81,8 +81,10 @@ public class Atom extends WebService {
                 this.username,
                 this.password,
                 false);
-        this.nscontext = new NamespaceContextMap("",
-                "http://www.w3.org/2005/Atom");
+        this.nscontext = new NamespaceContextMap(
+                "", "http://www.w3.org/2005/Atom",
+                "georss", "http://www.georss.org/georss",
+                "inspire_dls", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
     }
     /**
      * @inheritDoc
@@ -133,12 +135,7 @@ public class Atom extends WebService {
     public Map<String, String> getAttributes(String type) {
         Map<String, String> attributes = new HashMap<>();
         String attributeURL = getURLforType(type);
-        String getEntry = "//entry/link[@href='" + attributeURL + "']";
-        Node n = (Node) XML.xpath(this.mainDoc,
-                getEntry,
-                XPathConstants.NODE,
-                this.nscontext);
-        Node entry = n.getParentNode();
+        Node entry = getEntry(attributeURL);
         //Predefined in ATOM Service
         String getId = "id";
         String id = (String) XML.xpath(entry,
@@ -194,17 +191,23 @@ public class Atom extends WebService {
     public String getDescription(String typeName) {
         String description = null;
         String attributeURL = getURLforType(typeName);
-        String getEntry = "//entry/link[@href='" + attributeURL + "']";
-        Node n = (Node) XML.xpath(this.mainDoc,
-                getEntry,
-                XPathConstants.NODE,
-                this.nscontext);
-        Node entry = n.getParentNode();
+        Node entry = getEntry(attributeURL);
         String summaryExpr = "summary";
         description = (String) XML.xpath(entry,
                 summaryExpr,
                 XPathConstants.STRING,
                 this.nscontext);
         return description;
+    }
+
+    private Node getEntry(String attributeURL) {
+        String getEntry = "//entry/link[@href=$HREF]";
+        HashMap<String, String> vars = new HashMap<>();
+        vars.put("HREF", attributeURL);
+        Node n = (Node) XML.xpath(this.mainDoc,
+                getEntry,
+                XPathConstants.NODE,
+                this.nscontext, vars);
+        return n.getParentNode();
     }
 }
