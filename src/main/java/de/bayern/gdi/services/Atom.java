@@ -90,7 +90,7 @@ public class Atom {
         /**
          * mimetype.
          */
-        public String type;
+        public String format;
 
         public Item() {
             otherCRSs = new ArrayList<>();
@@ -103,7 +103,7 @@ public class Atom {
             str += "title: " + title + "\n";
             str += "id: " + id + "\n";
             str += "description: " + description + "\n";
-            str += "type: " + type + "\n";
+            str += "format: " + format + "\n";
             str += "CRS: " + defaultCRS + "\n";
             str += "Other CRS:\n";
             for (String crs: otherCRSs) {
@@ -196,7 +196,7 @@ public class Atom {
             it.description = description.getTextContent();
             it.otherCRSs = getCRS(it.id);
             it.defaultCRS = it.otherCRSs.get(0);
-            it.type = getType(it.id);
+            it.format = getFormat(it.id);
             String bboxExpr = "//*[local-name()='polygon']";
             Node bbox = (Node) XML.xpath(entry,
                     bboxExpr,
@@ -248,17 +248,16 @@ public class Atom {
         return this.serviceURL;
     }
 
-    private String getType(String id) {
-        String type = null;
+    private String getFormat(String id) {
+        String format = null;
         String attributeURL = id;
-        Node entry = getEntry(attributeURL);
         Document entryDoc = XML.getDocument(attributeURL);
         String getType = "//entry/link/@type";
-        type = (String) XML.xpath(entryDoc,
+        format = (String) XML.xpath(entryDoc,
                 getType,
                 XPathConstants.STRING,
                 this.nscontext);
-        return type;
+        return format;
     }
 
     private ArrayList<String> getCRS(String id) {
