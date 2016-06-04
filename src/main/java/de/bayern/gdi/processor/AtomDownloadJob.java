@@ -19,9 +19,11 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +51,12 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private static final Logger log
         = Logger.getLogger(AtomDownloadJob.class.getName());
 
+    private static final String XPATH_LINKS =
+        "//atom:entry[atom:id/text()=$VARIATION]/atom:link";
+
+    private static final Properties
+        MINETYPE2EXT = loadMine2Ext();
+
     private String url;
     private String dataset;
     private String variation;
@@ -73,6 +81,29 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         this.dataset = dataset;
         this.variation = variation;
         this.workingDir = workingDir;
+    }
+
+    private static Properties loadMine2Ext() {
+        InputStream in = null;
+        try {
+            in = AtomDownloadJob.class.getResourceAsStream(
+                "mine2ext.properties");
+            if (in == null) {
+                throw new RuntimeException("resource not found");
+            }
+            Properties p = new Properties();
+            p.load(in);
+            return p;
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                }
+            }
+        }
     }
 
     @Override
@@ -108,28 +139,9 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         }
     }
 
-    private static final String XPATH_LINKS =
-        "//atom:entry[atom:id/text()=$VARIATION]/atom:link";
-
-    private static final String[][] MINETYPE2EXT = {
-        {"image/tiff", "tiff"},
-        {"image/jpeg", "jpg"},
-        {"image/png", "png"},
-        {"image/gif", "gif"},
-        {"application/pdf", "pdf"},
-        {"text/csv", "csv"},
-        {"text/xml", "xml"}
-        // TODO: Add more.
-    };
-
     private static String minetypeToExt(String type) {
         type = type.toLowerCase();
-        for (String[] pair: MINETYPE2EXT) {
-            if (pair[0].equals(type)) {
-                return pair[1];
-            }
-        }
-        return "dat";
+        return MINETYPE2EXT.getProperty(type, "dat");
     }
 
     private static final int TEN = 10;
