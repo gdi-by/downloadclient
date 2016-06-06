@@ -61,4 +61,9 @@ interface ServiceSchema {
      * gets the ServiceType.
      */
     ServiceType getServiceType();
+
+    /**
+     * gets the description.
+     */
+    String getDescription(String typeName);
 }

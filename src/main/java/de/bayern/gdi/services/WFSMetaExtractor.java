@@ -19,6 +19,11 @@ package de.bayern.gdi.services;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
@@ -47,6 +52,12 @@ public class WFSMetaExtractor {
             throw new RuntimeException(e);
         }
     }
+    private static final NamespaceContext NAMESPACES =
+        new NamespaceContextMap(
+            "ows", "http://www.opengis.net/ows/1.1",
+            "wfs", "http://www.opengis.net/wfs/2.0",
+            "xlink", "http://www.w3.org/1999/xlink",
+            "xsd", "http://www.w3.org/2001/XMLSchema");
 
     private static final String XPATH_TITLE
         = "//ows:ServiceIdentification/ows:Title/text()";
@@ -73,7 +84,40 @@ public class WFSMetaExtractor {
         + "string-length(local-name()) - string-length('Corner') +1)"
         + "= 'Corner']/text()";
 
-    private WFSMetaExtractor() {
+    private static final String XPATH_OPERATION_GET
+        = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
+
+    private static final String XPATH_OPERATIONS_VERSIONS
+        = "//ows:OperationsMetadata"
+        + "/ows:Parameter[@name='version']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
+    private static final String XPATH_OPERATION_OUT_FORMATS
+        = "ows:Parameter[@name='outputFormat']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
+    private static final String XPATH_DF_ELEMENT
+        = "//xsd:element[@name=$NAME]";
+
+    private static final String XPATH_TYPES
+        = "//xsd:*[local-name()='simpleType' or local-name()='complexType']";
+
+    private static final String XPATH_STORED_QUERIES
+        = "//wfs:StoredQueryDescription";
+
+    private String user;
+    private String password;
+    private String capURLString;
+
+    public WFSMetaExtractor(String capURLString) {
+        this.capURLString = capURLString;
+    }
+
+    public WFSMetaExtractor(
+        String capURLString, String user, String password) {
+        this(capURLString);
+        this.user = user;
+        this.password = password;
     }
 
     private static double[] toDouble(String s) {
@@ -128,49 +172,225 @@ public class WFSMetaExtractor {
 
     /**
      * Extracts meta information from a given capabilities path.
-     * @param capURLString The URL of the capabilities document.
      * @return The extracted meta data.
      * @throws IOException If something went wrong.
      */
-    public static WFSMeta parse(String capURLString) throws IOException {
-        URL capURL = new URL(capURLString);
-        Document capDoc = XML.getDocument(capURL);
-        if (capDoc == null) {
-            throw new IOException("Cannot load capabilities document.");
-        }
-        NamespaceContextMap nc = new NamespaceContextMap(
-                "ows", "http://www.opengis.net/ows/1.1",
-                "wfs", "http://www.opengis.net/wfs/2.0");
+    public WFSMeta parse() throws IOException {
         WFSMeta meta = new WFSMeta();
-        meta.title = XML.xpathString(capDoc, XPATH_TITLE, nc);
+        parseCapabilites(meta);
+        parseDescribeFeatures(meta);
+        parseDescribeStoredQueries(meta);
+        return meta;
+    }
+
+    private static String stripNS(String ns) {
+        int idx = ns.lastIndexOf(':');
+        return idx >= 0 ? ns.substring(idx + 1) : ns;
+    }
+
+    private static HashMap<String, Element> buildTypeIndex(
+        Document doc
+    ) {
+        HashMap<String, Element> name2types = new HashMap<>();
+
+        NodeList types = (NodeList)XML.xpath(
+            doc, XPATH_TYPES,
+            XPathConstants.NODESET, NAMESPACES);
+
+        for (int i = 0, n = types.getLength(); i < n; i++) {
+            Element type = (Element)types.item(i);
+            name2types.put(type.getAttribute("name"), type);
+        }
+
+        return name2types;
+    }
+
+    private static ArrayList<Field> recursiveResolve(
+        HashMap<String, Element> name2types,
+        Element element
+    ) {
+        ArrayList<Field> list = new ArrayList<>();
+        ArrayDeque<Element> queue = new ArrayDeque<>();
+
+        HashSet<String> visited = new HashSet<>();
+
+        queue.add(element);
+        while (!queue.isEmpty()) {
+            element = queue.remove();
+            String name = element.getAttribute("name");
+            if (!visited.add(name)) {
+                continue;
+            }
+            Element type = name2types.get(
+                stripNS(element.getAttribute("type")));
+            if (type == null) {
+                list.add(new Field(
+                    name,
+                    element.getAttribute("type")));
+            } else {
+                NodeList children =
+                    type.getElementsByTagNameNS(
+                        "http://www.w3.org/2001/XMLSchema",
+                        "element");
+                int n = children.getLength();
+                if (n == 0) {
+                    // TODO: Do more ... list union etc.
+                    list.add(new Field(
+                        element.getAttribute("name"),
+                        "Simple"));
+                } else {
+                    for (int i = 0; i < n; i++) {
+                        queue.add((Element)children.item(i));
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+    private Document getDocument(String url) throws IOException {
+        Document doc = XML.getDocument(new URL(url), this.user, this.password);
+        if (doc != null) {
+            return doc;
+        }
+        throw new IOException("Cannot load document.");
+    }
+
+    private void parseDescribeFeatures(WFSMeta meta)
+        throws IOException {
+
+        WFSMeta.Operation op = meta.findOperation("DescribeFeatureType");
+        if (op == null) {
+            return;
+        }
+
+        String urlString = op.get != null
+            ? op.get + (op.get.endsWith("?") ? "" : "?")
+                + "request=DescribeFeatureType"
+                + "&service=wfs"
+                + "&version=" + meta.highestVersion("2.0.0")
+            : capURLString.replace("GetCapabilities", "DescribeFeatureType");
+
+        Document dfDoc = getDocument(urlString);
+
+        HashMap<String, Element> name2types = buildTypeIndex(dfDoc);
+
+        for (WFSMeta.Feature feature: meta.features) {
+            HashMap<String, String> vars = new HashMap<>();
+            String name = stripNS(feature.name);
+            vars.put("NAME", name);
+            NodeList elements = (NodeList)XML.xpath(
+                dfDoc, XPATH_DF_ELEMENT,
+                XPathConstants.NODESET, NAMESPACES, vars);
+            if (elements.getLength() == 0) {
+                continue;
+            }
+            Element element = (Element)elements.item(0);
+            feature.fields = recursiveResolve(name2types, element);
+        }
+    }
+
+    private void parseDescribeStoredQueries(WFSMeta meta)
+        throws IOException {
+
+        WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
+        if (op == null) {
+            return;
+        }
+
+        String urlString = op.get != null
+            ? op.get + (op.get.endsWith("?") ? "" : "?")
+                + "request=DescribeStoredQueries"
+                + "&service=wfs"
+                + "&version=" + meta.highestVersion("2.0.0")
+            : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
+
+        Document dsqDoc = getDocument(urlString);
+
+        NodeList storedQueriesDesc = (NodeList)XML.xpath(
+            dsqDoc, XPATH_STORED_QUERIES,
+            XPathConstants.NODESET, NAMESPACES);
+
+        String wfs = "http://www.opengis.net/wfs/2.0";
+
+        for (int i = 0, n = storedQueriesDesc.getLength(); i < n; i++) {
+            Element sqd = (Element)storedQueriesDesc.item(i);
+            WFSMeta.StoredQuery sq = new WFSMeta.StoredQuery();
+            sq.id = sqd.getAttribute("id");
+            NodeList titles = sqd.getElementsByTagNameNS(wfs, "Title");
+            if (titles.getLength() > 0) {
+                sq.title = titles.item(0).getTextContent();
+            }
+            NodeList abstracts = sqd.getElementsByTagNameNS(wfs, "Abstract");
+            if (abstracts.getLength() > 0) {
+                sq.abstractDescription = abstracts.item(0).getTextContent();
+            }
+            NodeList parameters =
+                sqd.getElementsByTagNameNS(wfs, "Parameter");
+            for (int j = 0, m = parameters.getLength(); j < m; j++) {
+                Element parameter = (Element)parameters.item(j);
+                Field p = new Field(
+                    parameter.getAttribute("name"),
+                    parameter.getAttribute("type"));
+                sq.parameters.add(p);
+            }
+
+            meta.storedQueries.add(sq);
+        }
+    }
+
+    private void parseCapabilites(WFSMeta meta) throws IOException {
+
+        Document capDoc = getDocument(this.capURLString);
+
+        meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
-            = XML.xpathString(capDoc, XPATH_ABSTRACT, nc);
+            = XML.xpathString(capDoc, XPATH_ABSTRACT, NAMESPACES);
+
+        NodeList versions = (NodeList)XML.xpath(
+            capDoc, XPATH_OPERATIONS_VERSIONS,
+            XPathConstants.NODESET, NAMESPACES);
+        for (int i = 0, n = versions.getLength(); i < n; i++) {
+            meta.versions.add(versions.item(i).getTextContent());
+        }
+        Collections.sort(meta.versions);
 
         NodeList nl = (NodeList)XML.xpath(
-            capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             WFSMeta.Operation operation = new WFSMeta.Operation();
             Element node = (Element)nl.item(i);
             operation.name = node.getAttribute("name");
+            operation.get = XML.xpathString(
+                node, XPATH_OPERATION_GET, NAMESPACES);
+
+            NodeList outs = (NodeList)XML.xpath(
+                node, XPATH_OPERATION_OUT_FORMATS,
+                XPathConstants.NODESET, NAMESPACES);
+            for (int j = 0, m = outs.getLength(); j < m; j++) {
+                operation.outputFormats.add(outs.item(j).getTextContent());
+            }
             meta.operations.add(operation);
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_SUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_SUPPORTED_CONSTRAINTS,
+            XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Node node = nl.item(i);
             meta.supportedConstraints.add(node.getTextContent());
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS, XPathConstants.NODESET, nc);
+            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS,
+            XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Node node = nl.item(i);
             meta.unsupportedConstraints.add(node.getTextContent());
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_FEATURETYPES, XPathConstants.NODESET, nc);
+            capDoc, XPATH_FEATURETYPES, XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Element el = (Element)nl.item(i);
 
@@ -203,10 +423,9 @@ public class WFSMetaExtractor {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }
 
-            feature.bbox = getBounds(el, nc);
+            feature.bbox = getBounds(el, NAMESPACES);
 
             meta.features.add(feature);
         }
-        return meta;
     }
 }

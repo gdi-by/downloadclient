@@ -20,8 +20,6 @@ package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.services.Atom;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -56,23 +54,10 @@ public class DebugAtom {
 
     private void go() {
         atom = new Atom(this.urlString, this.userName, this.password);
-        printArrayStringList(atom.getTypes());
-        printStringMap(atom.getAttributes(atom.getTypes().get(1)));
-    }
-
-
-
-    private void printArrayStringList(ArrayList<String> als) {
-        for (String str : als) {
-            System.out.println(str);
-        }
-    }
-
-    private void printStringMap(Map<String, String> map)  {
-        Iterator it = map.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
-        }
+        System.out.println("Title: " + atom.getTitle());
+        System.out.println("Subtitle: " + atom.getSubTitle());
+        System.out.println("ID: " + atom.getID());
+        ArrayList<Atom.Item> items = atom.getItems();
+        System.out.println(items.toString());
     }
 }

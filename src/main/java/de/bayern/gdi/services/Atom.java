@@ -24,11 +24,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,19 +38,84 @@ import org.w3c.dom.NodeList;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class Atom extends WebService {
+public class Atom {
 
     private String serviceURL;
     private String username;
     private String password;
+    private String title;
+    private String subTitle;
+    private String serviceID;
     private Document mainDoc;
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
-    private ArrayList<String> types;
-    private Map<String, String> typesWithURLS;
+    private ArrayList<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
+
+
+    /** feature. */
+    public static class Item {
+        /**
+         * title.
+         */
+        public String title;
+        /**
+         * id.
+         */
+        public String id;
+        /**
+         * default description.
+         */
+        public String description;
+        /**
+         * default CRS.
+         */
+        public String defaultCRS;
+        /**
+         * other CRSs.
+         */
+        public List<String> otherCRSs;
+        /**
+         * bbox.
+         */
+        public ReferencedEnvelope bbox;
+        /**
+         * fields.
+         */
+        public List<Field> fields;
+
+        /**
+         * mimetype.
+         */
+        public String format;
+
+        public Item() {
+            otherCRSs = new ArrayList<>();
+            fields = new ArrayList<>();
+            defaultCRS = null;
+        }
+        @Override
+        public String toString() {
+            String str = null;
+            str += "title: " + title + "\n";
+            str += "id: " + id + "\n";
+            str += "description: " + description + "\n";
+            str += "format: " + format + "\n";
+            str += "CRS: " + defaultCRS + "\n";
+            str += "Other CRS:\n";
+            for (String crs: otherCRSs) {
+                str += "\t" + crs;
+            }
+            str += "Other Fields:\n";
+            for (Field f: fields) {
+                str += "\t" + f.name + ": " + f.type + "\n";
+            }
+            return str;
+        }
+    }
+
 
     /**
      * @inheritDoc
@@ -69,7 +135,6 @@ public class Atom extends WebService {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
-        this.types = null;
         URL url = null;
 
         try {
@@ -81,70 +146,124 @@ public class Atom extends WebService {
                 this.username,
                 this.password,
                 false);
-        this.nscontext = new NamespaceContextMap("",
-                "http://www.w3.org/2005/Atom");
-    }
-    /**
-     * @inheritDoc
-     * @return the Types of the service
-     */
-    public ArrayList<String> getTypes() {
-        if (this.types == null) {
-            types = new ArrayList<>();
-            typesWithURLS = new HashMap<String, String>();
-            String getEntriesQuery = "//entry";
-            NodeList entries = (NodeList) XML.xpath(this.mainDoc,
-                    getEntriesQuery,
-                    XPathConstants.NODESET,
-                    this.nscontext);
-            for (int i = 0; i < entries.getLength(); i++) {
-                Node entry = entries.item(i);
-                String getEntryTitle = "title";
-                String getEntryid = "id";
-                Node title = (Node) XML.xpath(entry,
-                        getEntryTitle,
-                        XPathConstants.NODE,
-                        this.nscontext);
-                types.add(title.getTextContent());
-                Node id = (Node) XML.xpath(entry,
-                        getEntryid,
-                        XPathConstants.NODE,
-                        this.nscontext);
-                typesWithURLS.put(title.getTextContent(), id.getTextContent());
-            }
-        }
-        return types;
-    }
-
-    /**
-     * returns the URL for the selected Type.
-     * @param type the type
-     * @return URL
-     */
-    public String getURLforType(String type) {
-        return (String) this.typesWithURLS.get(type);
-    }
-
-    /**
-     * @inheritDoc
-     * @param type the Type
-     * @return The Attributes of the Service
-     */
-    public Map<String, String> getAttributes(String type) {
-        Map<String, String> attributes = new HashMap<>();
-        String attributeURL = getURLforType(type);
-        String getEntry = "//entry/link[@href='" + attributeURL + "']";
-        Node n = (Node) XML.xpath(this.mainDoc,
-                getEntry,
-                XPathConstants.NODE,
-                this.nscontext);
-        Node entry = n.getParentNode();
-        //Predefined in ATOM Service
-        String getId = "id";
-        String id = (String) XML.xpath(entry,
-                getId,
+        this.nscontext = new NamespaceContextMap(
+                "", "http://www.w3.org/2005/Atom",
+                "georss", "http://www.georss.org/georss",
+                "inspire_dls",
+                "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
+        items = new ArrayList<>();
+        String getTitle = "//title";
+        this.title = (String) XML.xpath(this.mainDoc,
+                getTitle,
                 XPathConstants.STRING,
                 this.nscontext);
+        String getSubtitle = "//subtitle";
+        this.subTitle = (String) XML.xpath(this.mainDoc,
+                getSubtitle,
+                XPathConstants.STRING,
+                this.nscontext);
+        String getID = "//id";
+        this.serviceID = (String) XML.xpath(this.mainDoc,
+                getID,
+                XPathConstants.STRING,
+                this.nscontext);
+        String getEntriesQuery = "//entry";
+        NodeList entries = (NodeList) XML.xpath(this.mainDoc,
+                getEntriesQuery,
+                XPathConstants.NODESET,
+                this.nscontext);
+        for (int i = 0; i < entries.getLength(); i++) {
+            Node entry = entries.item(i);
+            String getEntryTitle = "title";
+            String getEntryid = "id";
+            Node titleN = (Node) XML.xpath(entry,
+                    getEntryTitle,
+                    XPathConstants.NODE,
+                    this.nscontext);
+            Node id = (Node) XML.xpath(entry,
+                    getEntryid,
+                    XPathConstants.NODE,
+                    this.nscontext);
+            String summaryExpr = "summary";
+            Node description = (Node) XML.xpath(entry,
+                    summaryExpr,
+                    XPathConstants.NODE,
+                    this.nscontext);
+            Item it = new Item();
+            it.id = id.getTextContent();
+            it.title = titleN.getTextContent();
+            it.description = description.getTextContent();
+            it.otherCRSs = getCRS(it.id);
+            it.defaultCRS = it.otherCRSs.get(0);
+            it.format = getFormat(it.id);
+            String bboxExpr = "//*[local-name()='polygon']";
+            Node bbox = (Node) XML.xpath(entry,
+                    bboxExpr,
+                    XPathConstants.NODE,
+                    this.nscontext);
+            it.bbox = new ReferencedEnvelope();
+            //TODO: Calculate Bounding Box
+            it.fields = getFieldForEntry(it.id);
+            items.add(it);
+        }
+    }
+    /**
+     * Items of the services.
+     * @return the Items of the service
+     */
+    public ArrayList<Item> getItems() {
+        return this.items;
+    }
+
+    /**
+     * returns the title of the service.
+     * @return title of the serivce
+     */
+    public String getTitle() {
+        return this.title;
+    }
+
+    /**
+     * subtitle of the service.
+     * @return subtitle of the service.
+     */
+    public String getSubTitle() {
+        return this.subTitle;
+    }
+
+    /**
+     * id of the service.
+     * @return id of the serivce
+     */
+    public String getID() {
+        return this.serviceID;
+    }
+
+    /**
+     * URL of the service.
+     * @return URL of the service
+     */
+    public String getURL() {
+        return this.serviceURL;
+    }
+
+    private String getFormat(String id) {
+        String format = null;
+        String attributeURL = id;
+        Document entryDoc = XML.getDocument(attributeURL);
+        String getType = "//entry/link/@type";
+        format = (String) XML.xpath(entryDoc,
+                getType,
+                XPathConstants.STRING,
+                this.nscontext);
+        return format;
+    }
+
+    private ArrayList<String> getCRS(String id) {
+        ArrayList<String> crs = new ArrayList<>();
+        String attributeURL = id;
+        Node entry = getEntry(attributeURL);
+        //Predefined in ATOM Service
         String getCategories = "category";
         NodeList cL = (NodeList) XML.xpath(entry,
                 getCategories,
@@ -156,14 +275,42 @@ public class Atom extends WebService {
             String epsg = null;
             for (int j = 0; j < catAttributes.getLength(); j++) {
                 Node catAttr = catAttributes.item(j);
-                if (catAttr.getNodeName().equals("term")) {
+                if (catAttr.getNodeName().equals("label")) {
                     epsg = catAttr.getTextContent();
-                    String attrVal = makeAttributeValue(id, epsg);
-                    attributes.put(ATTRIBUTENAME + String.valueOf(i), attrVal);
+                    crs.add(epsg);
                 }
             }
         }
-        return attributes;
+        return crs;
+    }
+
+    private ArrayList<Field> getFieldForEntry(String id) {
+        ArrayList<Field> fields = new ArrayList<>();
+        String attributeURL = id;
+        Node entry = getEntry(attributeURL);
+        //Predefined in ATOM Service
+        String getCategories = "category";
+        NodeList cL = (NodeList) XML.xpath(entry,
+                getCategories,
+                XPathConstants.NODESET,
+                this.nscontext);
+        for (int i = 0; i < cL.getLength(); i++) {
+            Node cat = cL.item(i);
+            NamedNodeMap catAttributes = cat.getAttributes();
+            String epsg = null;
+            String attrVal = null;
+            String csr = null;
+            for (int j = 0; j < catAttributes.getLength(); j++) {
+                Node catAttr = catAttributes.item(j);
+                if (catAttr.getNodeName().equals("term")) {
+                    epsg = catAttr.getTextContent();
+                    attrVal = makeAttributeValue(id, epsg);
+                    Field f = new Field(ATTRIBUTENAME, attrVal);
+                    fields.add(f);
+                }
+            }
+        }
+        return fields;
     }
 
     private String makeAttributeValue(String id, String categoryTerm) {
@@ -179,11 +326,16 @@ public class Atom extends WebService {
         return attrVal;
     }
 
-    /**
-     * @inheritDoc
-     * @return the Type of the Service
-     */
-    public ServiceType getServiceType() {
-        return ServiceType.Atom;
+
+    private Node getEntry(String attributeURL) {
+        String getEntry = "//entry/link[@href=$HREF]";
+        HashMap<String, String> vars = new HashMap<>();
+        vars.put("HREF", attributeURL);
+        Node n = (Node) XML.xpath(this.mainDoc,
+                getEntry,
+                XPathConstants.NODE,
+                this.nscontext, vars);
+        return n.getParentNode();
     }
+
 }

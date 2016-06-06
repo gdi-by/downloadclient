@@ -18,12 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.services.CatalogService;
-import de.bayern.gdi.services.WebService;
-
-import de.bayern.gdi.utils.ServiceSetting;
-import de.bayern.gdi.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +25,15 @@ import java.util.Observable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.stage.Stage;
+
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.CatalogService;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+//import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.ServiceSetting;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -43,8 +44,11 @@ public class DataBean extends Observable {
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
-    private Map<String, String> services;
-    private WebService webService;
+    private Map<String, String> staticServices;
+    private Map<String, String> catalogServices;
+    private ServiceType serviceType;
+    private Atom atomService;
+    private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
     private Map<String, String> attributes;
     private String wmsUrl;
@@ -62,10 +66,12 @@ public class DataBean extends Observable {
         this.primaryStage = primaryStage;
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
-        this.services = this.serviceSetting.getServices();
+        this.staticServices = this.serviceSetting.getServices();
+        this.catalogServices = new HashMap<String, String>();
         this.catalogService = new CatalogService(this.serviceSetting
                 .getCatalogueURL());
-        this.webService = null;
+        this.atomService = null;
+        this.wfsService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
         this.userName = null;
@@ -81,13 +87,23 @@ public class DataBean extends Observable {
     }
 
     /**
+     * Reset the services list.
+     */
+    public void reset() {
+        this.catalogServices.clear();
+    }
+
+    /**
      * Builds a Observable List from the services Map.
      * @return List build from services Map
      */
     public ObservableList<String> getServicesAsList() {
         ObservableList<String> serviceNames =
                 FXCollections.observableArrayList();
-        for (String name: this.services.keySet()) {
+        for (String name: this.staticServices.keySet()) {
+            serviceNames.add(name);
+        }
+        for (String name: this.catalogServices.keySet()) {
             serviceNames.add(name);
         }
         return serviceNames;
@@ -98,9 +114,19 @@ public class DataBean extends Observable {
      * @param serviceName the Name of the Service
      * @param serviceURL the URL of the Service
      */
-    public void addServiceToList(String serviceName, String serviceURL) {
-        this.services.put(serviceName, serviceURL);
+    public void addCatalogServiceToList(String serviceName, String serviceURL) {
+        this.catalogServices.put(serviceName, serviceURL);
     }
+
+    /**
+     * Adds a Service to the list.
+     * @param serviceName the Name of the Service
+     * @param serviceURL the URL of the Service
+     */
+    public void addServiceToList(String serviceName, String serviceURL) {
+        this.catalogServices.put(serviceName, serviceURL);
+    }
+
     /**
      * Returns the Service URL for a given Service Name.
      * @param serviceName name of a Service
@@ -108,8 +134,8 @@ public class DataBean extends Observable {
      */
     public String getServiceURL(String serviceName) {
         String returnStr = null;
-        if (this.services.containsKey(serviceName)) {
-            returnStr = this.services.get(serviceName);
+        if (this.staticServices.containsKey(serviceName)) {
+            returnStr = this.staticServices.get(serviceName);
         }
         return returnStr;
     }
@@ -123,19 +149,53 @@ public class DataBean extends Observable {
     }
 
     /**
+     * Set the service type.
+     * @param type the service type
+     */
+    public void setServiceType(ServiceType type) {
+        this.serviceType = type;
+    }
+
+    /**
+     * Get the service type.
+     * @return the service type
+     */
+    public ServiceType getServiceType() {
+        return this.serviceType;
+    }
+
+    /**
      * gets the Webservice.
      * @return webservice
      */
-    public WebService getWebService() {
-        return webService;
+    public Atom getAtomService() {
+        return atomService;
+    }
+
+    /**
+     * Get the WFS service.
+     * @return the service
+     */
+    public WFSMeta getWFSService() {
+        return wfsService;
     }
 
     /**
      * sets the webservice.
      * @param webService webservice
      */
-    public void setWebService(WebService webService) {
-        this.webService = webService;
+    public void setAtomService(Atom webService) {
+        this.serviceType = ServiceType.Atom;
+        this.atomService = webService;
+    }
+
+    /**
+     * sets the webservice.
+     * @param webService webservice
+     */
+    public void setWFSService(WFSMeta webService) {
+        this.serviceType = ServiceType.WFSTwo;
+        this.wfsService = webService;
     }
 
     /**
@@ -143,7 +203,8 @@ public class DataBean extends Observable {
      * @return true if webservice ist set; false if not set
      */
     public boolean isWebServiceSet() {
-        if (this.webService == null) {
+        if (this.atomService == null
+            && this.wfsService == null) {
             return false;
         }
         return true;

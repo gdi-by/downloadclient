@@ -26,14 +26,31 @@ public class DebugWFSMeta {
     private DebugWFSMeta() {
     }
 
+    private static String findArg(String[] args, String what) {
+        for (String arg: args) {
+            if (arg.startsWith(what)) {
+                return arg.substring(what.length());
+            }
+        }
+        return null;
+    }
+
     /**
      * @param args the command line arguments.
      * @throws Exception If something went wrong.
      */
     public static void main(String[] args) throws Exception {
 
+        String user = findArg(args, "--user=");
+        String password = findArg(args, "--password=");
+
         for (String arg: args) {
-            WFSMeta meta = WFSMetaExtractor.parse(arg);
+            if (arg.startsWith("--")) {
+                continue;
+            }
+            WFSMetaExtractor extractor
+                = new WFSMetaExtractor(arg, user, password);
+            WFSMeta meta = extractor.parse();
             System.out.println(meta);
         }
     }
