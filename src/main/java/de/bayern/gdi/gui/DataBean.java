@@ -194,6 +194,7 @@ public class DataBean extends Observable {
      * @param webService webservice
      */
     public void setWFSService(WFSMeta webService) {
+        this.serviceType = ServiceType.WFSTwo;
         this.wfsService = webService;
     }
 

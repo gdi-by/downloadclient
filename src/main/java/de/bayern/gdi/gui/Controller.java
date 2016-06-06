@@ -55,6 +55,8 @@ import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
@@ -85,8 +87,10 @@ public class Controller {
     @FXML private TextField serviceUser;
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
-    @FXML private ComboBox serviceTypeChooser;
+    @FXML private ComboBox<ItemModel> serviceTypeChooser;
     @FXML private ComboBox atomVariationChooser;
+    @FXML private ComboBox dataFormatChooser;
+    @FXML private ComboBox referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
@@ -204,11 +208,12 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleServiceTypeSelect(ActionEvent event) {
-        String item =
+        ItemModel item =
             this.serviceTypeChooser.
-                getSelectionModel().getSelectedItem().toString();
-        System.out.println("Selected: " + item);
-        chooseType(item);
+                getSelectionModel().getSelectedItem();
+        if (item != null) {
+            chooseType(item);
+        }
     }
 
     /**
@@ -303,9 +308,12 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.wfstwo"));
                                 });
-                                ws = new WFSTwo(url, dataBean
-                                        .getUserName(), dataBean
-                                        .getPassword());
+                                WFSMetaExtractor extractor =
+                                    new WFSMetaExtractor(url,
+                                        dataBean.getUserName(),
+                                        dataBean.getPassword());
+                                WFSMeta meta = extractor.parse();
+                                dataBean.setWFSService(meta);
                                 break;
                             default:
                                 log.log(Level.WARNING,
@@ -353,69 +361,78 @@ public class Controller {
 //                            dataBean.getWFSService());
 //                    break;
                 case WFSTwo:
-/*                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
-                    ArrayList<String> wfstwoServices = new ArrayList<>();
-                    ArrayList<String> storedQuieres = dataBean
-                        .getWebService().getStoredQueries();
-                    for (String str: storedQuieres) {
-                        str = wfstwo.getSimplePrefix() + " " + str;
-                        wfstwoServices.add(str);
+                    List<WFSMeta.Feature> features =
+                        dataBean.getWFSService().features;
+                    List<WFSMeta.StoredQuery> queries =
+                        dataBean.getWFSService().storedQueries;
+                    ObservableList<ItemModel> types =
+                        FXCollections.observableArrayList();
+                    for (WFSMeta.Feature f : features) {
+                        types.add(new FeatureModel(f));
                     }
-                    ArrayList<String> types = dataBean
-                            .getWebService().getTypes();
-                    for (String str: types) {
-                        str = wfstwo.getBasicPrefix() + " " + str;
-                        wfstwoServices.add(str);
+                    for (WFSMeta.StoredQuery s : queries) {
+                        types.add(new StoredQueryModel(s));
                     }
-                    dataBean.setServiceTypes(wfstwoServices);*/
+                    serviceTypeChooser.getItems().retainAll();
+                    serviceTypeChooser.setItems(types);
+                    serviceTypeChooser.setValue(types.get(0));
+                    chooseType(serviceTypeChooser.getValue());
                     break;
                 case Atom:
                     List<Atom.Item> items =
                         dataBean.getAtomService().getItems();
-                    ObservableList<String> opts =
+                    ObservableList<ItemModel> opts =
                         FXCollections.observableArrayList();
-                    System.out.println("set Atom");
-                    for (Atom.Item item : items) {
-                        System.out.println(item.title);
-                        opts.add(item.title);
+                    for (Atom.Item i : items) {
+                        opts.add(new AtomItemModel(i));
                     }
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
-                    chooseType(opts.get(0));
+                    serviceTypeChooser.setValue(opts.get(0));
+                    chooseType(serviceTypeChooser.getValue());
                 default:
             }
         }
     }
 
-    private void chooseType(String data) {
+    private void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
-            Atom service = this.dataBean.getAtomService();
-            List<Atom.Item> items = service.getItems();
-            for (Atom.Item item : items) {
-                if (item.title.equals(data)) {
-                    List<Field> fields = item.fields;
-                    ObservableList<String> list =
-                        FXCollections.observableArrayList();
-                    for (Field f : fields) {
-                        list.add(f.type);
-                    }
-                    this.atomVariationChooser.setItems(list);
-                    this.valueAtomDescr.setText(item.description);
-                    this.valueAtomFormat.setText(item.format);
-                    this.valueAtomRefsys.setText(item.defaultCRS);
-                }
+            Atom.Item item = (Atom.Item)data.getItem();
+            List<Field> fields = item.fields;
+            ObservableList<String> list =
+                FXCollections.observableArrayList();
+            for (Field f : fields) {
+                list.add(f.type);
             }
+            this.atomVariationChooser.setItems(list);
+            this.valueAtomDescr.setText(item.description);
+            this.valueAtomFormat.setText(item.format);
+            this.valueAtomRefsys.setText(item.defaultCRS);
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
+        } else if (type == ServiceType.WFSTwo) {
+            if (data instanceof FeatureModel) {
+                this.simpleWFSContainer.setVisible(false);
+                this.basicWFSContainer.setVisible(true);
+                this.atomContainer.setVisible(false);
+                WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
+                ObservableList list = FXCollections.observableArrayList();
+                list.add(feature.defaultCRS);
+                list.addAll(feature.otherCRSs);
+                this.referenceSystemChooser.setItems(list);
+                this.referenceSystemChooser.setValue(feature.defaultCRS);
+            } else if (data instanceof StoredQueryModel) {
+                factory.fillSimpleWFS(
+                    dataBean,
+                    this.simpleWFSContainer,
+                    (WFSMeta.StoredQuery)data.getItem());
+                this.simpleWFSContainer.setVisible(true);
+                this.basicWFSContainer.setVisible(false);
+                this.atomContainer.setVisible(false);
+            }
         }
-/*        else if (type == ServiceType.WFSTwo) {
-            factory.fillAtom(this.dataBean, this.atomContainer);
-            this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(false);
-            this.atomContainer.setVisible(true);
-        }*/
     }
 
     /**
@@ -440,7 +457,7 @@ public class Controller {
         this.mapNodeAtom.getChildren().add(mapAtom);
 
         this.simpleWFSContainer.setVisible(false);
-        this.basicWFSContainer.setVisible(true);
+        this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
         applyI18n();
     }
@@ -456,8 +473,7 @@ public class Controller {
         labelSelectType.setText(I18n.getMsg("gui.choose_type"));
         statusBarText.setText(I18n.getMsg("status.ready"));
         chkChain.setText(I18n.getMsg("gui.post_process"));
-        chkChain.setText(I18n.getMsg("gui.process_chain"));
-        labelPostProcess.setText(I18n.getMsg("gui.post_process"));
+        labelPostProcess.setText(I18n.getMsg("gui.process_chain"));
         buttonDownload.setText(I18n.getMsg("gui.download"));
         buttonSaveConfig.setText(I18n.getMsg("gui.save-conf"));
         addChainItem.setText(I18n.getMsg("gui.add"));
