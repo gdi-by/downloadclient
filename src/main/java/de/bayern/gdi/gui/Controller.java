@@ -272,9 +272,10 @@ public class Controller {
                 }
                 if (url != null) {
                     //view.setStatusBarText("Check for Servicetype");
-                    ServiceType st =
-                            ServiceChecker.checkService(url,
-                                    dataBean.getBase64EncAuth());
+                    ServiceType st = ServiceChecker.checkService(
+                        url,
+                        dataBean.getUserName(),
+                        dataBean.getPassword());
                     WebService ws = null;
                     //Check for null, since switch breaks on a null value
                     if (st == null) {
