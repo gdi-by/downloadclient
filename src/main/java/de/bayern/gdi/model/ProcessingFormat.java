@@ -21,7 +21,7 @@ package de.bayern.gdi.model;
 public class ProcessingFormat {
 
     private String type;
-    private String mineType;
+    private String mimeType;
 
     public ProcessingFormat() {
     }
@@ -41,16 +41,16 @@ public class ProcessingFormat {
     }
 
     /**
-     * @return the mineType
+     * @return the mimeType
      */
-    public String getMineType() {
-        return mineType;
+    public String getMimeType() {
+        return mimeType;
     }
 
     /**
-     * @param mineType the mineType to set
+     * @param mimeType the mimeType to set
      */
-    public void setMineType(String mineType) {
-        this.mineType = mineType;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

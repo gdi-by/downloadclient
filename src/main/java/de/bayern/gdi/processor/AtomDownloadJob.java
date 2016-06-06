@@ -55,7 +55,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         "//atom:entry[atom:id/text()=$VARIATION]/atom:link";
 
     private static final Properties
-        MINETYPE2EXT = loadMine2Ext();
+        MIMETYPE2EXT = loadMine2Ext();
 
     private String url;
     private String dataset;
@@ -87,7 +87,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         InputStream in = null;
         try {
             in = AtomDownloadJob.class.getResourceAsStream(
-                "mine2ext.properties");
+                "mime2ext.properties");
             if (in == null) {
                 throw new RuntimeException("resource not found");
             }
@@ -139,9 +139,9 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         }
     }
 
-    private static String minetypeToExt(String type) {
+    private static String mimetypeToExt(String type) {
         type = type.toLowerCase();
-        return MINETYPE2EXT.getProperty(type, "dat");
+        return MIMETYPE2EXT.getProperty(type, "dat");
     }
 
     private static final int TEN = 10;
@@ -247,7 +247,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
             // Service call?
             if (dataURL.getQuery() != null) {
                 String type = link.getAttribute("type");
-                String ext = minetypeToExt(type);
+                String ext = mimetypeToExt(type);
                 fileName = String.format(format, j, ext);
                 j++;
             } else { // Direct download.
@@ -257,7 +257,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
                 if (fileName.isEmpty()) {
                     String type = link.getAttribute("type");
-                    String ext = minetypeToExt(type);
+                    String ext = mimetypeToExt(type);
                     fileName = String.format(format, j, ext);
                     j++;
                 }
