@@ -63,7 +63,8 @@ public class ServiceChecker {
 
             //It seems that there is more than one implementation of this
             //stuff...
-            NodeList nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
+            final String wfs = "http://www.opengis.net/wfs/2.0";
+            NodeList nl = doc.getElementsByTagNameNS(wfs, "WFS_Capabilities");
             if (nl.getLength() == 0) {
                 nl = doc.getElementsByTagName("WFS_Capabilities");
             }
