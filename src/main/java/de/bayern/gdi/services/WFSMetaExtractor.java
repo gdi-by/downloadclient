@@ -17,16 +17,17 @@
  */
 package de.bayern.gdi.services;
 
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -35,6 +36,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.XML;
 
 /** Extract meta data from a WFS. */
 public class WFSMetaExtractor {
@@ -82,6 +86,11 @@ public class WFSMetaExtractor {
 
     private static final String XPATH_OPERATION_GET
         = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
+
+    private static final String XPATH_OPERATIONS_VERSIONS
+        = "//ows:OperationsMetadata"
+        + "/ows:Parameter[@name='version']"
+        + "/ows:AllowedValues/ows:Value/text()";
 
     private static final String XPATH_OPERATION_OUT_FORMATS
         = "ows:Parameter[@name='outputFormat']"
@@ -256,7 +265,10 @@ public class WFSMetaExtractor {
         }
 
         String urlString = op.get != null
-            ? op.get + "?request=DescribeFeatureType"
+            ? op.get + (op.get.endsWith("?") ? "" : "?")
+                + "request=DescribeFeatureType"
+                + "&service=wfs"
+                + "&version=" + meta.highestVersion("2.0.0")
             : capURLString.replace("GetCapabilities", "DescribeFeatureType");
 
         Document dfDoc = getDocument(urlString);
@@ -287,7 +299,10 @@ public class WFSMetaExtractor {
         }
 
         String urlString = op.get != null
-            ? op.get + "?request=DescribeStoredQueries"
+            ? op.get + (op.get.endsWith("?") ? "" : "?")
+                + "request=DescribeStoredQueries"
+                + "&service=wfs"
+                + "&version=" + meta.highestVersion("2.0.0")
             : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
 
         Document dsqDoc = getDocument(urlString);
@@ -331,6 +346,14 @@ public class WFSMetaExtractor {
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription
             = XML.xpathString(capDoc, XPATH_ABSTRACT, NAMESPACES);
+
+        NodeList versions = (NodeList)XML.xpath(
+            capDoc, XPATH_OPERATIONS_VERSIONS,
+            XPathConstants.NODESET, NAMESPACES);
+        for (int i = 0, n = versions.getLength(); i < n; i++) {
+            meta.versions.add(versions.item(i).getTextContent());
+        }
+        Collections.sort(meta.versions);
 
         NodeList nl = (NodeList)XML.xpath(
             capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);

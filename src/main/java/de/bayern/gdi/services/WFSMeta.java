@@ -164,6 +164,8 @@ public class WFSMeta {
     public List<Feature> features;
     /** stored queries. */
     public List<StoredQuery> storedQueries;
+    /** versions. */
+    public List<String> versions;
 
     public WFSMeta() {
         operations = new ArrayList<>();
@@ -171,6 +173,7 @@ public class WFSMeta {
         unsupportedConstraints = new ArrayList<>();
         features = new ArrayList<>();
         storedQueries = new ArrayList<>();
+        versions = new ArrayList<>();
     }
 
     /**
@@ -194,6 +197,17 @@ public class WFSMeta {
             }
         }
         return null;
+    }
+
+    /**
+     * Return the highest supported version.
+     * @param def The default. Used if there are no version informations.
+     * @return The highest version.
+     */
+    public String highestVersion(String def) {
+        return versions.size() > 0
+            ? versions.get(versions.size() - 1)
+            : def;
     }
 
     @Override
@@ -225,6 +239,11 @@ public class WFSMeta {
         sb.append("\tstored queries: {\n");
         for (StoredQuery sq: storedQueries) {
             sb.append("\t\t").append(sq).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tversions: {\n");
+        for (String version: versions) {
+            sb.append("\t\t").append(version).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");
