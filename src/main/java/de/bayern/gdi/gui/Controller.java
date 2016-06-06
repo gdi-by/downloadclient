@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,14 +34,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -58,7 +60,6 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WFSOne;
-import de.bayern.gdi.services.WFSTwo;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
@@ -76,8 +77,7 @@ public class Controller {
 
     private UIFactory factory;
 
-    @FXML private Menu menuFile;
-    @FXML private MenuItem menuClose;
+    @FXML private Button buttonClose;
     @FXML private MenuBar mainMenu;
     @FXML private ListView serviceList;
     @FXML private TextField searchField;
@@ -124,11 +124,21 @@ public class Controller {
      * @param event The event.
      */
     @FXML protected void handleCloseApp(ActionEvent event) {
-        Stage stage = (Stage) mainMenu.getScene().getWindow();
-        stage.fireEvent(new WindowEvent(
-            stage,
-            WindowEvent.WINDOW_CLOSE_REQUEST
-        ));
+        Alert closeDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        closeDialog.setTitle(I18n.getMsg("gui.confirm-exit"));
+        closeDialog.setContentText(I18n.getMsg("gui.want-to-quit"));
+        ButtonType confirm = new ButtonType(I18n.getMsg("gui.exit"));
+        ButtonType cancel = new ButtonType(I18n.getMsg("gui.cancel"),
+            ButtonData.CANCEL_CLOSE);
+        closeDialog.getButtonTypes().setAll(confirm, cancel);
+        Optional<ButtonType> res = closeDialog.showAndWait();
+        if (res.get() == confirm) {
+            Stage stage = (Stage) buttonClose.getScene().getWindow();
+            stage.fireEvent(new WindowEvent(
+                stage,
+                WindowEvent.WINDOW_CLOSE_REQUEST
+            ));
+        }
     }
 
     /**
@@ -464,8 +474,7 @@ public class Controller {
     }
 
     private void applyI18n() {
-        menuFile.setText(I18n.getMsg("menu.options"));
-        menuClose.setText(I18n.getMsg("menu.quit"));
+        buttonClose.setText(I18n.getMsg("menu.quit"));
         labelURL.setText(I18n.getMsg("gui.url"));
         labelUser.setText(I18n.getMsg("gui.user"));
         labelPassword.setText(I18n.getMsg("gui.password"));

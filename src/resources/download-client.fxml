@@ -10,15 +10,6 @@
 
 <VBox prefHeight="622.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bayern.gdi.gui.Controller">
    <children>
-      <MenuBar fx:id="mainMenu">
-        <menus>
-          <Menu fx:id="menuFile" mnemonicParsing="false" text="Datei">
-            <items>
-              <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#handleCloseApp" text="Schließen" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
       <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
          <items>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="140.0" SplitPane.resizableWithParent="false">
@@ -324,6 +315,12 @@
                               <Button fx:id="buttonSaveConfig" mnemonicParsing="false" prefHeight="44.0" prefWidth="186.0" text="Download-Konfiguration speichern" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="10.0" right="15.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Pane HBox.hgrow="ALWAYS" />
+                              <Button fx:id="buttonClose" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCloseApp" prefHeight="44.0" text="Beenden">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
                            </children>
