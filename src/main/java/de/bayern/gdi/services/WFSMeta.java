@@ -120,6 +120,8 @@ public class WFSMeta {
         public String id;
         /** title. */
         public String title;
+        /** abstract. */
+        public String abstractDescription;
         /** parameters. */
         public ArrayList<Field> parameters;
 
@@ -143,6 +145,7 @@ public class WFSMeta {
             return "stored query: { "
                 + "id: " + id + " "
                 + "title: " + title + " "
+                + "abstract: " + abstractDescription + " "
                 + "parameters: " + parameters() + " }";
         }
     }

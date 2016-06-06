@@ -306,6 +306,10 @@ public class WFSMetaExtractor {
             if (titles.getLength() > 0) {
                 sq.title = titles.item(0).getTextContent();
             }
+            NodeList abstracts = sqd.getElementsByTagNameNS(wfs, "Abstract");
+            if (abstracts.getLength() > 0) {
+                sq.abstractDescription = abstracts.item(0).getTextContent();
+            }
             NodeList parameters =
                 sqd.getElementsByTagNameNS(wfs, "Parameter");
             for (int j = 0, m = parameters.getLength(); j < m; j++) {
