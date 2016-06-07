@@ -58,6 +58,23 @@ public class ProcessingConfiguration {
     }
 
     /**
+     * Look for a step configuation with a given title.
+     * @param title The title of the config to find.
+     * @return the matching step configuration if found null otherwise.
+     */
+    public ProcessingStepConfiguration findProcessingStepConfiguration(
+        String title
+    ) {
+        for (ProcessingStepConfiguration psc: this.processingSteps) {
+            String ptitle = psc.getTitle();
+            if (ptitle != null && ptitle.equals(title)) {
+                return psc;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return the formats
      */
     public List<ProcessingFormat> getFormats() {

@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
-import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
 
@@ -135,49 +134,6 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-
-    private static final String OGR2OGR
-        = System.getProperty("ogr2ogr", "ogr2ogr");
-
-    private static void createProcessings(
-        DownloadStep dls,
-        JobList jl,
-        File wd) throws ConverterException {
-
-        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
-
-        if (steps == null) {
-            return;
-        }
-
-        for (ProcessingStep ps: steps) {
-            if (ps.getName().equals("toShape")) {
-                ArrayList<String> params = new ArrayList<String>();
-
-                params.add("-f");
-                params.add("ESRI Shapefile");
-                params.add("download.shp");
-                params.add("download.gml");
-
-                for (Parameter p: ps.getParameters()) {
-                    if (p.getKey().equals("EPSG")) {
-                        params.add("-t_srs");
-                        params.add(p.getValue());
-                    }
-                    // TODO: Handle more parameters.
-                }
-
-                ExternalProcessJob epj = new ExternalProcessJob(
-                    OGR2OGR,
-                    wd,
-                    params.toArray(new String[params.size()]));
-
-                jl.addJob(epj);
-            }
-            // TODO: Implement more steps.
-        }
-    }
-
     private static void createWfsDownload(
         JobList jl,
         File workingDir,
@@ -246,7 +202,10 @@ public class DownloadStepConverter {
             createWfsDownload(jl, path, user, password, dls);
         }
 
-        createProcessings(dls, jl, path);
+        ProcessingStepConverter psc =
+            new ProcessingStepConverter(getProcessingConfiguration());
+
+        psc.convert(dls, jl, path);
 
         return jl;
     }

@@ -70,6 +70,21 @@ public class ProcessingStep {
         this.parameters = parameters;
     }
 
+    /**
+     * Looks up a parameter value for a given key.
+     * @param key The key.
+     * @return The value if found null otherwise.
+     */
+    public String findParameter(String key) {
+        for (Parameter parameter: parameters) {
+            String pkey = parameter.getKey();
+            if (pkey != null && pkey.equals(key)) {
+                return parameter.getValue();
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[processing step: ");
