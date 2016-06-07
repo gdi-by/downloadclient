@@ -18,12 +18,15 @@
 package de.bayern.gdi.processor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
@@ -33,6 +36,8 @@ public class DownloadStepConverter {
 
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
+
+    private static ProcessingConfiguration processingConfig;
 
     private DownloadStepConverter() {
     }
@@ -244,5 +249,41 @@ public class DownloadStepConverter {
         createProcessings(dls, jl, path);
 
         return jl;
+    }
+
+    private static
+    ProcessingConfiguration loadProcessingConfiguration() {
+        InputStream in = null;
+        try {
+            in = DownloadStepConverter.class.getResourceAsStream(
+                "Verarbeitungsschritte.xml");
+            if (in == null) {
+                log.log(Level.SEVERE, "Verarbeitungsschritte.xml not found");
+                return new ProcessingConfiguration();
+            }
+            return ProcessingConfiguration.read(in);
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE, "Failed to load configuration", ioe);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                }
+            }
+        }
+        return new ProcessingConfiguration();
+    }
+
+    /**
+     * Returns the processing step configuration.
+     * @return the processing step configuration.
+     */
+    public static synchronized
+    ProcessingConfiguration getProcessingConfiguration() {
+        if (processingConfig == null) {
+            processingConfig = loadProcessingConfiguration();
+        }
+        return processingConfig;
     }
 }
