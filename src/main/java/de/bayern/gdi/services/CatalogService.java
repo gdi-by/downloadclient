@@ -213,7 +213,19 @@ public class CatalogService {
                 String serviceName = (String) XML.xpath(serviceN,
                         nameExpr,
                         XPathConstants.STRING, context);
-
+                String restrictionExpr =
+                        "gmd:identificationInfo"
+                                + "/srv:SV_ServiceIdentification"
+                                + "/gmd:resourceConstraints"
+                                + "/gmd:MD_SecurityConstraints"
+                                + "/gmd:classification"
+                                + "/gmd:MD_ClassificationCode";
+                String restriction = (String) XML.xpath(serviceN,
+                        restrictionExpr,
+                        XPathConstants.STRING, context);
+                if (restriction != null) {
+                    serviceName += restriction;
+                }
                 String typeExpr =
                         "gmd:identificationInfo"
                                 + "/srv:SV_ServiceIdentification"

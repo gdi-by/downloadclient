@@ -191,6 +191,15 @@ public class XML {
         return null;
     }
 
+    /**
+     * Getting a document by posting an xml to a url.
+     * @param url the url
+     * @param userName the username
+     * @param password the password
+     * @param postXML the xml to post
+     * @param nameSpaceAware if namespace aware
+     * @return the returned document
+     */
     public static final Document getDocument(
             URL url,
             String userName,
@@ -235,8 +244,8 @@ public class XML {
             boolean nameSpaceAware) {
         Document doc = null;
         try {
-            doc = getDocument(url, userName, password, documentToString
-                            (postXML), nameSpaceAware);
+            doc = getDocument(url, userName, password, documentToString(
+                            postXML), nameSpaceAware);
         } catch (TransformerException e) {
             log.log(Level.SEVERE, e.getLocalizedMessage(), e);
         }
