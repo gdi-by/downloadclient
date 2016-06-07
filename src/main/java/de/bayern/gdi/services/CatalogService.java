@@ -223,8 +223,8 @@ public class CatalogService {
                 String restriction = (String) XML.xpath(serviceN,
                         restrictionExpr,
                         XPathConstants.STRING, context);
-                if (restriction != null) {
-                    serviceName += restriction;
+                if ("restricted".equals(restriction)) {
+                    serviceName += " - " + restriction;
                 }
                 String typeExpr =
                         "gmd:identificationInfo"
@@ -283,13 +283,20 @@ public class CatalogService {
         if (!url.toUpperCase().contains("GETCAPABILITIES") && type
                 .toUpperCase().contains("WFS")) {
             return url + "?service=wfs&version=" + getVersionOfType(type)
-                    + "request=GetCapabilities";
+                    + "&request=GetCapabilities";
         }
         return url;
     }
 
     private String getVersionOfType(String type) {
         String versionNumber = type.substring(type.lastIndexOf(" ") + 1);
+        if ("2.0".equals(versionNumber)) {
+            versionNumber = "2.0.0";
+        } else if ("1.0".equals(versionNumber)) {
+            versionNumber = "1.1.0";
+        } else if ("1.1".equals(versionNumber)) {
+            versionNumber = "1.1.0";
+        }
         return versionNumber;
     }
 

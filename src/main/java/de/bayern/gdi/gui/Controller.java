@@ -166,14 +166,6 @@ public class Controller {
         String searchValue = currentText.toUpperCase();
         ObservableList<String> subentries
                 = FXCollections.observableArrayList();
-        if (currentText.length() > 2) {
-            Map<String, String> catalog = dataBean.getCatalogService()
-                    .getServicesByFilter(currentText);
-            for (Map.Entry<String, String> entry: catalog.entrySet()) {
-                dataBean.addCatalogServiceToList(
-                    entry.getKey(), entry.getValue());
-            }
-        }
         ObservableList<String> all = this.dataBean.getServicesAsList();
         for (String entry : all) {
             boolean match = true;
@@ -184,6 +176,17 @@ public class Controller {
                 subentries.add(entry);
             }
         }
+        if (currentText.length() > 2) {
+            Map<String, String> catalog = dataBean.getCatalogService()
+                    .getServicesByFilter(currentText);
+            System.out.println(catalog.size());
+            for (Map.Entry<String, String> entry: catalog.entrySet()) {
+                dataBean.addCatalogServiceToList(
+                    entry.getKey(), entry.getValue());
+                subentries.add(entry.getKey());
+            }
+        }
+
         this.serviceList.setItems(subentries);
     }
 
@@ -496,7 +499,6 @@ public class Controller {
             = Logger.getLogger(Controller.class.getName());
     /**
      * Creates the Controller.
-     * @param dataBean the model
      */
     public Controller() {
         this.factory = new UIFactory();
