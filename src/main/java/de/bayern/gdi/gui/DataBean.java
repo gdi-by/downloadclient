@@ -137,6 +137,9 @@ public class DataBean extends Observable {
         if (this.staticServices.containsKey(serviceName)) {
             returnStr = this.staticServices.get(serviceName);
         }
+        if (this.catalogServices.containsKey(serviceName)) {
+            returnStr = this.catalogServices.get(serviceName);
+        }
         return returnStr;
     }
 
