@@ -293,7 +293,7 @@ public class CatalogService {
         if ("2.0".equals(versionNumber)) {
             versionNumber = "2.0.0";
         } else if ("1.0".equals(versionNumber)) {
-            versionNumber = "1.1.0";
+            versionNumber = "1.0.0";
         } else if ("1.1".equals(versionNumber)) {
             versionNumber = "1.1.0";
         }
