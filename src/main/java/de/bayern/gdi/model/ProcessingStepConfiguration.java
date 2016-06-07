@@ -20,12 +20,28 @@ package de.bayern.gdi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 'Verarbeitungsschritt' of processing step configuration. */
+@XmlRootElement(name = "Verarbeitungsschritt")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingStepConfiguration {
 
+    @XmlElement(name = "Titel")
     private String title;
+
+    @XmlElement(name = "Beschreibung")
     private String description;
+
+    @XmlElement(name = "Befehl")
     private String command;
+
+    @XmlElementWrapper(name = "ParameterSet")
+    @XmlElement(name = "Parameter")
     private List<ConfigurationParameter> parameters;
 
     public ProcessingStepConfiguration() {

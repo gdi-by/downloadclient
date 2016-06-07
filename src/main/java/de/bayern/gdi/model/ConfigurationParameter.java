@@ -17,10 +17,21 @@
  */
 package de.bayern.gdi.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 'Parameter' of processing step configuration. */
+@XmlRootElement(name = "Parameter")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurationParameter {
 
+    @XmlAttribute(name = "verpflichtend")
     private boolean mandatory;
+
+    @XmlElement
     private String value;
 
     public ConfigurationParameter() {
