@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
 /** Extract meta data from a WFS. */
@@ -257,6 +258,26 @@ public class WFSMetaExtractor {
         throw new IOException("Cannot load document.");
     }
 
+    private static String url(
+        String  url,
+        String  request,
+        WFSMeta meta
+    ) throws IOException {
+        int idx = url.lastIndexOf('?');
+        if (idx >= 0) {
+            String pre = url.substring(0, idx);
+            String post = url.substring(idx + 1);
+            url = pre + "?request=" + request
+                + "&service=wfs"
+                + "&version="
+                + StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+            if (post.length() > 0) {
+                url += "&" + post;
+            }
+        }
+        return url;
+    }
+
     private void parseDescribeFeatures(WFSMeta meta)
         throws IOException {
 
@@ -266,10 +287,7 @@ public class WFSMetaExtractor {
         }
 
         String urlString = op.get != null
-            ? op.get + (op.get.endsWith("?") ? "" : "?")
-                + "request=DescribeFeatureType"
-                + "&service=wfs"
-                + "&version=" + meta.highestVersion("2.0.0")
+            ? url(op.get, "DescribeFeatureType", meta)
             : capURLString.replace("GetCapabilities", "DescribeFeatureType");
 
         Document dfDoc = getDocument(urlString);
@@ -300,10 +318,7 @@ public class WFSMetaExtractor {
         }
 
         String urlString = op.get != null
-            ? op.get + (op.get.endsWith("?") ? "" : "?")
-                + "request=DescribeStoredQueries"
-                + "&service=wfs"
-                + "&version=" + meta.highestVersion("2.0.0")
+            ? url(op.get, "DescribeStoredQueries", meta)
             : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
 
         Document dsqDoc = getDocument(urlString);
