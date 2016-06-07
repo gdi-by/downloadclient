@@ -20,6 +20,9 @@ package de.bayern.gdi.services;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,6 +36,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,6 +67,8 @@ public class CatalogService {
             "http://www.opengis.net/ogc";
     private static final String XML_NAMESPACE =
             "http://www.w3.org/2000/xmlns/";
+    private static final String CSW_QUERY_FILEPATH =
+            "csw_getrecords_wfs20_atom.xml";
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
     private URL catalogURL;
@@ -150,8 +156,9 @@ public class CatalogService {
     public Map<String, String> getServicesByFilter(String filter) {
         Map<String, String> map = new HashMap<>();
         if (filter.length() > MIN_SEARCHLENGTH) {
-            Document search = createXMLFilter(filter);
-            XML.printDocument(search, System.out);
+            //Document search = createXMLFilter(filter);
+            String search = loadXMLFilter(filter);
+            //System.out.println(search);
             /*
             URL requestURL = setURLRequestAndSearch(filter);
             Document xml = XML.getDocument(requestURL,
@@ -163,7 +170,7 @@ public class CatalogService {
                     this.password,
                     search,
                     true);
-            XML.printDocument(xml, System.out);
+            //XML.printDocument(xml, System.out);
             Node exceptionNode = (Node) XML.xpath(xml,
                     "//ows:ExceptionReport",
                     XPathConstants.NODE, this.context);
@@ -306,6 +313,20 @@ public class CatalogService {
         return newURL;
     }
 
+    private String loadXMLFilter(String search) {
+        ClassLoader classLoader = CatalogService.class.getClassLoader();
+        InputStream stream =
+                classLoader.getResourceAsStream(CSW_QUERY_FILEPATH);
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(stream, writer, "UTF-8");
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        String xmlStr = writer.toString();
+        return xmlStr.replace("{SUCHBEGRIFF}", search);
+    }
+
     /**
      * https://github.com/gdi-by/beispiele/
      *      blob/master/csw/GetRecords-wfs20-atom.xml .
@@ -369,7 +390,7 @@ public class CatalogService {
             anyTextPropertyName.setTextContent("gmd:anytext");
             anyTextPropertyIsLike.appendChild(anyTextPropertyName);
             Element anyTextLiteral = xml.createElement("ogc:Literal");
-            anyTextLiteral.setTextContent("*{" + search + "}*");
+            anyTextLiteral.setTextContent("*" + search + "*");
             anyTextPropertyIsLike.appendChild(anyTextLiteral);
             Element orServices = xml.createElementNS(OGC_NAMESPACE, "ogc:Or");
             andAnyText.appendChild(orServices);

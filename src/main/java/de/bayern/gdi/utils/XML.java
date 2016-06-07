@@ -191,6 +191,33 @@ public class XML {
         return null;
     }
 
+    public static final Document getDocument(
+            URL url,
+            String userName,
+            String password,
+            String postXML,
+            boolean nameSpaceAware) {
+        CloseableHttpClient client = HTTP.getClient(url, userName, password);
+        try {
+            DocumentResponseHandler handler = new DocumentResponseHandler();
+            handler.setNamespaceAware(nameSpaceAware);
+            HttpPost request = HTTP.getPostRequest(url);
+            InputStream inputStream =
+                    new ByteArrayInputStream(postXML.getBytes());
+            InputStreamEntity inputStreamEntity = new InputStreamEntity(
+                    inputStream);
+            request.setHeader("Content-type", "text/xml;charset=utf-8");
+            request.setEntity(inputStreamEntity);
+            return client.execute(request, handler);
+        } catch (IOException
+                | URISyntaxException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            HTTP.closeGraceful(client);
+        }
+        return null;
+    }
+
     /**
      * Gets a Document by posting an XML to the given URL.
      * @param url the URL to post to
@@ -206,27 +233,14 @@ public class XML {
             String password,
             Document postXML,
             boolean nameSpaceAware) {
-        CloseableHttpClient client = HTTP.getClient(url, userName, password);
+        Document doc = null;
         try {
-            DocumentResponseHandler handler = new DocumentResponseHandler();
-            handler.setNamespaceAware(nameSpaceAware);
-            HttpPost request = HTTP.getPostRequest(url);
-            String xmlString = documentToString(postXML);
-            InputStream inputStream =
-                    new ByteArrayInputStream(xmlString.getBytes());
-            InputStreamEntity inputStreamEntity = new InputStreamEntity(
-                    inputStream);
-            request.setHeader("Content-type", "text/xml;charset=utf-8");
-            request.setEntity(inputStreamEntity);
-            return client.execute(request, handler);
-        } catch (IOException
-                | URISyntaxException
-                | TransformerException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-            HTTP.closeGraceful(client);
+            doc = getDocument(url, userName, password, documentToString
+                            (postXML), nameSpaceAware);
+        } catch (TransformerException e) {
+            log.log(Level.SEVERE, e.getLocalizedMessage(), e);
         }
-        return null;
+        return doc;
     }
 
     /**
