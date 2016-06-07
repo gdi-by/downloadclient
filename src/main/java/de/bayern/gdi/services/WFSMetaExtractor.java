@@ -177,6 +177,7 @@ public class WFSMetaExtractor {
      */
     public WFSMeta parse() throws IOException {
         WFSMeta meta = new WFSMeta();
+        meta.url = capURLString;
         parseCapabilites(meta);
         parseDescribeFeatures(meta);
         parseDescribeStoredQueries(meta);

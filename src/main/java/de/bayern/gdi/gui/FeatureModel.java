@@ -37,6 +37,10 @@ public class FeatureModel implements ItemModel {
         return this.feature;
     }
 
+    public String getDataset() {
+        return feature.name;
+    }
+
     @Override
     public String toString() {
         return this.feature.title;

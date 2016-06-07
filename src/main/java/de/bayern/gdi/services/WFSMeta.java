@@ -152,6 +152,8 @@ public class WFSMeta {
 
     /** title. */
     public String title;
+    /** URL. */
+    public String url;
     /** abstract. */
     public String abstractDescription;
     /** operations. */
