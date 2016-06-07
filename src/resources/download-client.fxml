@@ -149,7 +149,7 @@
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
                                                             </Label>
-                                                            <ComboBox fx:id="dataformatChooser" minWidth="-Infinity" onAction="#handleDataformatSelect" prefWidth="150.0">
+                                                            <ComboBox fx:id="dataFormatChooser" minWidth="-Infinity" onAction="#handleDataformatSelect" prefWidth="150.0">
                                                                <HBox.margin>
                                                                   <Insets left="3.0" />
                                                                </HBox.margin>
@@ -236,7 +236,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <ComboBox fx:id="atomVariationChooser" prefWidth="150.0" />
+                                                      <ComboBox fx:id="atomVariationChooser" onAction="#handleVariationSelect" prefWidth="150.0" />
                                                    </children>
                                                 </HBox>
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
@@ -307,7 +307,7 @@
                         </SplitPane>
                         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="54.0" prefWidth="590.0" VBox.vgrow="NEVER">
                            <children>
-                              <Button fx:id="buttonDownload" mnemonicParsing="false" prefHeight="44.0" prefWidth="134.0" text="Download starten" textAlignment="CENTER">
+                              <Button fx:id="buttonDownload" mnemonicParsing="false" onAction="#handleDownload" prefHeight="44.0" prefWidth="134.0" text="Download starten" textAlignment="CENTER">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
                                  </HBox.margin>

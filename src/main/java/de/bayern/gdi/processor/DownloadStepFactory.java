@@ -19,17 +19,17 @@
 package de.bayern.gdi.processor;
 
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import de.bayern.gdi.gui.DataBean;
-import de.bayern.gdi.gui.View;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSTwo;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -58,26 +58,17 @@ public class DownloadStepFactory {
 
     /**
      * gets Downloadstep from Frontend.
-     * @param view the view
      * @param bean the databean
      * @param savePath the save path
      * @return downloadStep
      */
-    public DownloadStep getStep(View view, DataBean bean, String savePath) {
+    public DownloadStep getStep(DataBean bean, String savePath) {
         try {
-
-            //DownloadStep step = new DownloadStep();
             ServiceType type = bean.getServiceType();
-//            String serviceURL = type == ServiceType.Atom ?
-//                bean.getAtomService().getURL() :
-//                bean.getWFSService().getUrl();
-            String serviceURL = "";
+            String serviceURL = type == ServiceType.Atom
+                ? bean.getAtomService().getURL()
+                : bean.getWFSService().url;
             serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
-            //step.setServiceURL(bean.getWebService().getServiceURL());
-            ServiceType serviceType =
-                    bean.getServiceType();
-            //step.setServiceType(bean.getWebService().getServiceType());
-            //step.setPath(savePath);
             Map<String, String> paramMap = bean.getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
             for (Map.Entry<String, String> entry: paramMap.entrySet()) {
@@ -88,15 +79,13 @@ public class DownloadStepFactory {
                 }
             }
             //step.setParameters(parameters);
-            String dataset = view.getTypeComboBox().getSelectionModel()
-                    .getSelectedItem()
-                    .toString();
+            String dataset = bean.getDatatype().getDataset();
             //step.setDataset(dataset);
             ArrayList<ProcessingStep> processingSteps = new ArrayList<>();
             //step.setProcessingSteps(processingSteps);
             //System.out.println(serviceType.toString());
             String serviceTypeStr = null;
-            switch (serviceType) {
+            switch (type) {
                 case WFSOne:
                     serviceTypeStr = "WFS1";
                     break;

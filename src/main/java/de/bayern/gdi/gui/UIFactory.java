@@ -49,7 +49,6 @@ public class UIFactory {
     private static final int MARGIN_15 = 15;
     private static final int PREF_HEIGHT = 31;
 
-
     /**
      * Creates a stack pane with content based on the selected service.
      *
@@ -103,6 +102,8 @@ public class UIFactory {
         label.setText(field.name);
         label.setMinWidth(LABEL_MIN_WIDTH);
         TextField textField = new TextField();
+        textField.setUserData(field.name);
+        textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
         type.setText(field.type.replace("xsd:", "").replace("xs:", ""));

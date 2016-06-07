@@ -17,18 +17,44 @@
  */
 package de.bayern.gdi.model;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 'Verarbeitungskonfiguration' of processing step configuration. */
+@XmlRootElement(name = "Verarbeitungskonfiguration")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingConfiguration {
 
+    @XmlElementWrapper(name = "Formate")
+    @XmlElement(name = "Format")
     private List<ProcessingFormat> formats;
+
+    @XmlElementWrapper(name = "Eingabeelemente")
+    @XmlElement(name = "Eingabeelement")
     private List<InputElement> inputElements;
+
+    @XmlElementWrapper(name = "Verarbeitungsschritte")
+    @XmlElement(name = "Verarbeitungsschritt")
+    private List<ProcessingStepConfiguration> processingSteps;
 
     public ProcessingConfiguration() {
         this.formats = new ArrayList<>();
         this.inputElements = new ArrayList<>();
+        this.processingSteps = new ArrayList<>();
     }
 
     /**
@@ -57,5 +83,52 @@ public class ProcessingConfiguration {
      */
     public void setInputElements(List<InputElement> inputElements) {
         this.inputElements = inputElements;
+    }
+
+    /**
+     * @return the processingSteps
+     */
+    public List<ProcessingStepConfiguration> getProcessingSteps() {
+        return processingSteps;
+    }
+
+    /**
+     * @param processingSteps the processingSteps to set
+     */
+    public void setProcessingSteps(
+        List<ProcessingStepConfiguration> processingSteps) {
+        this.processingSteps = processingSteps;
+    }
+
+    /**
+     * Loads ProcessingConfiguration from a file.
+     * @param file The file to load the ProcessingConfiguration from.
+     * @return The restored ProcessingConfiguration.
+     * @throws IOException Something went wrong.
+     */
+    public static ProcessingConfiguration read(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return read(fis);
+        }
+    }
+
+    /**
+     * Loads ProcessingConfiguration from an input stream.
+     * @param fis The input stram to load the ProcessingConfiguration from.
+     * @return The restored ProcessingConfiguration.
+     * @throws IOException Something went wrong.
+     */
+    public static ProcessingConfiguration read(InputStream fis)
+        throws IOException {
+
+        try {
+            JAXBContext context =
+                JAXBContext.newInstance(ProcessingConfiguration.class);
+            Unmarshaller um = context.createUnmarshaller();
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            return (ProcessingConfiguration)um.unmarshal(bis);
+        } catch (JAXBException je) {
+            throw new IOException("", je);
+        }
     }
 }

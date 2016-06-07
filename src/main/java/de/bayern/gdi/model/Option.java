@@ -17,10 +17,19 @@
  */
 package de.bayern.gdi.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 'Option' of processing step configuration. */
+@XmlRootElement(name = "Option")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Option {
 
+    @XmlElement(name = "Titel")
     private String title;
+    @XmlElement(name = "Wert")
     private String value;
 
     public Option() {

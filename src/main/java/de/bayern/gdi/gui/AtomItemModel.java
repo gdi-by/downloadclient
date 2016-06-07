@@ -38,6 +38,10 @@ public class AtomItemModel implements ItemModel {
         return this.item;
     }
 
+    public String getDataset() {
+        return item.id;
+    }
+
     @Override
     public String toString() {
         return this.item.title;
