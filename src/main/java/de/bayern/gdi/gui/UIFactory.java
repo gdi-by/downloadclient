@@ -17,22 +17,22 @@
  */
 package de.bayern.gdi.gui;
 
-import java.util.Map;
-
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ComboBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
+import de.bayern.gdi.services.Field;
+import de.bayern.gdi.services.WFSMeta;
 //import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.utils.I18n;
 
@@ -44,8 +44,10 @@ public class UIFactory {
     private static final double LABEL_MIN_WIDTH = 150f;
     private static final double TEXTFIELD_MIN_WIDTH = 170f;
     private static final double FONT_BIG = 14f;
-    private static final int MARGIN_FIVE = 5;
+    private static final int MARGIN_0 = 0;
+    private static final int MARGIN_5 = 5;
     private static final int MARGIN_15 = 15;
+    private static final int PREF_HEIGHT = 31;
 
 
     /**
@@ -56,51 +58,64 @@ public class UIFactory {
      * @param container The container node
      *
      */
-    public void fillAtom(
+    public void fillSimpleWFS(
         DataBean dataBean,
         VBox container,
-        String type
+        WFSMeta.StoredQuery type
     ) {
+        createSimpleWFS(dataBean, type, container);
     }
 
     private void createSimpleWFS(
         DataBean dataBean,
-        String type,
+        WFSMeta.StoredQuery type,
         VBox container
     ) {
         container.getChildren().clear();
         Label descriptionHead = new Label();
-        descriptionHead.setText(I18n.getMsg("description"));
-        Label description = new Label();
-        Font font = description.getFont();
-        description.setFont(
+        descriptionHead.setText(I18n.getMsg("gui.description"));
+        Font font = descriptionHead.getFont();
+        descriptionHead.setFont(
             Font.font(font.getFamily(),
                 FontWeight.BOLD,
                 FONT_BIG));
+        Label description = new Label();
         description.setWrapText(true);
-        description.setText("some example text. real descrption goes here.");
+        description.setText(type.abstractDescription);
         container.getChildren().add(descriptionHead);
         container.getChildren().add(description);
+        container.setMargin(descriptionHead,
+            new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_5));
+        container.setMargin(description,
+            new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
 
-/*        Map<String, String> attributes =
-            dataBean.getWebService().getAttributes(type);
-        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+        for (Field entry : type.parameters) {
             HBox attributeItem = createAttributeItem(entry);
             container.getChildren().add(attributeItem);
         }
-        */
     }
 
-    private HBox createAttributeItem(Map.Entry<String, String> item) {
+    private HBox createAttributeItem(Field field) {
         HBox root = new HBox();
+        root.setPrefHeight(PREF_HEIGHT);
+        root.setMaxHeight(PREF_HEIGHT);
         Label label = new Label();
-        label.setText(item.getKey());
+        label.setText(field.name);
         label.setMinWidth(LABEL_MIN_WIDTH);
         TextField textField = new TextField();
-        textField.setText(item.getValue());
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
+        Label type = new Label();
+        type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
+        type.setMinWidth(LABEL_MIN_WIDTH);
+        root.setMargin(label,
+            new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
+        root.setMargin(textField,
+            new Insets(MARGIN_0, MARGIN_5, MARGIN_0, MARGIN_5));
+        root.setMargin(type,
+            new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_5));
         root.getChildren().add(label);
         root.getChildren().add(textField);
+        root.getChildren().add(type);
         return root;
     }
 
@@ -123,12 +138,12 @@ public class UIFactory {
             }
         });
         root.getChildren().addAll(box, field, remove);
-        root.setMargin(box, new Insets(MARGIN_FIVE,
-            MARGIN_FIVE, MARGIN_FIVE, MARGIN_FIVE));
-        root.setMargin(field, new Insets(MARGIN_FIVE,
-            MARGIN_FIVE, MARGIN_FIVE, MARGIN_FIVE));
-        root.setMargin(remove, new Insets(MARGIN_FIVE,
-            MARGIN_FIVE, MARGIN_FIVE, MARGIN_FIVE));
+        root.setMargin(box, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
+        root.setMargin(field, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
+        root.setMargin(remove, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
 
         container.getChildren().add(root);
     }

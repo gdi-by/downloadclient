@@ -20,7 +20,6 @@ package de.bayern.gdi.utils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,30 +44,27 @@ public class ServiceChecker {
     /**
      * checks the service type.
      * @param serviceURL the service url
-     * @param authStr the String with the Authentication details
+     * @param user The optional user name.
+     * @param password The optional password.
      * @return the type of service; null if failed
      */
-    public static ServiceType checkService(String serviceURL, String
-            authStr) {
+    public static ServiceType checkService(
+        String serviceURL,
+        String user,
+        String password
+    ) {
         try {
-            URL url = new URL(serviceURL);
-            URLConnection conn = null;
-            if (url.toString().toLowerCase().startsWith("https")) {
-                System.setProperty("jsse.enableSNIExtension", "false");
-                conn = url.openConnection();
-            }
-            conn = url.openConnection();
-            if (authStr != null) {
-                conn.setRequestProperty("Authorization", "Basic " + authStr);
-            }
-            Document doc = XML.getDocument(conn.getInputStream());
+            Document doc = XML.getDocument(
+                new URL(serviceURL),
+                user, password);
             if (doc == null) {
                 return null;
             }
 
             //It seems that there is more than one implementation of this
             //stuff...
-            NodeList nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
+            final String wfs = "http://www.opengis.net/wfs/2.0";
+            NodeList nl = doc.getElementsByTagNameNS(wfs, "WFS_Capabilities");
             if (nl.getLength() == 0) {
                 nl = doc.getElementsByTagName("WFS_Capabilities");
             }

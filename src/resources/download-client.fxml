@@ -10,15 +10,6 @@
 
 <VBox prefHeight="622.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.bayern.gdi.gui.Controller">
    <children>
-      <MenuBar fx:id="mainMenu">
-        <menus>
-          <Menu fx:id="menuFile" mnemonicParsing="false" text="Datei">
-            <items>
-              <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#handleCloseApp" text="Schließen" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
       <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
          <items>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="140.0" SplitPane.resizableWithParent="false">
@@ -107,16 +98,16 @@
                            <items>
                               <ScrollPane prefViewportHeight="314.0" prefViewportWidth="590.0">
                                  <content>
-                                    <StackPane prefHeight="337.0">
+                                    <StackPane>
                                        <children>
                                           <VBox fx:id="basicWFSContainer">
                                              <children>
-                                                <Group fx:id="mapNodeWFS">
+                                                <Group fx:id="mapNodeWFS" VBox.vgrow="ALWAYS">
                                                    <VBox.margin>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Group>
-                                                <VBox>
+                                                <VBox VBox.vgrow="SOMETIMES">
                                                    <children>
                                                       <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                          <children>
@@ -175,15 +166,15 @@
                                                 </VBox>
                                              </children>
                                           </VBox>
-                                          <VBox fx:id="simpleWFSContainer" prefHeight="200.0" prefWidth="100.0" />
-                                          <VBox fx:id="atomContainer" prefHeight="200.0" prefWidth="100.0">
+                                          <VBox fx:id="simpleWFSContainer" />
+                                          <VBox fx:id="atomContainer">
                                              <children>
-                                                <Group fx:id="mapNodeAtom">
+                                                <Group fx:id="mapNodeAtom" VBox.vgrow="ALWAYS">
                                                    <VBox.margin>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Group>
-                                                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0">
+                                                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label text="x1">
                                                          <HBox.margin>
@@ -199,7 +190,7 @@
                                                       <TextField fx:id="atomY1" minWidth="-Infinity" prefWidth="140.0" />
                                                    </children>
                                                 </HBox>
-                                                <HBox prefHeight="31.0" prefWidth="200.0">
+                                                <HBox prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label text="x2">
                                                          <HBox.margin>
@@ -209,7 +200,8 @@
                                                       <TextField fx:id="atomX2" minWidth="-Infinity" prefWidth="140.0">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" />
-                                                         </HBox.margin></TextField>
+                                                         </HBox.margin>
+                                                      </TextField>
                                                       <Label text="y2">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
@@ -218,11 +210,12 @@
                                                       <TextField fx:id="atomY2" minWidth="-Infinity" prefWidth="140.0">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" />
-                                                         </HBox.margin></TextField>
+                                                         </HBox.margin>
+                                                      </TextField>
                                                    </children>
                                                 </HBox>
-                                                <Separator prefWidth="200.0" />
-                                                <Label text="Beschreibung">
+                                                <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
+                                                <Label text="Beschreibung" VBox.vgrow="NEVER">
                                                    <font>
                                                       <Font name="System Bold" size="13.0" />
                                                    </font>
@@ -230,17 +223,19 @@
                                                       <Insets bottom="5.0" left="15.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Label>
-                                                <Label fx:id="valueAtomDescr" prefHeight="31.0" prefWidth="540.0" text="description" wrapText="true" VBox.vgrow="ALWAYS">
+                                                <Label fx:id="valueAtomDescr" maxWidth="600.0" text="description" wrapText="true" VBox.vgrow="SOMETIMES">
                                                    <VBox.margin>
                                                       <Insets bottom="5.0" left="20.0" right="15.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Label>
+                                                <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label fx:id="labelAtomVariation" minWidth="-Infinity" prefWidth="200.0" text="Varianten">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                         </HBox.margin></Label>
+                                                         </HBox.margin>
+                                                      </Label>
                                                       <ComboBox fx:id="atomVariationChooser" prefWidth="150.0" />
                                                    </children>
                                                 </HBox>
@@ -251,10 +246,11 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomFormat" text="format" wrapText="true">
+                                                      <Label fx:id="valueAtomFormat" text="format" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
-                                                         </HBox.margin></Label>
+                                                         </HBox.margin>
+                                                      </Label>
                                                    </children>
                                                 </HBox>
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
@@ -264,7 +260,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomRefsys" prefHeight="21.0" prefWidth="40.0" text="refsys" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="refsys" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>
@@ -319,6 +315,12 @@
                               <Button fx:id="buttonSaveConfig" mnemonicParsing="false" prefHeight="44.0" prefWidth="186.0" text="Download-Konfiguration speichern" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="10.0" right="15.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Pane HBox.hgrow="ALWAYS" />
+                              <Button fx:id="buttonClose" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCloseApp" prefHeight="44.0" text="Beenden">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
                            </children>
