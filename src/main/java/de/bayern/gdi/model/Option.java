@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Option {
 
-    @XmlElement(name = "Titel")
+    @XmlElement(name = "Title")
     private String title;
     @XmlElement(name = "Wert")
     private String value;
