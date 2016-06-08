@@ -19,6 +19,7 @@
 package de.bayern.gdi.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -326,6 +328,25 @@ public class Controller {
         Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
+    }
+
+    @FXML protected void handleSaveConfig(ActionEvent event) {
+        FileChooser configFileChooser = new FileChooser();
+        configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+        File configFile = configFileChooser.showSaveDialog(
+                dataBean.getPrimaryStage());
+        if (configFile == null) {
+            return;
+        }
+        String savePath = configFile.getPath();
+        DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+        DownloadStep ds = dsf.getStep(dataBean, savePath);
+        try {
+            ds.write(configFile);
+
+        } catch (IOException ex) {
+            log.log(Level.WARNING, ex.getMessage() , ex);
+        }
     }
 
     /**
