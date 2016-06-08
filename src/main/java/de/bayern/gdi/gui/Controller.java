@@ -188,7 +188,7 @@ public class Controller {
         if (currentText.length() > 2) {
             Map<String, String> catalog = dataBean.getCatalogService()
                     .getServicesByFilter(currentText);
-            System.out.println(catalog.size());
+            //System.out.println(catalog.size());
             for (Map.Entry<String, String> entry: catalog.entrySet()) {
                 dataBean.addCatalogServiceToList(
                     entry.getKey(), entry.getValue());

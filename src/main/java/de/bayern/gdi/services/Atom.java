@@ -23,7 +23,6 @@ import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +93,7 @@ public class Atom {
         public Item() {
             otherCRSs = new ArrayList<>();
             fields = new ArrayList<>();
-            defaultCRS = null;
+            format = null;
         }
         @Override
         public String toString() {
@@ -113,6 +112,30 @@ public class Atom {
                 str += "\t" + f.name + ": " + f.type + "\n";
             }
             return str;
+        }
+
+        /**
+         * Loads the "costly" details.
+         */
+        public void load() {
+            format = getFormat(this.id);
+        }
+
+        private String getFormat(String itemid) {
+            NamespaceContext nscontext = new NamespaceContextMap(
+                    "", "http://www.w3.org/2005/Atom",
+                    "georss", "http://www.georss.org/georss",
+                    "inspire_dls",
+                    "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
+            String itemformat = null;
+            String attributeURL = itemid;
+            Document entryDoc = XML.getDocument(attributeURL);
+            String getType = "//entry/link/@type";
+            itemformat = (String) XML.xpath(entryDoc,
+                    getType,
+                    XPathConstants.STRING,
+                    nscontext);
+            return itemformat;
         }
     }
 
@@ -147,7 +170,7 @@ public class Atom {
                 this.password,
                 false);
         this.nscontext = new NamespaceContextMap(
-                "", "http://www.w3.org/2005/Atom",
+                null , "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
                 "inspire_dls",
                 "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
@@ -173,26 +196,47 @@ public class Atom {
                 XPathConstants.NODESET,
                 this.nscontext);
         for (int i = 0; i < entries.getLength(); i++) {
+            //Long beginRead = System.currentTimeMillis();
             Node entry = entries.item(i);
             String getEntryTitle = "title";
-            String getEntryid = "id";
             Node titleN = (Node) XML.xpath(entry,
                     getEntryTitle,
                     XPathConstants.NODE,
                     this.nscontext);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + "  ms\tTitle: " + titleN.getTextContent());
+            String getEntryid = "*[local-name()"
+                    + "='spatial_dataset_identifier_code']";
             Node id = (Node) XML.xpath(entry,
                     getEntryid,
                     XPathConstants.NODE,
                     this.nscontext);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + "ms \tID: " + id.getTextContent());
             String summaryExpr = "summary";
             Node description = (Node) XML.xpath(entry,
                     summaryExpr,
                     XPathConstants.NODE,
                     this.nscontext);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + " ms\tDescirption: " + description.getTextContent());
             Item it = new Item();
             it.id = id.getTextContent();
             it.title = titleN.getTextContent();
             it.description = description.getTextContent();
+            it.otherCRSs = getCRS(entry);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + " ms\totherCRS: " + it.otherCRSs);
+            it.defaultCRS = it.otherCRSs.get(0);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + " ms\tdefaultCRS: " + it.defaultCRS);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + " ms\tformat: " + it.format);
+            it.bbox = new ReferencedEnvelope();
+            //TODO: Calculate Bounding Box
+            it.fields = getFieldForEntry(entry, it.id);
+            //System.out.println((System.currentTimeMillis() - beginRead)
+            //        + " ms\tfields: " + it.fields);
             items.add(it);
         }
     }
@@ -236,33 +280,9 @@ public class Atom {
         return this.serviceURL;
     }
 
-    public Item loadDataset(Item item) {
-        item.otherCRSs = getCRS(item.id);
-        item.defaultCRS = item.otherCRSs.get(0);
-        item.format = getFormat(item.id);
-        item.bbox = new ReferencedEnvelope();
-        //TODO: Calculate Bounding Box
-        item.fields = getFieldForEntry(item.id);
-        return item;
-    }
 
-    private String getFormat(String id) {
-        String format = null;
-        String attributeURL = id;
-        Document entryDoc = XML.getDocument(attributeURL);
-        String getType = "//entry/link/@type";
-        format = (String) XML.xpath(entryDoc,
-                getType,
-                XPathConstants.STRING,
-                this.nscontext);
-        return format;
-    }
-
-
-    private ArrayList<String> getCRS(String id) {
+    private ArrayList<String> getCRS(Node entry) {
         ArrayList<String> crs = new ArrayList<>();
-        String attributeURL = id;
-        Node entry = getEntry(attributeURL);
         //Predefined in ATOM Service
         String getCategories = "category";
         NodeList cL = (NodeList) XML.xpath(entry,
@@ -284,10 +304,8 @@ public class Atom {
         return crs;
     }
 
-    private ArrayList<Field> getFieldForEntry(String id) {
+    private ArrayList<Field> getFieldForEntry(Node entry, String id) {
         ArrayList<Field> fields = new ArrayList<>();
-        String attributeURL = id;
-        Node entry = getEntry(attributeURL);
         //Predefined in ATOM Service
         String getCategories = "category";
         NodeList cL = (NodeList) XML.xpath(entry,
@@ -317,25 +335,6 @@ public class Atom {
         categoryTerm =
             categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
         categoryTerm = EPSG + categoryTerm;
-        String attrVal = null;
-        attrVal = id.substring(0,
-                id.lastIndexOf("."));
-        attrVal = attrVal.substring(attrVal.lastIndexOf(".") + 1,
-                attrVal.length());
-        attrVal = attrVal + "_" + categoryTerm;
-        return attrVal;
+        return id + "_" + categoryTerm;
     }
-
-
-    private Node getEntry(String attributeURL) {
-        String getEntry = "//entry/link[@href=$HREF]";
-        HashMap<String, String> vars = new HashMap<>();
-        vars.put("HREF", attributeURL);
-        Node n = (Node) XML.xpath(this.mainDoc,
-                getEntry,
-                XPathConstants.NODE,
-                this.nscontext, vars);
-        return n.getParentNode();
-    }
-
 }
