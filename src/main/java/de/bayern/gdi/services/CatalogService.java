@@ -156,9 +156,12 @@ public class CatalogService {
     public Map<String, String> getServicesByFilter(String filter) {
         Map<String, String> map = new HashMap<>();
         if (filter.length() > MIN_SEARCHLENGTH) {
-            //Document search = createXMLFilter(filter);
+            //Document searchXML = createXMLFilter(filter);
+            //XML.printDocument(searchXML, System.out);
             String search = loadXMLFilter(filter);
+            //Document xmlRead = XML.getDocument(search);
             //System.out.println(search);
+            //XML.printDocument(xmlRead, System.out);
             /*
             URL requestURL = setURLRequestAndSearch(filter);
             Document xml = XML.getDocument(requestURL,
@@ -405,7 +408,7 @@ public class CatalogService {
             anyTextPropertyIsLike.setAttribute("singleChar", "?");
             anyTextPropertyIsLike.setAttribute("wildCard", "*");
             andAnyText.appendChild(anyTextPropertyIsLike);
-            Element anyTextPropertyName = xml.createElement("PropertyName");
+            Element anyTextPropertyName = xml.createElement("ogc:PropertyName");
             anyTextPropertyName.setTextContent("gmd:anytext");
             anyTextPropertyIsLike.appendChild(anyTextPropertyName);
             Element anyTextLiteral = xml.createElement("ogc:Literal");
@@ -438,7 +441,7 @@ public class CatalogService {
             Element wfs20VersionPropertyName =
                     xml.createElementNS(OGC_NAMESPACE, "ogc:PropertyName");
             wfs20VersionPropertyName.setTextContent("gmd:serviceTypeVersion");
-            wfs20VersionPropertyIsLike.appendChild(wfs20NamePropertyName);
+            wfs20VersionPropertyIsLike.appendChild(wfs20VersionPropertyName);
             Element wfs20VersionLiteral = xml.createElementNS(OGC_NAMESPACE,
                     "ogc:Literal");
             wfs20VersionLiteral.setTextContent("*2.0*");
