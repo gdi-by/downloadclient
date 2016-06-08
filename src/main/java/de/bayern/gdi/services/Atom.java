@@ -193,17 +193,6 @@ public class Atom {
             it.id = id.getTextContent();
             it.title = titleN.getTextContent();
             it.description = description.getTextContent();
-            it.otherCRSs = getCRS(it.id);
-            it.defaultCRS = it.otherCRSs.get(0);
-            it.format = getFormat(it.id);
-            String bboxExpr = "//*[local-name()='polygon']";
-            Node bbox = (Node) XML.xpath(entry,
-                    bboxExpr,
-                    XPathConstants.NODE,
-                    this.nscontext);
-            it.bbox = new ReferencedEnvelope();
-            //TODO: Calculate Bounding Box
-            it.fields = getFieldForEntry(it.id);
             items.add(it);
         }
     }
@@ -247,6 +236,16 @@ public class Atom {
         return this.serviceURL;
     }
 
+    public Item loadDataset(Item item) {
+        item.otherCRSs = getCRS(item.id);
+        item.defaultCRS = item.otherCRSs.get(0);
+        item.format = getFormat(item.id);
+        item.bbox = new ReferencedEnvelope();
+        //TODO: Calculate Bounding Box
+        item.fields = getFieldForEntry(item.id);
+        return item;
+    }
+
     private String getFormat(String id) {
         String format = null;
         String attributeURL = id;
@@ -258,6 +257,7 @@ public class Atom {
                 this.nscontext);
         return format;
     }
+
 
     private ArrayList<String> getCRS(String id) {
         ArrayList<String> crs = new ArrayList<>();
