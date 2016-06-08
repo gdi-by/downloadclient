@@ -17,10 +17,31 @@
  */
 package de.bayern.gdi.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
+
 /** 'Parameter' of processing step configuration. */
+@XmlRootElement(name = "Parameter")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurationParameter {
 
+    @XmlAttribute(name = "verpflichtend")
     private boolean mandatory;
+
+    @XmlAttribute(name = "eingabeelement")
+    private String inputElement;
+
+    @XmlValue
     private String value;
 
     public ConfigurationParameter() {
@@ -41,6 +62,20 @@ public class ConfigurationParameter {
     }
 
     /**
+     * @return the inputElement
+     */
+    public String getInputElement() {
+        return inputElement;
+    }
+
+    /**
+     * @param inputElement the inputElement to set
+     */
+    public void setInputElement(String inputElement) {
+        this.inputElement = inputElement;
+    }
+
+    /**
      * @return the value
      */
     public String getValue() {
@@ -52,5 +87,47 @@ public class ConfigurationParameter {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    private static final Pattern VARS_RE = Pattern.compile("\\{([^\\}]+)\\}");
+
+    /**
+     * Extracts the variables from the value.
+     * @return The list of variables in the value.
+     */
+    public List<String> extractVariables() {
+        if (this.value == null) {
+            return Collections.<String>emptyList();
+        }
+        Matcher matcher = VARS_RE.matcher(this.value);
+        ArrayList<String> vars = new ArrayList<>();
+        while (matcher.find()) {
+            vars.add(matcher.group(1));
+        }
+        return vars;
+    }
+
+    /**
+     * Resolves the variable of the value with a map.
+     * @param vars The variables.
+     * @return The resolved value.
+     */
+    public String replaceVars(Map<String, String> vars) {
+        if (this.value == null) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = VARS_RE.matcher(this.value);
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            String val = vars.get(name);
+            if (value != null) {
+                matcher.appendReplacement(sb, val);
+            } else {
+                matcher.appendReplacement(sb, name);
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 }

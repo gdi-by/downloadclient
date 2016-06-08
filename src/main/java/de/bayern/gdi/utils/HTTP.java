@@ -22,12 +22,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -99,15 +99,26 @@ public final class HTTP {
         }
     }
 
+    private static RequestConfig getProxyConfig(String proto) {
+        String proxy = System.getProperty(proto + ".proxyHost");
+        Integer port = Integer.getInteger(proto + ".proxyPort");
+        HttpHost proxyHost = new HttpHost(proxy, port, proto);
+        return RequestConfig.custom()
+                .setProxy(proxyHost)
+                .build();
+    }
+
     private static void configureProxy(HttpGet request, String proto) {
         String proxy = System.getProperty(proto + ".proxyHost");
         if (proxy != null) {
-            Integer port = Integer.getInteger(proto + ".proxyPort");
-            HttpHost proxyHost = new HttpHost(proxy, port, proto);
-            RequestConfig config = RequestConfig.custom()
-                .setProxy(proxyHost)
-                .build();
-            request.setConfig(config);
+            request.setConfig(getProxyConfig(proto));
+        }
+    }
+
+    private static void configureProxy(HttpPost request, String proto) {
+        String proxy = System.getProperty(proto + ".proxyHost");
+        if (proxy != null) {
+            request.setConfig(getProxyConfig(proto));
         }
     }
 
@@ -122,6 +133,20 @@ public final class HTTP {
         configureProxy(request, url.getProtocol().equals("https")
             ? "https"
             : "http");
+        return request;
+    }
+
+    /**
+     * Ret urns a configured Post request.
+     * @param url the URL to post to
+     * @return the POST Request Object
+     * @throws URISyntaxException if the url is not valid
+     */
+    public static HttpPost getPostRequest(URL url)  throws URISyntaxException {
+        HttpPost request = new HttpPost(url.toURI());
+        configureProxy(request, url.getProtocol().equals("https")
+                ? "https"
+                : "http");
         return request;
     }
 }

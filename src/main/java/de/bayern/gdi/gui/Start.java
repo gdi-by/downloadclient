@@ -18,20 +18,21 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.I18n;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import de.bayern.gdi.utils.I18n;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -82,8 +83,12 @@ public class Start extends Application {
         try {
             ClassLoader classLoader = Start.class.getClassLoader();
             URL url = classLoader.getResource("download-client.fxml");
-            System.out.println(url);
-            FXMLLoader fxmlLoader = new FXMLLoader(url);
+            //System.out.println(url);
+            InputStream inputStream =
+                    classLoader.getResource(
+                            "messages.properties").openStream();
+            ResourceBundle bundle = new PropertyResourceBundle(inputStream);
+            FXMLLoader fxmlLoader = new FXMLLoader(url, bundle);
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
             DataBean dataBean = new DataBean(primaryStage);

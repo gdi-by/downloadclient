@@ -27,4 +27,10 @@ public interface ItemModel {
      * @return the item
      */
     Object getItem();
+
+    /**
+     * Get the selected dataset.
+     * @return the dataset
+     */
+    String getDataset();
 }

@@ -47,6 +47,7 @@ public class DataBean extends Observable {
     private Map<String, String> staticServices;
     private Map<String, String> catalogServices;
     private ServiceType serviceType;
+    private ItemModel dataType;
     private Atom atomService;
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
@@ -137,6 +138,9 @@ public class DataBean extends Observable {
         if (this.staticServices.containsKey(serviceName)) {
             returnStr = this.staticServices.get(serviceName);
         }
+        if (this.catalogServices.containsKey(serviceName)) {
+            returnStr = this.catalogServices.get(serviceName);
+        }
         return returnStr;
     }
 
@@ -147,6 +151,23 @@ public class DataBean extends Observable {
     public Stage getPrimaryStage() {
         return primaryStage;
     }
+
+    /**
+     * Set the data type.
+     * @param type The data type
+     */
+    public void setDataType(ItemModel type) {
+        this.dataType = type;
+    }
+
+    /**
+     * Get the data type.
+     * @return the datatype
+     */
+    public ItemModel getDatatype() {
+        return dataType;
+    }
+
 
     /**
      * Set the service type.
@@ -241,6 +262,15 @@ public class DataBean extends Observable {
      */
     public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
+    }
+
+    /**
+     * Adds an attribute for a selected Service.
+     * @param key The key
+     * @param value The value
+     */
+    public void addAttribute(String key, String value) {
+        this.attributes.put(key, value);
     }
 
     /**

@@ -17,6 +17,9 @@
  */
 package de.bayern.gdi.gui;
 
+import java.util.List;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,11 +29,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import de.bayern.gdi.model.ConfigurationParameter;
+import de.bayern.gdi.model.InputElement;
+import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.ProcessingConfiguration;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.WFSMeta;
 //import de.bayern.gdi.services.ServiceType;
@@ -48,7 +58,6 @@ public class UIFactory {
     private static final int MARGIN_5 = 5;
     private static final int MARGIN_15 = 15;
     private static final int PREF_HEIGHT = 31;
-
 
     /**
      * Creates a stack pane with content based on the selected service.
@@ -103,6 +112,8 @@ public class UIFactory {
         label.setText(field.name);
         label.setMinWidth(LABEL_MIN_WIDTH);
         TextField textField = new TextField();
+        textField.setUserData(field.name);
+        textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
         type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
@@ -126,10 +137,24 @@ public class UIFactory {
      * @param container The container
      */
     public void addChainAttribute(DataBean dataBean, VBox container) {
-        HBox root = new HBox();
+        VBox root = new VBox();
+        VBox dynroot = new VBox();
+        HBox subroot = new HBox();
         ComboBox box = new ComboBox();
-        // TODO add elements to box.
-        TextField field = new TextField();
+        ProcessingConfiguration config =
+            DownloadStepConverter.getProcessingConfiguration();
+        List<ProcessingStepConfiguration> steps = config.getProcessingSteps();
+        ObservableList<ProcessingStepConfiguration> conf =
+            FXCollections.observableArrayList(steps);
+        box.setItems(conf);
+        box.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                generateChainItem(
+                    (ProcessingStepConfiguration)box.getValue(),
+                    dynroot,
+                    config);
+            }
+        });
         Button remove = new Button(I18n.getMsg("gui.remove"));
         remove.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
@@ -137,14 +162,92 @@ public class UIFactory {
                 items.remove(root);
             }
         });
-        root.getChildren().addAll(box, field, remove);
-        root.setMargin(box, new Insets(MARGIN_5,
+        subroot.getChildren().addAll(box, remove);
+        subroot.setMargin(box, new Insets(MARGIN_5,
             MARGIN_5, MARGIN_5, MARGIN_5));
-        root.setMargin(field, new Insets(MARGIN_5,
+        subroot.setMargin(remove, new Insets(MARGIN_5,
             MARGIN_5, MARGIN_5, MARGIN_5));
-        root.setMargin(remove, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
+        Separator sep = new Separator();
+        root.getChildren().addAll(subroot, dynroot, sep);
 
         container.getChildren().add(root);
+    }
+
+    private void generateChainItem(
+        ProcessingStepConfiguration item,
+        VBox container,
+        ProcessingConfiguration config
+    ) {
+        container.getChildren().clear();
+        container.setId("process_parameter");
+        List<ConfigurationParameter> parameters = item.getParameters();
+        for (ConfigurationParameter p : parameters) {
+            if (p.getInputElement() != null) {
+                String ie = p.getInputElement();
+                List<InputElement> inputs = config.getInputElements();
+                for (InputElement input : inputs) {
+                    HBox root = new HBox();
+                    List<String> var = p.extractVariables();
+                    Label label = new Label();
+                    label.setText(var.get(0));
+                    label.setMinWidth(LABEL_MIN_WIDTH);
+                    if (input.getName().equals(ie)
+                        && "ComboBox".equals(input.getType())) {
+                        ComboBox inputEl = new ComboBox();
+                        inputEl.setUserData(var.get(0));
+                        inputEl.setId("process_var");
+                        List<Option> opts = input.getOptions();
+                        inputEl.setItems(
+                            FXCollections.observableArrayList(opts));
+                        root.getChildren().add(label);
+                        root.getChildren().add(inputEl);
+                        root.setPrefHeight(PREF_HEIGHT);
+                        root.setMaxHeight(PREF_HEIGHT);
+                        root.setMargin(label, new Insets(MARGIN_5,
+                            MARGIN_5, MARGIN_5, MARGIN_15));
+                        container.getChildren().add(root);
+                        container.setMargin(root, new Insets(MARGIN_5,
+                            MARGIN_5, MARGIN_5, MARGIN_5));
+                        break;
+                    }
+                    if (input.getName().equals(ie)
+                        && "TextField".equals(input.getType())) {
+                        TextField inputEl = new TextField();
+                        inputEl.setUserData(var.get(0));
+                        inputEl.setId("process_var");
+                        root.getChildren().add(label);
+                        root.getChildren().add(inputEl);
+                        root.setPrefHeight(PREF_HEIGHT);
+                        root.setMaxHeight(PREF_HEIGHT);
+                        root.setMargin(label, new Insets(MARGIN_5,
+                            MARGIN_5, MARGIN_5, MARGIN_15));
+                        container.getChildren().add(root);
+                        container.setMargin(root, new Insets(MARGIN_5,
+                            MARGIN_5, MARGIN_5, MARGIN_5));
+                        break;
+                    }
+                }
+            } else {
+                List<String> vars = p.extractVariables();
+                for (String var : vars) {
+                    HBox root = new HBox();
+                    root.setPrefHeight(PREF_HEIGHT);
+                    root.setMaxHeight(PREF_HEIGHT);
+                    Label label = new Label();
+                    label.setText(var);
+                    label.setMinWidth(LABEL_MIN_WIDTH);
+                    TextField textField = new TextField();
+                    textField.setUserData(var);
+                    textField.setId("process_var");
+                    textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
+                    root.getChildren().addAll(label, textField);
+                    root.setMargin(label, new Insets(MARGIN_5,
+                        MARGIN_5, MARGIN_5, MARGIN_15));
+                    container.getChildren().add(root);
+                    container.setMargin(root, new Insets(MARGIN_5,
+                        MARGIN_5, MARGIN_5, MARGIN_5));
+                }
+            }
+        }
     }
 }

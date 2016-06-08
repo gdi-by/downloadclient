@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetRecords
+        xmlns="http://www.opengis.net/cat/csw/2.0.2"
+        xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+        xmlns:gmd="http://www.isotc211.org/2005/gmd"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        service="CSW"
+        version="2.0.2"
+        maxRecords="500"
+        startPosition="1"
+        resultType="results"
+        outputFormat="application/xml"
+        outputSchema="http://www.isotc211.org/2005/gmd"
+        xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
+    <Query typeNames="gmd:MD_Metadata">
+        <ElementSetName typeNames="csw:IsoRecord">full</ElementSetName>
+        <Constraint version="1.1.0">
+            <ogc:Filter
+                    xmlns:ogc="http://www.opengis.net/ogc"
+                    xmlns:gml="http://www.opengis.net/gml"
+            >
+                <ogc:And>
+                    <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                        <ogc:PropertyName>gmd:anytext</ogc:PropertyName>
+                        <ogc:Literal>*{SUCHBEGRIFF}*</ogc:Literal>
+                    </ogc:PropertyIsLike>
+                    <ogc:Or>
+                        <ogc:And>
+                            <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                                <ogc:PropertyName>gmd:serviceTypeVersion</ogc:PropertyName>
+                                <ogc:Literal>*OGC:WFS*</ogc:Literal>
+                            </ogc:PropertyIsLike>
+                            <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                                <ogc:PropertyName>gmd:serviceTypeVersion</ogc:PropertyName>
+                                <ogc:Literal>*2.0*</ogc:Literal>
+                            </ogc:PropertyIsLike>
+                        </ogc:And>
+                        <ogc:Or>
+                            <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                                <ogc:PropertyName>gmd:serviceTypeVersion</ogc:PropertyName>
+                                <ogc:Literal>*atom*</ogc:Literal>
+                            </ogc:PropertyIsLike>
+                            <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                                <ogc:PropertyName>gmd:serviceTypeVersion</ogc:PropertyName>
+                                <ogc:Literal>*Atom*</ogc:Literal>
+                            </ogc:PropertyIsLike>
+                            <ogc:PropertyIsLike escapeChar="\" singleChar="?" wildCard="*">
+                                <ogc:PropertyName>gmd:serviceTypeVersion</ogc:PropertyName>
+                                <ogc:Literal>*ATOM*</ogc:Literal>
+                            </ogc:PropertyIsLike>
+                        </ogc:Or>
+                    </ogc:Or>
+                </ogc:And>
+            </ogc:Filter>
+        </Constraint>
+    </Query>
+</GetRecords>

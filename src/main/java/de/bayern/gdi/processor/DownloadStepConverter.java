@@ -18,13 +18,17 @@
 package de.bayern.gdi.processor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
-import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.ProcessingConfiguration;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
 
@@ -34,15 +38,10 @@ public class DownloadStepConverter {
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
 
+    private static ProcessingConfiguration processingConfig;
+
     private DownloadStepConverter() {
     }
-
-    private static final String[][] SERVICE2VERSION = {
-        {"ATOM", "2.0.0"},
-        {"WFS2_BASIC", "2.0.0"},
-        {"WFS2_SIMPLE", "2.0.0"},
-        {"WFS", "1.1.0"}
-    };
 
     private static final String[][] SERVICE2TYPE = {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
@@ -50,16 +49,6 @@ public class DownloadStepConverter {
         {"WFS2_SIMPLE", "STOREDQUERY_ID"},
         {"WFS", "DATASET"}
     };
-
-    private static String findWFSVersion(String type) {
-        type = type.toUpperCase();
-        for (String []pair: SERVICE2VERSION) {
-            if (type.equals(pair[0])) {
-                return pair[1];
-            }
-        }
-        return "2.0.0";
-    }
 
     private static String findQueryType(String type) {
         String t = type.toUpperCase();
@@ -87,21 +76,43 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static String wfsURL(DownloadStep dls) {
+    private static String baseURL(String url) {
+        int idx = url.indexOf(url);
+        return idx >= 0 ? url.substring(0, idx) : url;
+
+    }
+
+    private static String capURL(String base) {
+        return base + "?service=WFS&request=GetCapabilities&version=2.0.0";
+    }
+
+    private static String wfsURL(DownloadStep dls) throws ConverterException {
+
         String url = dls.getServiceURL();
+        String base = baseURL(url);
+        String cap = capURL(base);
+
+        WFSMetaExtractor extractor = new WFSMetaExtractor(cap);
+
+        WFSMeta meta;
+        try {
+            meta = extractor.parse();
+        } catch (IOException ioe) {
+            // TODO: I18n
+            throw new ConverterException("Cannot load meta data", ioe);
+        }
+
+        String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
-        String version = findWFSVersion(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
         sb.append(url)
           .append('?')
           .append("service=wfs&")
           .append("request=GetFeature&")
-          .append("version=")
-              .append(StringUtils.urlEncode(version));
-
-        // TODO: handle namespaces?!
+          .append("version=").append(version);
 
         if (queryType.equals("STOREDQUERY_ID")) {
             sb.append("&STOREDQUERY_ID=")
@@ -109,6 +120,15 @@ public class DownloadStepConverter {
         } else {
             sb.append("&typeNames=")
               .append(StringUtils.urlEncode(dataset));
+        }
+
+        int idx = dataset.indexOf(':');
+        if (idx >= 0) {
+            String prefix = dataset.substring(0, idx);
+            String ns = meta.namespaces.getNamespaceURI(prefix);
+            sb.append("&namespaces=(")
+                .append(StringUtils.urlEncode(prefix)).append('.')
+                .append(StringUtils.urlEncode(ns)).append(')');
         }
 
         String parameters = encodeParameters(dls.getParameters());
@@ -128,49 +148,6 @@ public class DownloadStepConverter {
         }
         */
         return sb.toString();
-    }
-
-
-    private static final String OGR2OGR
-        = System.getProperty("ogr2ogr", "ogr2ogr");
-
-    private static void createProcessings(
-        DownloadStep dls,
-        JobList jl,
-        File wd) throws ConverterException {
-
-        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
-
-        if (steps == null) {
-            return;
-        }
-
-        for (ProcessingStep ps: steps) {
-            if (ps.getName().equals("toShape")) {
-                ArrayList<String> params = new ArrayList<String>();
-
-                params.add("-f");
-                params.add("ESRI Shapefile");
-                params.add("download.shp");
-                params.add("download.gml");
-
-                for (Parameter p: ps.getParameters()) {
-                    if (p.getKey().equals("EPSG")) {
-                        params.add("-t_srs");
-                        params.add(p.getValue());
-                    }
-                    // TODO: Handle more parameters.
-                }
-
-                ExternalProcessJob epj = new ExternalProcessJob(
-                    OGR2OGR,
-                    wd,
-                    params.toArray(new String[params.size()]));
-
-                jl.addJob(epj);
-            }
-            // TODO: Implement more steps.
-        }
     }
 
     private static void createWfsDownload(
@@ -241,8 +218,47 @@ public class DownloadStepConverter {
             createWfsDownload(jl, path, user, password, dls);
         }
 
-        createProcessings(dls, jl, path);
+        ProcessingStepConverter psc =
+            new ProcessingStepConverter(getProcessingConfiguration());
+
+        psc.convert(dls, jl, path);
 
         return jl;
+    }
+
+    private static
+    ProcessingConfiguration loadProcessingConfiguration() {
+        InputStream in = null;
+        try {
+            in = DownloadStepConverter.class.getResourceAsStream(
+                "Verarbeitungsschritte.xml");
+            if (in == null) {
+                log.log(Level.SEVERE, "Verarbeitungsschritte.xml not found");
+                return new ProcessingConfiguration();
+            }
+            return ProcessingConfiguration.read(in);
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE, "Failed to load configuration", ioe);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                }
+            }
+        }
+        return new ProcessingConfiguration();
+    }
+
+    /**
+     * Returns the processing step configuration.
+     * @return the processing step configuration.
+     */
+    public static synchronized
+    ProcessingConfiguration getProcessingConfiguration() {
+        if (processingConfig == null) {
+            processingConfig = loadProcessingConfiguration();
+        }
+        return processingConfig;
     }
 }

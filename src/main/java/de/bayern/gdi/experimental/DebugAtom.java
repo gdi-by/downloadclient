@@ -58,6 +58,10 @@ public class DebugAtom {
         System.out.println("Subtitle: " + atom.getSubTitle());
         System.out.println("ID: " + atom.getID());
         ArrayList<Atom.Item> items = atom.getItems();
+        for (int i = 0; i < items.size(); i++) {
+            Atom.Item item = items.get(i);
+            item.load();
+        }
         System.out.println(items.toString());
     }
 }

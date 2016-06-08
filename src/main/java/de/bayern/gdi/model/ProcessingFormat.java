@@ -17,10 +17,21 @@
  */
 package de.bayern.gdi.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 'Format' of processing step configuration. */
+@XmlRootElement(name = "Format")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingFormat {
 
+    @XmlAttribute(name = "formattyp")
     private String type;
+
+    @XmlElement(name = "MimeType")
     private String mimeType;
 
     public ProcessingFormat() {

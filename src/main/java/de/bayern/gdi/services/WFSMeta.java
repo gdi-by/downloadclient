@@ -19,7 +19,10 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
+
+import de.bayern.gdi.utils.NamespaceContextMap;
 
 /** Stores meta data about WFS. */
 public class WFSMeta {
@@ -152,6 +155,8 @@ public class WFSMeta {
 
     /** title. */
     public String title;
+    /** URL. */
+    public String url;
     /** abstract. */
     public String abstractDescription;
     /** operations. */
@@ -166,6 +171,8 @@ public class WFSMeta {
     public List<StoredQuery> storedQueries;
     /** versions. */
     public List<String> versions;
+    /** namespaces. */
+    public NamespaceContextMap namespaces;
 
     public WFSMeta() {
         operations = new ArrayList<>();
@@ -174,6 +181,7 @@ public class WFSMeta {
         features = new ArrayList<>();
         storedQueries = new ArrayList<>();
         versions = new ArrayList<>();
+        namespaces = new NamespaceContextMap();
     }
 
     /**
