@@ -29,7 +29,7 @@
                               <Insets left="10.0" right="10.0" />
                            </VBox.margin>
                         </ListView>
-                        <Label fx:id="labelURL" text="URL:" VBox.vgrow="NEVER">
+                        <Label fx:id="labelURL" text="%gui.url" VBox.vgrow="NEVER">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -42,13 +42,13 @@
                               <Insets left="10.0" right="10.0" />
                            </VBox.margin>
                         </TextField>
-                        <Button fx:id="serviceSelection" alignment="CENTER_RIGHT" mnemonicParsing="false" onMouseClicked="#handleServiceSelectButton" text="Dienst wählen">
+                        <Button fx:id="serviceSelection" alignment="CENTER_RIGHT" mnemonicParsing="false" onMouseClicked="#handleServiceSelectButton" text="%gui.choose_service">
                            <VBox.margin>
                               <Insets bottom="5.0" left="50.0" right="10.0" top="5.0" />
                            </VBox.margin>
                         </Button>
                         <Separator prefWidth="200.0" />
-                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="Dienst zugriffsgeschützt">
+                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="%gui.use_auth">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -56,7 +56,7 @@
                               <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
                            </VBox.margin>
                         </CheckBox>
-                        <Label fx:id="labelUser" text="Kennung:">
+                        <Label fx:id="labelUser" text="%gui.user">
                            <VBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </VBox.margin>
@@ -66,7 +66,7 @@
                               <Insets left="10.0" right="10.0" />
                            </VBox.margin>
                         </TextField>
-                        <Label fx:id="labelPassword" text="Passwort:">
+                        <Label fx:id="labelPassword" text="%gui.password">
                            <VBox.margin>
                               <Insets left="10.0" right="10.0" top="3.0" />
                            </VBox.margin>
@@ -84,7 +84,7 @@
                <children>
                   <VBox layoutX="78.0" layoutY="99.0" prefHeight="398.0" prefWidth="416.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label fx:id="labelSelectType" text="Datensatz auswählen:">
+                        <Label fx:id="labelSelectType" text="%gui.choose-dataset">
                            <VBox.margin>
                               <Insets bottom="5.0" left="10.0" top="10.0" />
                            </VBox.margin>
@@ -144,7 +144,7 @@
                                                       <Separator prefWidth="200.0" />
                                                       <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                          <children>
-                                                            <Label minWidth="-Infinity" prefWidth="100.0" text="Datenformat">
+                                                            <Label minWidth="-Infinity" prefWidth="100.0" text="%gui.data-format">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -154,7 +154,7 @@
                                                                   <Insets left="3.0" />
                                                                </HBox.margin>
                                                             </ComboBox>
-                                                            <Label minWidth="-Infinity" prefWidth="120.0" text="ReferenzSystem">
+                                                            <Label minWidth="-Infinity" prefWidth="120.0" text="%gui.reference-system">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -176,13 +176,13 @@
                                                 </Group>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label text="x1">
+                                                      <Label text="%gui.x1">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
                                                       <TextField fx:id="atomX1" minWidth="-Infinity" prefWidth="140.0" />
-                                                      <Label text="y1">
+                                                      <Label text="%gui.y1">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -192,7 +192,7 @@
                                                 </HBox>
                                                 <HBox prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label text="x2">
+                                                      <Label text="%gui.x2">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -202,7 +202,7 @@
                                                             <Insets bottom="5.0" />
                                                          </HBox.margin>
                                                       </TextField>
-                                                      <Label text="y2">
+                                                      <Label text="%gui.y2">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -215,7 +215,7 @@
                                                    </children>
                                                 </HBox>
                                                 <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
-                                                <Label text="Beschreibung" VBox.vgrow="NEVER">
+                                                <Label text="%gui.description" VBox.vgrow="NEVER">
                                                    <font>
                                                       <Font name="System Bold" size="13.0" />
                                                    </font>
@@ -231,7 +231,7 @@
                                                 <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label fx:id="labelAtomVariation" minWidth="-Infinity" prefWidth="200.0" text="Varianten">
+                                                      <Label fx:id="labelAtomVariation" minWidth="-Infinity" prefWidth="200.0" text="%gui.variants">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -241,7 +241,7 @@
                                                 </HBox>
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label minWidth="-Infinity" prefWidth="200.0" text="Format">
+                                                      <Label minWidth="-Infinity" prefWidth="200.0" text="%gui.data-format">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -255,7 +255,7 @@
                                                 </HBox>
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label prefWidth="200.0" text="Koordinatenreferenzsystem">
+                                                      <Label prefWidth="200.0" text="%gui.coordinate-ref-system">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
@@ -277,7 +277,7 @@
                                  <content>
                                     <VBox fx:id="chainContainer" minWidth="-Infinity" prefHeight="63.0" prefWidth="570.0">
                                        <children>
-                                          <CheckBox fx:id="chkChain" mnemonicParsing="false" text="Weiterverarbeitung">
+                                          <CheckBox fx:id="chkChain" mnemonicParsing="false" text="%gui.post_process">
                                              <VBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </VBox.margin>
@@ -286,7 +286,7 @@
                                              <children>
                                                 <HBox prefHeight="26.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <Label fx:id="labelPostProcess" text="Verarbeitungskette">
+                                                      <Label fx:id="labelPostProcess" text="%gui.process_chain">
                                                          <font>
                                                             <Font name="System Bold" size="13.0" />
                                                          </font>
@@ -294,7 +294,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Button fx:id="addChainItem" mnemonicParsing="false" onAction="#handleAddChainItem" text="Add" />
+                                                      <Button fx:id="addChainItem" mnemonicParsing="false" onAction="#handleAddChainItem" text="%gui.add" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -307,18 +307,18 @@
                         </SplitPane>
                         <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="54.0" prefWidth="590.0" VBox.vgrow="NEVER">
                            <children>
-                              <Button fx:id="buttonDownload" mnemonicParsing="false" onAction="#handleDownload" prefHeight="44.0" prefWidth="134.0" text="Download starten" textAlignment="CENTER">
+                              <Button fx:id="buttonDownload" mnemonicParsing="false" onAction="#handleDownload" prefHeight="44.0" prefWidth="134.0" text="%gui.download" textAlignment="CENTER">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button fx:id="buttonSaveConfig" mnemonicParsing="false" prefHeight="44.0" prefWidth="186.0" text="Download-Konfiguration speichern" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                              <Button fx:id="buttonSaveConfig" mnemonicParsing="false" prefHeight="44.0" prefWidth="186.0" text="%gui.save-conf" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="10.0" right="15.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
                               <Pane HBox.hgrow="ALWAYS" />
-                              <Button fx:id="buttonClose" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCloseApp" prefHeight="44.0" text="Beenden">
+                              <Button fx:id="buttonClose" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCloseApp" prefHeight="44.0" text="%gui.quit">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                  </HBox.margin>
@@ -333,7 +333,7 @@
       </SplitPane>
       <HBox prefHeight="25.0" prefWidth="693.0" style="-fx-background-color: gainsboro;">
          <children>
-            <Label fx:id="statusBarText" text="Ready">
+            <Label fx:id="statusBarText" text="%status.ready">
                <HBox.margin>
                   <Insets bottom="5.0" left="15.0" top="5.0" />
                </HBox.margin>

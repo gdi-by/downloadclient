@@ -68,7 +68,7 @@ public class CatalogService {
     private static final String XML_NAMESPACE =
             "http://www.w3.org/2000/xmlns/";
     private static final String CSW_QUERY_FILEPATH =
-            "csw_getrecords_wfs20_atom.xml";
+            "csw_searchQuery.xml";
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
     private URL catalogURL;
