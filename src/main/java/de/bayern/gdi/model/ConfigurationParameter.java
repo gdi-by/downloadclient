@@ -38,6 +38,9 @@ public class ConfigurationParameter {
     @XmlAttribute(name = "verpflichtend")
     private boolean mandatory;
 
+    @XmlAttribute(name = "eingabeelement")
+    private String inputElement;
+
     @XmlElement
     private String value;
 
@@ -56,6 +59,20 @@ public class ConfigurationParameter {
      */
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
+    }
+
+    /**
+     * @return the inputElement
+     */
+    public String getInputElement() {
+        return inputElement;
+    }
+
+    /**
+     * @param inputElement the inputElement to set
+     */
+    public void setInputElement(String inputElement) {
+        this.inputElement = inputElement;
     }
 
     /**

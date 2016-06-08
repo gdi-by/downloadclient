@@ -330,7 +330,12 @@ public class Controller {
         th.start();
     }
 
-    @FXML protected void handleSaveConfig(ActionEvent event) {
+    /**
+     * Handle config saving.
+     * @param event The event.
+     */
+    @FXML
+    protected void handleSaveConfig(ActionEvent event) {
         FileChooser configFileChooser = new FileChooser();
         configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
         File configFile = configFileChooser.showSaveDialog(
