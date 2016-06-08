@@ -263,17 +263,18 @@ public class WFSMetaExtractor {
         String  request,
         WFSMeta meta
     ) throws IOException {
+        String post = "";
         int idx = url.lastIndexOf('?');
         if (idx >= 0) {
-            String pre = url.substring(0, idx);
-            String post = url.substring(idx + 1);
-            url = pre + "?request=" + request
-                + "&service=wfs"
-                + "&version="
-                + StringUtils.urlEncode(meta.highestVersion("2.0.0"));
-            if (post.length() > 0) {
-                url += "&" + post;
-            }
+            post = url.substring(idx + 1);
+            url = url.substring(0, idx);
+        }
+        url += "?request=" + request
+            + "&service=wfs"
+            + "&version="
+            + StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+        if (post.length() > 0) {
+            url += "&" + post;
         }
         return url;
     }
