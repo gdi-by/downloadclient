@@ -86,6 +86,11 @@ public class Atom {
         public List<Field> fields;
 
         /**
+         * describedBy.
+         */
+        public String describedBy;
+
+        /**
          * mimetype.
          */
         public String format;
@@ -101,6 +106,7 @@ public class Atom {
             str += "title: " + title + "\n";
             str += "id: " + id + "\n";
             str += "description: " + description + "\n";
+            str += "described by: " + describedBy + "\n";
             str += "format: " + format + "\n";
             str += "CRS: " + defaultCRS + "\n";
             str += "Other CRS:\n";
@@ -118,7 +124,7 @@ public class Atom {
          * Loads the "costly" details.
          */
         public void load() {
-            format = getFormat(this.id);
+            format = getFormat(this.describedBy);
         }
 
         private String getFormat(String itemid) {
@@ -218,12 +224,18 @@ public class Atom {
                     summaryExpr,
                     XPathConstants.NODE,
                     this.nscontext);
+            String describedByExpr = "link[@rel='alternate']/@href";
+            Node describedBy = (Node) XML.xpath(entry,
+                    describedByExpr,
+                    XPathConstants.NODE,
+                    this.nscontext);
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tDescirption: " + description.getTextContent());
             Item it = new Item();
             it.id = id.getTextContent();
             it.title = titleN.getTextContent();
             it.description = description.getTextContent();
+            it.describedBy = describedBy.getTextContent();
             it.otherCRSs = getCRS(entry);
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\totherCRS: " + it.otherCRSs);
