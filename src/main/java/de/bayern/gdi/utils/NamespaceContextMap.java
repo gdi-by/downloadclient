@@ -29,7 +29,6 @@ import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -56,23 +55,23 @@ public final class NamespaceContextMap implements
     }
 
     /**
-     * Creates a context from the prefixes/namespaceURI of a given document.
-     * @param doc Document.
+     * Creates a context from the prefixes/namespaceURI of a given node.
+     * @param node The node.
      */
-    public NamespaceContextMap(Document doc) {
-        this.prefixMap = collectNS(doc);
+    public NamespaceContextMap(Node node) {
+        this.prefixMap = collectNS(node);
         this.nsMap = createNamespaceMap(this.prefixMap);
     }
 
-    private static Map<String, String> collectNS(Document doc) {
+    private static Map<String, String> collectNS(Node node) {
 
         Map<String, String> prefixMap = new HashMap<>();
         ArrayDeque<Node> stack = new ArrayDeque<>();
 
-        stack.push(doc);
+        stack.push(node);
 
         while (!stack.isEmpty()) {
-            Node node = stack.pop();
+            node = stack.pop();
             String prefix = node.getPrefix();
             String ns = node.getNamespaceURI();
 
@@ -97,11 +96,12 @@ public final class NamespaceContextMap implements
         return prefixMap;
     }
 
-    /** Joins the prefix/namespaces of a given document into this context.
-     * @param doc The new document.
+    /** Joins the prefix/namespaces recursivly
+     * from a given node into this context.
+     * @param node The new document.
      */
-    public void join(Document doc) {
-        Map<String, String> newPrefixMap = collectNS(doc);
+    public void join(Node node) {
+        Map<String, String> newPrefixMap = collectNS(node);
         for (Map.Entry<String, String> entry: newPrefixMap.entrySet()) {
             if (!this.prefixMap.containsKey(entry.getKey())) {
                 this.prefixMap.put(entry.getKey(), entry.getValue());
