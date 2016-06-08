@@ -103,4 +103,9 @@ public class ProcessingStepConfiguration {
     public void setParameters(List<ConfigurationParameter> parameters) {
         this.parameters = parameters;
     }
+
+    @Override
+    public String toString() {
+        return this.title;
+    }
 }

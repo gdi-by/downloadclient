@@ -59,6 +59,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Option;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.DownloadStepFactory;
 import de.bayern.gdi.processor.JobList;
@@ -305,6 +306,30 @@ public class Controller {
                     f.getText());
             }
         }
+
+        if (this.chkChain.isSelected()) {
+            Set<Node> parameter =
+                this.chainContainer.lookupAll("#process_parameter");
+            for (Node n : parameter) {
+                Set<Node> vars = n.lookupAll("#process_var");
+                for (Node v : vars) {
+                    String varName = "";
+                    String varValue = "";
+                    if (v instanceof TextField) {
+                        TextField input = (TextField)v;
+                        varName = input.getUserData().toString();
+                        varValue = input.getText();
+                    } else if (v instanceof ComboBox) {
+                        ComboBox input = (ComboBox)v;
+                        varName = input.getUserData().toString();
+                        varValue = input.getValue() != null
+                            ? ((Option)input.getValue()).getValue() : "";
+                    }
+                    System.out.println(varName + ": " + varValue);
+                }
+            }
+        }
+
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
         //fileChooser.getExtensionFilters().addAll();
