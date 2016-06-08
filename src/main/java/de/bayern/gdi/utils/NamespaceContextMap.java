@@ -18,14 +18,21 @@
 
 package de.bayern.gdi.utils;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -46,6 +53,63 @@ public final class NamespaceContextMap implements
             Map<String, String> prefixMappings) {
         prefixMap = createPrefixMap(prefixMappings);
         nsMap = createNamespaceMap(prefixMap);
+    }
+
+    /**
+     * Creates a context from the prefixes/namespaceURI of a given document.
+     * @param doc Document.
+     */
+    public NamespaceContextMap(Document doc) {
+        this.prefixMap = collectNS(doc);
+        this.nsMap = createNamespaceMap(this.prefixMap);
+    }
+
+    private static Map<String, String> collectNS(Document doc) {
+
+        Map<String, String> prefixMap = new HashMap<>();
+        ArrayDeque<Node> stack = new ArrayDeque<>();
+
+        stack.push(doc);
+
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            String prefix = node.getPrefix();
+            String ns = node.getNamespaceURI();
+
+            if (prefix != null && ns != null) {
+                if (!prefixMap.containsKey(prefix)) {
+                    System.out.println(prefix + ": " + ns);
+                    prefixMap.put(prefix, ns);
+                }
+            }
+
+            NodeList children = node.getChildNodes();
+            for (int i = 0, n = children.getLength(); i < n; i++) {
+                stack.push(children.item(i));
+            }
+            NamedNodeMap attrs = node.getAttributes();
+            if (attrs != null) {
+                for (int i = 0, n = attrs.getLength(); i < n; i++) {
+                    stack.push(attrs.item(i));
+                }
+            }
+        }
+
+        return prefixMap;
+    }
+
+    /** Joins the prefix/namespaces of a given document into this context.
+     * @param doc The new document.
+     */
+    public void join(Document doc) {
+        Map<String, String> newPrefixMap = collectNS(doc);
+        for (Map.Entry<String, String> entry: newPrefixMap.entrySet()) {
+            if (!this.prefixMap.containsKey(entry.getKey())) {
+                this.prefixMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        this.nsMap.clear();
+        updateNamespaceMap(this.prefixMap, this.nsMap);
     }
 
     /**
@@ -89,8 +153,15 @@ public final class NamespaceContextMap implements
     }
 
     private Map<String, Set<String>> createNamespaceMap(
-            Map<String, String> prefMap) {
+        Map<String, String> prefMap) {
         Map<String, Set<String>> namespMap = new HashMap<String, Set<String>>();
+        return updateNamespaceMap(prefMap, namespMap);
+    }
+
+    private Map<String, Set<String>> updateNamespaceMap(
+            Map<String, String> prefMap,
+            Map<String, Set<String>> namespMap
+    ) {
         for (Map.Entry<String, String> entry : prefMap
                 .entrySet()) {
             String nsURI = entry.getValue();
