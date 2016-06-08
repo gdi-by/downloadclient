@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -88,7 +89,17 @@ public final class NamespaceContextMap implements
             NamedNodeMap attrs = node.getAttributes();
             if (attrs != null) {
                 for (int i = 0, n = attrs.getLength(); i < n; i++) {
-                    stack.push(attrs.item(i));
+                    Attr attr = (Attr)attrs.item(i);
+                    String nsa = attr.getNamespaceURI();
+                    if (nsa != null
+                    && nsa.equals("http://www.w3.org/2000/xmlns/")) {
+                        String nsp = attr.getLocalName();
+                        String nsv = attr.getValue();
+                        if (!prefixMap.containsKey(nsp)) {
+                            prefixMap.put(nsp, nsv);
+                        }
+                    }
+                    stack.push(attr);
                 }
             }
         }
