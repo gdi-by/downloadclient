@@ -247,7 +247,9 @@ public class Controller {
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
         this.dataBean.addAttribute("format",
-            this.dataFormatChooser.getValue().toString());
+            this.dataFormatChooser.getValue() != null
+                ? this.dataFormatChooser.getValue().toString()
+                : "");
     }
 
     /**
@@ -278,7 +280,9 @@ public class Controller {
      */
     @FXML protected void handleVariationSelect(ActionEvent event) {
         this.dataBean.addAttribute("VARIATION",
-            this.atomVariationChooser.getValue().toString());
+            this.atomVariationChooser.getValue() != null
+                ? this.atomVariationChooser.getValue().toString()
+                : "");
     }
 
     /**
@@ -481,6 +485,7 @@ public class Controller {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
             Atom.Item item = (Atom.Item)data.getItem();
+            item.load();
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();

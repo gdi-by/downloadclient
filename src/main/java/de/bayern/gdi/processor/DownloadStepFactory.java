@@ -68,7 +68,10 @@ public class DownloadStepFactory {
             String serviceURL = type == ServiceType.Atom
                 ? bean.getAtomService().getURL()
                 : bean.getWFSService().url;
-            serviceURL = serviceURL.substring(0, serviceURL.lastIndexOf("?"));
+            if (serviceURL.lastIndexOf("?") > 0) {
+                serviceURL =
+                    serviceURL.substring(0, serviceURL.lastIndexOf("?"));
+            }
             Map<String, String> paramMap = bean.getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
             for (Map.Entry<String, String> entry: paramMap.entrySet()) {
