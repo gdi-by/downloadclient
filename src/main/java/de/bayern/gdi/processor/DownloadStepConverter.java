@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
 
@@ -41,29 +43,12 @@ public class DownloadStepConverter {
     private DownloadStepConverter() {
     }
 
-    private static final String[][] SERVICE2VERSION = {
-        {"ATOM", "2.0.0"},
-        {"WFS2_BASIC", "2.0.0"},
-        {"WFS2_SIMPLE", "2.0.0"},
-        {"WFS", "1.1.0"}
-    };
-
     private static final String[][] SERVICE2TYPE = {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
         {"WFS2_BASIC", "DATASET"},
         {"WFS2_SIMPLE", "STOREDQUERY_ID"},
         {"WFS", "DATASET"}
     };
-
-    private static String findWFSVersion(String type) {
-        type = type.toUpperCase();
-        for (String []pair: SERVICE2VERSION) {
-            if (type.equals(pair[0])) {
-                return pair[1];
-            }
-        }
-        return "2.0.0";
-    }
 
     private static String findQueryType(String type) {
         String t = type.toUpperCase();
@@ -91,21 +76,43 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static String wfsURL(DownloadStep dls) {
+    private static String baseURL(String url) {
+        int idx = url.indexOf(url);
+        return idx >= 0 ? url.substring(0, idx) : url;
+
+    }
+
+    private static String capURL(String base) {
+        return base + "?service=WFS&request=GetCapabilities&version=2.0.0";
+    }
+
+    private static String wfsURL(DownloadStep dls) throws ConverterException {
+
         String url = dls.getServiceURL();
+        String base = baseURL(url);
+        String cap = capURL(base);
+
+        WFSMetaExtractor extractor = new WFSMetaExtractor(cap);
+
+        WFSMeta meta;
+        try {
+            meta = extractor.parse();
+        } catch (IOException ioe) {
+            // TODO: I18n
+            throw new ConverterException("Cannot load meta data", ioe);
+        }
+
+        String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
-        String version = findWFSVersion(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
         sb.append(url)
           .append('?')
           .append("service=wfs&")
           .append("request=GetFeature&")
-          .append("version=")
-              .append(StringUtils.urlEncode(version));
-
-        // TODO: handle namespaces?!
+          .append("version=").append(version);
 
         if (queryType.equals("STOREDQUERY_ID")) {
             sb.append("&STOREDQUERY_ID=")
@@ -113,6 +120,15 @@ public class DownloadStepConverter {
         } else {
             sb.append("&typeNames=")
               .append(StringUtils.urlEncode(dataset));
+        }
+
+        int idx = dataset.indexOf(':');
+        if (idx >= 0) {
+            String prefix = dataset.substring(0, idx);
+            String ns = meta.namespaces.getNamespaceURI(prefix);
+            sb.append("&namespaces=(")
+                .append(StringUtils.urlEncode(prefix)).append('.')
+                .append(StringUtils.urlEncode(ns)).append(')');
         }
 
         String parameters = encodeParameters(dls.getParameters());
