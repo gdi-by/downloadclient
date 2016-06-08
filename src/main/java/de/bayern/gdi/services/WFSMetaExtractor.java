@@ -292,6 +292,7 @@ public class WFSMetaExtractor {
             : capURLString.replace("GetCapabilities", "DescribeFeatureType");
 
         Document dfDoc = getDocument(urlString);
+        meta.namespaces.join(dfDoc);
 
         HashMap<String, Element> name2types = buildTypeIndex(dfDoc);
 
@@ -323,6 +324,7 @@ public class WFSMetaExtractor {
             : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
 
         Document dsqDoc = getDocument(urlString);
+        meta.namespaces.join(dsqDoc);
 
         NodeList storedQueriesDesc = (NodeList)XML.xpath(
             dsqDoc, XPATH_STORED_QUERIES,
@@ -359,6 +361,7 @@ public class WFSMetaExtractor {
     private void parseCapabilites(WFSMeta meta) throws IOException {
 
         Document capDoc = getDocument(this.capURLString);
+        meta.namespaces.join(capDoc);
 
         meta.title = XML.xpathString(capDoc, XPATH_TITLE, NAMESPACES);
         meta.abstractDescription

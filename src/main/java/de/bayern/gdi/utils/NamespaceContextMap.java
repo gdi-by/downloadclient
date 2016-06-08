@@ -78,7 +78,6 @@ public final class NamespaceContextMap implements
 
             if (prefix != null && ns != null) {
                 if (!prefixMap.containsKey(prefix)) {
-                    System.out.println(prefix + ": " + ns);
                     prefixMap.put(prefix, ns);
                 }
             }
@@ -140,7 +139,7 @@ public final class NamespaceContextMap implements
                 XMLConstants.XML_NS_URI);
         addConstant(prefMap, XMLConstants.XMLNS_ATTRIBUTE,
                 XMLConstants.XMLNS_ATTRIBUTE_NS_URI);
-        return Collections.unmodifiableMap(prefMap);
+        return prefMap;
     }
 
     private void addConstant(Map<String, String> prefMap,
