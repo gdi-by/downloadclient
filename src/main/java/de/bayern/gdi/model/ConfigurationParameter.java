@@ -89,7 +89,18 @@ public class ConfigurationParameter {
         this.value = value;
     }
 
-    private static final Pattern VARS_RE = Pattern.compile("\\{([^\\}]+)\\}");
+    /** The defining pattern of a variable.*/
+    public static final Pattern VARS_RE = Pattern.compile("\\{([^\\}]+)\\}");
+
+    /**
+     * Extract the first variable out of a string.
+     * @param s The string to be searched.
+     * @return The name of the variable if found null otherwise.
+     */
+    public static String extractVariable(String s) {
+        Matcher matcher = VARS_RE.matcher(s);
+        return matcher != null ? matcher.group(1) : null;
+    }
 
     /**
      * Extracts the variables from the value.
