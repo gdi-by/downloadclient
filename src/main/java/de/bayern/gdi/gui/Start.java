@@ -84,11 +84,7 @@ public class Start extends Application {
             ClassLoader classLoader = Start.class.getClassLoader();
             URL url = classLoader.getResource("download-client.fxml");
             //System.out.println(url);
-            InputStream inputStream =
-                    classLoader.getResource(
-                            "messages.properties").openStream();
-            ResourceBundle bundle = new PropertyResourceBundle(inputStream);
-            FXMLLoader fxmlLoader = new FXMLLoader(url, bundle);
+            FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
             DataBean dataBean = new DataBean(primaryStage);
