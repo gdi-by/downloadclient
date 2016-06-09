@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -184,5 +186,46 @@ public class StringUtils {
                 "unbalanced quotes in " + toProcess);
         }
         return result.toArray(new String[result.size()]);
+    }
+
+    /**
+     * Splits a string by a pattern. It does not keep the delimeters.
+     * @param s The string to split.
+     * @param delim The delimeter.
+     * @return The splitted string.
+     */
+    public static String[] split(String s, Pattern delim) {
+        return split(s, delim, false);
+    }
+
+    /**
+     * Splits a string by a pattern.
+     * @param s The string to split.
+     * @param delim The delimeter.
+     * @param keep Indicates if the delimeters should be kept.
+     * @return The splitted string.
+     */
+    public static String[] split(String s, Pattern delim, boolean keep) {
+        if (s == null) {
+            s = "";
+        }
+        int lastMatch = 0;
+        ArrayList<String> parts = new ArrayList<>();
+        Matcher m = delim.matcher(s);
+        while (m.find()) {
+            String x = s.substring(lastMatch, m.start());
+            if (!x.isEmpty()) {
+                parts.add(x);
+            }
+            if (keep) {
+                parts.add(m.group(0));
+            }
+            lastMatch = m.end();
+        }
+        String x = s.substring(lastMatch);
+        if (!x.isEmpty()) {
+            parts.add(x);
+        }
+        return parts.toArray(new String[parts.size()]);
     }
 }
