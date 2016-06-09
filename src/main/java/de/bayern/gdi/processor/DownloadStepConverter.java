@@ -77,7 +77,7 @@ public class DownloadStepConverter {
     }
 
     private static String baseURL(String url) {
-        int idx = url.indexOf(url);
+        int idx = url.indexOf('?');
         return idx >= 0 ? url.substring(0, idx) : url;
 
     }
