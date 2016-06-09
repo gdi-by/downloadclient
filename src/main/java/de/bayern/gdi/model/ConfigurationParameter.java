@@ -99,7 +99,7 @@ public class ConfigurationParameter {
      */
     public static String extractVariable(String s) {
         Matcher matcher = VARS_RE.matcher(s);
-        return matcher != null ? matcher.group(1) : null;
+        return matcher.find() ? matcher.group(1) : null;
     }
 
     /**

@@ -95,6 +95,7 @@ public class ProcessingStepConverter {
 
                         if (var == null) {
                             row.add(atom);
+                            continue;
                         }
 
                         String val = step.findParameter(var);
