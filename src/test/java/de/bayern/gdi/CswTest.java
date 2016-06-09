@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * @author Jürgen Weichand (LDBV Bayern) 
+ * @author Jürgen Weichand (LDBV Bayern)
  */
 public class CswTest extends TestCase {
     /**
@@ -46,29 +46,27 @@ public class CswTest extends TestCase {
 
     /**
      * Check if the correct service url is determined from the metadata
-     * 
+     *
      * @throws java.net.MalformedURLException
      */
-    public void testCswBy() throws MalformedURLException 
-    {
-        
+    public void testCswBy() throws MalformedURLException {
+
         String[] notValidExtensions = {".pdf", ".htm"};
-                
-        String csw_by = "http://geoportal.bayern.de/csw/gdi?service=CSW&version=2.0.2&request=GetCapabilities";
-        CatalogService catalogService = new CatalogService(csw_by);
-        
-        Map<String, String> results = catalogService.getServicesByFilter("umwelt");
-        for (String key : results.keySet()) 
-        {
+
+        String cswUrl = "http://geoportal.bayern.de/csw/gdi?"
+                + "service=CSW&version=2.0.2&request=GetCapabilities";
+        CatalogService catalogService = new CatalogService(cswUrl);
+
+        Map<String, String> results =
+                catalogService.getServicesByFilter("umwelt");
+        for (String key : results.keySet()) {
             String url = results.get(key);
-            for (String notValidExtension : notValidExtensions) 
-            {
-                if (url.toLowerCase().endsWith(notValidExtension))
-                {
+            for (String notValidExtension : notValidExtensions) {
+                if (url.toLowerCase().endsWith(notValidExtension)) {
                     assertFalse("Wrong URL parsed from metadata", true);
                 }
-            }                    
-        }        
+            }
+        }
     }
-     
+
 }
