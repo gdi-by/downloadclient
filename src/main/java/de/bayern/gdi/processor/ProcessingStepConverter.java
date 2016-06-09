@@ -19,14 +19,13 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.utils.StringUtils;
 
 /** Converts processing steps to jobs of external program calls. */
 public class ProcessingStepConverter {
@@ -71,6 +70,7 @@ public class ProcessingStepConverter {
             }
             ArrayList<String> params = new ArrayList<>();
 
+            parameters:
             for (ConfigurationParameter cp: psc.getParameters()) {
                 String value = cp.getValue();
                 if (value == null) {
@@ -80,28 +80,38 @@ public class ProcessingStepConverter {
                 if (value.isEmpty()) {
                     continue;
                 }
-                List<String> vars = cp.extractVariables();
-                HashMap<String, String> values = new HashMap<>();
-                boolean incomplete = false;
-                for (String var: vars) {
-                    String val = step.findParameter(var);
-                    if (value != null) {
-                        values.put(var, val);
-                    } else {
-                        if (cp.isMandatory()) {
-                            // TODO: I18n
-                            throw new ConverterException(
-                                "Parameter " + var + " not found");
-                        } else {
-                            incomplete = true;
+                String[] parts = StringUtils.splitCommandLine(value);
+
+                for (String part: parts) {
+
+                    ArrayList<String> row = new ArrayList<>();
+
+                    String[] atoms = StringUtils.split(
+                        part, ConfigurationParameter.VARS_RE, true);
+
+                    for (String atom: atoms) {
+                        String var =
+                            ConfigurationParameter.extractVariable(atom);
+
+                        if (var == null) {
+                            row.add(atom);
                         }
-                    }
+
+                        String val = step.findParameter(var);
+                        if (val == null) {
+                            if (cp.isMandatory()) {
+                                // TODO: I18n
+                                throw new ConverterException(
+                                    "Parameter " + var + " not found");
+                            }
+                            // This parameter is incomplete -> skip it!
+                            continue parameters;
+                        }
+                    } // for all atoms
+
+                    params.addAll(row);
                 }
-                if (incomplete && !cp.isMandatory()) {
-                    continue;
-                }
-                params.add(cp.replaceVars(values));
-            }
+            } // for all config parameters.
 
             ExternalProcessJob epj = new ExternalProcessJob(
                 command,
