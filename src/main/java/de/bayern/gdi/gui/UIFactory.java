@@ -30,6 +30,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Separator;
+import javafx.scene.web.WebView;
+import javafx.scene.web.WebEngine;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -58,6 +60,12 @@ public class UIFactory {
     private static final int MARGIN_5 = 5;
     private static final int MARGIN_15 = 15;
     private static final int PREF_HEIGHT = 31;
+    private static final int BGCOLOR = 244;
+    private static final double FONTSCALE = 0.8;
+    private static final int WEBVIEW_PREF_WIDTH = 200;
+    private static final int WEBVIEW_MIN_WIDTH = 200;
+    private static final int WEBVIEW_PREF_HEIGHT = 50;
+    private static final int WEBVIEW_MIN_HEIGHT = 50;
 
     /**
      * Creates a stack pane with content based on the selected service.
@@ -88,9 +96,29 @@ public class UIFactory {
             Font.font(font.getFamily(),
                 FontWeight.BOLD,
                 FONT_BIG));
-        Label description = new Label();
-        description.setWrapText(true);
-        description.setText(type.abstractDescription);
+        WebView description = new WebView();
+        description.setFontScale(FONTSCALE);
+        description.setPrefHeight(WEBVIEW_PREF_HEIGHT);
+        description.setPrefWidth(WEBVIEW_PREF_WIDTH);
+        description.setMinHeight(WEBVIEW_MIN_HEIGHT);
+        description.setMinWidth(WEBVIEW_MIN_WIDTH);
+        WebEngine engine = description.getEngine();
+        java.lang.reflect.Field f;
+        try {
+            f = engine.getClass().getDeclaredField("page");
+            f.setAccessible(true);
+            com.sun.webkit.WebPage page =
+                (com.sun.webkit.WebPage) f.get(engine);
+            page.setBackgroundColor(
+                (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB());
+        } catch (NoSuchFieldException
+            | SecurityException
+            | IllegalArgumentException
+            | IllegalAccessException e) {
+            // Displays the webview with white background...
+        }
+        engine.loadContent(type.abstractDescription);
+
         container.getChildren().add(descriptionHead);
         container.getChildren().add(description);
         container.setMargin(descriptionHead,

@@ -45,6 +45,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextField;
@@ -82,6 +84,7 @@ public class Controller {
 
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
+    private static final int BGCOLOR = 244;
 
     // DataBean
     private DataBean dataBean;
@@ -121,7 +124,7 @@ public class Controller {
     @FXML private Label labelPassword;
     @FXML private Label labelSelectType;
     @FXML private Label labelPostProcess;
-    @FXML private Label valueAtomDescr;
+    @FXML private WebView valueAtomDescr;
     @FXML private Label valueAtomFormat;
     @FXML private Label valueAtomRefsys;
     @FXML private Button serviceSelection;
@@ -197,7 +200,9 @@ public class Controller {
             //System.out.println(catalog.size());
                     for (ServiceModel entry: catalog) {
                         dataBean.addCatalogServiceToList(entry);
-                        subentries.add(entry);
+                        Platform.runLater(() -> {
+                            subentries.add(entry);
+                        });
                     }
                     return 0;
                 }
@@ -578,7 +583,22 @@ public class Controller {
                 list.add(f.type);
             }
             this.atomVariationChooser.setItems(list);
-            this.valueAtomDescr.setText(item.description);
+            WebEngine engine = this.valueAtomDescr.getEngine();
+            java.lang.reflect.Field f;
+            try {
+                f = engine.getClass().getDeclaredField("page");
+                f.setAccessible(true);
+                com.sun.webkit.WebPage page =
+                    (com.sun.webkit.WebPage) f.get(engine);
+                page.setBackgroundColor(
+                    (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB());
+            } catch (NoSuchFieldException
+                | SecurityException
+                | IllegalArgumentException
+                | IllegalAccessException e) {
+                // Displays the webview with white background...
+            }
+            engine.loadContent(item.description);
             this.valueAtomFormat.setText(item.format);
             this.valueAtomRefsys.setText(item.defaultCRS);
             this.simpleWFSContainer.setVisible(false);
