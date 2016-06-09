@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * @author Jürgen Weichand (LDBV Bayern) 
+ * @author Jürgen Weichand (LDBV Bayern)
  */
 public class WfsTest extends TestCase {
     /**
@@ -46,37 +46,38 @@ public class WfsTest extends TestCase {
 
     /**
      * Check several WFS
-     * 
+     *
      * @throws java.net.MalformedURLException
      */
-    public void testWfs() throws IOException 
-    {                   
-        String[] urls = 
-        {            
-            "http://geoserv.weichand.de:8080/geoserver/ows?service=wfs&version=2.0.0&request=GetCapabilities", 
-            "http://geoserv.weichand.de/cgi-bin/mapserv-dev?map=/home/wei/wfs20-example.map&service=WFS&acceptversions=2.0.0&request=GetCapabilities",
-            "http://geoserv.weichand.de/cgi-bin/test-mapserver7.cgi?service=WFS&acceptversions=2.0.0&request=GetCapabilities",
-            "http://demo.deegree.org/inspire-workspace/services/wfs?service=WFS&acceptversions=2.0.0&request=GetCapabilities"        
+    public void testWfs() throws IOException  {
+        String[] urls =
+        {
+            "http://geoserv.weichand.de:8080/geoserver/ows?"
+                + "service=wfs&version=2.0.0&request=GetCapabilities",
+            "http://geoserv.weichand.de/cgi-bin/mapserv-dev?"
+                + "map=/home/wei/wfs20-example.map&"
+                + "service=WFS&acceptversions=2.0.0&request=GetCapabilities",
+            "http://geoserv.weichand.de/cgi-bin/test-mapserver7.cgi?"
+                + "service=WFS&acceptversions=2.0.0&request=GetCapabilities",
+            "http://demo.deegree.org/inspire-workspace/services/wfs?"
+                + "service=WFS&acceptversions=2.0.0&request=GetCapabilities"
         };
-        
-        for (String url : urls) 
-        {
+
+        for (String url : urls) {
             WFSMeta wfsMeta = new WFSMetaExtractor(url).parse();
-            hasOutputformats(wfsMeta);            
-        }        
+            hasOutputformats(wfsMeta);
+        }
     }
-    
-    
-    private void hasOutputformats(WFSMeta wfsMeta) 
-    {
-        if (wfsMeta.findOperation("GetFeature").outputFormats.size() < 1) 
-        {
+
+
+    private void hasOutputformats(WFSMeta wfsMeta) {
+        if (wfsMeta.findOperation("GetFeature").outputFormats.size() < 1) {
             StringBuilder sb = new StringBuilder();
             sb.append("No Outputformat found!");
             sb.append(" | ");
             sb.append(wfsMeta.url);
-            assertFalse(sb.toString(), true);                 
+            assertFalse(sb.toString(), true);
         }
     }
-     
+
 }
