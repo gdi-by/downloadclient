@@ -1214,7 +1214,7 @@ public class Controller {
 
         @Override
         public void run() {
-            //view.setStatusBarText(getMessage());
+            statusBarText.setText(getMessage());
         }
 
         @Override
