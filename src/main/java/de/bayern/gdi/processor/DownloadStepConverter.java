@@ -47,6 +47,7 @@ public class DownloadStepConverter {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
         {"WFS2_BASIC", "DATASET"},
         {"WFS2_SIMPLE", "STOREDQUERY_ID"},
+        {"WFS1", "DATASET"},
         {"WFS", "DATASET"}
     };
 

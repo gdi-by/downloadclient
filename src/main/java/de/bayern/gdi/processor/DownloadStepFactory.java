@@ -25,11 +25,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.bayern.gdi.gui.DataBean;
+import de.bayern.gdi.gui.ItemModel;
+import de.bayern.gdi.gui.StoredQueryModel;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.services.WFSTwo;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -93,20 +94,15 @@ public class DownloadStepFactory {
                     serviceTypeStr = "WFS1";
                     break;
                 case WFSTwo:
-                    if (dataset.startsWith(WFSTwo.getSimplePrefix())) {
+                    ItemModel itemModel = bean.getDatatype();
+                    if (itemModel instanceof StoredQueryModel) {
                         serviceTypeStr = "WFS2_SIMPLE";
-                        dataset = dataset.substring(WFSTwo.getSimplePrefix()
-                                .length() + 1);
                     } else {
                         serviceTypeStr = "WFS2_BASIC";
-                        dataset = dataset.substring(WFSTwo.getBasicPrefix()
-                                .length() + 1);
                     }
                     break;
                 case Atom:
                     serviceTypeStr = "ATOM";
-
-                    //dataset = atom.getURLforType(dataset);
                     break;
                 default:
             }
