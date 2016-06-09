@@ -170,8 +170,9 @@ public class Controller {
      */
     @FXML protected void handleSearch(KeyEvent event) {
         String currentText = this.searchField.getText();
+        this.serviceList.getItems().clear();
+        this.dataBean.reset();
         if ("".equals(currentText) || currentText == null) {
-            this.dataBean.reset();
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
         String searchValue = currentText.toUpperCase();
@@ -188,13 +189,23 @@ public class Controller {
             }
         }
         if (currentText.length() > 2) {
-            List<ServiceModel> catalog = dataBean.getCatalogService()
-                    .getServicesByFilter(currentText);
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    List<ServiceModel> catalog = dataBean.getCatalogService()
+                            .getServicesByFilter(currentText);
             //System.out.println(catalog.size());
-            for (ServiceModel entry: catalog) {
-                dataBean.addCatalogServiceToList(entry);
-                subentries.add(entry);
-            }
+                    for (ServiceModel entry: catalog) {
+                        dataBean.addCatalogServiceToList(entry);
+                        subentries.add(entry);
+                    }
+                    return 0;
+                }
+            };
+            Thread th = new Thread(task);
+            statusBarText.setText(I18n.getMsg("status.calling-service"));
+            th.setDaemon(true);
+            th.start();
         }
 
         this.serviceList.setItems(subentries);
