@@ -20,6 +20,7 @@ package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
@@ -44,8 +45,8 @@ public class DataBean extends Observable {
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
-    private Map<String, String> staticServices;
-    private Map<String, String> catalogServices;
+    private List<ServiceModel> staticServices;
+    private List<ServiceModel> catalogServices;
     private ServiceType serviceType;
     private ItemModel dataType;
     private Atom atomService;
@@ -68,7 +69,7 @@ public class DataBean extends Observable {
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
         this.staticServices = this.serviceSetting.getServices();
-        this.catalogServices = new HashMap<String, String>();
+        this.catalogServices = new ArrayList<ServiceModel>();
         this.catalogService = new CatalogService(this.serviceSetting
                 .getCatalogueURL());
         this.atomService = null;
@@ -98,41 +99,32 @@ public class DataBean extends Observable {
      * Builds a Observable List from the services Map.
      * @return List build from services Map
      */
-    public ObservableList<String> getServicesAsList() {
-        ObservableList<String> serviceNames =
-                FXCollections.observableArrayList();
-        for (String name: this.staticServices.keySet()) {
-            serviceNames.add(name);
-        }
-        for (String name: this.catalogServices.keySet()) {
-            serviceNames.add(name);
-        }
+    public ObservableList<ServiceModel> getServicesAsList() {
+        ObservableList<ServiceModel> serviceNames =
+                FXCollections.observableArrayList(this.staticServices);
+        serviceNames.addAll(this.catalogServices);
         return serviceNames;
     }
 
     /**
      * Adds a Service to the list.
-     * @param serviceName the Name of the Service
-     * @param serviceURL the URL of the Service
+     * @param service the Service
      */
-    public void addCatalogServiceToList(String serviceName, String serviceURL) {
-        this.catalogServices.put(serviceName, serviceURL);
+    public void addCatalogServiceToList(ServiceModel service) {
+        this.catalogServices.add(service);
     }
 
     /**
      * Adds a Service to the list.
-     * @param serviceName the Name of the Service
-     * @param serviceURL the URL of the Service
+     * @param service the Service
      */
-    public void addServiceToList(String serviceName, String serviceURL) {
-        this.catalogServices.put(serviceName, serviceURL);
+    public void addServiceToList(ServiceModel service) {
+        this.catalogServices.add(service);
     }
 
     /**
      * Returns the Service URL for a given Service Name.
-     * @param serviceName name of a Service
-     * @return the url of the service
-     */
+     *
     public String getServiceURL(String serviceName) {
         String returnStr = null;
         if (this.staticServices.containsKey(serviceName)) {
@@ -142,10 +134,10 @@ public class DataBean extends Observable {
             returnStr = this.catalogServices.get(serviceName);
         }
         return returnStr;
-    }
+    }/
 
     /**
-     * returns the current stage.
+     * Returns the current stage.
      * @return the stage
      */
     public Stage getPrimaryStage() {

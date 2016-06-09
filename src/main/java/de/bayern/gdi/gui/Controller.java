@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -176,12 +175,12 @@ public class Controller {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
         String searchValue = currentText.toUpperCase();
-        ObservableList<String> subentries
+        ObservableList<ServiceModel> subentries
                 = FXCollections.observableArrayList();
-        ObservableList<String> all = this.dataBean.getServicesAsList();
-        for (String entry : all) {
+        ObservableList<ServiceModel> all = this.dataBean.getServicesAsList();
+        for (ServiceModel entry : all) {
             boolean match = true;
-            if (!entry.toUpperCase().contains(searchValue)) {
+            if (!entry.getName().toUpperCase().contains(searchValue)) {
                 match = false;
             }
             if (match) {
@@ -189,13 +188,12 @@ public class Controller {
             }
         }
         if (currentText.length() > 2) {
-            Map<String, String> catalog = dataBean.getCatalogService()
+            List<ServiceModel> catalog = dataBean.getCatalogService()
                     .getServicesByFilter(currentText);
             //System.out.println(catalog.size());
-            for (Map.Entry<String, String> entry: catalog.entrySet()) {
-                dataBean.addCatalogServiceToList(
-                    entry.getKey(), entry.getValue());
-                subentries.add(entry.getKey());
+            for (ServiceModel entry: catalog) {
+                dataBean.addCatalogServiceToList(entry);
+                subentries.add(entry);
             }
         }
 
@@ -218,12 +216,34 @@ public class Controller {
             if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
                     != null
             ) {
-                String serviceName =
-                    this.serviceList.getSelectionModel().
-                        getSelectedItems().get(0).toString();
-                String url = dataBean.getServiceURL(serviceName);
+                ServiceModel service =
+                    (ServiceModel)this.serviceList.getSelectionModel()
+                        .getSelectedItems().get(0);
+                String url = service.getUrl();
                 this.serviceURL.setText(url);
+                if (service.isRestricted()) {
+                    this.serviceAuthenticationCbx.setDisable(false);
+                } else {
+                    this.serviceAuthenticationCbx.setSelected(false);
+                    this.serviceAuthenticationCbx.setDisable(true);
+                    this.serviceUser.setDisable(true);
+                    this.servicePW.setDisable(true);
+                }
             }
+        }
+    }
+
+    /**
+     * Handle authentication required selection.
+     * @param event the event
+     */
+    @FXML protected void handleAuthenticationRequired(ActionEvent event) {
+        if (this.serviceAuthenticationCbx.isSelected()) {
+            this.serviceUser.setDisable(false);
+            this.servicePW.setDisable(false);
+        } else {
+            this.serviceUser.setDisable(true);
+            this.servicePW.setDisable(true);
         }
     }
 
@@ -396,7 +416,9 @@ public class Controller {
                             serviceList.
                                 getSelectionModel().
                                     getSelectedItems().get(0).toString();
-                    url = dataBean.getServiceURL(serviceName);
+                    url = ((ServiceModel)
+                        serviceList.getSelectionModel()
+                            .getSelectedItem()).getUrl();
                 } else {
                     url = serviceURL.getText();
                 }
@@ -603,6 +625,9 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
+        this.serviceAuthenticationCbx.setDisable(true);
+        this.serviceUser.setDisable(true);
+        this.servicePW.setDisable(true);
     }
 
     private static final Logger log

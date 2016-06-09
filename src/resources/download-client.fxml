@@ -57,7 +57,7 @@
                            </tooltip>
                         </Button>
                         <Separator prefWidth="200.0" />
-                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="%gui.use_auth">
+                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" onAction="#handleAuthenticationRequired" text="%gui.use_auth">
                            <font>
                               <Font size="12.0" />
                            </font>

@@ -18,8 +18,6 @@
 
 package de.bayern.gdi.services;
 
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -27,20 +25,26 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
+
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import de.bayern.gdi.gui.ServiceModel;
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.XML;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -153,8 +157,8 @@ public class CatalogService {
      * @param filter the Word to filter to
      * @return Map of Service Names and URLs
      */
-    public Map<String, String> getServicesByFilter(String filter) {
-        Map<String, String> map = new HashMap<>();
+    public List<ServiceModel> getServicesByFilter(String filter) {
+        List<ServiceModel> services = new ArrayList<ServiceModel>();
         if (filter.length() > MIN_SEARCHLENGTH) {
             //Document searchXML = createXMLFilter(filter);
             //XML.printDocument(searchXML, System.out);
@@ -226,8 +230,9 @@ public class CatalogService {
                 String restriction = (String) XML.xpath(serviceN,
                         restrictionExpr,
                         XPathConstants.STRING, context);
+                boolean restricted = false;
                 if ("restricted".equals(restriction)) {
-                    serviceName += " - " + restriction;
+                    restricted = true;
                 }
                 String typeExpr =
                         "gmd:identificationInfo"
@@ -269,13 +274,18 @@ public class CatalogService {
                         if (!serviceName.equals("")) {
                             serviceURL = makeCapabiltiesURL(serviceURL,
                                     serviceTypeVersion);
-                            map.put(serviceName, serviceURL);
+                            ServiceModel service = new ServiceModel();
+                            service.setName(serviceName);
+                            service.setUrl(serviceURL);
+                            service.setVersion(serviceTypeVersion);
+                            service.setRestricted(restricted);
+                            services.add(service);
                         }
                     }
                 }
             }
         }
-        return map;
+        return services;
     }
 
     private String makeCapabiltiesURL(String url, String type) {

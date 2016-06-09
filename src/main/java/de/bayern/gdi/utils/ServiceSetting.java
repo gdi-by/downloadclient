@@ -19,18 +19,20 @@
 package de.bayern.gdi.utils;
 
 import java.io.InputStream;
-
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import de.bayern.gdi.gui.ServiceModel;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -41,7 +43,7 @@ public class ServiceSetting {
         = Logger.getLogger(ServiceSetting.class.getName());
 
     private InputStream settingStream;
-    private Map<String, String> services;
+    private List<ServiceModel> services;
     private Document xmlSettingFile;
     private static final String SERVICE_SETTING_FILEPATH =
             "serviceSetting.xml";
@@ -93,7 +95,7 @@ public class ServiceSetting {
      * returns a map of Strings with service Names und URLS.
      * @return Map of Strings with <Name, URL> of Services
      */
-    public Map<String, String> getServices()  {
+    public List<ServiceModel> getServices()  {
         return this.services;
     }
 
@@ -128,9 +130,55 @@ public class ServiceSetting {
     }
 
     private void parseDocument(Document xmlDocument) {
-        this.services = parseNameURLScheme(xmlDocument, "services");
+        this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
         this.wms = parseNameURLScheme(xmlDocument, "wms");
+    }
+
+
+    private List<ServiceModel> parseService(Document xmlDocument) {
+        List<ServiceModel> servicesList = new ArrayList<ServiceModel>();
+
+        NodeList servicesNL = xmlDocument.getElementsByTagName("services");
+        Node servicesNode = servicesNL.item(0);
+        NodeList serviceNL = servicesNode.getChildNodes();
+        Node serviceNode, serviceValueNode;
+
+        for (int i = 0; i < serviceNL.getLength(); i++) {
+            serviceNode = serviceNL.item(i);
+            if (serviceNode.getNodeType() == Node.ELEMENT_NODE) {
+                NodeList serviceValueNL = serviceNode.getChildNodes();
+                String serviceURL = null;
+                String serviceName = null;
+                boolean restricted = false;
+                for (int k = 0; k < serviceValueNL.getLength(); k++) {
+                    serviceValueNode = serviceValueNL.item(k);
+                    if (serviceValueNode.getNodeType() == 1) {
+                        if (serviceValueNode.getNodeName().equals("url")) {
+                            serviceURL =
+                             serviceValueNode.getFirstChild().getTextContent();
+                        } else if (serviceValueNode.getNodeName()
+                                .equals("name")) {
+                            serviceName =
+                             serviceValueNode.getFirstChild().getTextContent();
+                        } else if (serviceValueNode.getNodeName()
+                                .equals("restricted")) {
+                            String restr =
+                             serviceValueNode.getFirstChild().getTextContent();
+                            restricted = restr.equals("true") ? true : false;
+                        }
+                    }
+                }
+                if (serviceURL != null && serviceName != null) {
+                    ServiceModel service = new ServiceModel();
+                    service.setName(serviceName);
+                    service.setUrl(serviceURL);
+                    service.setRestricted(restricted);
+                    servicesList.add(service);
+                }
+            }
+        }
+        return servicesList;
     }
 
     private Map<String, String> parseNameURLScheme(Document xmlDocument,
@@ -148,9 +196,11 @@ public class ServiceSetting {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
+                boolean restricted = false;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
                     serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
+                        System.out.println(serviceValueNode.getNodeName());
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
                              serviceValueNode.getFirstChild().getTextContent();

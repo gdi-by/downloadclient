@@ -18,11 +18,13 @@
 
 package de.bayern.gdi.experimental;
 
-import de.bayern.gdi.services.CatalogService;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
+
+import de.bayern.gdi.gui.ServiceModel;
+import de.bayern.gdi.services.CatalogService;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -65,10 +67,10 @@ public class DebugCatalog {
             String second = "baye";
             String third = "atom";
             String fourth = "wfs";
-            printStringMap(catalog.getServicesByFilter(first));
-            printStringMap(catalog.getServicesByFilter(second));
-            printStringMap(catalog.getServicesByFilter(third));
-            printStringMap(catalog.getServicesByFilter(fourth));
+            printService(catalog.getServicesByFilter(first));
+            printService(catalog.getServicesByFilter(second));
+            printService(catalog.getServicesByFilter(third));
+            printService(catalog.getServicesByFilter(fourth));
 
         } catch (MalformedURLException e) {
             System.out.println(e.getMessage());
@@ -83,11 +85,11 @@ public class DebugCatalog {
         }
     }
 
-    private void printStringMap(Map<String, String> map)  {
-        Iterator it = map.entrySet().iterator();
+    private void printService(List<ServiceModel> services)  {
+        Iterator it = services.iterator();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
+            ServiceModel model = (ServiceModel)it.next();
+            System.out.println(model.getName() + " = " + model.getUrl());
         }
     }
 }
