@@ -45,15 +45,16 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -131,6 +132,7 @@ public class Controller {
     @FXML private Button buttonDownload;
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
+    @FXML private ProgressIndicator progressSearch;
 
     /**
      * Handler to close the application.
@@ -195,6 +197,9 @@ public class Controller {
             Task task = new Task() {
                 @Override
                 protected Integer call() throws Exception {
+                    Platform.runLater(() -> {
+                        progressSearch.setVisible(true);
+                    });
                     List<ServiceModel> catalog = dataBean.getCatalogService()
                             .getServicesByFilter(currentText);
             //System.out.println(catalog.size());
@@ -204,6 +209,9 @@ public class Controller {
                             subentries.add(entry);
                         });
                     }
+                    Platform.runLater(() -> {
+                        progressSearch.setVisible(false);
+                    });
                     return 0;
                 }
             };
@@ -657,6 +665,7 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
+        this.progressSearch.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
     }

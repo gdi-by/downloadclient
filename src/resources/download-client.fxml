@@ -17,17 +17,29 @@
                <children>
                   <VBox layoutX="37.0" layoutY="147.0" prefHeight="398.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <TextField fx:id="searchField" onKeyReleased="#handleSearch" scaleShape="false" VBox.vgrow="NEVER">
-                           <opaqueInsets>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </opaqueInsets>
+                        <HBox>
+                           <children>
+                              <TextField fx:id="searchField" onKeyReleased="#handleSearch" scaleShape="false" HBox.hgrow="ALWAYS" VBox.vgrow="NEVER">
+                                 <opaqueInsets>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </opaqueInsets>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                 </VBox.margin>
+                                 <tooltip>
+                                    <Tooltip text="%tooltip.search" wrapText="true" />
+                                 </tooltip>
+                              </TextField>
+                              <ProgressIndicator fx:id="progressSearch" prefHeight="0.0" prefWidth="23.0" HBox.hgrow="NEVER">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </ProgressIndicator>
+                           </children>
                            <VBox.margin>
-                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                              <Insets bottom="5.0" left="10.0" right="5.0" top="10.0" />
                            </VBox.margin>
-                           <tooltip>
-                              <Tooltip text="%tooltip.search" wrapText="true" />
-                           </tooltip>
-                        </TextField>
+                        </HBox>
                         <ListView fx:id="serviceList" onMouseClicked="#handleServiceSelect" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
                               <Insets left="10.0" right="10.0" />
@@ -58,7 +70,7 @@
                            </tooltip>
                         </Button>
                         <Separator prefWidth="200.0" />
-                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="%gui.use_auth">
+                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" onAction="#handleAuthenticationRequired" text="%gui.use_auth">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -239,7 +251,7 @@
                                                       <Insets bottom="5.0" left="15.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Label>
-                                                <WebView fx:id="valueAtomDescr" fontScale="0.8" minHeight="50.0" minWidth="200.0" prefHeight="100.0" prefWidth="200.0">
+                                                <WebView fx:id="valueAtomDescr" fontScale="0.8" minHeight="10.0" minWidth="200.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
                                                    <VBox.margin>
                                                       <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
