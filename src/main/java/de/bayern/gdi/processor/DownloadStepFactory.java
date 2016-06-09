@@ -37,24 +37,10 @@ import de.bayern.gdi.services.ServiceType;
  */
 public class DownloadStepFactory {
 
-    private static DownloadStepFactory instance;
-
     private static final Logger log
             = Logger.getLogger(DownloadStepFactory.class.getName());
 
-    private DownloadStepFactory() {
-
-    }
-
-    /**
-     * gets the instance of the Factory.
-     * @return DownloadstepFactory
-     */
-    public static synchronized DownloadStepFactory getInstance() {
-        if (DownloadStepFactory.instance == null) {
-            DownloadStepFactory.instance = new DownloadStepFactory();
-        }
-        return DownloadStepFactory.instance;
+    public DownloadStepFactory() {
     }
 
     /**

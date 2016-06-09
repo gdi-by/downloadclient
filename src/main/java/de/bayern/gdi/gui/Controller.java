@@ -394,7 +394,7 @@ public class Controller {
             @Override
             protected Integer call() throws Exception {
                 String savePath = selectedDir.getPath();
-                DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+                DownloadStepFactory dsf = new DownloadStepFactory();
                 DownloadStep ds = dsf.getStep(dataBean, savePath);
                 JobList jl = DownloadStepConverter.convert(ds);
                 Processor p = Processor.getInstance();
@@ -421,7 +421,7 @@ public class Controller {
             return;
         }
         String savePath = configFile.getPath();
-        DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+        DownloadStepFactory dsf = new DownloadStepFactory();
         DownloadStep ds = dsf.getStep(dataBean, savePath);
         try {
             ds.write(configFile);
@@ -941,7 +941,7 @@ public class Controller {
                 return;
             }
             String savePath = downloadFile.getPath();
-            DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+            DownloadStepFactory dsf = new DownloadstepFactory();
             DownloadStep ds = dsf.getStep(view, dataBean, savePath);
             try {
                 ds.write(configFile);
