@@ -128,7 +128,7 @@ public class DownloadStepConverter {
             String prefix = dataset.substring(0, idx);
             String ns = meta.namespaces.getNamespaceURI(prefix);
             sb.append("&namespaces=(")
-                .append(StringUtils.urlEncode(prefix)).append('.')
+                .append(StringUtils.urlEncode(prefix)).append(',')
                 .append(StringUtils.urlEncode(ns)).append(')');
         }
 
