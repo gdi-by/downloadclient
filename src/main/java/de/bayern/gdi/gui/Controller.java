@@ -603,27 +603,7 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
-        applyI18n();
     }
-
-    private void applyI18n() {
-        buttonClose.setText(I18n.getMsg("menu.quit"));
-        labelURL.setText(I18n.getMsg("gui.url"));
-        labelUser.setText(I18n.getMsg("gui.user"));
-        labelPassword.setText(I18n.getMsg("gui.password"));
-        serviceSelection.setText(I18n.getMsg("gui.choose_service"));
-        serviceAuthenticationCbx.setText(I18n.getMsg("gui.use_auth"));
-        labelSelectType.setText(I18n.getMsg("gui.choose_type"));
-        statusBarText.setText(I18n.getMsg("status.ready"));
-        chkChain.setText(I18n.getMsg("gui.post_process"));
-        labelPostProcess.setText(I18n.getMsg("gui.process_chain"));
-        buttonDownload.setText(I18n.getMsg("gui.download"));
-        buttonSaveConfig.setText(I18n.getMsg("gui.save-conf"));
-        addChainItem.setText(I18n.getMsg("gui.add"));
-    }
-
-    // view
-    //private view view;
 
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
