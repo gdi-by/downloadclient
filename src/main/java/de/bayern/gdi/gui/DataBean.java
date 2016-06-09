@@ -61,7 +61,7 @@ public class DataBean extends Observable {
     private String wmsName;
     private String userName;
     private String password;
-
+    private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
 
@@ -75,12 +75,9 @@ public class DataBean extends Observable {
         this.catalogServices = new ArrayList<ServiceModel>();
         this.catalogService = new CatalogService(this.serviceSetting
                 .getCatalogueURL());
-        this.atomService = null;
-        this.wfsService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
-        this.userName = null;
-        this.password = null;
+        this.processingSteps = new ArrayList<>();
     }
 
     /**
@@ -96,6 +93,7 @@ public class DataBean extends Observable {
      */
     public void reset() {
         this.catalogServices.clear();
+        this.processingSteps.clear();
     }
 
     /**
@@ -331,6 +329,20 @@ public class DataBean extends Observable {
         return StringUtils.getBase64EncAuth(this.userName, this.password);
     }
 
+    /**
+     * @return the processingSteps
+     */
+    public ArrayList<ProcessingStep> getProcessingSteps() {
+        return processingSteps;
+    }
+
+    /**
+     * @param processingSteps the processingSteps to set
+     */
+    public void setProcessingSteps(ArrayList<ProcessingStep> processingSteps) {
+        this.processingSteps = processingSteps;
+    }
+
     public CatalogService getCatalogService() {
         return catalogService;
     }
@@ -346,9 +358,9 @@ public class DataBean extends Observable {
             String serviceURL = type == ServiceType.Atom
                 ? getAtomService().getURL()
                 : getWFSService().url;
-            if (serviceURL.lastIndexOf("?") > 0) {
-                serviceURL =
-                    serviceURL.substring(0, serviceURL.lastIndexOf("?"));
+            int idx = serviceURL.indexOf('?');
+            if (idx >= 0) {
+                serviceURL = serviceURL.substring(0, idx);
             }
             Map<String, String> paramMap = getAttributes();
             ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
@@ -359,12 +371,6 @@ public class DataBean extends Observable {
                     parameters.add(param);
                 }
             }
-            //step.setParameters(parameters);
-            String dataset = getDatatype().getDataset();
-            //step.setDataset(dataset);
-            ArrayList<ProcessingStep> processingSteps = new ArrayList<>();
-            //step.setProcessingSteps(processingSteps);
-            //System.out.println(serviceType.toString());
             String serviceTypeStr = null;
             switch (type) {
                 case WFSOne:
@@ -383,13 +389,14 @@ public class DataBean extends Observable {
                     break;
                 default:
             }
-            DownloadStep step = new DownloadStep(dataset,
-                    parameters,
-                    serviceTypeStr,
-                    serviceURL,
-                    savePath,
-                    processingSteps);
-            return step;
+            return new DownloadStep(
+                getDatatype().getDataset(),
+                parameters,
+                serviceTypeStr,
+                serviceURL,
+                savePath,
+                processingSteps);
+
         } catch (Exception ex) {
             log.log(Level.SEVERE, ex.getMessage() , ex);
         }

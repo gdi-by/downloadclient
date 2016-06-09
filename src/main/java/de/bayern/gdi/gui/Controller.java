@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,8 @@ import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
@@ -335,12 +338,69 @@ public class Controller {
                 : "");
     }
 
+    private ArrayList<ProcessingStep> extractProcessingSteps() {
+
+        ArrayList<ProcessingStep> steps = new ArrayList<>();
+        if (!this.chkChain.isSelected()) {
+            return steps;
+        }
+
+        Set<Node> parameter =
+            this.chainContainer.lookupAll("#process_parameter");
+
+        for (Node n: parameter) {
+            Set<Node> vars = n.lookupAll("#process_var");
+            Node nameNode = n.lookup("#process_name");
+            ComboBox namebox = (ComboBox)nameNode;
+            String name =
+                ((ProcessingStepConfiguration)namebox.getValue())
+                    .getName();
+            //System.out.println(name);
+
+            ProcessingStep ps = new ProcessingStep();
+            ps.setName(name);
+            ArrayList<Parameter> parameters = new ArrayList<>();
+            ps.setParameters(parameters);
+
+            for (Node v: vars) {
+                String varName = null;
+                String varValue = null;
+                if (v instanceof TextField) {
+                    TextField input = (TextField)v;
+                    varName = input.getUserData().toString();
+                    varValue = input.getText();
+                } else if (v instanceof ComboBox) {
+                    ComboBox input = (ComboBox)v;
+                    varName = input.getUserData().toString();
+                    varValue = input.getValue() != null
+                        ? ((Option)input.getValue()).getValue()
+                        : null;
+                }
+                //System.out.println(varName + ": " + varValue);
+                if (varName != null && varValue != null) {
+                    Parameter p = new Parameter(varName, varValue);
+                    parameters.add(p);
+                }
+            }
+        }
+        return steps;
+    }
+
     /**
      * Start the download.
      *
      * @param event The event
      */
     @FXML protected void handleDownload(ActionEvent event) {
+
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+        //fileChooser.getExtensionFilters().addAll();
+        File selectedDir = dirChooser.showDialog(getPrimaryStage());
+        if (selectedDir == null) {
+            return;
+        }
+
         ItemModel data = this.dataBean.getDatatype();
         if (data instanceof StoredQueryModel) {
             this.dataBean.setAttributes(new HashMap<String, String>());
@@ -354,42 +414,8 @@ public class Controller {
             }
         }
 
-        if (this.chkChain.isSelected()) {
-            Set<Node> parameter =
-                this.chainContainer.lookupAll("#process_parameter");
-            for (Node n : parameter) {
-                Set<Node> vars = n.lookupAll("#process_var");
-                Node nameNode = n.lookup("#process_name");
-                ComboBox namebox = (ComboBox)nameNode;
-                String name =
-                    ((ProcessingStepConfiguration)namebox.getValue())
-                        .getCommand();
-                System.out.println(name);
-                for (Node v : vars) {
-                    String varName = "";
-                    String varValue = "";
-                    if (v instanceof TextField) {
-                        TextField input = (TextField)v;
-                        varName = input.getUserData().toString();
-                        varValue = input.getText();
-                    } else if (v instanceof ComboBox) {
-                        ComboBox input = (ComboBox)v;
-                        varName = input.getUserData().toString();
-                        varValue = input.getValue() != null
-                            ? ((Option)input.getValue()).getValue() : "";
-                    }
-                    System.out.println(varName + ": " + varValue);
-                }
-            }
-        }
+        this.dataBean.setProcessingSteps(extractProcessingSteps());
 
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        //fileChooser.getExtensionFilters().addAll();
-        File selectedDir = dirChooser.showDialog(getPrimaryStage());
-        if (selectedDir == null) {
-            return;
-        }
         Task task = new Task() {
             @Override
             protected Integer call() throws Exception {
