@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
@@ -34,10 +36,16 @@ import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.ServiceSetting;
 import de.bayern.gdi.utils.StringUtils;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class DataBean extends Observable {
+
+    private static final Logger log
+        = Logger.getLogger(DataBean.class.getName());
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
@@ -325,5 +333,66 @@ public class DataBean extends Observable {
 
     public CatalogService getCatalogService() {
         return catalogService;
+    }
+
+    /**
+     * gets Downloadstep from Frontend.
+     * @param savePath the save path
+     * @return downloadStep
+     */
+    public DownloadStep convertToDownloadStep(String savePath) {
+        try {
+            ServiceType type = getServiceType();
+            String serviceURL = type == ServiceType.Atom
+                ? getAtomService().getURL()
+                : getWFSService().url;
+            if (serviceURL.lastIndexOf("?") > 0) {
+                serviceURL =
+                    serviceURL.substring(0, serviceURL.lastIndexOf("?"));
+            }
+            Map<String, String> paramMap = getAttributes();
+            ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
+            for (Map.Entry<String, String> entry: paramMap.entrySet()) {
+                if (!entry.getValue().equals("")) {
+                    Parameter param = new Parameter(
+                            entry.getKey(), entry.getValue());
+                    parameters.add(param);
+                }
+            }
+            //step.setParameters(parameters);
+            String dataset = getDatatype().getDataset();
+            //step.setDataset(dataset);
+            ArrayList<ProcessingStep> processingSteps = new ArrayList<>();
+            //step.setProcessingSteps(processingSteps);
+            //System.out.println(serviceType.toString());
+            String serviceTypeStr = null;
+            switch (type) {
+                case WFSOne:
+                    serviceTypeStr = "WFS1";
+                    break;
+                case WFSTwo:
+                    ItemModel itemModel = getDatatype();
+                    if (itemModel instanceof StoredQueryModel) {
+                        serviceTypeStr = "WFS2_SIMPLE";
+                    } else {
+                        serviceTypeStr = "WFS2_BASIC";
+                    }
+                    break;
+                case Atom:
+                    serviceTypeStr = "ATOM";
+                    break;
+                default:
+            }
+            DownloadStep step = new DownloadStep(dataset,
+                    parameters,
+                    serviceTypeStr,
+                    serviceURL,
+                    savePath,
+                    processingSteps);
+            return step;
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage() , ex);
+        }
+        return null;
     }
 }

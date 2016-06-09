@@ -29,6 +29,24 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.Field;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.services.WFSOne;
+import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.ServiceChecker;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,25 +77,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.model.Option;
-import de.bayern.gdi.model.ProcessingStepConfiguration;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.DownloadStepFactory;
-import de.bayern.gdi.processor.JobList;
-import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.processor.ProcessorEvent;
-import de.bayern.gdi.processor.ProcessorListener;
-import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.Field;
-import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.services.WFSOne;
-import de.bayern.gdi.services.WebService;
-import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.ServiceChecker;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -395,8 +394,7 @@ public class Controller {
             @Override
             protected Integer call() throws Exception {
                 String savePath = selectedDir.getPath();
-                DownloadStepFactory dsf = new DownloadStepFactory();
-                DownloadStep ds = dsf.getStep(dataBean, savePath);
+                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
                 JobList jl = DownloadStepConverter.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
@@ -422,8 +420,7 @@ public class Controller {
             return;
         }
         String savePath = configFile.getPath();
-        DownloadStepFactory dsf = new DownloadStepFactory();
-        DownloadStep ds = dsf.getStep(dataBean, savePath);
+        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
         try {
             ds.write(configFile);
 
