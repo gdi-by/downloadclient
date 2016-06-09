@@ -108,6 +108,7 @@ public class ProcessingStepConverter {
                             // This parameter is incomplete -> skip it!
                             continue parameters;
                         }
+                        row.add(val);
                     } // for all atoms
 
                     params.addAll(row);
