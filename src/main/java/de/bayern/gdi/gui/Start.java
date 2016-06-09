@@ -18,21 +18,20 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.I18n;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
+import de.bayern.gdi.utils.I18n;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
