@@ -357,10 +357,11 @@ public class Controller {
                     .getName();
             //System.out.println(name);
 
-            ProcessingStep ps = new ProcessingStep();
-            ps.setName(name);
+            ProcessingStep step = new ProcessingStep();
+            steps.add(step);
+            step.setName(name);
             ArrayList<Parameter> parameters = new ArrayList<>();
-            ps.setParameters(parameters);
+            step.setParameters(parameters);
 
             for (Node v: vars) {
                 String varName = null;
@@ -386,6 +387,21 @@ public class Controller {
         return steps;
     }
 
+    private void extractStoredQuery() {
+        ItemModel data = this.dataBean.getDatatype();
+        if (data instanceof StoredQueryModel) {
+            this.dataBean.setAttributes(new HashMap<String, String>());
+            Set<Node> textfields =
+                this.simpleWFSContainer.lookupAll("#parameter");
+            for (Node n: textfields) {
+                TextField f = (TextField)n;
+                this.dataBean.addAttribute(
+                    f.getUserData().toString(),
+                    f.getText());
+            }
+        }
+    }
+
     /**
      * Start the download.
      *
@@ -401,19 +417,7 @@ public class Controller {
             return;
         }
 
-        ItemModel data = this.dataBean.getDatatype();
-        if (data instanceof StoredQueryModel) {
-            this.dataBean.setAttributes(new HashMap<String, String>());
-            Set<Node> textfields =
-                this.simpleWFSContainer.lookupAll("#parameter");
-            for (Node n : textfields) {
-                TextField f = (TextField)n;
-                this.dataBean.addAttribute(
-                    f.getUserData().toString(),
-                    f.getText());
-            }
-        }
-
+        extractStoredQuery();
         this.dataBean.setProcessingSteps(extractProcessingSteps());
 
         Task task = new Task() {
@@ -438,18 +442,28 @@ public class Controller {
      */
     @FXML
     protected void handleSaveConfig(ActionEvent event) {
-        FileChooser configFileChooser = new FileChooser();
-        configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-        File configFile = configFileChooser.showSaveDialog(
-            getPrimaryStage());
+
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+        File downloadDir = dirChooser.showDialog(getPrimaryStage());
+        if (downloadDir == null) {
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
         if (configFile == null) {
             return;
         }
-        String savePath = configFile.getPath();
+
+        extractStoredQuery();
+        this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+        String savePath = downloadDir.getPath();
         DownloadStep ds = dataBean.convertToDownloadStep(savePath);
         try {
             ds.write(configFile);
-
         } catch (IOException ex) {
             log.log(Level.WARNING, ex.getMessage() , ex);
         }
