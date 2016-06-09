@@ -47,9 +47,6 @@ Download a recent JRE from http://www.oracle.com/technetwork/java/javase/downloa
 In order to process data after downloading it, you might require additional
 tools, such as ogr2ogr.
 One solution to have this tool available is to install gdal.
-A source for gdal might be:
-
-http://gisinternals.com/query.html?content=filelist&file=release-1800-x64-gdal-2-1-0-mapserver-7-0-1.zip
 
 ### Linux
 
