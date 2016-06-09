@@ -39,7 +39,7 @@ import de.bayern.gdi.utils.I18n;
 public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
-    private static Start start = null;
+    private static Start start;
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
@@ -86,8 +86,9 @@ public class Start extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = new DataBean(primaryStage);
+            DataBean dataBean = new DataBean();
             Controller controller = fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);
 
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
@@ -115,6 +116,4 @@ public class Start extends Application {
 //        Controller c = new Controller(dataBean);
 //        c.show();
     }
-
-
 }

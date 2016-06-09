@@ -26,13 +26,11 @@ import java.util.Observable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.stage.Stage;
 
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
-//import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.ServiceSetting;
 import de.bayern.gdi.utils.StringUtils;
 
@@ -40,8 +38,6 @@ import de.bayern.gdi.utils.StringUtils;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class DataBean extends Observable {
-
-    private Stage primaryStage;
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
@@ -64,8 +60,7 @@ public class DataBean extends Observable {
     /**
      * Constructor.
      */
-    public DataBean(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+    public DataBean() {
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
         this.staticServices = this.serviceSetting.getServices();
@@ -137,14 +132,6 @@ public class DataBean extends Observable {
     }/
 
     /**
-     * Returns the current stage.
-     * @return the stage
-     */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
-    /**
      * Set the data type.
      * @param type The data type
      */
@@ -159,7 +146,6 @@ public class DataBean extends Observable {
     public ItemModel getDatatype() {
         return dataType;
     }
-
 
     /**
      * Set the service type.

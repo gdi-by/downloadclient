@@ -91,6 +91,8 @@ public class Controller {
     // DataBean
     private DataBean dataBean;
 
+    private Stage primaryStage;
+
     private UIFactory factory;
 
     @FXML private Button buttonClose;
@@ -385,8 +387,7 @@ public class Controller {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
         //fileChooser.getExtensionFilters().addAll();
-        File selectedDir = dirChooser.showDialog(
-                dataBean.getPrimaryStage());
+        File selectedDir = dirChooser.showDialog(getPrimaryStage());
         if (selectedDir == null) {
             return;
         }
@@ -416,7 +417,7 @@ public class Controller {
         FileChooser configFileChooser = new FileChooser();
         configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
         File configFile = configFileChooser.showSaveDialog(
-                dataBean.getPrimaryStage());
+            getPrimaryStage());
         if (configFile == null) {
             return;
         }
@@ -679,6 +680,21 @@ public class Controller {
 
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
+
+    /**
+     * @return the primaryStage
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * @param primaryStage the primaryStage to set
+     */
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
     /**
      * Creates the Controller.
      */
@@ -722,7 +738,7 @@ public class Controller {
         Processor.getInstance().addListener(new DownloadListener());
 
         // stage overrides
-//        this.dataBean.getPrimaryStage().
+//        getPrimaryStage().
 //                setOnCloseRequest(new ConfirmCloseEventHandler());
 
     }
@@ -731,7 +747,7 @@ public class Controller {
      * shows the view.
      *
     public void show() {
-    //    view.show(dataBean.getPrimaryStage());
+    //    view.show(getPrimaryStage());
     }
 
     /**
@@ -895,7 +911,7 @@ public class Controller {
             configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
 
             File configFile = configFileChooser.showOpenDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (configFile == null) {
                 return;
             }
@@ -905,7 +921,7 @@ public class Controller {
                 downloadFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
                 downloadFileChooser.setInitialDirectory(new File(ds.getPath()));
                 File downloadFile = downloadFileChooser.showSaveDialog(
-                        dataBean.getPrimaryStage());
+                        getPrimaryStage());
                 if (downloadFile == null) {
                     return;
                 }
@@ -929,14 +945,14 @@ public class Controller {
             FileChooser downloadFileChooser = new FileChooser();
             downloadFileChooser.setTitle(I18n.getMsg("gui.save-file"));
             File downloadFile = downloadFileChooser.showSaveDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (downloadFile == null) {
                 return;
             }
             FileChooser configFileChooser = new FileChooser();
             configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = configFileChooser.showSaveDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (configFile == null) {
                 return;
             }
@@ -959,9 +975,9 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            dataBean.getPrimaryStage().fireEvent(
+            getPrimaryStage().fireEvent(
                             new WindowEvent(
-                                    dataBean.getPrimaryStage(),
+                                    getPrimaryStage(),
                                     WindowEvent.WINDOW_CLOSE_REQUEST
                             )
             );
@@ -990,7 +1006,7 @@ public class Controller {
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             //fileChooser.getExtensionFilters().addAll();
             File selectedDir = dirChooser.showDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (selectedDir == null) {
                 return;
             }
@@ -1160,7 +1176,7 @@ public class Controller {
             exitButton.setText(I18n.getMsg("gui.exit"));
             closeConfirmation.setHeaderText(I18n.getMsg("gui.confirm-exit"));
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
-            closeConfirmation.initOwner(dataBean.getPrimaryStage());
+            closeConfirmation.initOwner(getPrimaryStage());
 
             Optional<ButtonType> closeResponse =
                     closeConfirmation.showAndWait();
