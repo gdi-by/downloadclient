@@ -222,10 +222,11 @@ public class Controller {
                 String url = service.getUrl();
                 this.serviceURL.setText(url);
                 if (service.isRestricted()) {
-                    this.serviceAuthenticationCbx.setDisable(false);
+                    this.serviceAuthenticationCbx.setSelected(true);
+                    this.serviceUser.setDisable(false);
+                    this.servicePW.setDisable(false);
                 } else {
                     this.serviceAuthenticationCbx.setSelected(false);
-                    this.serviceAuthenticationCbx.setDisable(true);
                     this.serviceUser.setDisable(true);
                     this.servicePW.setDisable(true);
                 }
@@ -625,7 +626,6 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
-        this.serviceAuthenticationCbx.setDisable(true);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
     }
