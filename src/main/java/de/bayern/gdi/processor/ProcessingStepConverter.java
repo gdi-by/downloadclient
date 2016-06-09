@@ -19,6 +19,9 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.DownloadStep;
@@ -31,24 +34,25 @@ import de.bayern.gdi.utils.StringUtils;
 public class ProcessingStepConverter {
 
     private ProcessingConfiguration config;
+    private Set<String> usedVars;
+    private List<Job> jobs;
 
     public ProcessingStepConverter(ProcessingConfiguration config) {
         this.config = config;
+        this.usedVars = new HashSet<>();
+        this.jobs = new ArrayList<>();
     }
 
     /**
      * Converts the processing steps from the download step to
      * a list of jobs and appends the to the given list of jobs.
      * @param dls The download step.
-     * @param jl The list of job to append on.
      * @param workingDir The working directory of the external program calls.
      * @throws ConverterException If something went wrong.
      */
-    public void convert(
-        DownloadStep dls,
-        JobList      jl,
-        File workingDir
-    ) throws ConverterException {
+    public void convert(DownloadStep dls, File workingDir)
+    throws ConverterException {
+
         ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
         if (steps == null) {
             return;
@@ -108,6 +112,7 @@ public class ProcessingStepConverter {
                             // This parameter is incomplete -> skip it!
                             continue parameters;
                         }
+                        usedVars.add(var);
                         row.add(val);
                     } // for all atoms
 
@@ -120,7 +125,21 @@ public class ProcessingStepConverter {
                 workingDir,
                 params.toArray(new String[params.size()]));
 
-            jl.addJob(epj);
+            jobs.add(epj);
         }
+    }
+
+    /**
+     * @return the usedVars
+     */
+    public Set<String> getUsedVars() {
+        return usedVars;
+    }
+
+    /**
+     * @return the jobs
+     */
+    public List<Job> getJobs() {
+        return jobs;
     }
 }
