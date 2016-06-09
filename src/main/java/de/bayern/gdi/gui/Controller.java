@@ -62,6 +62,7 @@ import javafx.stage.WindowEvent;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.DownloadStepFactory;
 import de.bayern.gdi.processor.JobList;
@@ -357,6 +358,12 @@ public class Controller {
                 this.chainContainer.lookupAll("#process_parameter");
             for (Node n : parameter) {
                 Set<Node> vars = n.lookupAll("#process_var");
+                Node nameNode = n.lookup("#process_name");
+                ComboBox namebox = (ComboBox)nameNode;
+                String name =
+                    ((ProcessingStepConfiguration)namebox.getValue())
+                        .getCommand();
+                System.out.println(name);
                 for (Node v : vars) {
                     String varName = "";
                     String varValue = "";

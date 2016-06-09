@@ -175,6 +175,7 @@ public class UIFactory {
         ObservableList<ProcessingStepConfiguration> conf =
             FXCollections.observableArrayList(steps);
         box.setItems(conf);
+        box.setId("process_name");
         box.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 generateChainItem(
@@ -197,6 +198,7 @@ public class UIFactory {
             MARGIN_5, MARGIN_5, MARGIN_5));
         Separator sep = new Separator();
         root.getChildren().addAll(subroot, dynroot, sep);
+        root.setId("process_parameter");
 
         container.getChildren().add(root);
     }
@@ -207,7 +209,6 @@ public class UIFactory {
         ProcessingConfiguration config
     ) {
         container.getChildren().clear();
-        container.setId("process_parameter");
         List<ConfigurationParameter> parameters = item.getParameters();
         for (ConfigurationParameter p : parameters) {
             if (p.getInputElement() != null) {
