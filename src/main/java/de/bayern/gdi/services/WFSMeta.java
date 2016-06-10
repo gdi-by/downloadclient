@@ -23,6 +23,7 @@ import java.util.List;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.StringUtils;
 
 /** Stores meta data about WFS. */
 public class WFSMeta {
@@ -41,14 +42,7 @@ public class WFSMeta {
         }
 
         private String outputFormats() {
-            StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < outputFormats.size(); i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(outputFormats.get(i));
-            }
-            return sb.append("]").toString();
+            return "[" + StringUtils.join(outputFormats, ", ") + "]";
         }
 
         @Override
@@ -72,22 +66,22 @@ public class WFSMeta {
         public String defaultCRS;
         /** other CRSs. */
         public List<String> otherCRSs;
+        /** outputFormats. */
+        public List<String> outputFormats;
         /** bbox. */
         public ReferencedEnvelope bbox;
 
         public Feature() {
-            otherCRSs = new ArrayList<>();
+            this.otherCRSs = new ArrayList<>();
+            this.outputFormats = new ArrayList<>();
         }
 
         private String otherCRSs() {
-            StringBuilder sb = new StringBuilder("[");
-            for (int i = 0; i < otherCRSs.size(); i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(otherCRSs.get(i));
-            }
-            return sb.append("]").toString();
+            return "[" + StringUtils.join(otherCRSs, ", ") + "]";
+        }
+
+        private String outputFormats() {
+            return "[" + StringUtils.join(outputFormats, ", ") + "]";
         }
 
         @Override
@@ -98,6 +92,7 @@ public class WFSMeta {
                 + "abstract: " + abstractDescription + " "
                 + "defaultCRS: " + defaultCRS + " "
                 + "otherCRSs: " +  otherCRSs() + " "
+                + "otherCRSs: " +  outputFormats() + " "
                 + "bbox: " + bbox + " }";
         }
     }
