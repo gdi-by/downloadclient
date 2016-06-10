@@ -243,18 +243,7 @@ public class CatalogService {
                         typeExpr,
                         XPathConstants.STRING, context);
 
-                String urlExpr =
-                        "gmd:distributionInfo"
-                                + "/gmd:MD_Distribution"
-                                + "/gmd:transferOptions"
-                                + "/gmd:MD_DigitalTransferOptions"
-                                + "/gmd:onLine"
-                                + "/gmd:CI_OnlineResource"
-                                + "/gmd:linkage"
-                                + "/gmd:URL";
-                String serviceURL = (String) XML.xpath(serviceN,
-                        urlExpr,
-                        XPathConstants.STRING, context);
+
                 String serviceTypeVersionExpr =
                         "gmd:identificationInfo"
                                 + "/srv:SV_ServiceIdentification"
@@ -263,27 +252,46 @@ public class CatalogService {
                 String serviceTypeVersion = (String) XML.xpath(serviceN,
                         serviceTypeVersionExpr,
                         XPathConstants.STRING, context);
-                String applicationprofileExpr =
-                        "gmd:distributionInfo"
-                                + "/gmd:MD_Distribution"
-                                + "/gmd:transferOptions"
-                                + "/gmd:MD_DigitalTransferOptions"
-                                + "/gmd:onLine"
-                                + "/gmd:CI_OnlineResource"
-                                + "/gmd:applicationProfile"
-                                + "/gco:CharacterString";
-                String applicationProfile = (String) XML.xpath(serviceN,
-                        applicationprofileExpr,
-                        XPathConstants.STRING, context);
-                applicationProfile = applicationProfile.toLowerCase();
+                String onLineExpr = "gmd:distributionInfo"
+                        + "/gmd:MD_Distribution"
+                        + "/gmd:transferOptions"
+                        + "/gmd:MD_DigitalTransferOptions"
+                        + "/gmd:onLine";
+                NodeList onlineNL = (NodeList) XML.xpath(serviceN,
+                        onLineExpr,
+                        XPathConstants.NODESET, context);
+                String serviceURL = null;
+                for (int j = 0; j < onlineNL.getLength(); j++) {
+                    Node onlineN = onlineNL.item(j);
+                    String urlExpr =
+                            "gmd:CI_OnlineResource"
+                                    + "/gmd:linkage"
+                                    + "/gmd:URL";
+                    String onLineserviceURL = (String) XML.xpath(onlineN,
+                            urlExpr,
+                            XPathConstants.STRING, context);
+                    String applicationprofileExpr =
+                            "gmd:CI_OnlineResource"
+                                    + "/gmd:applicationProfile"
+                                    + "/gco:CharacterString";
+                    String applicationProfile = (String) XML.xpath(onlineN,
+                            applicationprofileExpr,
+                            XPathConstants.STRING, context);
+                    applicationProfile = applicationProfile.toLowerCase();
+                    if (applicationProfile.equals("wfs-url")
+                            || applicationProfile.equals("feed-url")) {
+                        serviceURL = onLineserviceURL;
+                        break;
+                    } else if (applicationProfile.equals("dienste-url")
+                            || applicationProfile.equals("download")) {
+                        serviceURL = onLineserviceURL;
+                    }
+                }
+
                 if (serviceTypeVersion.equals("")) {
                     serviceTypeVersion = "ATOM";
                 }
-                if (applicationProfile.equals("wfs-url")
-                        || applicationProfile.equals("feed-url")
-                        || applicationProfile.equals("dienste-url")
-                        || applicationProfile.equals("download")) {
-                    if (!serviceName.equals("")) {
+                    if (!serviceName.equals("") && serviceURL != null) {
                         serviceURL = makeCapabiltiesURL(serviceURL,
                                 serviceTypeVersion);
                         ServiceModel service = new ServiceModel();
@@ -295,7 +303,6 @@ public class CatalogService {
                     }
                 }
 
-            }
         }
         return services;
     }
