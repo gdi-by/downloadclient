@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.geometry.Envelope2D;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
@@ -138,6 +140,8 @@ public class Controller {
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
+    private WMSMapSwing mapAtom;
+    private WMSMapSwing mapWFS;
 
     /**
      * Handler to close the application.
@@ -402,6 +406,25 @@ public class Controller {
         }
     }
 
+    private void extractBoundingBox() {
+        String bbox = "";
+        Envelope2D envelope;
+        if (this.dataBean.getServiceType().equals(ServiceType.Atom)) {
+            envelope = this.mapAtom.getBounds();
+        } else {
+            envelope = this.mapWFS.getBounds();
+        }
+        if (envelope != null) {
+            bbox += envelope.getX() + ", ";
+            bbox += envelope.getY() + ", ";
+            bbox += (envelope.getX() + envelope.getWidth()) + ", ";
+            bbox += (envelope.getY() + envelope.getHeight());
+            this.dataBean.addAttribute("bbox", bbox);
+        } else {
+            // Raise an error?
+        }
+    }
+
     /**
      * Start the download.
      *
@@ -418,6 +441,7 @@ public class Controller {
         }
 
         extractStoredQuery();
+        extractBoundingBox();
         this.dataBean.setProcessingSteps(extractProcessingSteps());
 
         Task task = new Task() {
@@ -699,9 +723,9 @@ public class Controller {
             url = new URL(this.dataBean.getWmsUrl());
         } catch (MalformedURLException e) {
         }
-        WMSMapSwing mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        WMSMapSwing mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);
