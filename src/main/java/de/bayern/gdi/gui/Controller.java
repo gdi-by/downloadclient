@@ -22,13 +22,33 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.Field;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.services.WFSOne;
+import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.ServiceChecker;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -48,33 +68,18 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.model.Option;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.DownloadStepFactory;
-import de.bayern.gdi.processor.JobList;
-import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.processor.ProcessorEvent;
-import de.bayern.gdi.processor.ProcessorListener;
-import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.Field;
-import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.services.WFSOne;
-import de.bayern.gdi.services.WebService;
-import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.ServiceChecker;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -83,9 +88,12 @@ public class Controller {
 
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
+    private static final int BGCOLOR = 244;
 
     // DataBean
     private DataBean dataBean;
+
+    private Stage primaryStage;
 
     private UIFactory factory;
 
@@ -122,13 +130,14 @@ public class Controller {
     @FXML private Label labelPassword;
     @FXML private Label labelSelectType;
     @FXML private Label labelPostProcess;
-    @FXML private Label valueAtomDescr;
+    @FXML private WebView valueAtomDescr;
     @FXML private Label valueAtomFormat;
     @FXML private Label valueAtomRefsys;
     @FXML private Button serviceSelection;
     @FXML private Button buttonDownload;
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
+    @FXML private ProgressIndicator progressSearch;
 
     /**
      * Handler to close the application.
@@ -171,17 +180,18 @@ public class Controller {
      */
     @FXML protected void handleSearch(KeyEvent event) {
         String currentText = this.searchField.getText();
+        this.serviceList.getItems().clear();
+        this.dataBean.reset();
         if ("".equals(currentText) || currentText == null) {
-            this.dataBean.reset();
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
         String searchValue = currentText.toUpperCase();
-        ObservableList<String> subentries
+        ObservableList<ServiceModel> subentries
                 = FXCollections.observableArrayList();
-        ObservableList<String> all = this.dataBean.getServicesAsList();
-        for (String entry : all) {
+        ObservableList<ServiceModel> all = this.dataBean.getServicesAsList();
+        for (ServiceModel entry : all) {
             boolean match = true;
-            if (!entry.toUpperCase().contains(searchValue)) {
+            if (!entry.getName().toUpperCase().contains(searchValue)) {
                 match = false;
             }
             if (match) {
@@ -189,14 +199,31 @@ public class Controller {
             }
         }
         if (currentText.length() > 2) {
-            Map<String, String> catalog = dataBean.getCatalogService()
-                    .getServicesByFilter(currentText);
+            Task task = new Task() {
+                @Override
+                protected Integer call() throws Exception {
+                    Platform.runLater(() -> {
+                        progressSearch.setVisible(true);
+                    });
+                    List<ServiceModel> catalog = dataBean.getCatalogService()
+                            .getServicesByFilter(currentText);
             //System.out.println(catalog.size());
-            for (Map.Entry<String, String> entry: catalog.entrySet()) {
-                dataBean.addCatalogServiceToList(
-                    entry.getKey(), entry.getValue());
-                subentries.add(entry.getKey());
-            }
+                    for (ServiceModel entry: catalog) {
+                        dataBean.addCatalogServiceToList(entry);
+                        Platform.runLater(() -> {
+                            subentries.add(entry);
+                        });
+                    }
+                    Platform.runLater(() -> {
+                        progressSearch.setVisible(false);
+                    });
+                    return 0;
+                }
+            };
+            Thread th = new Thread(task);
+            statusBarText.setText(I18n.getMsg("status.calling-service"));
+            th.setDaemon(true);
+            th.start();
         }
 
         this.serviceList.setItems(subentries);
@@ -218,12 +245,35 @@ public class Controller {
             if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
                     != null
             ) {
-                String serviceName =
-                    this.serviceList.getSelectionModel().
-                        getSelectedItems().get(0).toString();
-                String url = dataBean.getServiceURL(serviceName);
+                ServiceModel service =
+                    (ServiceModel)this.serviceList.getSelectionModel()
+                        .getSelectedItems().get(0);
+                String url = service.getUrl();
                 this.serviceURL.setText(url);
+                if (service.isRestricted()) {
+                    this.serviceAuthenticationCbx.setSelected(true);
+                    this.serviceUser.setDisable(false);
+                    this.servicePW.setDisable(false);
+                } else {
+                    this.serviceAuthenticationCbx.setSelected(false);
+                    this.serviceUser.setDisable(true);
+                    this.servicePW.setDisable(true);
+                }
             }
+        }
+    }
+
+    /**
+     * Handle authentication required selection.
+     * @param event the event
+     */
+    @FXML protected void handleAuthenticationRequired(ActionEvent event) {
+        if (this.serviceAuthenticationCbx.isSelected()) {
+            this.serviceUser.setDisable(false);
+            this.servicePW.setDisable(false);
+        } else {
+            this.serviceUser.setDisable(true);
+            this.servicePW.setDisable(true);
         }
     }
 
@@ -288,62 +338,93 @@ public class Controller {
                 : "");
     }
 
-    /**
-     * Start the download.
-     *
-     * @param event The event
-     */
-    @FXML protected void handleDownload(ActionEvent event) {
+    private ArrayList<ProcessingStep> extractProcessingSteps() {
+
+        ArrayList<ProcessingStep> steps = new ArrayList<>();
+        if (!this.chkChain.isSelected()) {
+            return steps;
+        }
+
+        Set<Node> parameter =
+            this.chainContainer.lookupAll("#process_parameter");
+
+        for (Node n: parameter) {
+            Set<Node> vars = n.lookupAll("#process_var");
+            Node nameNode = n.lookup("#process_name");
+            ComboBox namebox = (ComboBox)nameNode;
+            String name =
+                ((ProcessingStepConfiguration)namebox.getValue())
+                    .getName();
+            //System.out.println(name);
+
+            ProcessingStep step = new ProcessingStep();
+            steps.add(step);
+            step.setName(name);
+            ArrayList<Parameter> parameters = new ArrayList<>();
+            step.setParameters(parameters);
+
+            for (Node v: vars) {
+                String varName = null;
+                String varValue = null;
+                if (v instanceof TextField) {
+                    TextField input = (TextField)v;
+                    varName = input.getUserData().toString();
+                    varValue = input.getText();
+                } else if (v instanceof ComboBox) {
+                    ComboBox input = (ComboBox)v;
+                    varName = input.getUserData().toString();
+                    varValue = input.getValue() != null
+                        ? ((Option)input.getValue()).getValue()
+                        : null;
+                }
+                //System.out.println(varName + ": " + varValue);
+                if (varName != null && varValue != null) {
+                    Parameter p = new Parameter(varName, varValue);
+                    parameters.add(p);
+                }
+            }
+        }
+        return steps;
+    }
+
+    private void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
         if (data instanceof StoredQueryModel) {
             this.dataBean.setAttributes(new HashMap<String, String>());
             Set<Node> textfields =
                 this.simpleWFSContainer.lookupAll("#parameter");
-            for (Node n : textfields) {
+            for (Node n: textfields) {
                 TextField f = (TextField)n;
                 this.dataBean.addAttribute(
                     f.getUserData().toString(),
                     f.getText());
             }
         }
+    }
 
-        if (this.chkChain.isSelected()) {
-            Set<Node> parameter =
-                this.chainContainer.lookupAll("#process_parameter");
-            for (Node n : parameter) {
-                Set<Node> vars = n.lookupAll("#process_var");
-                for (Node v : vars) {
-                    String varName = "";
-                    String varValue = "";
-                    if (v instanceof TextField) {
-                        TextField input = (TextField)v;
-                        varName = input.getUserData().toString();
-                        varValue = input.getText();
-                    } else if (v instanceof ComboBox) {
-                        ComboBox input = (ComboBox)v;
-                        varName = input.getUserData().toString();
-                        varValue = input.getValue() != null
-                            ? ((Option)input.getValue()).getValue() : "";
-                    }
-                    System.out.println(varName + ": " + varValue);
-                }
-            }
-        }
+    /**
+     * Start the download.
+     *
+     * @param event The event
+     */
+    @FXML protected void handleDownload(ActionEvent event) {
 
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
         //fileChooser.getExtensionFilters().addAll();
-        File selectedDir = dirChooser.showDialog(
-                dataBean.getPrimaryStage());
+        File selectedDir = dirChooser.showDialog(getPrimaryStage());
         if (selectedDir == null) {
             return;
         }
+
+        extractStoredQuery();
+        this.dataBean.setProcessingSteps(extractProcessingSteps());
+
         Task task = new Task() {
             @Override
             protected Integer call() throws Exception {
                 String savePath = selectedDir.getPath();
-                DownloadStepFactory dsf = DownloadStepFactory.getInstance();
-                DownloadStep ds = dsf.getStep(dataBean, savePath);
+                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
                 JobList jl = DownloadStepConverter.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
@@ -361,19 +442,28 @@ public class Controller {
      */
     @FXML
     protected void handleSaveConfig(ActionEvent event) {
-        FileChooser configFileChooser = new FileChooser();
-        configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-        File configFile = configFileChooser.showSaveDialog(
-                dataBean.getPrimaryStage());
+
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+        File downloadDir = dirChooser.showDialog(getPrimaryStage());
+        if (downloadDir == null) {
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
         if (configFile == null) {
             return;
         }
-        String savePath = configFile.getPath();
-        DownloadStepFactory dsf = DownloadStepFactory.getInstance();
-        DownloadStep ds = dsf.getStep(dataBean, savePath);
+
+        extractStoredQuery();
+        this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+        String savePath = downloadDir.getPath();
+        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
         try {
             ds.write(configFile);
-
         } catch (IOException ex) {
             log.log(Level.WARNING, ex.getMessage() , ex);
         }
@@ -396,7 +486,9 @@ public class Controller {
                             serviceList.
                                 getSelectionModel().
                                     getSelectedItems().get(0).toString();
-                    url = dataBean.getServiceURL(serviceName);
+                    url = ((ServiceModel)
+                        serviceList.getSelectionModel()
+                            .getSelectedItem()).getUrl();
                 } else {
                     url = serviceURL.getText();
                 }
@@ -544,7 +636,22 @@ public class Controller {
                 list.add(f.type);
             }
             this.atomVariationChooser.setItems(list);
-            this.valueAtomDescr.setText(item.description);
+            WebEngine engine = this.valueAtomDescr.getEngine();
+            java.lang.reflect.Field f;
+            try {
+                f = engine.getClass().getDeclaredField("page");
+                f.setAccessible(true);
+                com.sun.webkit.WebPage page =
+                    (com.sun.webkit.WebPage) f.get(engine);
+                page.setBackgroundColor(
+                    (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB());
+            } catch (NoSuchFieldException
+                | SecurityException
+                | IllegalArgumentException
+                | IllegalAccessException e) {
+                // Displays the webview with white background...
+            }
+            engine.loadContent(item.description);
             this.valueAtomFormat.setText(item.format);
             this.valueAtomRefsys.setText(item.defaultCRS);
             this.simpleWFSContainer.setVisible(false);
@@ -603,30 +710,28 @@ public class Controller {
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(false);
-        applyI18n();
+        this.progressSearch.setVisible(false);
+        this.serviceUser.setDisable(true);
+        this.servicePW.setDisable(true);
     }
-
-    private void applyI18n() {
-        buttonClose.setText(I18n.getMsg("menu.quit"));
-        labelURL.setText(I18n.getMsg("gui.url"));
-        labelUser.setText(I18n.getMsg("gui.user"));
-        labelPassword.setText(I18n.getMsg("gui.password"));
-        serviceSelection.setText(I18n.getMsg("gui.choose_service"));
-        serviceAuthenticationCbx.setText(I18n.getMsg("gui.use_auth"));
-        labelSelectType.setText(I18n.getMsg("gui.choose_type"));
-        statusBarText.setText(I18n.getMsg("status.ready"));
-        chkChain.setText(I18n.getMsg("gui.post_process"));
-        labelPostProcess.setText(I18n.getMsg("gui.process_chain"));
-        buttonDownload.setText(I18n.getMsg("gui.download"));
-        buttonSaveConfig.setText(I18n.getMsg("gui.save-conf"));
-        addChainItem.setText(I18n.getMsg("gui.add"));
-    }
-
-    // view
-    //private view view;
 
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
+
+    /**
+     * @return the primaryStage
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * @param primaryStage the primaryStage to set
+     */
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
     /**
      * Creates the Controller.
      */
@@ -670,7 +775,7 @@ public class Controller {
         Processor.getInstance().addListener(new DownloadListener());
 
         // stage overrides
-//        this.dataBean.getPrimaryStage().
+//        getPrimaryStage().
 //                setOnCloseRequest(new ConfirmCloseEventHandler());
 
     }
@@ -679,7 +784,7 @@ public class Controller {
      * shows the view.
      *
     public void show() {
-    //    view.show(dataBean.getPrimaryStage());
+    //    view.show(getPrimaryStage());
     }
 
     /**
@@ -843,7 +948,7 @@ public class Controller {
             configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
 
             File configFile = configFileChooser.showOpenDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (configFile == null) {
                 return;
             }
@@ -853,7 +958,7 @@ public class Controller {
                 downloadFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
                 downloadFileChooser.setInitialDirectory(new File(ds.getPath()));
                 File downloadFile = downloadFileChooser.showSaveDialog(
-                        dataBean.getPrimaryStage());
+                        getPrimaryStage());
                 if (downloadFile == null) {
                     return;
                 }
@@ -877,19 +982,19 @@ public class Controller {
             FileChooser downloadFileChooser = new FileChooser();
             downloadFileChooser.setTitle(I18n.getMsg("gui.save-file"));
             File downloadFile = downloadFileChooser.showSaveDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (downloadFile == null) {
                 return;
             }
             FileChooser configFileChooser = new FileChooser();
             configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = configFileChooser.showSaveDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (configFile == null) {
                 return;
             }
             String savePath = downloadFile.getPath();
-            DownloadStepFactory dsf = DownloadStepFactory.getInstance();
+            DownloadStepFactory dsf = new DownloadstepFactory();
             DownloadStep ds = dsf.getStep(view, dataBean, savePath);
             try {
                 ds.write(configFile);
@@ -907,9 +1012,9 @@ public class Controller {
             implements EventHandler<ActionEvent> {
         @Override
         public void handle(ActionEvent e) {
-            dataBean.getPrimaryStage().fireEvent(
+            getPrimaryStage().fireEvent(
                             new WindowEvent(
-                                    dataBean.getPrimaryStage(),
+                                    getPrimaryStage(),
                                     WindowEvent.WINDOW_CLOSE_REQUEST
                             )
             );
@@ -938,7 +1043,7 @@ public class Controller {
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             //fileChooser.getExtensionFilters().addAll();
             File selectedDir = dirChooser.showDialog(
-                    dataBean.getPrimaryStage());
+                    getPrimaryStage());
             if (selectedDir == null) {
                 return;
             }
@@ -1108,7 +1213,7 @@ public class Controller {
             exitButton.setText(I18n.getMsg("gui.exit"));
             closeConfirmation.setHeaderText(I18n.getMsg("gui.confirm-exit"));
             closeConfirmation.initModality(Modality.APPLICATION_MODAL);
-            closeConfirmation.initOwner(dataBean.getPrimaryStage());
+            closeConfirmation.initOwner(getPrimaryStage());
 
             Optional<ButtonType> closeResponse =
                     closeConfirmation.showAndWait();
@@ -1162,7 +1267,7 @@ public class Controller {
 
         @Override
         public void run() {
-            //view.setStatusBarText(getMessage());
+            statusBarText.setText(getMessage());
         }
 
         @Override

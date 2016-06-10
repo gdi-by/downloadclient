@@ -18,21 +18,20 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.I18n;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
+import de.bayern.gdi.utils.I18n;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -40,7 +39,7 @@ import javafx.stage.WindowEvent;
 public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
-    private static Start start = null;
+    private static Start start;
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
 
@@ -84,15 +83,12 @@ public class Start extends Application {
             ClassLoader classLoader = Start.class.getClassLoader();
             URL url = classLoader.getResource("download-client.fxml");
             //System.out.println(url);
-            InputStream inputStream =
-                    classLoader.getResource(
-                            "messages.properties").openStream();
-            ResourceBundle bundle = new PropertyResourceBundle(inputStream);
-            FXMLLoader fxmlLoader = new FXMLLoader(url, bundle);
+            FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = new DataBean(primaryStage);
+            DataBean dataBean = new DataBean();
             Controller controller = fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);
 
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
@@ -120,6 +116,4 @@ public class Start extends Application {
 //        Controller c = new Controller(dataBean);
 //        c.show();
     }
-
-
 }

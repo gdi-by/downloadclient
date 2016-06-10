@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.scene.*?>
 <?import javafx.embed.swing.*?>
 <?import javafx.scene.text.*?>
@@ -16,14 +17,29 @@
                <children>
                   <VBox layoutX="37.0" layoutY="147.0" prefHeight="398.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <TextField fx:id="searchField" onKeyReleased="#handleSearch" scaleShape="false" VBox.vgrow="NEVER">
-                           <opaqueInsets>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </opaqueInsets>
+                        <HBox>
+                           <children>
+                              <TextField fx:id="searchField" onKeyReleased="#handleSearch" scaleShape="false" HBox.hgrow="ALWAYS" VBox.vgrow="NEVER">
+                                 <opaqueInsets>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </opaqueInsets>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                 </VBox.margin>
+                                 <tooltip>
+                                    <Tooltip text="%tooltip.search" wrapText="true" />
+                                 </tooltip>
+                              </TextField>
+                              <ProgressIndicator fx:id="progressSearch" prefHeight="0.0" prefWidth="23.0" HBox.hgrow="NEVER">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </ProgressIndicator>
+                           </children>
                            <VBox.margin>
-                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                              <Insets bottom="5.0" left="10.0" right="5.0" top="10.0" />
                            </VBox.margin>
-                        </TextField>
+                        </HBox>
                         <ListView fx:id="serviceList" onMouseClicked="#handleServiceSelect" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
                               <Insets left="10.0" right="10.0" />
@@ -41,20 +57,29 @@
                            <VBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </VBox.margin>
+                           <tooltip>
+                              <Tooltip text="%tooltip.url" />
+                           </tooltip>
                         </TextField>
                         <Button fx:id="serviceSelection" alignment="CENTER_RIGHT" mnemonicParsing="false" onMouseClicked="#handleServiceSelectButton" text="%gui.choose_service">
                            <VBox.margin>
                               <Insets bottom="5.0" left="50.0" right="10.0" top="5.0" />
                            </VBox.margin>
+                           <tooltip>
+                              <Tooltip text="%tooltip.choose_service" />
+                           </tooltip>
                         </Button>
                         <Separator prefWidth="200.0" />
-                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" text="%gui.use_auth">
+                        <CheckBox fx:id="serviceAuthenticationCbx" mnemonicParsing="false" onAction="#handleAuthenticationRequired" text="%gui.use_auth">
                            <font>
                               <Font size="12.0" />
                            </font>
                            <VBox.margin>
                               <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
                            </VBox.margin>
+                           <tooltip>
+                              <Tooltip text="%tooltip.require_auth" />
+                           </tooltip>
                         </CheckBox>
                         <Label fx:id="labelUser" text="%gui.user">
                            <VBox.margin>
@@ -93,6 +118,9 @@
                            <VBox.margin>
                               <Insets bottom="5.0" left="15.0" right="15.0" />
                            </VBox.margin>
+                           <tooltip>
+                              <Tooltip text="%tooltip.choose_dataset" />
+                           </tooltip>
                         </ComboBox>
                         <SplitPane dividerPositions="0.8" orientation="VERTICAL" VBox.vgrow="ALWAYS">
                            <items>
@@ -223,11 +251,11 @@
                                                       <Insets bottom="5.0" left="15.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Label>
-                                                <Label fx:id="valueAtomDescr" maxWidth="600.0" text="description" wrapText="true" VBox.vgrow="SOMETIMES">
+                                                <WebView fx:id="valueAtomDescr" fontScale="0.8" minHeight="10.0" minWidth="200.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
                                                    <VBox.margin>
-                                                      <Insets bottom="5.0" left="20.0" right="15.0" top="5.0" />
+                                                      <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
-                                                </Label>
+                                                </WebView>
                                                 <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
                                                 <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -281,6 +309,9 @@
                                              <VBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </VBox.margin>
+                                             <tooltip>
+                                                <Tooltip text="%tooltip.post_process" />
+                                             </tooltip>
                                           </CheckBox>
                                           <VBox fx:id="containerChain" prefHeight="103.0" prefWidth="574.0">
                                              <children>
@@ -294,7 +325,10 @@
                                                             <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Button fx:id="addChainItem" mnemonicParsing="false" onAction="#handleAddChainItem" text="%gui.add" />
+                                                      <Button fx:id="addChainItem" mnemonicParsing="false" onAction="#handleAddChainItem" text="%gui.add">
+                                                         <tooltip>
+                                                            <Tooltip text="%tooltip.add_post_process" />
+                                                         </tooltip></Button>
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -311,17 +345,26 @@
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="15.0" right="10.0" top="5.0" />
                                  </HBox.margin>
+                                 <tooltip>
+                                    <Tooltip text="%tooltip.start_download" />
+                                 </tooltip>
                               </Button>
                               <Button fx:id="buttonSaveConfig" mnemonicParsing="false" onAction="#handleSaveConfig" prefHeight="44.0" prefWidth="186.0" text="%gui.save-conf" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="10.0" right="15.0" top="5.0" />
                                  </HBox.margin>
+                                 <tooltip>
+                                    <Tooltip text="%tooltip.save_config" />
+                                 </tooltip>
                               </Button>
                               <Pane HBox.hgrow="ALWAYS" />
                               <Button fx:id="buttonClose" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleCloseApp" prefHeight="44.0" text="%gui.quit">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
                                  </HBox.margin>
+                                 <tooltip>
+                                    <Tooltip text="%tooltip.quit" />
+                                 </tooltip>
                               </Button>
                            </children>
                         </HBox>
