@@ -511,25 +511,14 @@ public class Controller {
                 String url = null;
                 String username = null;
                 String password = null;
-                if (serviceList.getSelectionModel().getSelectedItems().get(0)
-                        != null) {
-                    String serviceName =
-                            serviceList.
-                                getSelectionModel().
-                                    getSelectedItems().get(0).toString();
-                    url = ((ServiceModel)
-                        serviceList.getSelectionModel()
-                            .getSelectedItem()).getUrl();
-                } else {
-                    url = serviceURL.getText();
-                }
+                url = serviceURL.getText();
                 if (serviceAuthenticationCbx.isSelected()) {
                     username = serviceUser.getText();
                     dataBean.setUsername(username);
                     password = servicePW.getText();
                     dataBean.setPassword(password);
                 }
-                if (url != null) {
+                if (url != null && !"".equals(url)) {
                     //view.setStatusBarText("Check for Servicetype");
                     ServiceType st = ServiceChecker.checkService(
                         url,
@@ -703,10 +692,14 @@ public class Controller {
                 list.addAll(feature.otherCRSs);
                 this.referenceSystemChooser.setItems(list);
                 this.referenceSystemChooser.setValue(feature.defaultCRS);
+                List<String> outputFormats = feature.outputFormats;
+                if (outputFormats.isEmpty()) {
+                    outputFormats =
+                        this.dataBean.getWFSService()
+                            .findOperation("GetFeature").outputFormats;
+                }
                 ObservableList<String> formats =
-                    FXCollections.observableArrayList(
-                        dataBean.getWFSService().
-                            findOperation("GetFeature").outputFormats);
+                    FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
             } else if (data instanceof StoredQueryModel) {
                 factory.fillSimpleWFS(
