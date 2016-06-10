@@ -504,25 +504,14 @@ public class Controller {
                 String url = null;
                 String username = null;
                 String password = null;
-                if (serviceList.getSelectionModel().getSelectedItems().get(0)
-                        != null) {
-                    String serviceName =
-                            serviceList.
-                                getSelectionModel().
-                                    getSelectedItems().get(0).toString();
-                    url = ((ServiceModel)
-                        serviceList.getSelectionModel()
-                            .getSelectedItem()).getUrl();
-                } else {
-                    url = serviceURL.getText();
-                }
+                url = serviceURL.getText();
                 if (serviceAuthenticationCbx.isSelected()) {
                     username = serviceUser.getText();
                     dataBean.setUsername(username);
                     password = servicePW.getText();
                     dataBean.setPassword(password);
                 }
-                if (url != null) {
+                if (url != null && !"".equals(url)) {
                     //view.setStatusBarText("Check for Servicetype");
                     ServiceType st = ServiceChecker.checkService(
                         url,
