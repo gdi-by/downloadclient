@@ -685,10 +685,14 @@ public class Controller {
                 list.addAll(feature.otherCRSs);
                 this.referenceSystemChooser.setItems(list);
                 this.referenceSystemChooser.setValue(feature.defaultCRS);
+                List<String> outputFormats = feature.outputFormats;
+                if (outputFormats.isEmpty()) {
+                    outputFormats =
+                        this.dataBean.getWFSService()
+                            .findOperation("GetFeature").outputFormats;
+                }
                 ObservableList<String> formats =
-                    FXCollections.observableArrayList(
-                        dataBean.getWFSService().
-                            findOperation("GetFeature").outputFormats);
+                    FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
             } else if (data instanceof StoredQueryModel) {
                 factory.fillSimpleWFS(
