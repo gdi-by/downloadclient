@@ -136,7 +136,7 @@ public class DownloadStepConverter {
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
             String ns = meta.namespaces.getNamespaceURI(prefix);
-            sb.append("&namespaces=(")
+            sb.append("&namespaces=xmlns(")
                 .append(StringUtils.urlEncode(prefix)).append(',')
                 .append(StringUtils.urlEncode(ns)).append(')');
         }
@@ -180,16 +180,32 @@ public class DownloadStepConverter {
         jl.addJob(new GMLCheckJob(gml));
     }
 
+
+    private static void check(String s, String name)
+    throws ConverterException {
+        if (s == null || s.isEmpty()) {
+            throw new ConverterException(
+                I18n.format("dls.converter.missing", name));
+        }
+    }
+
     private static void createAtomDownload(
         JobList jl,
         File workingDir,
         DownloadStep dls
     ) throws ConverterException {
+
         String dataset = dls.getDataset();
         String url = dls.getServiceURL();
         String variation = dls.findParameter("VARIATION");
+
+        check(url, "service url");
+        check(dataset, "dataset");
+        check(variation, "VARIATION");
+
         String user = dls.findParameter("user");
         String password = dls.findParameter("password");
+
         AtomDownloadJob job = new AtomDownloadJob(
             url,
             dataset,

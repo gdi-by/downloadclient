@@ -26,18 +26,32 @@ import java.util.logging.Logger;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
+import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
 
 /**
  * The command line tool.
  */
-public class Headless {
+public class Headless implements ProcessorListener {
 
     private static final Logger log
         = Logger.getLogger(Headless.class.getName());
 
     private Headless() {
+    }
+
+    @Override
+    public void receivedMessage(ProcessorEvent pe) {
+        log.info(pe.getMessage());
+    }
+
+    @Override
+    public void receivedException(ProcessorEvent pe) {
+        JobExecutionException jee = pe.getException();
+        log.log(Level.SEVERE, jee.getMessage(), jee);
     }
 
     /**
@@ -62,6 +76,7 @@ public class Headless {
         }
 
         Processor processor = new Processor();
+        processor.addListener(new Headless());
         Thread thread = new Thread(processor);
         thread.start();
 

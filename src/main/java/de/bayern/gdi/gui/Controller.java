@@ -30,11 +30,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.geometry.Envelope2D;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
@@ -45,7 +48,6 @@ import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
@@ -138,6 +140,8 @@ public class Controller {
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
+    private WMSMapSwing mapAtom;
+    private WMSMapSwing mapWFS;
 
     /**
      * Handler to close the application.
@@ -402,6 +406,25 @@ public class Controller {
         }
     }
 
+    private void extractBoundingBox() {
+        String bbox = "";
+        Envelope2D envelope;
+        if (this.dataBean.getServiceType().equals(ServiceType.Atom)) {
+            envelope = this.mapAtom.getBounds();
+        } else {
+            envelope = this.mapWFS.getBounds();
+        }
+        if (envelope != null) {
+            bbox += envelope.getX() + ",";
+            bbox += envelope.getY() + ",";
+            bbox += (envelope.getX() + envelope.getWidth()) + ",";
+            bbox += (envelope.getY() + envelope.getHeight());
+            this.dataBean.addAttribute("bbox", bbox);
+        } else {
+            // Raise an error?
+        }
+    }
+
     /**
      * Start the download.
      *
@@ -418,16 +441,23 @@ public class Controller {
         }
 
         extractStoredQuery();
+        extractBoundingBox();
         this.dataBean.setProcessingSteps(extractProcessingSteps());
 
         Task task = new Task() {
             @Override
-            protected Integer call() throws Exception {
+            protected Integer call() {
                 String savePath = selectedDir.getPath();
                 DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                JobList jl = DownloadStepConverter.convert(ds);
-                Processor p = Processor.getInstance();
-                p.addJob(jl);
+                try {
+                    JobList jl = DownloadStepConverter.convert(ds);
+                    Processor p = Processor.getInstance();
+                    p.addJob(jl);
+                } catch (final ConverterException ce) {
+                    Platform.runLater(() -> {
+                        statusBarText.setText(ce.getMessage());
+                    });
+                }
                 return 0;
             }
         };
@@ -458,6 +488,7 @@ public class Controller {
         }
 
         extractStoredQuery();
+        extractBoundingBox();
         this.dataBean.setProcessingSteps(extractProcessingSteps());
 
         String savePath = downloadDir.getPath();
@@ -480,25 +511,14 @@ public class Controller {
                 String url = null;
                 String username = null;
                 String password = null;
-                if (serviceList.getSelectionModel().getSelectedItems().get(0)
-                        != null) {
-                    String serviceName =
-                            serviceList.
-                                getSelectionModel().
-                                    getSelectedItems().get(0).toString();
-                    url = ((ServiceModel)
-                        serviceList.getSelectionModel()
-                            .getSelectedItem()).getUrl();
-                } else {
-                    url = serviceURL.getText();
-                }
+                url = serviceURL.getText();
                 if (serviceAuthenticationCbx.isSelected()) {
                     username = serviceUser.getText();
                     dataBean.setUsername(username);
                     password = servicePW.getText();
                     dataBean.setPassword(password);
                 }
-                if (url != null) {
+                if (url != null && !"".equals(url)) {
                     //view.setStatusBarText("Check for Servicetype");
                     ServiceType st = ServiceChecker.checkService(
                         url,
@@ -528,9 +548,12 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.wfsone"));
                                 });
-                                ws = new WFSOne(url, dataBean
-                                        .getUserName(), dataBean
-                                        .getPassword());
+                                WFSMetaExtractor wfsOne =
+                                    new WFSMetaExtractor(url,
+                                        dataBean.getUserName(),
+                                        dataBean.getPassword());
+                                WFSMeta metaOne = wfsOne.parse();
+                                dataBean.setWFSService(metaOne);
                                 break;
                             case WFSTwo:
                                 Platform.runLater(() -> {
@@ -669,10 +692,14 @@ public class Controller {
                 list.addAll(feature.otherCRSs);
                 this.referenceSystemChooser.setItems(list);
                 this.referenceSystemChooser.setValue(feature.defaultCRS);
+                List<String> outputFormats = feature.outputFormats;
+                if (outputFormats.isEmpty()) {
+                    outputFormats =
+                        this.dataBean.getWFSService()
+                            .findOperation("GetFeature").outputFormats;
+                }
                 ObservableList<String> formats =
-                    FXCollections.observableArrayList(
-                        dataBean.getWFSService().
-                            findOperation("GetFeature").outputFormats);
+                    FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
             } else if (data instanceof StoredQueryModel) {
                 factory.fillSimpleWFS(
@@ -699,9 +726,9 @@ public class Controller {
             url = new URL(this.dataBean.getWmsUrl());
         } catch (MalformedURLException e) {
         }
-        WMSMapSwing mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        WMSMapSwing mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);

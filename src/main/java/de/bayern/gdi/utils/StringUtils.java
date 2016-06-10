@@ -20,6 +20,7 @@ package de.bayern.gdi.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -227,5 +228,22 @@ public class StringUtils {
             parts.add(x);
         }
         return parts.toArray(new String[parts.size()]);
+    }
+
+    /**
+     * Joins a list of strings with a separator.
+     * @param s The string list.
+     * @param sep The separator.
+     * @return the joined string.
+     */
+    public static String join(List<String> s, String sep) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, n = s.size(); i < n; i++) {
+            if (i > 0) {
+                sb.append(sep);
+            }
+            sb.append(s.get(i));
+        }
+        return sb.toString();
     }
 }

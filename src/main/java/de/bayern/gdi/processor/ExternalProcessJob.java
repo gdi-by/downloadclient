@@ -72,13 +72,27 @@ public class ExternalProcessJob implements Job {
             builder.directory(this.workingDir);
         }
 
+        if (p != null) {
+            p.broadcastMessage(
+                I18n.format("external.process.start", command));
+        }
+
         try {
             Process process = builder.start();
             // XXX: Implement some kind of cancellation mechanism.
-            process.waitFor();
+            int exitcode = process.waitFor();
+            if (exitcode != 0) {
+                throw new JobExecutionException(
+                    I18n.format("external.process.error", command, exitcode));
+            }
         } catch (IOException | InterruptedException e) {
             throw new JobExecutionException(
-                I18n.getMsg("external.process.failed"), e);
+                I18n.format("external.process.failed", command), e);
+        }
+
+        if (p != null) {
+            p.broadcastMessage(
+                I18n.format("external.process.end", command));
         }
     }
 }

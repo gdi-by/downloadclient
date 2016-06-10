@@ -86,7 +86,7 @@ import de.bayern.gdi.utils.I18n;
 public class WMSMapSwing extends Parent {
 
     private static final Logger log
-            = Logger.getLogger(WMSMapFX.class.getName());
+            = Logger.getLogger(WMSMapSwing.class.getName());
 
     private WebMapServer wms;
     private VBox vBox;
