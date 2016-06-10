@@ -200,7 +200,6 @@ public class ServiceSetting {
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
                     serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
-                        System.out.println(serviceValueNode.getNodeName());
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
                              serviceValueNode.getFirstChild().getTextContent();
