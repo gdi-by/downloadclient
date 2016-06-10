@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,6 +31,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Verarbeitungsschritt")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingStepConfiguration {
+
+    @XmlAttribute(name = "name")
+    private String name;
+
+    @XmlAttribute(name = "formattyp")
+    private String formatType;
 
     @XmlElement(name = "Titel")
     private String title;
@@ -46,6 +53,34 @@ public class ProcessingStepConfiguration {
 
     public ProcessingStepConfiguration() {
         parameters = new ArrayList<>();
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the formatType
+     */
+    public String getFormatType() {
+        return formatType;
+    }
+
+    /**
+     * @param formatType the formatType to set
+     */
+    public void setFormatType(String formatType) {
+        this.formatType = formatType;
     }
 
     /**

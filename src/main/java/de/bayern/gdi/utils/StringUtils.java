@@ -19,8 +19,12 @@ package de.bayern.gdi.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -107,5 +111,121 @@ public class StringUtils {
             }
         }
         return null;
+    }
+
+    /** States for the command line splitting. */
+    private static enum State {
+        NORMAL,
+        IN_QUOTE,
+        IN_DOUBLE_QUOTE
+    }
+
+    /**
+     * Split a command line.
+     * @param toProcess the command line to process.
+     * @return the command line broken into strings.
+     * An empty or null toProcess parameter results in a zero sized array.
+     * @throws IllegalArgumentException Thrown if quotes are unbalanced.
+     */
+    public static String[] splitCommandLine(String toProcess)
+    throws IllegalArgumentException {
+
+        if (toProcess == null || toProcess.length() == 0) {
+            //no command? no string
+            return new String[0];
+        }
+        // parse with a simple finite state machine
+
+        State state = State.NORMAL;
+        StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
+        ArrayList<String> result = new ArrayList<String>();
+        StringBuilder current = new StringBuilder();
+        boolean lastTokenHasBeenQuoted = false;
+
+        while (tok.hasMoreTokens()) {
+            String nextTok = tok.nextToken();
+            switch (state) {
+            case IN_QUOTE:
+                if ("\'".equals(nextTok)) {
+                    lastTokenHasBeenQuoted = true;
+                    state = State.NORMAL;
+                } else {
+                    current.append(nextTok);
+                }
+                break;
+            case IN_DOUBLE_QUOTE:
+                if ("\"".equals(nextTok)) {
+                    lastTokenHasBeenQuoted = true;
+                    state = State.NORMAL;
+                } else {
+                    current.append(nextTok);
+                }
+                break;
+            default:
+                if ("\'".equals(nextTok)) {
+                    state = State.IN_QUOTE;
+                } else if ("\"".equals(nextTok)) {
+                    state = State.IN_DOUBLE_QUOTE;
+                } else if (" ".equals(nextTok)) {
+                    if (lastTokenHasBeenQuoted || current.length() != 0) {
+                        result.add(current.toString());
+                        current.setLength(0);
+                    }
+                } else {
+                    current.append(nextTok);
+                }
+                lastTokenHasBeenQuoted = false;
+                break;
+            }
+        }
+        if (lastTokenHasBeenQuoted || current.length() != 0) {
+            result.add(current.toString());
+        }
+        if (state == State.IN_QUOTE || state == State.IN_DOUBLE_QUOTE) {
+            throw new IllegalArgumentException(
+                "unbalanced quotes in " + toProcess);
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
+    /**
+     * Splits a string by a pattern. It does not keep the delimeters.
+     * @param s The string to split.
+     * @param delim The delimeter.
+     * @return The splitted string.
+     */
+    public static String[] split(String s, Pattern delim) {
+        return split(s, delim, false);
+    }
+
+    /**
+     * Splits a string by a pattern.
+     * @param s The string to split.
+     * @param delim The delimeter.
+     * @param keep Indicates if the delimeters should be kept.
+     * @return The splitted string.
+     */
+    public static String[] split(String s, Pattern delim, boolean keep) {
+        if (s == null) {
+            s = "";
+        }
+        int lastMatch = 0;
+        ArrayList<String> parts = new ArrayList<>();
+        Matcher m = delim.matcher(s);
+        while (m.find()) {
+            String x = s.substring(lastMatch, m.start());
+            if (!x.isEmpty()) {
+                parts.add(x);
+            }
+            if (keep) {
+                parts.add(m.group(0));
+            }
+            lastMatch = m.end();
+        }
+        String x = s.substring(lastMatch);
+        if (!x.isEmpty()) {
+            parts.add(x);
+        }
+        return parts.toArray(new String[parts.size()]);
     }
 }

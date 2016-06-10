@@ -186,6 +186,9 @@ public class WFSMetaExtractor {
     }
 
     private static String stripNS(String ns) {
+        if (ns == null) {
+            return null;
+        }
         int idx = ns.lastIndexOf(':');
         return idx >= 0 ? ns.substring(idx + 1) : ns;
     }

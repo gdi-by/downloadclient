@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,7 @@ public class DownloadStepConverter {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
         {"WFS2_BASIC", "DATASET"},
         {"WFS2_SIMPLE", "STOREDQUERY_ID"},
+        {"WFS1", "DATASET"},
         {"WFS", "DATASET"}
     };
 
@@ -60,10 +62,15 @@ public class DownloadStepConverter {
         return type;
     }
 
-    private static String encodeParameters(ArrayList<Parameter> parameters) {
+    private static String encodeParameters(
+        ArrayList<Parameter> parameters,
+        Set<String>          usedVars
+    ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (p.getKey().equals("user") || p.getKey().equals("password")) {
+            if (usedVars.contains(p.getKey())
+            || p.getKey().equals("user")
+            || p.getKey().equals("password")) {
                 continue;
             }
             if (sb.length() > 0) {
@@ -77,7 +84,7 @@ public class DownloadStepConverter {
     }
 
     private static String baseURL(String url) {
-        int idx = url.indexOf(url);
+        int idx = url.indexOf('?');
         return idx >= 0 ? url.substring(0, idx) : url;
 
     }
@@ -86,7 +93,10 @@ public class DownloadStepConverter {
         return base + "?service=WFS&request=GetCapabilities&version=2.0.0";
     }
 
-    private static String wfsURL(DownloadStep dls) throws ConverterException {
+    private static String wfsURL(
+        DownloadStep dls,
+        Set<String>  usedVars
+    ) throws ConverterException {
 
         String url = dls.getServiceURL();
         String base = baseURL(url);
@@ -127,11 +137,11 @@ public class DownloadStepConverter {
             String prefix = dataset.substring(0, idx);
             String ns = meta.namespaces.getNamespaceURI(prefix);
             sb.append("&namespaces=(")
-                .append(StringUtils.urlEncode(prefix)).append('.')
+                .append(StringUtils.urlEncode(prefix)).append(',')
                 .append(StringUtils.urlEncode(ns)).append(')');
         }
 
-        String parameters = encodeParameters(dls.getParameters());
+        String parameters = encodeParameters(dls.getParameters(), usedVars);
         if (parameters.length() > 0) {
             sb.append('&').append(parameters);
         }
@@ -153,15 +163,17 @@ public class DownloadStepConverter {
     private static void createWfsDownload(
         JobList jl,
         File workingDir,
-        String user,
-        String password,
+        Set<String> usedVars,
         DownloadStep dls
     ) throws ConverterException {
-        String url = wfsURL(dls);
+        String url = wfsURL(dls, usedVars);
         log.log(Level.INFO, "url: " + url);
 
         File gml = new File(workingDir, "download.gml");
         log.log(Level.INFO, "Download to file \"" + gml + "\"");
+
+        String user = dls.findParameter("user");
+        String password = dls.findParameter("password");
 
         FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
@@ -171,13 +183,13 @@ public class DownloadStepConverter {
     private static void createAtomDownload(
         JobList jl,
         File workingDir,
-        String user,
-        String password,
         DownloadStep dls
     ) throws ConverterException {
         String dataset = dls.getDataset();
         String url = dls.getServiceURL();
         String variation = dls.findParameter("VARIATION");
+        String user = dls.findParameter("user");
+        String password = dls.findParameter("password");
         AtomDownloadJob job = new AtomDownloadJob(
             url,
             dataset,
@@ -194,11 +206,9 @@ public class DownloadStepConverter {
      * @throws ConverterException If the conversion went wrong.
      */
     public static JobList convert(DownloadStep dls) throws ConverterException {
-        JobList jl = new JobList();
 
-        //XXX: Alternative ways of getting the credentials?
-        String user = dls.findParameter("user");
-        String password = dls.findParameter("password");
+        ProcessingStepConverter psc =
+            new ProcessingStepConverter(getProcessingConfiguration());
 
         File path = new File(dls.getPath());
 
@@ -212,16 +222,17 @@ public class DownloadStepConverter {
                 I18n.format("dls.converter.not.dir", path));
         }
 
+        psc.convert(dls, path);
+
+        JobList jl = new JobList();
+
         if (dls.getServiceType().equals("ATOM")) {
-            createAtomDownload(jl, path, user, password, dls);
+            createAtomDownload(jl, path, dls);
         } else {
-            createWfsDownload(jl, path, user, password, dls);
+            createWfsDownload(jl, path, psc.getUsedVars(), dls);
         }
 
-        ProcessingStepConverter psc =
-            new ProcessingStepConverter(getProcessingConfiguration());
-
-        psc.convert(dls, jl, path);
+        jl.addJobs(psc.getJobs());
 
         return jl;
     }

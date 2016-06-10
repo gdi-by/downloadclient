@@ -43,7 +43,11 @@ public final class I18n {
         return Holder.INSTANCE;
     }
 
-    private static ResourceBundle getBundle() {
+    /**
+     * Get the current i18n resource bundle.
+     * @return the resource bundle
+     */
+    public static ResourceBundle getBundle() {
         // ResourceBundle caches according to documentation.
         return ResourceBundle.getBundle("messages");
     }

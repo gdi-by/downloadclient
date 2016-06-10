@@ -20,32 +20,37 @@ package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.stage.Stage;
-
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
-//import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.ServiceSetting;
 import de.bayern.gdi.utils.StringUtils;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class DataBean extends Observable {
 
-    private Stage primaryStage;
+    private static final Logger log
+        = Logger.getLogger(DataBean.class.getName());
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
-    private Map<String, String> staticServices;
-    private Map<String, String> catalogServices;
+    private List<ServiceModel> staticServices;
+    private List<ServiceModel> catalogServices;
     private ServiceType serviceType;
     private ItemModel dataType;
     private Atom atomService;
@@ -56,27 +61,23 @@ public class DataBean extends Observable {
     private String wmsName;
     private String userName;
     private String password;
-
+    private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
 
     /**
      * Constructor.
      */
-    public DataBean(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+    public DataBean() {
         this.namePwMap = new HashMap<>();
         this.serviceSetting = new ServiceSetting();
         this.staticServices = this.serviceSetting.getServices();
-        this.catalogServices = new HashMap<String, String>();
+        this.catalogServices = new ArrayList<ServiceModel>();
         this.catalogService = new CatalogService(this.serviceSetting
                 .getCatalogueURL());
-        this.atomService = null;
-        this.wfsService = null;
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
-        this.userName = null;
-        this.password = null;
+        this.processingSteps = new ArrayList<>();
     }
 
     /**
@@ -92,47 +93,39 @@ public class DataBean extends Observable {
      */
     public void reset() {
         this.catalogServices.clear();
+        this.processingSteps.clear();
     }
 
     /**
      * Builds a Observable List from the services Map.
      * @return List build from services Map
      */
-    public ObservableList<String> getServicesAsList() {
-        ObservableList<String> serviceNames =
-                FXCollections.observableArrayList();
-        for (String name: this.staticServices.keySet()) {
-            serviceNames.add(name);
-        }
-        for (String name: this.catalogServices.keySet()) {
-            serviceNames.add(name);
-        }
+    public ObservableList<ServiceModel> getServicesAsList() {
+        ObservableList<ServiceModel> serviceNames =
+                FXCollections.observableArrayList(this.staticServices);
+        serviceNames.addAll(this.catalogServices);
         return serviceNames;
     }
 
     /**
      * Adds a Service to the list.
-     * @param serviceName the Name of the Service
-     * @param serviceURL the URL of the Service
+     * @param service the Service
      */
-    public void addCatalogServiceToList(String serviceName, String serviceURL) {
-        this.catalogServices.put(serviceName, serviceURL);
+    public void addCatalogServiceToList(ServiceModel service) {
+        this.catalogServices.add(service);
     }
 
     /**
      * Adds a Service to the list.
-     * @param serviceName the Name of the Service
-     * @param serviceURL the URL of the Service
+     * @param service the Service
      */
-    public void addServiceToList(String serviceName, String serviceURL) {
-        this.catalogServices.put(serviceName, serviceURL);
+    public void addServiceToList(ServiceModel service) {
+        this.catalogServices.add(service);
     }
 
     /**
      * Returns the Service URL for a given Service Name.
-     * @param serviceName name of a Service
-     * @return the url of the service
-     */
+     *
     public String getServiceURL(String serviceName) {
         String returnStr = null;
         if (this.staticServices.containsKey(serviceName)) {
@@ -142,15 +135,7 @@ public class DataBean extends Observable {
             returnStr = this.catalogServices.get(serviceName);
         }
         return returnStr;
-    }
-
-    /**
-     * returns the current stage.
-     * @return the stage
-     */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
+    }/
 
     /**
      * Set the data type.
@@ -167,7 +152,6 @@ public class DataBean extends Observable {
     public ItemModel getDatatype() {
         return dataType;
     }
-
 
     /**
      * Set the service type.
@@ -345,7 +329,77 @@ public class DataBean extends Observable {
         return StringUtils.getBase64EncAuth(this.userName, this.password);
     }
 
+    /**
+     * @return the processingSteps
+     */
+    public ArrayList<ProcessingStep> getProcessingSteps() {
+        return processingSteps;
+    }
+
+    /**
+     * @param processingSteps the processingSteps to set
+     */
+    public void setProcessingSteps(ArrayList<ProcessingStep> processingSteps) {
+        this.processingSteps = processingSteps;
+    }
+
     public CatalogService getCatalogService() {
         return catalogService;
+    }
+
+    /**
+     * gets Downloadstep from Frontend.
+     * @param savePath the save path
+     * @return downloadStep
+     */
+    public DownloadStep convertToDownloadStep(String savePath) {
+        try {
+            ServiceType type = getServiceType();
+            String serviceURL = type == ServiceType.Atom
+                ? getAtomService().getURL()
+                : getWFSService().url;
+            int idx = serviceURL.indexOf('?');
+            if (idx >= 0) {
+                serviceURL = serviceURL.substring(0, idx);
+            }
+            Map<String, String> paramMap = getAttributes();
+            ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
+            for (Map.Entry<String, String> entry: paramMap.entrySet()) {
+                if (!entry.getValue().equals("")) {
+                    Parameter param = new Parameter(
+                            entry.getKey(), entry.getValue());
+                    parameters.add(param);
+                }
+            }
+            String serviceTypeStr = null;
+            switch (type) {
+                case WFSOne:
+                    serviceTypeStr = "WFS1";
+                    break;
+                case WFSTwo:
+                    ItemModel itemModel = getDatatype();
+                    if (itemModel instanceof StoredQueryModel) {
+                        serviceTypeStr = "WFS2_SIMPLE";
+                    } else {
+                        serviceTypeStr = "WFS2_BASIC";
+                    }
+                    break;
+                case Atom:
+                    serviceTypeStr = "ATOM";
+                    break;
+                default:
+            }
+            return new DownloadStep(
+                getDatatype().getDataset(),
+                parameters,
+                serviceTypeStr,
+                serviceURL,
+                savePath,
+                processingSteps);
+
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage() , ex);
+        }
+        return null;
     }
 }

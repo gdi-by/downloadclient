@@ -45,6 +45,14 @@ public class JobList implements Job {
         jobs.add(job);
     }
 
+    /**
+     * Add all jobs to this job list.
+     * @param other The jobs to add.
+     */
+    public void addJobs(List<Job> other) {
+        jobs.addAll(other);
+    }
+
     @Override
     public void run(Processor p) throws JobExecutionException {
         log.info("Executing job list");
