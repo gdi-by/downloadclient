@@ -47,7 +47,6 @@ import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.services.WFSOne;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
@@ -553,9 +552,12 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.wfsone"));
                                 });
-                                ws = new WFSOne(url, dataBean
-                                        .getUserName(), dataBean
-                                        .getPassword());
+                                WFSMetaExtractor wfsOne =
+                                    new WFSMetaExtractor(url,
+                                        dataBean.getUserName(),
+                                        dataBean.getPassword());
+                                WFSMeta metaOne = wfsOne.parse();
+                                dataBean.setWFSService(metaOne);
                                 break;
                             case WFSTwo:
                                 Platform.runLater(() -> {
