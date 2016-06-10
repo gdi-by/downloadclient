@@ -17,9 +17,10 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.gui.ServiceModel;
 import de.bayern.gdi.services.CatalogService;
 import java.net.MalformedURLException;
-import java.util.Map;
+import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -57,13 +58,20 @@ public class CswTest extends TestCase {
                 + "service=CSW&version=2.0.2&request=GetCapabilities";
         CatalogService catalogService = new CatalogService(cswUrl);
 
-        Map<String, String> results =
+        List<ServiceModel> results =
                 catalogService.getServicesByFilter("umwelt");
-        for (String key : results.keySet()) {
-            String url = results.get(key);
+
+        for (ServiceModel serviceModel :results) {
+
+            String url = serviceModel.getUrl();
+
             for (String notValidExtension : notValidExtensions) {
                 if (url.toLowerCase().endsWith(notValidExtension)) {
-                    assertFalse("Wrong URL parsed from metadata", true);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Wrong URL parsed from metadata");
+                    sb.append(" | ");
+                    sb.append(url);
+                    assertFalse(sb.toString(), true);
                 }
             }
         }
