@@ -93,6 +93,9 @@ public class WFSMetaExtractor {
         = "ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
 
+    private static final String XPATH_FEATURE_OUT_FORMATS
+        = "wfs:OutputFormats/wfs:Format/text()";
+
     private static final String XPATH_STORED_QUERIES
         = "//wfs:StoredQueryDescription";
 
@@ -333,6 +336,13 @@ public class WFSMetaExtractor {
             NodeList otherCRSs = el.getElementsByTagName("OtherCRS");
             for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
+            }
+
+            NodeList outs = (NodeList)XML.xpath(
+                el, XPATH_FEATURE_OUT_FORMATS,
+                XPathConstants.NODESET, NAMESPACES);
+            for (int j = 0, m = outs.getLength(); j < m; j++) {
+                feature.outputFormats.add(outs.item(j).getTextContent());
             }
 
             feature.bbox = getBounds(el, NAMESPACES);

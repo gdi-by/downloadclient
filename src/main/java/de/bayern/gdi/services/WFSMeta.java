@@ -92,7 +92,7 @@ public class WFSMeta {
                 + "abstract: " + abstractDescription + " "
                 + "defaultCRS: " + defaultCRS + " "
                 + "otherCRSs: " +  otherCRSs() + " "
-                + "otherCRSs: " +  outputFormats() + " "
+                + "outputFormats: " +  outputFormats() + " "
                 + "bbox: " + bbox + " }";
         }
     }
