@@ -263,26 +263,38 @@ public class CatalogService {
                 String serviceTypeVersion = (String) XML.xpath(serviceN,
                         serviceTypeVersionExpr,
                         XPathConstants.STRING, context);
-                if (serviceType.toUpperCase().contains("DOWNLOAD")) {
-                    if (serviceTypeVersion.equals("")) {
-                        serviceTypeVersion = "ATOM";
-                    }
-                    if (serviceTypeVersion.toUpperCase().contains("WFS")
-                            || serviceTypeVersion.toUpperCase().contains("ATOM")
-                            || serviceTypeVersion.
-                                toUpperCase().contains("DOWNLOAD")) {
-                        if (!serviceName.equals("")) {
-                            serviceURL = makeCapabiltiesURL(serviceURL,
-                                    serviceTypeVersion);
-                            ServiceModel service = new ServiceModel();
-                            service.setName(serviceName);
-                            service.setUrl(serviceURL);
-                            service.setVersion(serviceTypeVersion);
-                            service.setRestricted(restricted);
-                            services.add(service);
-                        }
+                String applicationprofileExpr =
+                        "gmd:distributionInfo"
+                                + "/gmd:MD_Distribution"
+                                + "/gmd:transferOptions"
+                                + "/gmd:MD_DigitalTransferOptions"
+                                + "/gmd:onLine"
+                                + "/gmd:CI_OnlineResource"
+                                + "/gmd:applicationProfile"
+                                + "/gco:CharacterString";
+                String applicationProfile = (String) XML.xpath(serviceN,
+                        applicationprofileExpr,
+                        XPathConstants.STRING, context);
+                applicationProfile = applicationProfile.toLowerCase();
+                if (serviceTypeVersion.equals("")) {
+                    serviceTypeVersion = "ATOM";
+                }
+                if (applicationProfile.equals("wfs-url")
+                        || applicationProfile.equals("feed-url")
+                        || applicationProfile.equals("dienste-url")
+                        || applicationProfile.equals("download")) {
+                    if (!serviceName.equals("")) {
+                        serviceURL = makeCapabiltiesURL(serviceURL,
+                                serviceTypeVersion);
+                        ServiceModel service = new ServiceModel();
+                        service.setName(serviceName);
+                        service.setUrl(serviceURL);
+                        service.setVersion(serviceTypeVersion);
+                        service.setRestricted(restricted);
+                        services.add(service);
                     }
                 }
+
             }
         }
         return services;
@@ -315,7 +327,7 @@ public class CatalogService {
 
     /**
      * http://www.weichand.de/2012/03/24/
-     *      grundlagen-catalogue-service-web-csw-2-0-2/ .
+     * grundlagen-catalogue-service-web-csw-2-0-2/ .
      */
     private URL setURLRequestAndSearch(String search) {
         URL newURL = null;
@@ -361,7 +373,7 @@ public class CatalogService {
 
     /**
      * https://github.com/gdi-by/beispiele/
-     *      blob/master/csw/GetRecords-wfs20-atom.xml .
+     * blob/master/csw/GetRecords-wfs20-atom.xml .
      */
     private Document createXMLFilter(String search) {
         Document xml = null;
@@ -405,7 +417,7 @@ public class CatalogService {
             Element constraint = xml.createElement("Constraint");
             constraint.setAttribute("version", "1.1.0");
             query.appendChild(constraint);
-            Element ogcFilter = xml.createElementNS(OGC_NAMESPACE ,
+            Element ogcFilter = xml.createElementNS(OGC_NAMESPACE,
                     "ogc:Filter");
             ogcFilter.setAttribute("xmlns:ogc", "http://www.opengis.net/ogc");
             ogcFilter.setAttribute("xmlns:gml", "http://www.opengis.net/gml");
