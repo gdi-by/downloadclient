@@ -415,9 +415,9 @@ public class Controller {
             envelope = this.mapWFS.getBounds();
         }
         if (envelope != null) {
-            bbox += envelope.getX() + ", ";
-            bbox += envelope.getY() + ", ";
-            bbox += (envelope.getX() + envelope.getWidth()) + ", ";
+            bbox += envelope.getX() + ",";
+            bbox += envelope.getY() + ",";
+            bbox += (envelope.getX() + envelope.getWidth()) + ",";
             bbox += (envelope.getY() + envelope.getHeight());
             this.dataBean.addAttribute("bbox", bbox);
         } else {
@@ -482,6 +482,7 @@ public class Controller {
         }
 
         extractStoredQuery();
+        extractBoundingBox();
         this.dataBean.setProcessingSteps(extractProcessingSteps());
 
         String savePath = downloadDir.getPath();
