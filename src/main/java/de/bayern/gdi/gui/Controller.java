@@ -37,6 +37,7 @@ import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
@@ -445,12 +446,18 @@ public class Controller {
 
         Task task = new Task() {
             @Override
-            protected Integer call() throws Exception {
+            protected Integer call() {
                 String savePath = selectedDir.getPath();
                 DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                JobList jl = DownloadStepConverter.convert(ds);
-                Processor p = Processor.getInstance();
-                p.addJob(jl);
+                try {
+                    JobList jl = DownloadStepConverter.convert(ds);
+                    Processor p = Processor.getInstance();
+                    p.addJob(jl);
+                } catch (final ConverterException ce) {
+                    Platform.runLater(() -> {
+                        statusBarText.setText(ce.getMessage());
+                    });
+                }
                 return 0;
             }
         };

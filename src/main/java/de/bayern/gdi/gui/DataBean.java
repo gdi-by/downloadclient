@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
@@ -43,9 +41,6 @@ import javafx.collections.ObservableList;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class DataBean extends Observable {
-
-    private static final Logger log
-        = Logger.getLogger(DataBean.class.getName());
 
     private Map<String, String> namePwMap;
     private ServiceSetting serviceSetting;
@@ -353,53 +348,47 @@ public class DataBean extends Observable {
      * @return downloadStep
      */
     public DownloadStep convertToDownloadStep(String savePath) {
-        try {
-            ServiceType type = getServiceType();
-            String serviceURL = type == ServiceType.Atom
-                ? getAtomService().getURL()
-                : getWFSService().url;
-            int idx = serviceURL.indexOf('?');
-            if (idx >= 0) {
-                serviceURL = serviceURL.substring(0, idx);
-            }
-            Map<String, String> paramMap = getAttributes();
-            ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
-            for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-                if (!entry.getValue().equals("")) {
-                    Parameter param = new Parameter(
-                            entry.getKey(), entry.getValue());
-                    parameters.add(param);
-                }
-            }
-            String serviceTypeStr = null;
-            switch (type) {
-                case WFSOne:
-                    serviceTypeStr = "WFS1";
-                    break;
-                case WFSTwo:
-                    ItemModel itemModel = getDatatype();
-                    if (itemModel instanceof StoredQueryModel) {
-                        serviceTypeStr = "WFS2_SIMPLE";
-                    } else {
-                        serviceTypeStr = "WFS2_BASIC";
-                    }
-                    break;
-                case Atom:
-                    serviceTypeStr = "ATOM";
-                    break;
-                default:
-            }
-            return new DownloadStep(
-                getDatatype().getDataset(),
-                parameters,
-                serviceTypeStr,
-                serviceURL,
-                savePath,
-                processingSteps);
-
-        } catch (Exception ex) {
-            log.log(Level.SEVERE, ex.getMessage() , ex);
+        ServiceType type = getServiceType();
+        String serviceURL = type == ServiceType.Atom
+            ? getAtomService().getURL()
+            : getWFSService().url;
+        int idx = serviceURL.indexOf('?');
+        if (idx >= 0) {
+            serviceURL = serviceURL.substring(0, idx);
         }
-        return null;
+        Map<String, String> paramMap = getAttributes();
+        ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
+        for (Map.Entry<String, String> entry: paramMap.entrySet()) {
+            if (!entry.getValue().equals("")) {
+                Parameter param = new Parameter(
+                        entry.getKey(), entry.getValue());
+                parameters.add(param);
+            }
+        }
+        String serviceTypeStr = null;
+        switch (type) {
+            case WFSOne:
+                serviceTypeStr = "WFS1";
+                break;
+            case WFSTwo:
+                ItemModel itemModel = getDatatype();
+                if (itemModel instanceof StoredQueryModel) {
+                    serviceTypeStr = "WFS2_SIMPLE";
+                } else {
+                    serviceTypeStr = "WFS2_BASIC";
+                }
+                break;
+            case Atom:
+                serviceTypeStr = "ATOM";
+                break;
+            default:
+        }
+        return new DownloadStep(
+            getDatatype().getDataset(),
+            parameters,
+            serviceTypeStr,
+            serviceURL,
+            savePath,
+            processingSteps);
     }
 }
