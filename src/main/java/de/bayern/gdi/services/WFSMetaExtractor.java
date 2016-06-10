@@ -170,7 +170,6 @@ public class WFSMetaExtractor {
         WFSMeta meta = new WFSMeta();
         meta.url = capURLString;
         parseCapabilites(meta);
-        //parseDescribeFeatures(meta);
         parseDescribeStoredQueries(meta);
         return meta;
     }
