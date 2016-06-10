@@ -74,12 +74,9 @@ public class WFSMeta {
         public List<String> otherCRSs;
         /** bbox. */
         public ReferencedEnvelope bbox;
-        /** fields. */
-        public List<Field> fields;
 
         public Feature() {
             otherCRSs = new ArrayList<>();
-            fields = new ArrayList<>();
         }
 
         private String otherCRSs() {
@@ -93,17 +90,6 @@ public class WFSMeta {
             return sb.append("]").toString();
         }
 
-        private String fields() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < fields.size(); i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(fields.get(i));
-            }
-            return sb.toString();
-        }
-
         @Override
         public String toString() {
             return "feature: { "
@@ -112,8 +98,7 @@ public class WFSMeta {
                 + "abstract: " + abstractDescription + " "
                 + "defaultCRS: " + defaultCRS + " "
                 + "otherCRSs: " +  otherCRSs() + " "
-                + "bbox: " + bbox + " "
-                + "fields: " + fields() + " }";
+                + "bbox: " + bbox + " }";
         }
     }
 

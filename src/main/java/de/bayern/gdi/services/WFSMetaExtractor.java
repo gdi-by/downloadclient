@@ -19,11 +19,7 @@ package de.bayern.gdi.services;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
@@ -96,12 +92,6 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATION_OUT_FORMATS
         = "ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
-
-    private static final String XPATH_DF_ELEMENT
-        = "//xsd:element[@name=$NAME]";
-
-    private static final String XPATH_TYPES
-        = "//xsd:*[local-name()='simpleType' or local-name()='complexType']";
 
     private static final String XPATH_STORED_QUERIES
         = "//wfs:StoredQueryDescription";
@@ -180,77 +170,9 @@ public class WFSMetaExtractor {
         WFSMeta meta = new WFSMeta();
         meta.url = capURLString;
         parseCapabilites(meta);
-        parseDescribeFeatures(meta);
+        //parseDescribeFeatures(meta);
         parseDescribeStoredQueries(meta);
         return meta;
-    }
-
-    private static String stripNS(String ns) {
-        if (ns == null) {
-            return null;
-        }
-        int idx = ns.lastIndexOf(':');
-        return idx >= 0 ? ns.substring(idx + 1) : ns;
-    }
-
-    private static HashMap<String, Element> buildTypeIndex(
-        Document doc
-    ) {
-        HashMap<String, Element> name2types = new HashMap<>();
-
-        NodeList types = (NodeList)XML.xpath(
-            doc, XPATH_TYPES,
-            XPathConstants.NODESET, NAMESPACES);
-
-        for (int i = 0, n = types.getLength(); i < n; i++) {
-            Element type = (Element)types.item(i);
-            name2types.put(type.getAttribute("name"), type);
-        }
-
-        return name2types;
-    }
-
-    private static ArrayList<Field> recursiveResolve(
-        HashMap<String, Element> name2types,
-        Element element
-    ) {
-        ArrayList<Field> list = new ArrayList<>();
-        ArrayDeque<Element> queue = new ArrayDeque<>();
-
-        HashSet<String> visited = new HashSet<>();
-
-        queue.add(element);
-        while (!queue.isEmpty()) {
-            element = queue.remove();
-            String name = element.getAttribute("name");
-            if (!visited.add(name)) {
-                continue;
-            }
-            Element type = name2types.get(
-                stripNS(element.getAttribute("type")));
-            if (type == null) {
-                list.add(new Field(
-                    name,
-                    element.getAttribute("type")));
-            } else {
-                NodeList children =
-                    type.getElementsByTagNameNS(
-                        "http://www.w3.org/2001/XMLSchema",
-                        "element");
-                int n = children.getLength();
-                if (n == 0) {
-                    // TODO: Do more ... list union etc.
-                    list.add(new Field(
-                        element.getAttribute("name"),
-                        "Simple"));
-                } else {
-                    for (int i = 0; i < n; i++) {
-                        queue.add((Element)children.item(i));
-                    }
-                }
-            }
-        }
-        return list;
     }
 
     private Document getDocument(String url) throws IOException {
@@ -280,38 +202,6 @@ public class WFSMetaExtractor {
             url += "&" + post;
         }
         return url;
-    }
-
-    private void parseDescribeFeatures(WFSMeta meta)
-        throws IOException {
-
-        WFSMeta.Operation op = meta.findOperation("DescribeFeatureType");
-        if (op == null) {
-            return;
-        }
-
-        String urlString = op.get != null
-            ? url(op.get, "DescribeFeatureType", meta)
-            : capURLString.replace("GetCapabilities", "DescribeFeatureType");
-
-        Document dfDoc = getDocument(urlString);
-        meta.namespaces.join(dfDoc);
-
-        HashMap<String, Element> name2types = buildTypeIndex(dfDoc);
-
-        for (WFSMeta.Feature feature: meta.features) {
-            HashMap<String, String> vars = new HashMap<>();
-            String name = stripNS(feature.name);
-            vars.put("NAME", name);
-            NodeList elements = (NodeList)XML.xpath(
-                dfDoc, XPATH_DF_ELEMENT,
-                XPathConstants.NODESET, NAMESPACES, vars);
-            if (elements.getLength() == 0) {
-                continue;
-            }
-            Element element = (Element)elements.item(0);
-            feature.fields = recursiveResolve(name2types, element);
-        }
     }
 
     private void parseDescribeStoredQueries(WFSMeta meta)
