@@ -113,14 +113,7 @@ public class WFSMeta {
         }
 
         private String parameters() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < parameters.size(); i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(parameters.get(i));
-            }
-            return sb.toString();
+            return "[" + StringUtils.join(parameters, ", ") + "]";
         }
 
         @Override

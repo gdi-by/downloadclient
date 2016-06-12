@@ -231,12 +231,12 @@ public class StringUtils {
     }
 
     /**
-     * Joins a list of strings with a separator.
-     * @param s The string list.
+     * Joins a list of objects with a separator to a string.
+     * @param s The list of objects.
      * @param sep The separator.
      * @return the joined string.
      */
-    public static String join(List<String> s, String sep) {
+    public static String join(List<?> s, String sep) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = s.size(); i < n; i++) {
             if (i > 0) {
