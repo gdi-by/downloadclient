@@ -69,7 +69,7 @@ public class WFSMeta {
             for (Constraint constraint: this.constraints) {
                 if (constraint.name != null
                 && constraint.value != null
-                    && constraint.equals("CountDefault")) {
+                && constraint.name.equals("CountDefault")) {
                     try {
                         return Integer.valueOf(constraint.value);
                     } catch (NumberFormatException nfe) {
