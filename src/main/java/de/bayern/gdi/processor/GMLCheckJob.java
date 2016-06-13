@@ -19,6 +19,8 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -28,7 +30,8 @@ import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.XML;
 
 /**
- * Checks is a given GML file contains indicators for an exception.
+ * Checks if a given set of GML files contain
+ * indicators for an WFS exception.
  */
 public class GMLCheckJob implements Job {
 
@@ -38,7 +41,7 @@ public class GMLCheckJob implements Job {
         = "//*[local-name()='Exception']"
         + "/*[local-name()='ExceptionText']/text()";
 
-    private File file;
+    private List<File> files;
 
     private static final String[] EXCEPTION_INDICATORS = {
         "ExceptionReport"
@@ -48,14 +51,19 @@ public class GMLCheckJob implements Job {
     }
 
     public GMLCheckJob(File file) {
-        this.file = file;
+        this.files = new ArrayList<>();
+        this.files.add(file);
     }
 
-    private void checkForProblems() throws JobExecutionException {
-        Document doc = XML.getDocument(this.file);
+    public GMLCheckJob(List<File> files) {
+        this.files = files;
+    }
+
+    private void checkForProblems(File file) throws JobExecutionException {
+        Document doc = XML.getDocument(file);
         if (doc == null) {
             throw new JobExecutionException(
-                I18n.format("gml.check.parsing.failed", this.file));
+                I18n.format("gml.check.parsing.failed", file));
         }
         String message = XML.xpathString(doc, ERROR_MESSAGE, null);
         if (message != null && !message.isEmpty()) {
@@ -67,29 +75,31 @@ public class GMLCheckJob implements Job {
     @Override
     public void run(Processor p) throws JobExecutionException {
 
-        p.broadcastMessage(I18n.format("gml.check.start", this.file));
+        for (File file: this.files) {
+            p.broadcastMessage(I18n.format("gml.check.start", file));
 
-        if (!this.file.isFile() || !this.file.canRead()) {
-            throw new JobExecutionException(
-                I18n.format("gml.check.not.accessible", this.file));
-        }
-
-        // If the document is large screen for
-        // indicators of ExceptionReport first to avoid
-        // building a large in memory DOM.
-        if (file.length() > SCREENING_THESHOLD) {
-            try {
-                if (XML.containsTags(this.file, EXCEPTION_INDICATORS) == null) {
-                    // No indicators no cry ...
-                    p.broadcastMessage(I18n.getMsg("gml.check.passed"));
-                    return;
-                }
-            } catch (XMLStreamException | IOException e) {
+            if (!file.isFile() || !file.canRead()) {
                 throw new JobExecutionException(
-                    I18n.format("gml.check.processing.failed", this.file));
+                    I18n.format("gml.check.not.accessible", file));
             }
+
+            // If the document is large screen for
+            // indicators of ExceptionReport first to avoid
+            // building a large in memory DOM.
+            if (file.length() > SCREENING_THESHOLD) {
+                try {
+                    if (XML.containsTags(file, EXCEPTION_INDICATORS) == null) {
+                        // No indicators no cry ...
+                        p.broadcastMessage(I18n.getMsg("gml.check.passed"));
+                        return;
+                    }
+                } catch (XMLStreamException | IOException e) {
+                    throw new JobExecutionException(
+                        I18n.format("gml.check.processing.failed", file));
+                }
+            }
+            checkForProblems(file);
+            p.broadcastMessage(I18n.getMsg("gml.check.passed"));
         }
-        checkForProblems();
-        p.broadcastMessage(I18n.getMsg("gml.check.passed"));
     }
 }
