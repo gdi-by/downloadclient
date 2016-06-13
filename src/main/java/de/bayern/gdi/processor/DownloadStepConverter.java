@@ -20,6 +20,8 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Level;
@@ -30,7 +32,9 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.utils.FeatureGuesser;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.NumberMatched;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Make DownloadStep configurations suitable for the download processor. */
@@ -95,26 +99,12 @@ public class DownloadStepConverter {
 
     private static String wfsURL(
         DownloadStep dls,
-        Set<String>  usedVars
+        Set<String>  usedVars,
+        WFSMeta      meta
     ) throws ConverterException {
 
         String url = dls.getServiceURL();
         String base = baseURL(url);
-        String cap = capURL(base);
-
-        WFSMetaExtractor extractor = new WFSMetaExtractor(cap);
-
-        WFSMeta meta;
-        try {
-            meta = extractor.parse();
-        } catch (IOException ioe) {
-            // TODO: I18n
-            throw new ConverterException("Cannot load meta data", ioe);
-        }
-
-        System.err.println("operations: " + meta.operations);
-        System.err.println("paging: "
-            + meta.findOperation("GetFeature").featuresPerPage());
 
         String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
 
@@ -122,7 +112,7 @@ public class DownloadStepConverter {
         String queryType = findQueryType(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
-        sb.append(url)
+        sb.append(base)
           .append('?')
           .append("service=wfs&")
           .append("request=GetFeature&")
@@ -164,24 +154,105 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static void createWfsDownload(
-        JobList jl,
-        File workingDir,
-        Set<String> usedVars,
-        DownloadStep dls
+    private static void unpagedWFSDownload(
+        JobList      jl,
+        File         workingDir,
+        Set<String>  usedVars,
+        DownloadStep dls,
+        WFSMeta      meta
     ) throws ConverterException {
-        String url = wfsURL(dls, usedVars);
+
+        String url = wfsURL(dls, usedVars, meta);
         log.log(Level.INFO, "url: " + url);
 
         File gml = new File(workingDir, "download.gml");
-        log.log(Level.INFO, "Download to file \"" + gml + "\"");
+        log.info("Download to file \"" + gml + "\"");
 
-        String user = dls.findParameter("user");
+        String user     = dls.findParameter("user");
         String password = dls.findParameter("password");
 
         FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
         jl.addJob(new GMLCheckJob(gml));
+    }
+
+    private static URL newURL(String url) throws ConverterException {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException mfe) {
+            throw new ConverterException(mfe.getMessage(), mfe);
+        }
+    }
+
+    private static void createWFSDownload(
+        JobList      jl,
+        File         workingDir,
+        Set<String>  usedVars,
+        DownloadStep dls
+    ) throws ConverterException {
+
+        String user     = dls.findParameter("user");
+        String password = dls.findParameter("password");
+
+        String url = dls.getServiceURL();
+        String base = baseURL(url);
+        String cap = capURL(base);
+
+        WFSMetaExtractor extractor = new WFSMetaExtractor(cap, user, password);
+
+        WFSMeta meta;
+        try {
+            meta = extractor.parse();
+        } catch (IOException ioe) {
+            // TODO: I18n
+            throw new ConverterException("Cannot load meta data", ioe);
+        }
+
+        Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
+
+        if (fpp == null) {
+            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            return;
+        }
+
+        String wfsURL = wfsURL(dls, usedVars, meta);
+        NumberMatched nm = new NumberMatched(wfsURL, user, password);
+        int numFeatures;
+        try {
+            numFeatures = nm.numFeatures(0, fpp);
+        } catch (Exception e) {
+            throw new ConverterException(e.getMessage(), e);
+        }
+        // Page size greater than number features -> Normal download.
+        if (numFeatures < fpp) {
+            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            return;
+        }
+        // Real paging. Figure out the real number of features.
+        FeatureGuesser guesser = new FeatureGuesser(fpp);
+        try {
+            numFeatures = guesser.totalNumFeatures(nm);
+        } catch (Exception e) {
+            throw new ConverterException(e.getMessage(), e);
+        }
+        log.info("total number of features: " + numFeatures);
+
+        FilesDownloadJob fdj = new FilesDownloadJob(user, password);
+        GMLCheckJob gcj = new GMLCheckJob();
+
+        int numFiles = Math.max(1, numFeatures / fpp);
+        String format = "%0" + StringUtils.places(numFiles) + "d-%d.gml";
+
+        for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
+            String filename = String.format(format, i, ofs);
+            File file = new File(workingDir, filename);
+            URL featureURL = newURL(nm.getFeatureURL(ofs, fpp));
+            fdj.add(file, featureURL);
+            gcj.add(file);
+        }
+
+        jl.addJob(fdj);
+        jl.addJob(gcj);
     }
 
 
@@ -246,10 +317,11 @@ public class DownloadStepConverter {
 
         JobList jl = new JobList();
 
+
         if (dls.getServiceType().equals("ATOM")) {
             createAtomDownload(jl, path, dls);
         } else {
-            createWfsDownload(jl, path, psc.getUsedVars(), dls);
+            createWFSDownload(jl, path, psc.getUsedVars(), dls);
         }
 
         jl.addJobs(psc.getJobs());

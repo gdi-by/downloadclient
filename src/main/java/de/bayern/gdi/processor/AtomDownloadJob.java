@@ -38,6 +38,7 @@ import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
 /** AtomDownloadJob is a job to download things from a ATOM service. */
@@ -126,16 +127,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         return MIMETYPE2EXT.getProperty(type, "dat");
     }
 
-    private static final int TEN = 10;
-
-    private static int places(int n) {
-        int places = 1;
-        for (int value = TEN; n > value; value *= TEN) {
-            places++;
-        }
-        return places;
-    }
-
     private static final String DATASOURCE_XPATH
         = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
         + " inspire_dls:spatial_dataset_identifier_code/text()=$CODE]"
@@ -173,7 +164,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
-        String format = "%0" + places(nl.getLength()) + "d.%s";
+        String format = "%0" + StringUtils.places(nl.getLength()) + "d.%s";
         for (int i = 0, j = 0, n = nl.getLength(); i < n; i++) {
             Element link = (Element)nl.item(i);
             String href = link.getAttribute("href");

@@ -54,7 +54,8 @@ public class WFSMetaExtractor {
     private static final String XLINK = "http://www.w3.org/1999/xlink";
     private static final String XSD = "http://www.w3.org/2001/XMLSchema";
 
-    private static final NamespaceContext NAMESPACES =
+    /** Common namespaces for WFS documents. */
+    public static final NamespaceContext NAMESPACES =
         new NamespaceContextMap(
             "ows",   OWS,
             "wfs",   WFS,

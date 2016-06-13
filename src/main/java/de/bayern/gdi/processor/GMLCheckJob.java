@@ -48,6 +48,7 @@ public class GMLCheckJob implements Job {
     };
 
     public GMLCheckJob() {
+        this.files = new ArrayList<>();
     }
 
     public GMLCheckJob(File file) {
@@ -57,6 +58,13 @@ public class GMLCheckJob implements Job {
 
     public GMLCheckJob(List<File> files) {
         this.files = files;
+    }
+
+    /** Adds a GML file to check.
+     * @param file The file to check.
+     */
+    public void add(File file) {
+        this.files.add(file);
     }
 
     private static void checkForProblems(File file)

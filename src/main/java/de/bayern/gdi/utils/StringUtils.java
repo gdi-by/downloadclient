@@ -246,4 +246,18 @@ public class StringUtils {
         }
         return sb.toString();
     }
+
+    private static final int TEN = 10;
+
+    /** How many digit place does a number need?
+     * @param n The number.
+     * @return the number of digits.
+     */
+    public static int places(int n) {
+        int places = 1;
+        for (int value = TEN; n > value; value *= TEN) {
+            places++;
+        }
+        return places;
+    }
 }
