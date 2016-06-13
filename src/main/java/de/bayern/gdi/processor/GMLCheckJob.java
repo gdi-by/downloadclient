@@ -59,7 +59,8 @@ public class GMLCheckJob implements Job {
         this.files = files;
     }
 
-    private void checkForProblems(File file) throws JobExecutionException {
+    private static void checkForProblems(File file)
+    throws JobExecutionException {
         Document doc = XML.getDocument(file);
         if (doc == null) {
             throw new JobExecutionException(
