@@ -36,20 +36,49 @@ public class WFSMeta {
         public String get;
         /** output formats. */
         public ArrayList<String> outputFormats;
+        /** constraints. */
+        public List<Constraint> constraints;
 
         public Operation() {
             this.outputFormats = new ArrayList<>();
+            this.constraints = new ArrayList<>();
         }
 
         private String outputFormats() {
             return "[" + StringUtils.join(outputFormats, ", ") + "]";
         }
 
+        private String constraints() {
+            return "[" + StringUtils.join(constraints, ", ") + "]";
+        }
+
         @Override
         public String toString() {
             return "operation: { name: " + name + " "
                 + " get: " + get + " "
+                + " constraints: " +  constraints() + " "
                 + " output formats: " + outputFormats() + " }";
+        }
+
+        /**
+         * Figure out if this service implements paging.
+         * @return number of features per page.
+         *         null if paging is not supported.
+         */
+        public Integer featuresPerPage() {
+            for (Constraint constraint: this.constraints) {
+                if (constraint.name != null
+                && constraint.value != null
+                    && constraint.equals("CountDefault")) {
+                    try {
+                        return Integer.valueOf(constraint.value);
+                    } catch (NumberFormatException nfe) {
+                        // Ignore me.
+                    }
+                    return null;
+                }
+            }
+            return null;
         }
     }
 
@@ -126,6 +155,22 @@ public class WFSMeta {
         }
     }
 
+    /** Constraint. */
+    public static class Constraint {
+        /** name. */
+        public String name;
+        /** value. */
+        public String value;
+
+        public Constraint() {
+        }
+
+        @Override
+        public String toString() {
+            return "[ name: " + name + ", value: " + value + "]";
+        }
+    }
+
     /** title. */
     public String title;
     /** URL. */
@@ -134,10 +179,8 @@ public class WFSMeta {
     public String abstractDescription;
     /** operations. */
     public List<Operation> operations;
-    /** supported constraints. */
-    public List<String> supportedConstraints;
-    /** unsupported constraints. */
-    public List<String> unsupportedConstraints;
+    /** constraints. */
+    public List<Constraint> constraints;
     /** features. */
     public List<Feature> features;
     /** stored queries. */
@@ -149,8 +192,7 @@ public class WFSMeta {
 
     public WFSMeta() {
         operations = new ArrayList<>();
-        supportedConstraints = new ArrayList<>();
-        unsupportedConstraints = new ArrayList<>();
+        constraints = new ArrayList<>();
         features = new ArrayList<>();
         storedQueries = new ArrayList<>();
         versions = new ArrayList<>();
@@ -202,13 +244,8 @@ public class WFSMeta {
             sb.append("\t\t").append(op).append("\n");
         }
         sb.append("\t}\n");
-        sb.append("\tsupported constraints: {\n");
-        for (String c: supportedConstraints) {
-            sb.append("\t\t").append(c).append("\n");
-        }
-        sb.append("\t}\n");
-        sb.append("\tunsupported constraints: {\n");
-        for (String c: unsupportedConstraints) {
+        sb.append("\tconstraints: {\n");
+        for (Constraint c: constraints) {
             sb.append("\t\t").append(c).append("\n");
         }
         sb.append("\t}\n");
