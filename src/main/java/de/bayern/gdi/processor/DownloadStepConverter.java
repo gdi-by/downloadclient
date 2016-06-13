@@ -112,6 +112,10 @@ public class DownloadStepConverter {
             throw new ConverterException("Cannot load meta data", ioe);
         }
 
+        System.err.println("operations: " + meta.operations);
+        System.err.println("paging: "
+            + meta.findOperation("GetFeature").featuresPerPage());
+
         String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
 
         String dataset = dls.getDataset();
