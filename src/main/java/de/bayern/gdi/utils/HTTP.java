@@ -18,14 +18,15 @@
 package de.bayern.gdi.utils;
 
 import java.io.IOException;
+import java.net.ProxySelector;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -34,6 +35,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 /** Helper for HTTP. */
 public final class HTTP {
@@ -76,9 +78,14 @@ public final class HTTP {
         authCache.put(target, basicAuth);
         context.setAuthCache(authCache);
 
+        // Use JVM proxy settings.
+        SystemDefaultRoutePlanner routePlanner
+            = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
+
         return HttpClients
             .custom()
             .setDefaultCredentialsProvider(credsProv)
+            .setRoutePlanner(routePlanner)
             .build();
     }
 
@@ -99,29 +106,6 @@ public final class HTTP {
         }
     }
 
-    private static RequestConfig getProxyConfig(String proto) {
-        String proxy = System.getProperty(proto + ".proxyHost");
-        Integer port = Integer.getInteger(proto + ".proxyPort");
-        HttpHost proxyHost = new HttpHost(proxy, port, proto);
-        return RequestConfig.custom()
-                .setProxy(proxyHost)
-                .build();
-    }
-
-    private static void configureProxy(HttpGet request, String proto) {
-        String proxy = System.getProperty(proto + ".proxyHost");
-        if (proxy != null) {
-            request.setConfig(getProxyConfig(proto));
-        }
-    }
-
-    private static void configureProxy(HttpPost request, String proto) {
-        String proxy = System.getProperty(proto + ".proxyHost");
-        if (proxy != null) {
-            request.setConfig(getProxyConfig(proto));
-        }
-    }
-
     /**
      * Returns a configured GET request.
      * @param url The URL to browse.
@@ -129,11 +113,7 @@ public final class HTTP {
      * @throws URISyntaxException If the URL is not valid.
      */
     public static HttpGet getGetRequest(URL url) throws URISyntaxException {
-        HttpGet request = new HttpGet(url.toURI());
-        configureProxy(request, url.getProtocol().equals("https")
-            ? "https"
-            : "http");
-        return request;
+        return new HttpGet(url.toURI());
     }
 
     /**
@@ -143,10 +123,6 @@ public final class HTTP {
      * @throws URISyntaxException if the url is not valid
      */
     public static HttpPost getPostRequest(URL url)  throws URISyntaxException {
-        HttpPost request = new HttpPost(url.toURI());
-        configureProxy(request, url.getProtocol().equals("https")
-                ? "https"
-                : "http");
-        return request;
+        return new HttpPost(url.toURI());
     }
 }
