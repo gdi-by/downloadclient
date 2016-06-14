@@ -234,54 +234,41 @@ public class WMSMapSwing extends Parent {
             @Override
             public void run() {
                 StringBuilder sb = new StringBuilder();
-                sb.append("[]");
-                sb.append("[min!]");
-
+                sb.append("[][min!]");
                 JPanel panel = new JPanel(new MigLayout(
                         "wrap 1, insets 0",
-
                         "[grow]",
-
                         sb.toString()));
-
                 ExtJMapPane mapPane = new ExtJMapPane(mapContent);
-
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
                 mapPane.setMinimumSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.addFocusListener(new FocusAdapter() {
-
                     @Override
                     public void focusGained(FocusEvent e) {
                         mapPane.setBorder(
                                 BorderFactory.createLineBorder(Color.BLACK));
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         mapPane.setBorder(
                               BorderFactory.createLineBorder(Color.LIGHT_GRAY));
                     }
                 });
-
                 mapPane.addMouseListener(new MouseAdapter() {
-
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         mapPane.requestFocusInWindow();
                     }
                 });
-
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
-
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
-
                 NoToolAction noAction = new NoToolAction(mapPane) {
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent ev) {
@@ -330,8 +317,7 @@ public class WMSMapSwing extends Parent {
                             @Override
                             public void onMousePressed(MapMouseEvent ev) { }
                             @Override
-                            public void onMouseDragged(MapMouseEvent ev) {
-                            }
+                            public void onMouseDragged(MapMouseEvent ev) { }
                         };
                         getMapPane().setCursorTool(tool);
                     }
@@ -340,33 +326,25 @@ public class WMSMapSwing extends Parent {
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new PanAction(mapPane));
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new InfoAction(mapPane));
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 btn = new JButton(new ResetAction(mapPane));
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
@@ -375,8 +353,6 @@ public class WMSMapSwing extends Parent {
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
-
-
                 MapViewport old = mapContent.getViewport();
                 CoordinateReferenceSystem crs = null;
                 try {
@@ -400,7 +376,6 @@ public class WMSMapSwing extends Parent {
                 }
                 MapViewport viewport = new MapViewport(initExtend, true);
                 mapContent.setViewport(viewport);
-
             }
         });
     }
