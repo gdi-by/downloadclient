@@ -73,6 +73,7 @@ import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -108,11 +109,11 @@ public class WMSMapSwing extends Parent {
             = "ToolbarZoomInButton";
     private static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
             = "ToolbarZoomOutButton";
-    private static final double INITIAL_EXTEND_X2 = 50.8980D;
-    private static final double INITIAL_EXTEND_Y2 = 8.7684D;
+    private static final double INITIAL_EXTEND_X2 = 50.922573D;
+    private static final double INITIAL_EXTEND_Y2 = 9.353201D;
     private static final double INITIAL_EXTEND_X1 = 47.3037D;
     private static final double INITIAL_EXTEND_Y1 = 13.8221D;
-    private static final String INITIAL_CRS = "EPSG:4326";
+    private static final String INITIAL_CRS = "EPSG:3857";
 
 
     /**
@@ -374,20 +375,32 @@ public class WMSMapSwing extends Parent {
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
-                MapViewport viewport = mapContent.getViewport();
 
+
+                MapViewport old = mapContent.getViewport();
                 CoordinateReferenceSystem crs = null;
                 try {
                     crs = CRS.decode(INITIAL_CRS);
                 } catch (FactoryException e) {
-
+                    log.log(Level.SEVERE, e.getMessage(), e);
                 }
                 ReferencedEnvelope initExtend =
                         new ReferencedEnvelope(INITIAL_EXTEND_X1,
                                 INITIAL_EXTEND_X2,
                                 INITIAL_EXTEND_Y1,
                                 INITIAL_EXTEND_Y2, crs);
-                viewport.setBounds(initExtend);
+                CoordinateReferenceSystem crs1024 = null;
+                CoordinateReferenceSystem worldCRS = mapContent
+                        .getCoordinateReferenceSystem();
+                try {
+                    crs1024 = CRS.decode("EPSG:1024");
+                    initExtend.transform(crs1024, true);
+                } catch (FactoryException | TransformException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+                MapViewport viewport = new MapViewport(initExtend, true);
+                mapContent.setViewport(viewport);
+
             }
         });
     }
