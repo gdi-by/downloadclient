@@ -37,22 +37,40 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ProxyConfiguration {
 
     @XmlAttribute(name = "overrideSystemSettings")
-    private boolean overrideSystemSettings;
+    private Boolean overrideSystemSettings;
 
-    @XmlElement(name = "ProxyHost")
-    private String proxyHost;
+    @XmlAttribute(name = "enableSNIExtension")
+    private Boolean enableSNIExtension;
 
-    @XmlElement(name = "ProxyPort")
-    private int proxyPort;
+    @XmlElement(name = "HTTPProxyHost")
+    private String httpProxyHost;
 
-    @XmlElement(name = "ProxyUser")
-    private String proxyUser;
+    @XmlElement(name = "HTTPProxyPort")
+    private Integer httpProxyPort;
 
-    @XmlElement(name = "ProxyPasswort")
-    private String proxyPasswort;
+    @XmlElement(name = "HTTPProxyUser")
+    private String httpProxyUser;
 
-    @XmlElement(name = "NonProxyHosts")
-    private String nonProxyHosts;
+    @XmlElement(name = "HTTPProxyPasswort")
+    private String httpProxyPasswort;
+
+    @XmlElement(name = "HTTPNonProxyHosts")
+    private String httpNonProxyHosts;
+
+    @XmlElement(name = "HTTPSProxyHost")
+    private String httpsProxyHost;
+
+    @XmlElement(name = "HTTPSProxyPort")
+    private Integer httpsProxyPort;
+
+    @XmlElement(name = "HTTPSProxyUser")
+    private String httpsProxyUser;
+
+    @XmlElement(name = "HTTPSProxyPasswort")
+    private String httpsProxyPasswort;
+
+    @XmlElement(name = "HTTPSNonProxyHosts")
+    private String httpsNonProxyHosts;
 
     public ProxyConfiguration() {
     }
@@ -60,71 +78,201 @@ public class ProxyConfiguration {
     /**
      * @return the overrideSystemSettings
      */
-    public boolean isOverrideSystemSettings() {
+    public Boolean getOverrideSystemSettings() {
         return overrideSystemSettings;
     }
 
     /**
      * @param overrideSystemSettings the overrideSystemSettings to set
      */
-    public void setOverrideSystemSettings(boolean overrideSystemSettings) {
+    public void setOverrideSystemSettings(Boolean overrideSystemSettings) {
         this.overrideSystemSettings = overrideSystemSettings;
     }
 
     /**
-     * @return the proxyHost
+     * @return the httpProxyHost
      */
-    public String getProxyHost() {
-        return proxyHost;
+    public String getHttpProxyHost() {
+        return httpProxyHost;
     }
 
     /**
-     * @param proxyHost the proxyHost to set
+     * @param httpProxyHost the httpProxyHost to set
      */
-    public void setProxyHost(String proxyHost) {
-        this.proxyHost = proxyHost;
+    public void setHttpProxyHost(String httpProxyHost) {
+        this.httpProxyHost = httpProxyHost;
     }
 
     /**
-     * @return the proxyPort
+     * @return the httpProxyPort
      */
-    public int getProxyPort() {
-        return proxyPort;
+    public Integer getHttpProxyPort() {
+        return httpProxyPort;
     }
 
     /**
-     * @param proxyPort the proxyPort to set
+     * @param httpProxyPort the httpProxyPort to set
      */
-    public void setProxyPort(int proxyPort) {
-        this.proxyPort = proxyPort;
+    public void setHttpProxyPort(Integer httpProxyPort) {
+        this.httpProxyPort = httpProxyPort;
     }
 
     /**
-     * @return the proxyPasswort
+     * @return the httpProxyUser
      */
-    public String getProxyPasswort() {
-        return proxyPasswort;
+    public String getHttpProxyUser() {
+        return httpProxyUser;
     }
 
     /**
-     * @param proxyPasswort the proxyPasswort to set
+     * @param httpProxyUser the httpProxyUser to set
      */
-    public void setProxyPasswort(String proxyPasswort) {
-        this.proxyPasswort = proxyPasswort;
+    public void setHttpProxyUser(String httpProxyUser) {
+        this.httpProxyUser = httpProxyUser;
     }
 
     /**
-     * @return the nonProxyHosts
+     * @return the httpProxyPasswort
      */
-    public String getNonProxyHosts() {
-        return nonProxyHosts;
+    public String getHttpProxyPasswort() {
+        return httpProxyPasswort;
     }
 
     /**
-     * @param nonProxyHosts the nonProxyHosts to set
+     * @param httpProxyPasswort the httpProxyPasswort to set
      */
-    public void setNonProxyHosts(String nonProxyHosts) {
-        this.nonProxyHosts = nonProxyHosts;
+    public void setHttpProxyPasswort(String httpProxyPasswort) {
+        this.httpProxyPasswort = httpProxyPasswort;
+    }
+
+    /**
+     * @return the httpNonProxyHosts
+     */
+    public String getHttpNonProxyHosts() {
+        return httpNonProxyHosts;
+    }
+
+    /**
+     * @param httpNonProxyHosts the httpNonProxyHosts to set
+     */
+    public void setHttpNonProxyHosts(String httpNonProxyHosts) {
+        this.httpNonProxyHosts = httpNonProxyHosts;
+    }
+
+    /**
+     * @return the httpsProxyHost
+     */
+    public String getHttpsProxyHost() {
+        return httpsProxyHost;
+    }
+
+    /**
+     * @param httpsProxyHost the httpsProxyHost to set
+     */
+    public void setHttpsProxyHost(String httpsProxyHost) {
+        this.httpsProxyHost = httpsProxyHost;
+    }
+
+    /**
+     * @return the httpsProxyPort
+     */
+    public Integer getHttpsProxyPort() {
+        return httpsProxyPort;
+    }
+
+    /**
+     * @param httpsProxyPort the httpsProxyPort to set
+     */
+    public void setHttpsProxyPort(Integer httpsProxyPort) {
+        this.httpsProxyPort = httpsProxyPort;
+    }
+
+    /**
+     * @return the httpsProxyUser
+     */
+    public String getHttpsProxyUser() {
+        return httpsProxyUser;
+    }
+
+    /**
+     * @param httpsProxyUser the httpsProxyUser to set
+     */
+    public void setHttpsProxyUser(String httpsProxyUser) {
+        this.httpsProxyUser = httpsProxyUser;
+    }
+
+    /**
+     * @return the httpsProxyPasswort
+     */
+    public String getHttpsProxyPasswort() {
+        return httpsProxyPasswort;
+    }
+
+    /**
+     * @param httpsProxyPasswort the httpsProxyPasswort to set
+     */
+    public void setHttpsProxyPasswort(String httpsProxyPasswort) {
+        this.httpsProxyPasswort = httpsProxyPasswort;
+    }
+
+    /**
+     * @return the httpsNonProxyHosts
+     */
+    public String getHttpsNonProxyHosts() {
+        return httpsNonProxyHosts;
+    }
+
+    /**
+     * @param httpsNonProxyHosts the httpsNonProxyHosts to set
+     */
+    public void setHttpsNonProxyHosts(String httpsNonProxyHosts) {
+        this.httpsNonProxyHosts = httpsNonProxyHosts;
+    }
+
+    /** Apply the settings to the system. */
+    public void apply() {
+
+        if (overrideSystemSettings == null || !overrideSystemSettings) {
+            return;
+        }
+
+        // Configure HTTP:
+        if (httpProxyHost != null) {
+            System.setProperty("http.proxyHost", httpProxyHost);
+        }
+        if (httpProxyPort != null) {
+            System.setProperty("http.proxyPort", httpProxyPort.toString());
+        }
+        if (httpProxyUser != null) {
+            System.setProperty("http.proxyUser", httpProxyUser);
+        }
+        if (httpProxyPasswort != null) {
+            System.setProperty("http.proxyPasswort", httpProxyPasswort);
+        }
+        if (httpNonProxyHosts != null) {
+            System.setProperty("http.nonProxyHosts", httpNonProxyHosts);
+        }
+
+        // Configure HTTPS:
+        if (enableSNIExtension != null) {
+            System.setProperty(
+                "jsse.enableSNIExtension", enableSNIExtension.toString());
+        }
+        if (httpsProxyHost != null) {
+            System.setProperty("https.proxyHost", httpsProxyHost);
+        }
+        if (httpsProxyPort != null) {
+            System.setProperty("https.proxyPort", httpsProxyPort.toString());
+        }
+        if (httpsProxyUser != null) {
+            System.setProperty("https.proxyUser", httpsProxyUser);
+        }
+        if (httpsProxyPasswort != null) {
+            System.setProperty("https.proxyPasswort", httpsProxyPasswort);
+        }
+        if (httpsNonProxyHosts != null) {
+            System.setProperty("https.nonProxyHosts", httpsNonProxyHosts);
+        }
     }
 
     /**
