@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Base64;
-
 /**
  * Common string operations.
  */
@@ -38,20 +36,6 @@ public class StringUtils {
         = Logger.getLogger(StringUtils.class.getName());
 
     private StringUtils() {
-    }
-
-    /**
-     * Encodes user name and password into base64 encoded string.
-     * @param user The user name.
-     * @param password The passord.
-     * @return The encoded password. null if user or password is null.
-     */
-    public static String getBase64EncAuth(String user, String password) {
-        if (user == null || password == null) {
-            return null;
-        }
-        String auth = user + ":" + password;
-        return new String(Base64.encodeBase64(auth.getBytes()));
     }
 
     /**

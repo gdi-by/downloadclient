@@ -33,7 +33,6 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.ServiceSetting;
-import de.bayern.gdi.utils.StringUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -338,14 +337,6 @@ public class DataBean extends Observable {
      */
     public String getPassword() {
         return this.password;
-    }
-
-    /**
-     * gets the username and password as base64 encrypted string.
-     * @return the base 64 encrypted username and password string
-     */
-    public String getBase64EncAuth() {
-        return StringUtils.getBase64EncAuth(this.userName, this.password);
     }
 
     /**
