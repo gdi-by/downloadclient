@@ -185,6 +185,8 @@ public class WFSMeta {
     public List<Feature> features;
     /** stored queries. */
     public List<StoredQuery> storedQueries;
+    /** output formats. */
+    public List<String> outputFormats;
     /** versions. */
     public List<String> versions;
     /** namespaces. */
@@ -196,6 +198,7 @@ public class WFSMeta {
         features = new ArrayList<>();
         storedQueries = new ArrayList<>();
         versions = new ArrayList<>();
+        outputFormats = new ArrayList<>();
         namespaces = new NamespaceContextMap();
     }
 
@@ -262,6 +265,11 @@ public class WFSMeta {
         sb.append("\tversions: {\n");
         for (String version: versions) {
             sb.append("\t\t").append(version).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\toutput formats: {\n");
+        for (String outputFormat: outputFormats) {
+            sb.append("\t\t").append(outputFormat).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");

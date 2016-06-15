@@ -94,6 +94,11 @@ public class WFSMetaExtractor {
         = "ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
 
+    private static final String XPATH_OUT_FORMATS
+        = "/wfs:WFS_Capabilities"
+        + "/ows:OperationsMetadata/ows:Parameter[@name='outputFormat']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
     private static final String XPATH_FEATURE_OUT_FORMATS
         = "wfs:OutputFormats/wfs:Format/text()";
 
@@ -268,6 +273,13 @@ public class WFSMetaExtractor {
             meta.versions.add(versions.item(i).getTextContent());
         }
         Collections.sort(meta.versions);
+
+        NodeList outputFormats = (NodeList)XML.xpath(
+            capDoc, XPATH_OUT_FORMATS,
+            XPathConstants.NODESET, NAMESPACES);
+        for (int i = 0, n = outputFormats.getLength(); i < n; i++) {
+            meta.outputFormats.add(outputFormats.item(i).getTextContent());
+        }
 
         NodeList nl = (NodeList)XML.xpath(
             capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);

@@ -700,6 +700,10 @@ public class Controller {
                     outputFormats =
                         this.dataBean.getWFSService()
                             .findOperation("GetFeature").outputFormats;
+                    if (outputFormats.isEmpty()) {
+                        outputFormats =
+                            this.dataBean.getWFSService().outputFormats;
+                    }
                 }
                 ObservableList<String> formats =
                     FXCollections.observableArrayList(outputFormats);
