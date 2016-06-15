@@ -40,16 +40,16 @@ specified which overwrite the defaults.
 
       <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
         <!-- HTTP settings: -->
-        <HTTPProxyHost>HOST</HTTProxyHost>
-        <HTTPProxyPort>PORT</HTTProxyPort>
-        <HTTPProxyUser>USER</HTTProxyUser>
-        <HTTPProxyUser>PASSWORD</HTTProxyPassword>
+        <HTTPProxyHost>HOST</HTTPProxyHost>
+        <HTTPProxyPort>PORT</HTTPProxyPort>
+        <HTTPProxyUser>USER</HTTPProxyUser>
+        <HTTPProxyUser>PASSWORD</HTTPProxyPassword>
         <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
         <!-- HTTPS settings: -->
-        <HTTPSProxyHost>HOST</HTTSProxyHost>
-        <HTTPSProxyPort>PORT</HTTSProxyPort>
-        <HTTPSProxyUser>USER</HTTSProxyUser>
-        <HTTPSProxyUser>PASSWORD</HTTSProxyPassword>
+        <HTTPSProxyHost>HOST</HTTPSProxyHost>
+        <HTTPSProxyPort>PORT</HTTPSProxyPort>
+        <HTTPSProxyUser>USER</HTTPSProxyUser>
+        <HTTPSProxyUser>PASSWORD</HTTPSProxyPassword>
         <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
       </ProxyConfiguration>
 
