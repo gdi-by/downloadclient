@@ -62,7 +62,9 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
+import org.geotools.map.MapViewport;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.swing.JMapPane;
@@ -76,6 +78,7 @@ import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
+import com.vividsolutions.jts.geom.Polygon;
 
 import de.bayern.gdi.utils.I18n;
 
@@ -411,6 +414,18 @@ public class WMSMapSwing extends Parent {
         });
     }
 
+    public void setToExtend(ReferencedEnvelope envelope) {
+        MapViewport viewPort = new MapViewport(envelope, true);
+        this.mapContent.setViewport(viewPort);
+    }
+
+    public void drawBoxes(List<ReferencedEnvelope> envelopes) {
+
+    }
+
+    public void drawPolygon(Polygon polygon) {
+
+    }
     /**
      * return the Bounds of the Map.
      * @return the Bounds of the Map
