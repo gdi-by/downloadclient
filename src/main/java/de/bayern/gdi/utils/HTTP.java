@@ -34,6 +34,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
@@ -56,37 +57,38 @@ public final class HTTP {
     public static CloseableHttpClient getClient(
         URL url, String user, String password
     ) {
-        if (user == null || password == null) {
-            return HttpClients.createDefault();
-        }
-
-        UsernamePasswordCredentials defaultCreds
-            = new UsernamePasswordCredentials(user, password);
-
-        HttpClientContext context = HttpClientContext.create();
-        BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
-
-        credsProv.setCredentials(
-            new AuthScope(url.getHost(), url.getPort()), defaultCreds);
-
-        context.setCredentialsProvider(credsProv);
-
-        BasicAuthCache authCache = new BasicAuthCache();
-        BasicScheme basicAuth = new BasicScheme();
-        HttpHost target = new HttpHost(url.getHost(), url.getPort());
-
-        authCache.put(target, basicAuth);
-        context.setAuthCache(authCache);
-
         // Use JVM proxy settings.
         SystemDefaultRoutePlanner routePlanner
             = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
 
-        return HttpClients
+        HttpClientBuilder builder = HttpClients
             .custom()
-            .setDefaultCredentialsProvider(credsProv)
-            .setRoutePlanner(routePlanner)
-            .build();
+            .setRoutePlanner(routePlanner);
+
+        if (user != null && password != null) {
+
+            UsernamePasswordCredentials defaultCreds =
+                new UsernamePasswordCredentials(user, password);
+
+            BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
+
+            credsProv.setCredentials(
+                new AuthScope(url.getHost(), url.getPort()), defaultCreds);
+
+            HttpClientContext context = HttpClientContext.create();
+            context.setCredentialsProvider(credsProv);
+
+            BasicAuthCache authCache = new BasicAuthCache();
+            BasicScheme basicAuth = new BasicScheme();
+            HttpHost target = new HttpHost(url.getHost(), url.getPort());
+
+            authCache.put(target, basicAuth);
+            context.setAuthCache(authCache);
+
+            builder.setDefaultCredentialsProvider(credsProv);
+        }
+
+        return builder.build();
     }
 
     /**
