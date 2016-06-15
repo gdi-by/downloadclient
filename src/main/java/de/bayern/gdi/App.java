@@ -120,6 +120,8 @@ public class App {
                     "Loading config failed: " + ioe.getMessage());
                 System.exit(1);
             }
+        } else {
+            Config.uninitialized();
         }
 
         if (runHeadless(args)) {

@@ -25,10 +25,21 @@ import org.w3c.dom.Document;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
 
+//import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /** Load configurations from specified directory. */
 public class Config {
 
-    private static Config instance;
+    private static final Logger log
+        = Logger.getLogger(Config.class.getName());
+
+    /** Inner class to implicit synchronize the instance access. */
+    private static final class Holder {
+        static final Config INSTANCE = new Config();
+    }
+
+    private boolean initialized;
 
     private ServiceSetting services;
 
@@ -37,13 +48,23 @@ public class Config {
     private Config() {
     }
 
+    private static final long FIVEHUNDRED = 500;
+
     /**
      * Access the instance of the configuration.
      * Use #load before to initialize it.
      * @return The configuration instance.
      */
-    public static synchronized Config getInstance() {
-        return instance;
+    public static Config getInstance() {
+        synchronized (Holder.INSTANCE) {
+            try {
+                while (!Holder.INSTANCE.initialized) {
+                    Holder.INSTANCE.wait(FIVEHUNDRED);
+                }
+            } catch (InterruptedException ie) {
+            }
+            return Holder.INSTANCE;
+        }
     }
 
     /**
@@ -60,12 +81,33 @@ public class Config {
         return processingConfig;
     }
 
+    /** Mark global config as unused. */
+    public static void uninitialized() {
+        synchronized (Holder.INSTANCE) {
+            Holder.INSTANCE.initialized = true;
+            Holder.INSTANCE.notifyAll();
+        }
+    }
+
     /**
      * Load configurations.
      * @param dirname The directory with the configuration files.
      * @throws IOException If something went wrong.
      */
-    public static synchronized void load(String dirname) throws IOException {
+    public static void load(String dirname) throws IOException {
+        synchronized (Holder.INSTANCE) {
+            try {
+                loadInternal(dirname);
+            } finally {
+                Holder.INSTANCE.initialized = true;
+                Holder.INSTANCE.notifyAll();
+            }
+        }
+    }
+
+    private static void loadInternal(String dirname) throws IOException {
+
+        log.info("config directory: " + dirname);
 
         File dir = new File(dirname);
 
@@ -79,8 +121,6 @@ public class Config {
             proxyConfig.apply();
         }
 
-        instance = new Config();
-
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
         if (services.isFile() && services.canRead()) {
             Document doc = XML.getDocument(services);
@@ -88,13 +128,13 @@ public class Config {
                 throw new IOException(
                     "Cannot parse XML file '" + services + "'");
             }
-            instance.services = new ServiceSetting(doc);
+            Holder.INSTANCE.services = new ServiceSetting(doc);
         }
 
         File procConfig = new File(
             dir, ProcessingConfiguration.PROCESSING_CONFIG_FILE);
         if (procConfig.isFile() && procConfig.canRead()) {
-            instance.processingConfig =
+            Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.read(procConfig);
         }
 
