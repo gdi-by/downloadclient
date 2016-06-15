@@ -43,7 +43,6 @@ import javafx.collections.ObservableList;
 public class DataBean extends Observable {
 
     private Map<String, String> namePwMap;
-    private ServiceSetting serviceSetting;
     private List<ServiceModel> staticServices;
     private List<ServiceModel> catalogServices;
     private ServiceType serviceType;
@@ -52,44 +51,21 @@ public class DataBean extends Observable {
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
     private Map<String, String> attributes;
-    private String wmsUrl;
-    private String wmsName;
-    private String wmsLayer;
-    private String wmsVersion;
-    private String wmsService;
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
 
-    public String getWMSLayer() {
-        return wmsLayer;
-    }
-
-    public String getWMSVersion() {
-        return wmsVersion;
-    }
-
-    public String getWMSService() {
-        return wmsService;
-    }
-
     /**
      * Constructor.
      */
     public DataBean() {
         this.namePwMap = new HashMap<>();
-        this.serviceSetting = new ServiceSetting();
-        this.staticServices = this.serviceSetting.getServices();
+        this.staticServices = ServiceSetting.getInstance().getServices();
         this.catalogServices = new ArrayList<ServiceModel>();
-        this.catalogService = new CatalogService(this.serviceSetting
+        this.catalogService = new CatalogService(ServiceSetting.getInstance()
                 .getCatalogueURL());
-        this.wmsUrl = this.serviceSetting.getWMSUrl();
-        this.wmsName = this.serviceSetting.getWMSName();
-        this.wmsLayer = this.serviceSetting.getWMSLayer();
-        this.wmsVersion = this.serviceSetting.getWMSVersion();
-        this.wmsService = this.serviceSetting.getWMSService();
         this.processingSteps = new ArrayList<>();
     }
 
@@ -268,38 +244,6 @@ public class DataBean extends Observable {
      */
     public void addAttribute(String key, String value) {
         this.attributes.put(key, value);
-    }
-
-    /**
-     * gets the WMS Url.
-     * @return WMS Url
-     */
-    public String getWmsUrl() {
-        return wmsUrl;
-    }
-
-    /**
-     * sets the WMS Url.
-     * @param wmsUrl WMS Url
-     */
-    public void setWmsUrl(String wmsUrl) {
-        this.wmsUrl = wmsUrl;
-    }
-
-    /**
-     * gets the WMS Name.
-     * @return WMS Name
-     */
-    public String getWmsName() {
-        return wmsName;
-    }
-
-    /**
-     * sets the WMS Name.
-     * @param wmsName WMS Name
-     */
-    public void setWmsName(String wmsName) {
-        this.wmsName = wmsName;
     }
 
     /**

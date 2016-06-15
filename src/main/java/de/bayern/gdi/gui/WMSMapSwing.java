@@ -56,7 +56,6 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
-import org.geotools.map.MapViewport;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
@@ -71,8 +70,10 @@ import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -96,6 +97,7 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateY1;
     private TextField coordinateX2;
     private TextField coordinateY2;
+    private ExtJMapPane mapPane;
 
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -235,23 +237,18 @@ public class WMSMapSwing extends Parent {
                 StringBuilder sb = new StringBuilder();
                 sb.append("[]");
                 sb.append("[min!]");
-
                 JPanel panel = new JPanel(new MigLayout(
                         "wrap 1, insets 0",
-
                         "[grow]",
-
                         sb.toString()));
 
-                ExtJMapPane mapPane = new ExtJMapPane(mapContent);
-
+                mapPane = new ExtJMapPane(mapContent);
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
                 mapPane.setMinimumSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.addFocusListener(new FocusAdapter() {
-
                     @Override
                     public void focusGained(FocusEvent e) {
                         mapPane.setBorder(
@@ -264,23 +261,18 @@ public class WMSMapSwing extends Parent {
                               BorderFactory.createLineBorder(Color.LIGHT_GRAY));
                     }
                 });
-
                 mapPane.addMouseListener(new MouseAdapter() {
-
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         mapPane.requestFocusInWindow();
                     }
                 });
-
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
-
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
-
                 NoToolAction noAction = new NoToolAction(mapPane) {
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent ev) {
@@ -339,33 +331,25 @@ public class WMSMapSwing extends Parent {
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new PanAction(mapPane));
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new InfoAction(mapPane));
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 btn = new JButton(new ResetAction(mapPane));
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
@@ -374,14 +358,24 @@ public class WMSMapSwing extends Parent {
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
-
-                setExtend(INITIAL_EXTEND_X1,
-                        INITIAL_EXTEND_X2,
-                        INITIAL_EXTEND_Y1,
-                        INITIAL_EXTEND_Y2,
-                        INITIAL_CRS);
+                setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
+                        INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
             }
         });
+    }
+
+    private void setExtend(Envelope env) {
+        mapPane.setDisplayArea(env);
+    }
+
+    private void setExtend(ReferencedEnvelope extend) {
+        try {
+            extend = extend.transform(this.mapContent.getViewport()
+                .getCoordinateReferenceSystem(), true);
+            setExtend((Envelope) extend);
+        } catch (FactoryException | TransformException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     private void setExtend(Double x1, Double x2, Double y1, Double y2, String
@@ -389,16 +383,16 @@ public class WMSMapSwing extends Parent {
         CoordinateReferenceSystem coordinateReferenceSystem = null;
         try {
             coordinateReferenceSystem = CRS.decode(crs);
+            ReferencedEnvelope initExtend =
+                    new ReferencedEnvelope(x1,
+                            x2,
+                            y1,
+                            y2, coordinateReferenceSystem);
+            setExtend(initExtend);
         } catch (FactoryException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        ReferencedEnvelope initExtend =
-                new ReferencedEnvelope(x1,
-                        x2,
-                        y1,
-                        y2, coordinateReferenceSystem);
-        MapViewport viewport = new MapViewport(initExtend, true);
-        this.mapContent.setViewport(viewport);
+
     }
     /**
      * return the Bounds of the Map.

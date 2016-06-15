@@ -13,8 +13,6 @@
             !-->
             <url>http://sg.geodatenzentrum.de/wms_webatlasde.light</url>
             <layer>webatlasde.light</layer>
-            <service>WMS</service>
-            <version>1.1.1</version>
         </service>
     </wms>
     <services>

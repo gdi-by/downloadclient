@@ -50,19 +50,24 @@ public class ServiceSetting {
             "serviceSetting.xml";
     private Map<String, String> catalogues;
     private Map<String, String> wms;
+    private static ServiceSetting serviceSetting;
 
     /**
-     * Constructor.
+     * gets the instance.
+     * @return the service Settings
      */
-    public ServiceSetting() {
-        this(SERVICE_SETTING_FILEPATH);
+    public static ServiceSetting getInstance() {
+        if (serviceSetting == null) {
+            serviceSetting = new ServiceSetting(SERVICE_SETTING_FILEPATH);
+        }
+        return serviceSetting;
     }
 
     /**
      * Constructor.
      * @param filePath Path the the serviceSettings.xml
      */
-    public ServiceSetting(String filePath) {
+    private ServiceSetting(String filePath) {
         this.settingStream = getFileStream(filePath);
         this.xmlSettingFile = XML.getDocument(this.settingStream);
         parseDocument(this.xmlSettingFile);
@@ -128,36 +133,20 @@ public class ServiceSetting {
      * gets the WMS Name.
      * @return the WMS Name
      */
-    public String getWMSVersion() {
-        return this.wms.get("version");
-    }
-
-    /**
-     * gets the WMS Name.
-     * @return the WMS Name
-     */
     public String getWMSLayer() {
         return this.wms.get("layer");
     }
 
-    /**
-     * gets the WMS Name.
-     * @return the WMS Name
-     */
-    public String getWMSService() {
-        return this.wms.get("service");
-    }
 
 
     private void parseDocument(Document xmlDocument) {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
-        this.wms = parseSchema(xmlDocument, "wms",
-                "service",
-                "name",
+        this.wms = parseSchema(xmlDocument,
+                "wms",
                 "url",
                 "layer",
-                "version");
+                "name");
     }
 
     private Map<String, String> parseSchema(Document xmlDocument, String

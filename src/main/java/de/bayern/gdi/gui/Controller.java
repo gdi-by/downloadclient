@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.ServiceSetting;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -723,14 +724,14 @@ public class Controller {
         this.serviceList.setItems(this.dataBean.getServicesAsList());
         URL url = null;
         try {
-            url = new URL(this.dataBean.getWmsUrl());
+            url = new URL(ServiceSetting.getInstance().getWMSUrl());
         } catch (MalformedURLException e) {
         }
-        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT, this.dataBean
-                .getWMSLayer());
+        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
+                ServiceSetting.getInstance().getWMSLayer());
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT, this.dataBean
-                .getWMSLayer());
+        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
+                ServiceSetting.getInstance().getWMSLayer());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);
