@@ -78,7 +78,7 @@ public class App {
     }
 
     private static String password(String[] args) {
-        return StringUtils.extractPostfix(args, USER);
+        return StringUtils.extractPostfix(args, PASSWORD);
     }
 
     private static void helpAndExit() {
