@@ -30,6 +30,9 @@ or in headless mode:
 
     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
 
+To access protected services you can pass the needed credentials with `--user=<user>` and `--password=<password>`
+to the downloader.
+
 With `--config=<directory>` a folder with configuration files can be
 specified which overwrite the defaults.
 
