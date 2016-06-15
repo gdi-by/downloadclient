@@ -30,6 +30,9 @@ or in headless mode:
 
     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
 
+With `--config=<directory>` a folder with configuration files can be
+specified which overwrite the defaults.
+
 
 ## License
 

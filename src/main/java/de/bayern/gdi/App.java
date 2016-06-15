@@ -17,7 +17,10 @@
  */
 package de.bayern.gdi;
 
+import java.io.IOException;
+
 import de.bayern.gdi.gui.Start;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.StringUtils;
 
 /**
@@ -29,6 +32,12 @@ public class App {
         "-h",
         "--headless",
         "-headless"
+    };
+
+    private static final String[] CONFIG = {
+        "-c=",
+        "--config=",
+        "-config="
     };
 
     private static final String[] HELP = {
@@ -48,6 +57,10 @@ public class App {
         return StringUtils.contains(args, HELP);
     }
 
+    private static String useConfig(String[] args) {
+        return StringUtils.extractPostfix(args, CONFIG);
+    }
+
     private static void helpAndExit() {
         System.out.println("java -jar downloader.jar [options]");
         System.out.println("with options:");
@@ -55,7 +68,10 @@ public class App {
             "  -?|--help|-help: Print this message and exit.");
         System.out.println(
             "  -h|--headless|-headless: Start command line tool.");
-        System.out.println("without options:");
+        System.out.println(
+              "  -c=<dir>|--config=<dir>|-config=<dir>:"
+            + " Directory to overwrite default configuration.");
+        System.out.println("without options (except '--config'):");
         System.out.println("  Start as GUI application.");
         System.exit(0);
     }
@@ -67,6 +83,17 @@ public class App {
 
         if (help(args)) {
             helpAndExit();
+        }
+
+        String config = useConfig(args);
+        if (config != null) {
+            try {
+                Config.load(config);
+            } catch (IOException ioe) {
+                System.err.println(
+                    "Loading config failed: " + ioe.getMessage());
+                System.exit(1);
+            }
         }
 
         if (runHeadless(args)) {
