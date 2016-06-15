@@ -323,29 +323,29 @@ public class WFSMetaExtractor {
 
             WFSMeta.Feature feature = new WFSMeta.Feature();
 
-            NodeList names = el.getElementsByTagName("Name");
+            NodeList names = el.getElementsByTagNameNS(WFS, "Name");
             if (names.getLength() > 0) {
                 feature.name = names.item(0).getTextContent();
             }
 
-            NodeList titles = el.getElementsByTagName("Title");
+            NodeList titles = el.getElementsByTagNameNS(WFS, "Title");
             if (titles.getLength() > 0) {
                 feature.title = titles.item(0).getTextContent();
             }
 
-            NodeList abstracts = el.getElementsByTagName("Abstract");
+            NodeList abstracts = el.getElementsByTagNameNS(WFS, "Abstract");
             if (abstracts.getLength() > 0) {
                 feature.abstractDescription
                     = abstracts.item(0).getTextContent();
             }
 
-            NodeList defaultCRS = el.getElementsByTagName("DefaultCRS");
+            NodeList defaultCRS = el.getElementsByTagNameNS(WFS, "DefaultCRS");
             if (defaultCRS.getLength() > 0) {
                 feature.defaultCRS
                     = defaultCRS.item(0).getTextContent();
             }
 
-            NodeList otherCRSs = el.getElementsByTagName("OtherCRS");
+            NodeList otherCRSs = el.getElementsByTagNameNS(WFS, "OtherCRS");
             for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }
