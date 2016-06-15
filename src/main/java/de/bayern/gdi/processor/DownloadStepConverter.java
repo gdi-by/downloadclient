@@ -32,6 +32,7 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FeatureGuesser;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.NumberMatched;
@@ -334,9 +335,11 @@ public class DownloadStepConverter {
         InputStream in = null;
         try {
             in = DownloadStepConverter.class.getResourceAsStream(
-                "verarbeitungsschritte.xml");
+                ProcessingConfiguration.PROCESSING_CONFIG_FILE);
             if (in == null) {
-                log.log(Level.SEVERE, "verarbeitungsschritte.xml not found");
+                log.log(Level.SEVERE,
+                    ProcessingConfiguration.PROCESSING_CONFIG_FILE
+                    + " not found");
                 return new ProcessingConfiguration();
             }
             return ProcessingConfiguration.read(in);
@@ -360,7 +363,10 @@ public class DownloadStepConverter {
     public static synchronized
     ProcessingConfiguration getProcessingConfiguration() {
         if (processingConfig == null) {
-            processingConfig = loadProcessingConfiguration();
+            processingConfig = Config.getInstance().getProcessingConfig();
+            if (processingConfig == null) {
+                processingConfig = loadProcessingConfiguration();
+            }
         }
         return processingConfig;
     }

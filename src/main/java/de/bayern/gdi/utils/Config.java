@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.w3c.dom.Document;
 
+import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
 
 /** Load configurations from specified directory. */
@@ -30,6 +31,8 @@ public class Config {
     private static Config instance;
 
     private ServiceSetting services;
+
+    private ProcessingConfiguration processingConfig;
 
     private Config() {
     }
@@ -48,6 +51,13 @@ public class Config {
      */
     public ServiceSetting getServices() {
         return services;
+    }
+
+    /**
+     * @return the processingConfig
+     */
+    public ProcessingConfiguration getProcessingConfig() {
+        return processingConfig;
     }
 
     /**
@@ -81,6 +91,13 @@ public class Config {
             instance.services = new ServiceSetting(doc);
         }
 
-        // TODO: Implement me!
+        File procConfig = new File(
+            dir, ProcessingConfiguration.PROCESSING_CONFIG_FILE);
+        if (procConfig.isFile() && procConfig.canRead()) {
+            instance.processingConfig =
+                ProcessingConfiguration.read(procConfig);
+        }
+
+        // TODO: MIME types -> file extensions.
     }
 }

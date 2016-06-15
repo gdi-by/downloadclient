@@ -56,6 +56,7 @@ specified which overwrite the defaults.
   SSL-Hosts.
 
 * `serviceSetting.xml` A pre-selected set of services.
+* `verarbeitungsschritte.xml` A list of post-processing steps after successful downloads.
 
 
 
