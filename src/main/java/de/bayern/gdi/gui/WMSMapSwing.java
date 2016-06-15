@@ -81,6 +81,8 @@ import org.geotools.swing.tool.ZoomInTool;
 import com.vividsolutions.jts.geom.Polygon;
 
 import de.bayern.gdi.utils.I18n;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -415,8 +417,16 @@ public class WMSMapSwing extends Parent {
     }
 
     public void setToExtend(ReferencedEnvelope envelope) {
-        MapViewport viewPort = new MapViewport(envelope, true);
-        this.mapContent.setViewport(viewPort);
+        MapViewport oldViewPort = this.mapContent.getViewport();
+        try {
+            envelope = envelope.transform(
+                    oldViewPort.getCoordinateReferenceSystem(), true);
+            MapViewport newViewPort = new MapViewport(envelope, false);
+            this.mapContent.setViewport(newViewPort);
+        } catch (FactoryException | TransformException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+
     }
 
     public void drawBoxes(List<ReferencedEnvelope> envelopes) {

@@ -279,15 +279,23 @@ public class Atom {
                         + "))");
                 it.polygon = (Polygon) polygon;
                 Envelope env = polygon.getEnvelopeInternal();
-                String defaultCRSText = it.defaultCRS;
-                String defaultCRS = defaultCRSText.substring(0,
-                        defaultCRSText.lastIndexOf(")"));
-                defaultCRS = defaultCRS.substring(defaultCRS.lastIndexOf("(")
-                        + 1 , defaultCRS.length());
+                String getCategories = "(category/@term)[1]";
+                String categoryTerm = (String) XML.xpath(entry,
+                        getCategories,
+                        XPathConstants.STRING,
+                        this.nscontext);
+                String epsgNumber = categoryTerm.substring(categoryTerm
+                        .lastIndexOf("/")+1, categoryTerm.length());
+                String epsgUnit = categoryTerm.substring(0, categoryTerm
+                        .lastIndexOf(epsgNumber)-1);
+                epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf("/"));
+                epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf("/")+1,
+                        epsgUnit.length());
+                String defaultCRS = epsgUnit + ":" + epsgNumber;
                 CoordinateReferenceSystem crs = CRS.decode(defaultCRS);
                 it.bbox = new ReferencedEnvelope(env, crs);
-                //it.bbox = new ReferencedEnvelope(env.getMinX(), env.getMaxX()
-                //        , env.getMinY(), env.getMaxY(), crs);
+                //it.bbox = new ReferencedEnvelope(env.getMaxX(), env.getMinX()
+                //        , env.getMaxY(), env.getMinY(), crs);
                 //System.out.println((System.currentTimeMillis() - beginRead)
                 //        + " ms\t bbox: " + it.bbox);
             } catch (ParseException
