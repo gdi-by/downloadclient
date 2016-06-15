@@ -40,6 +40,18 @@ public class App {
         "-config="
     };
 
+    private static final String[] USER = {
+        "-u=",
+        "--user=",
+        "-user="
+    };
+
+    private static final String[] PASSWORD = {
+        "-p=",
+        "--password=",
+        "-password="
+    };
+
     private static final String[] HELP = {
         "-?",
         "--help",
@@ -61,6 +73,14 @@ public class App {
         return StringUtils.extractPostfix(args, CONFIG);
     }
 
+    private static String user(String[] args) {
+        return StringUtils.extractPostfix(args, USER);
+    }
+
+    private static String password(String[] args) {
+        return StringUtils.extractPostfix(args, USER);
+    }
+
     private static void helpAndExit() {
         System.out.println("java -jar downloader.jar [options]");
         System.out.println("with options:");
@@ -71,6 +91,12 @@ public class App {
         System.out.println(
               "  -c=<dir>|--config=<dir>|-config=<dir>:"
             + " Directory to overwrite default configuration.");
+        System.out.println(
+              "  -u=<user>|--user=<user>|-user=<user>:"
+            + " User name for protected services.");
+        System.out.println(
+              "  -p=<password>|--password=<password>|-password=<password>:"
+            + " Password for protected services.");
         System.out.println("without options (except '--config'):");
         System.out.println("  Start as GUI application.");
         System.exit(0);
@@ -97,7 +123,7 @@ public class App {
         }
 
         if (runHeadless(args)) {
-            System.exit(Headless.main(args));
+            System.exit(Headless.main(args, user(args), password(args)));
         }
 
         // Its kind of complicated to start a javafx application from

@@ -44,11 +44,6 @@ public class DownloadStepConverter {
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
 
-    private static ProcessingConfiguration processingConfig;
-
-    private DownloadStepConverter() {
-    }
-
     private static final String[][] SERVICE2TYPE = {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
         {"WFS2_BASIC", "DATASET"},
@@ -56,6 +51,64 @@ public class DownloadStepConverter {
         {"WFS1", "DATASET"},
         {"WFS", "DATASET"}
     };
+
+    private static ProcessingConfiguration processingConfig;
+
+    private String user;
+    private String password;
+
+    public DownloadStepConverter() {
+    }
+
+    /**
+     * Creates a converter with given user name and password.
+     * @param user The user name.
+     * @param password The password.
+     */
+    public DownloadStepConverter(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    /**
+     * Converts a DownloadStep into a sequence of jobs for the processor.
+     * @param dls DownloadStep the configuration to be converted.
+     * @return A job list for the download processor.
+     * @throws ConverterException If the conversion went wrong.
+     */
+    public JobList convert(DownloadStep dls) throws ConverterException {
+
+        ProcessingStepConverter psc =
+            new ProcessingStepConverter(getProcessingConfiguration());
+
+        File path = new File(dls.getPath());
+
+        if (!path.exists()) {
+            if (!path.mkdirs()) {
+                throw new ConverterException(
+                    I18n.format("dls.converter.cant.create.dir", path));
+            }
+        } else if (!path.isDirectory()) {
+            throw new ConverterException(
+                I18n.format("dls.converter.not.dir", path));
+        }
+
+        psc.convert(dls, path);
+
+        JobList jl = new JobList();
+
+
+        if (dls.getServiceType().equals("ATOM")) {
+            createAtomDownload(jl, path, dls);
+        } else {
+            createWFSDownload(jl, path, psc.getUsedVars(), dls);
+        }
+
+        jl.addJobs(psc.getJobs());
+
+        return jl;
+    }
+
 
     private static String findQueryType(String type) {
         String t = type.toUpperCase();
@@ -73,9 +126,7 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (usedVars.contains(p.getKey())
-            || p.getKey().equals("user")
-            || p.getKey().equals("password")) {
+            if (usedVars.contains(p.getKey())) {
                 continue;
             }
             if (sb.length() > 0) {
@@ -155,7 +206,7 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static void unpagedWFSDownload(
+    private void unpagedWFSDownload(
         JobList      jl,
         File         workingDir,
         Set<String>  usedVars,
@@ -169,10 +220,10 @@ public class DownloadStepConverter {
         File gml = new File(workingDir, "download.gml");
         log.info("Download to file \"" + gml + "\"");
 
-        String user     = dls.findParameter("user");
-        String password = dls.findParameter("password");
+        FileDownloadJob fdj = new FileDownloadJob(
+            url, gml,
+            this.user, this.password);
 
-        FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
         jl.addJob(new GMLCheckJob(gml));
     }
@@ -185,21 +236,19 @@ public class DownloadStepConverter {
         }
     }
 
-    private static void createWFSDownload(
+    private void createWFSDownload(
         JobList      jl,
         File         workingDir,
         Set<String>  usedVars,
         DownloadStep dls
     ) throws ConverterException {
 
-        String user     = dls.findParameter("user");
-        String password = dls.findParameter("password");
-
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String cap = capURL(base);
 
-        WFSMetaExtractor extractor = new WFSMetaExtractor(cap, user, password);
+        WFSMetaExtractor extractor =
+            new WFSMetaExtractor(cap, this.user, this.password);
 
         WFSMeta meta;
         try {
@@ -238,7 +287,8 @@ public class DownloadStepConverter {
         }
         log.info("total number of features: " + numFeatures);
 
-        FilesDownloadJob fdj = new FilesDownloadJob(user, password);
+        FilesDownloadJob fdj =
+            new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob();
 
         int numFiles = Math.max(1, numFeatures / fpp);
@@ -265,7 +315,7 @@ public class DownloadStepConverter {
         }
     }
 
-    private static void createAtomDownload(
+    private void createAtomDownload(
         JobList jl,
         File workingDir,
         DownloadStep dls
@@ -279,55 +329,13 @@ public class DownloadStepConverter {
         check(dataset, "dataset");
         check(variation, "VARIATION");
 
-        String user = dls.findParameter("user");
-        String password = dls.findParameter("password");
-
         AtomDownloadJob job = new AtomDownloadJob(
             url,
             dataset,
             variation,
             workingDir,
-            user, password);
+            this.user, this.password);
         jl.addJob(job);
-    }
-
-    /**
-     * Converts a DownloadStep into a sequence of jobs for the processor.
-     * @param dls DownloadStep the configuration to be converted.
-     * @return A job list for the download processor.
-     * @throws ConverterException If the conversion went wrong.
-     */
-    public static JobList convert(DownloadStep dls) throws ConverterException {
-
-        ProcessingStepConverter psc =
-            new ProcessingStepConverter(getProcessingConfiguration());
-
-        File path = new File(dls.getPath());
-
-        if (!path.exists()) {
-            if (!path.mkdirs()) {
-                throw new ConverterException(
-                    I18n.format("dls.converter.cant.create.dir", path));
-            }
-        } else if (!path.isDirectory()) {
-            throw new ConverterException(
-                I18n.format("dls.converter.not.dir", path));
-        }
-
-        psc.convert(dls, path);
-
-        JobList jl = new JobList();
-
-
-        if (dls.getServiceType().equals("ATOM")) {
-            createAtomDownload(jl, path, dls);
-        } else {
-            createWFSDownload(jl, path, psc.getUsedVars(), dls);
-        }
-
-        jl.addJobs(psc.getJobs());
-
-        return jl;
     }
 
     private static
