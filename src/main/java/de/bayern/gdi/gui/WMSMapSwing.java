@@ -92,6 +92,7 @@ public class WMSMapSwing extends Parent {
     private VBox vBox;
     private MapContent mapContent;
     private String title;
+    private Label mapSource;
     //private ObservableList<String> layerList;
     //private ListView wmsLayers;
     private ComboBox wmsLayers;
@@ -103,6 +104,8 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateY1;
     private TextField coordinateX2;
     private TextField coordinateY2;
+
+    private static final String MAP_SOURCE = "© GeoBasis-DE / BKG";
 
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -196,6 +199,11 @@ public class WMSMapSwing extends Parent {
             //this.add(this.layerLabel);
             //this.add(this.wmsLayers);
             this.add(this.mapNode);
+            this.mapSource = new Label();
+            this.mapSource.setLabelFor(mapNode);
+            this.mapSource.setText(I18n.getMsg("gui.source") + ": "
+                    + MAP_SOURCE);
+            this.add(this.mapSource);
             this.getChildren().add(vBox);
             this.wmsLayers.setOnAction(new SelectLayer());
 
