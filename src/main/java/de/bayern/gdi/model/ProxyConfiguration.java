@@ -36,6 +36,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProxyConfiguration {
 
+    /** Name of the config file. */
+    public static final String PROXY_CONFIG_FILE = "proxy.xml";
+
     @XmlAttribute(name = "overrideSystemSettings")
     private Boolean overrideSystemSettings;
 

@@ -55,6 +55,8 @@ specified which overwrite the defaults.
   Server Name Indication. This might be needed in case of some problematic
   SSL-Hosts.
 
+* `serviceSetting.xml` A pre-selected set of services.
+
 
 
 ## License

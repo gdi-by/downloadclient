@@ -43,11 +43,11 @@ public class ServiceSetting {
     private static final Logger log
         = Logger.getLogger(ServiceSetting.class.getName());
 
-    private InputStream settingStream;
-    private List<ServiceModel> services;
-    private Document xmlSettingFile;
-    private static final String SERVICE_SETTING_FILEPATH =
+    /** Name of the config file. */
+    public static final String SERVICE_SETTING_FILE =
             "serviceSetting.xml";
+
+    private List<ServiceModel> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
 
@@ -55,7 +55,7 @@ public class ServiceSetting {
      * Constructor.
      */
     public ServiceSetting() {
-        this(SERVICE_SETTING_FILEPATH);
+        this(SERVICE_SETTING_FILE);
     }
 
     /**
@@ -63,9 +63,15 @@ public class ServiceSetting {
      * @param filePath Path the the serviceSettings.xml
      */
     public ServiceSetting(String filePath) {
-        this.settingStream = getFileStream(filePath);
-        this.xmlSettingFile = XML.getDocument(this.settingStream);
-        parseDocument(this.xmlSettingFile);
+        parseDocument(XML.getDocument(getFileStream(filePath)));
+    }
+
+    /**
+     * Constructor.
+     * @param document The XML document to parse.
+     */
+    public ServiceSetting(Document doc) {
+        parseDocument(doc);
     }
 
     /**
@@ -234,7 +240,6 @@ public class ServiceSetting {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
-                boolean restricted = false;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
                     serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {

@@ -20,14 +20,16 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.io.IOException;
 
+import org.w3c.dom.Document;
+
 import de.bayern.gdi.model.ProxyConfiguration;
 
 /** Load configurations from specified directory. */
 public class Config {
 
-    private static final String PROXY_CONFIG_FILE = "proxy.xml";
-
     private static Config instance;
+
+    private ServiceSetting services;
 
     private Config() {
     }
@@ -37,8 +39,15 @@ public class Config {
      * Use #load before to initialize it.
      * @return The configuration instance.
      */
-    public synchronized Config getInstance() {
+    public static synchronized Config getInstance() {
         return instance;
+    }
+
+    /**
+     * @return the services
+     */
+    public ServiceSetting getServices() {
+        return services;
     }
 
     /**
@@ -54,13 +63,24 @@ public class Config {
             throw new IOException("'" + dirname + "' is not a directory.");
         }
 
-        File proxy = new File(dir, PROXY_CONFIG_FILE);
+        File proxy = new File(dir, ProxyConfiguration.PROXY_CONFIG_FILE);
         if (proxy.isFile() && proxy.canRead()) {
             ProxyConfiguration proxyConfig = ProxyConfiguration.read(proxy);
             proxyConfig.apply();
         }
 
-        // TODO: Implement me!
         instance = new Config();
+
+        File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
+        if (services.isFile() && services.canRead()) {
+            Document doc = XML.getDocument(services);
+            if (doc == null) {
+                throw new IOException(
+                    "Cannot parse XML file '" + services + "'");
+            }
+            instance.services = new ServiceSetting(doc);
+        }
+
+        // TODO: Implement me!
     }
 }
