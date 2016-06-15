@@ -334,9 +334,9 @@ public class DownloadStepConverter {
         InputStream in = null;
         try {
             in = DownloadStepConverter.class.getResourceAsStream(
-                "Verarbeitungsschritte.xml");
+                "verarbeitungsschritte.xml");
             if (in == null) {
-                log.log(Level.SEVERE, "Verarbeitungsschritte.xml not found");
+                log.log(Level.SEVERE, "verarbeitungsschritte.xml not found");
                 return new ProcessingConfiguration();
             }
             return ProcessingConfiguration.read(in);
