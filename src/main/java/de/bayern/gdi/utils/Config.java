@@ -17,10 +17,15 @@
  */
 package de.bayern.gdi.utils;
 
+import java.io.File;
 import java.io.IOException;
+
+import de.bayern.gdi.model.ProxyConfiguration;
 
 /** Load configurations from specified directory. */
 public class Config {
+
+    private static final String PROXY_CONFIG_FILE = "proxy.xml";
 
     private static Config instance;
 
@@ -38,10 +43,23 @@ public class Config {
 
     /**
      * Load configurations.
-     * @param dir The directory with the configuration files.
+     * @param dirname The directory with the configuration files.
      * @throws IOException If something went wrong.
      */
-    public static synchronized void load(String dir) throws IOException {
+    public static synchronized void load(String dirname) throws IOException {
+
+        File dir = new File(dirname);
+
+        if (!dir.isDirectory()) {
+            throw new IOException("'" + dirname + "' is not a directory.");
+        }
+
+        File proxy = new File(dir, PROXY_CONFIG_FILE);
+        if (proxy.isFile() && proxy.canRead()) {
+            ProxyConfiguration proxyConfig = ProxyConfiguration.read(proxy);
+            proxyConfig.apply();
+        }
+
         // TODO: Implement me!
         instance = new Config();
     }

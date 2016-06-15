@@ -33,6 +33,29 @@ or in headless mode:
 With `--config=<directory>` a folder with configuration files can be
 specified which overwrite the defaults.
 
+* `proxy.xml` To configure alternative HTTP(S) proxy settings.
+
+      <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
+        <!-- HTTP settings: -->
+        <HTTPProxyHost>HOST</HTTProxyHost>
+        <HTTPProxyPort>PORT</HTTProxyPort>
+        <HTTPProxyUser>USER</HTTProxyUser>
+        <HTTPProxyUser>PASSWORD</HTTProxyPassword>
+        <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
+        <!-- HTTPS settings: -->
+        <HTTPSProxyHost>HOST</HTTSProxyHost>
+        <HTTPSProxyPort>PORT</HTTSProxyPort>
+        <HTTPSProxyUser>USER</HTTSProxyUser>
+        <HTTPSProxyUser>PASSWORD</HTTSProxyPassword>
+        <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
+      </ProxyConfiguration>
+
+  All fields are optional. To avoid application of the settings set
+  `overrideSystemSetting="false"`. `enableSNIExtension` enables/disables
+  Server Name Indication. This might be needed in case of some problematic
+  SSL-Hosts.
+
+
 
 ## License
 
