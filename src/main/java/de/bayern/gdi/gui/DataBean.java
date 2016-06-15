@@ -142,20 +142,6 @@ public class DataBean extends Observable {
     }
 
     /**
-     * Returns the Service URL for a given Service Name.
-     *
-    public String getServiceURL(String serviceName) {
-        String returnStr = null;
-        if (this.staticServices.containsKey(serviceName)) {
-            returnStr = this.staticServices.get(serviceName);
-        }
-        if (this.catalogServices.containsKey(serviceName)) {
-            returnStr = this.catalogServices.get(serviceName);
-        }
-        return returnStr;
-    }/
-
-    /**
      * Set the data type.
      * @param type The data type
      */
