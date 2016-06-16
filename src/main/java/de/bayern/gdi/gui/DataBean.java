@@ -54,26 +54,11 @@ public class DataBean extends Observable {
     private Map<String, String> attributes;
     private String wmsUrl;
     private String wmsName;
-    private String wmsLayer;
-    private String wmsVersion;
-    private String wmsService;
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
-
-    public String getWMSLayer() {
-        return wmsLayer;
-    }
-
-    public String getWMSVersion() {
-        return wmsVersion;
-    }
-
-    public String getWMSService() {
-        return wmsService;
-    }
 
     /**
      * Constructor.
@@ -92,9 +77,6 @@ public class DataBean extends Observable {
                 .getCatalogueURL());
         this.wmsUrl = this.serviceSetting.getWMSUrl();
         this.wmsName = this.serviceSetting.getWMSName();
-        this.wmsLayer = this.serviceSetting.getWMSLayer();
-        this.wmsVersion = this.serviceSetting.getWMSVersion();
-        this.wmsService = this.serviceSetting.getWMSService();
         this.processingSteps = new ArrayList<>();
     }
 

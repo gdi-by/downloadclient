@@ -18,7 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -36,12 +35,19 @@ import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -49,7 +55,9 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
 import net.miginfocom.swing.MigLayout;
+
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.DirectPosition2D;
@@ -71,6 +79,8 @@ import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
+
+import de.bayern.gdi.utils.I18n;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -89,6 +99,8 @@ public class WMSMapSwing extends Parent {
     private String title;
     //private ObservableList<String> layerList;
     //private ListView wmsLayers;
+    private ComboBox wmsLayers;
+    private Label layerLabel;
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
@@ -158,10 +170,9 @@ public class WMSMapSwing extends Parent {
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
-    public WMSMapSwing(String mapURL, int width, int heigth, String layer)
-            throws
+    public WMSMapSwing(String mapURL, int width, int heigth) throws
             MalformedURLException {
-        this(new URL(mapURL), width, heigth, layer);
+        this(new URL(mapURL), width, heigth);
     }
 
     /**
@@ -169,7 +180,7 @@ public class WMSMapSwing extends Parent {
      *
      * @param mapURL The URL of the WMS Service
      */
-    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
+    public WMSMapSwing(URL mapURL, int width, int heigth) {
         initGeotoolsLocale();
         try {
             this.mapHeight = heigth;
@@ -177,24 +188,34 @@ public class WMSMapSwing extends Parent {
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
-            Layer myLayer = null;
-            for (Layer wmsLayer: layers) {
-                if (wmsLayer.getTitle().toLowerCase().equals(
-                        layer.toLowerCase())) {
-                    myLayer = wmsLayer;
-                    break;
-                }
+            ObservableList<String> layerList = FXCollections
+                    .observableArrayList();
+            for (Layer layer : layers) {
+                layerList.add(layer.getName());
+            }
+            if (layers == null) {
+                throw new ServiceException("could not connect to url");
             }
             this.mapContent = new MapContent();
             this.title = this.wms.getCapabilities().getService().getTitle();
             this.mapContent.setTitle(this.title);
-
+            this.wmsLayers = new ComboBox(layerList);
+            this.layerLabel = new Label();
+            this.layerLabel.setLabelFor(this.wmsLayers);
+            this.layerLabel.setText(I18n.getMsg("gui.layer") + ": ");
             this.mapNode = new SwingNode();
             //this.add(this.layerLabel);
             //this.add(this.wmsLayers);
             this.add(this.mapNode);
             this.getChildren().add(vBox);
-            displayMap(myLayer);
+            this.wmsLayers.setOnAction(new SelectLayer());
+            //Actually select the second entry, because the first is null
+            this.wmsLayers.getSelectionModel().select(0);
+            this.wmsLayers.getSelectionModel().selectNext();
+            //Maually fire the Event, because we "selected" something
+            ActionEvent layerSelected = new ActionEvent();
+            SelectLayer selLay = new SelectLayer();
+            selLay.handle(layerSelected);
         } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -226,6 +247,29 @@ public class WMSMapSwing extends Parent {
         this.coordinateY1 = y1;
         this.coordinateX2 = x2;
         this.coordinateY2 = y2;
+    }
+
+    /**
+     * Event Handler for the Layer Combobox.
+     */
+    private class SelectLayer
+            implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent e) {
+            if (wmsLayers.getSelectionModel().getSelectedItem() != null) {
+                String layerName = (String) wmsLayers.getSelectionModel()
+                        .getSelectedItem();
+                List<Layer> layers = wms.getCapabilities().getLayerList();
+                Layer layer = null;
+                for (Layer lay : layers) {
+                    if (layerName == lay.getName()) {
+                        layer = lay;
+                        break;
+                    }
+                }
+                displayMap(layer);
+            }
+        }
     }
 
     private void createSwingContent(final SwingNode swingNode) {

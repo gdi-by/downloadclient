@@ -733,11 +733,9 @@ public class Controller {
             url = new URL(this.dataBean.getWmsUrl());
         } catch (MalformedURLException e) {
         }
-        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT, this.dataBean
-                .getWMSLayer());
+        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT, this.dataBean
-                .getWMSLayer());
+        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);

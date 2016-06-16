@@ -8,13 +8,7 @@
     <wms>
         <service>
             <name>WMS WebAtlas-DE light</name>
-            <!--
             <url>http://sg.geodatenzentrum.de/wms_webatlasde.light?layer=webatlasde.light&amp;service=WMS&amp;version=1.1.1&amp;request=GetCapabilities</url>
-            !-->
-            <url>http://sg.geodatenzentrum.de/wms_webatlasde.light</url>
-            <layer>webatlasde.light</layer>
-            <service>WMS</service>
-            <version>1.1.1</version>
         </service>
     </wms>
     <services>
