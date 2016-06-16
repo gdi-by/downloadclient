@@ -27,16 +27,19 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
-import de.bayern.gdi.utils.FeatureGuesser;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.NumberMatched;
 import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.XML;
 
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
@@ -236,6 +239,41 @@ public class DownloadStepConverter {
         }
     }
 
+    private static final String XPATH_NUMBER_MATCHED
+        = "/wfs:FeatureCollection/@numberMatched";
+
+    private int numFeatures(String wfsURL) throws ConverterException {
+        URL url = newURL(wfsURL + "&returnType=hits");
+        Document hitsDoc = XML.getDocument(url, user, password);
+        if (hitsDoc == null) {
+            // TODO: I18n
+            throw new ConverterException("cannot load hits document");
+        }
+        String numberMatchedString = (String)XML.xpath(
+            hitsDoc, XPATH_NUMBER_MATCHED,
+            XPathConstants.STRING,
+            WFSMetaExtractor.NAMESPACES);
+
+        if (numberMatchedString == null || numberMatchedString.isEmpty()) {
+            // TODO: I18n
+            throw new ConverterException("numberMatched not found");
+        }
+        try {
+            return Integer.parseInt(numberMatchedString);
+        } catch (NumberFormatException nfe) {
+            // TODO: I18n
+            throw new ConverterException(nfe.getMessage(), nfe);
+        }
+    }
+
+    private URL pagedFeatureURL(String wfsURL, int ofs, int count)
+    throws ConverterException {
+        StringBuilder sb = new StringBuilder(wfsURL)
+            .append("&startIndex=").append(ofs)
+            .append("&count=").append(count);
+        return newURL(sb.toString());
+    }
+
     private void createWFSDownload(
         JobList      jl,
         File         workingDir,
@@ -266,25 +304,14 @@ public class DownloadStepConverter {
         }
 
         String wfsURL = wfsURL(dls, usedVars, meta);
-        NumberMatched nm = new NumberMatched(wfsURL, user, password);
-        int numFeatures;
-        try {
-            numFeatures = nm.numFeatures(0, fpp);
-        } catch (Exception e) {
-            throw new ConverterException(e.getMessage(), e);
-        }
+        int numFeatures = numFeatures(wfsURL);
+
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
             unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
             return;
         }
-        // Real paging. Figure out the real number of features.
-        FeatureGuesser guesser = new FeatureGuesser(fpp);
-        try {
-            numFeatures = guesser.totalNumFeatures(nm);
-        } catch (Exception e) {
-            throw new ConverterException(e.getMessage(), e);
-        }
+
         log.info("total number of features: " + numFeatures);
 
         FilesDownloadJob fdj =
@@ -297,8 +324,8 @@ public class DownloadStepConverter {
         for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
-            URL featureURL = newURL(nm.getFeatureURL(ofs, fpp));
-            fdj.add(file, featureURL);
+            log.info("download to file: " + file);
+            fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp));
             gcj.add(file);
         }
 
