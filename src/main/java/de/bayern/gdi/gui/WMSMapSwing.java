@@ -62,12 +62,9 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
-import org.geotools.map.MapViewport;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
-import org.geotools.referencing.CRS;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
@@ -81,8 +78,6 @@ import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
 
 import de.bayern.gdi.utils.I18n;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -120,12 +115,6 @@ public class WMSMapSwing extends Parent {
             = "ToolbarZoomInButton";
     private static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
             = "ToolbarZoomOutButton";
-    private static final double INITIAL_EXTEND_X2 = 50.8980D;
-    private static final double INITIAL_EXTEND_Y2 = 8.7684D;
-    private static final double INITIAL_EXTEND_X1 = 47.3037D;
-    private static final double INITIAL_EXTEND_Y1 = 13.8221D;
-    private static final String INITIAL_CRS = "EPSG:4326";
-
 
     /**
      * Initializes geotools localisation system with our default I18n locale.
@@ -209,6 +198,7 @@ public class WMSMapSwing extends Parent {
             this.add(this.mapNode);
             this.getChildren().add(vBox);
             this.wmsLayers.setOnAction(new SelectLayer());
+
             //Actually select the second entry, because the first is null
             this.wmsLayers.getSelectionModel().select(0);
             this.wmsLayers.getSelectionModel().selectNext();
@@ -288,7 +278,6 @@ public class WMSMapSwing extends Parent {
                         sb.toString()));
 
                 ExtJMapPane mapPane = new ExtJMapPane(mapContent);
-
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
@@ -418,20 +407,6 @@ public class WMSMapSwing extends Parent {
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
-                MapViewport viewport = mapContent.getViewport();
-
-                CoordinateReferenceSystem crs = null;
-                try {
-                    crs = CRS.decode(INITIAL_CRS);
-                } catch (FactoryException e) {
-
-                }
-                ReferencedEnvelope initExtend =
-                        new ReferencedEnvelope(INITIAL_EXTEND_X1,
-                                INITIAL_EXTEND_X2,
-                                INITIAL_EXTEND_Y1,
-                                INITIAL_EXTEND_Y2, crs);
-                viewport.setBounds(initExtend);
             }
         });
     }
