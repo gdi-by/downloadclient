@@ -303,7 +303,7 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        this.dataBean.addAttribute("format",
+        this.dataBean.addAttribute("outputformat",
             this.dataFormatChooser.getValue() != null
                 ? this.dataFormatChooser.getValue().toString()
                 : "");
