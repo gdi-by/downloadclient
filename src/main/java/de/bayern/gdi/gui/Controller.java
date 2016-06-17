@@ -765,7 +765,14 @@ public class Controller {
         public void handle(Event event) {
             String polygonName = mapAtom.getClickedPolygonName();
             String polygonID = mapAtom.getClickedPolygonID();
+
             if (polygonName != null && polygonID != null) {
+                if (polygonName.equals("#@#")) {
+                    statusBarText.setText(I18n.format(
+                            "status.polygon-intersect",
+                            polygonID));
+                    return;
+                }
                 ObservableList<ItemModel> items = serviceTypeChooser.getItems();
                 int i = 0;
                 for (i = 0; i < items.size(); i++) {

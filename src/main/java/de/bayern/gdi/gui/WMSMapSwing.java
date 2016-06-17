@@ -413,7 +413,11 @@ public class WMSMapSwing extends Parent {
                                             String id = (String)
                                                     featureData.get("id");
                                             setNameAndId(name, id);
+                                        } else if (numFeatures > 1) {
+                                            setNameAndId("#@#", Integer
+                                                    .toString(numFeatures));
                                         }
+
                                     }
 
                                 } catch (Exception e) {
