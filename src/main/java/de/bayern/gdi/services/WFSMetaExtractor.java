@@ -94,6 +94,11 @@ public class WFSMetaExtractor {
         = "ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
 
+    private static final String XPATH_OUT_FORMATS
+        = "/wfs:WFS_Capabilities"
+        + "/ows:OperationsMetadata/ows:Parameter[@name='outputFormat']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
     private static final String XPATH_FEATURE_OUT_FORMATS
         = "wfs:OutputFormats/wfs:Format/text()";
 
@@ -200,7 +205,8 @@ public class WFSMetaExtractor {
         url += "?request=" + request
             + "&service=wfs"
             + "&version="
-            + StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+            + StringUtils.urlEncode(
+                meta.highestVersion(WFSMeta.WFS2_0_0).toString());
         if (post.length() > 0) {
             url += "&" + post;
         }
@@ -265,9 +271,17 @@ public class WFSMetaExtractor {
             capDoc, XPATH_OPERATIONS_VERSIONS,
             XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = versions.getLength(); i < n; i++) {
-            meta.versions.add(versions.item(i).getTextContent());
+            meta.versions.add(
+                new WFSMeta.Version(versions.item(i).getTextContent()));
         }
         Collections.sort(meta.versions);
+
+        NodeList outputFormats = (NodeList)XML.xpath(
+            capDoc, XPATH_OUT_FORMATS,
+            XPathConstants.NODESET, NAMESPACES);
+        for (int i = 0, n = outputFormats.getLength(); i < n; i++) {
+            meta.outputFormats.add(outputFormats.item(i).getTextContent());
+        }
 
         NodeList nl = (NodeList)XML.xpath(
             capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);
@@ -323,29 +337,29 @@ public class WFSMetaExtractor {
 
             WFSMeta.Feature feature = new WFSMeta.Feature();
 
-            NodeList names = el.getElementsByTagName("Name");
+            NodeList names = el.getElementsByTagNameNS(WFS, "Name");
             if (names.getLength() > 0) {
                 feature.name = names.item(0).getTextContent();
             }
 
-            NodeList titles = el.getElementsByTagName("Title");
+            NodeList titles = el.getElementsByTagNameNS(WFS, "Title");
             if (titles.getLength() > 0) {
                 feature.title = titles.item(0).getTextContent();
             }
 
-            NodeList abstracts = el.getElementsByTagName("Abstract");
+            NodeList abstracts = el.getElementsByTagNameNS(WFS, "Abstract");
             if (abstracts.getLength() > 0) {
                 feature.abstractDescription
                     = abstracts.item(0).getTextContent();
             }
 
-            NodeList defaultCRS = el.getElementsByTagName("DefaultCRS");
+            NodeList defaultCRS = el.getElementsByTagNameNS(WFS, "DefaultCRS");
             if (defaultCRS.getLength() > 0) {
                 feature.defaultCRS
                     = defaultCRS.item(0).getTextContent();
             }
 
-            NodeList otherCRSs = el.getElementsByTagName("OtherCRS");
+            NodeList otherCRSs = el.getElementsByTagNameNS(WFS, "OtherCRS");
             for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }

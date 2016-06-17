@@ -30,6 +30,38 @@ or in headless mode:
 
     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
 
+To access protected services you can pass the needed credentials with `--user=<user>` and `--password=<password>`
+to the downloader.
+
+With `--config=<directory>` a folder with configuration files can be
+specified which overwrite the defaults.
+
+* `proxy.xml` To configure alternative HTTP(S) proxy settings.
+
+      <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
+        <!-- HTTP settings: -->
+        <HTTPProxyHost>HOST</HTTPProxyHost>
+        <HTTPProxyPort>PORT</HTTPProxyPort>
+        <HTTPProxyUser>USER</HTTPProxyUser>
+        <HTTPProxyUser>PASSWORD</HTTPProxyPassword>
+        <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
+        <!-- HTTPS settings: -->
+        <HTTPSProxyHost>HOST</HTTPSProxyHost>
+        <HTTPSProxyPort>PORT</HTTPSProxyPort>
+        <HTTPSProxyUser>USER</HTTPSProxyUser>
+        <HTTPSProxyUser>PASSWORD</HTTPSProxyPassword>
+        <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
+      </ProxyConfiguration>
+
+  All fields are optional. To avoid application of the settings set
+  `overrideSystemSetting="false"`. `enableSNIExtension` enables/disables
+  Server Name Indication. This might be needed in case of some problematic
+  SSL-Hosts.
+
+* `serviceSetting.xml` A pre-selected set of services.
+* `verarbeitungsschritte.xml` A list of post-processing steps after successful downloads.
+
+
 
 ## License
 

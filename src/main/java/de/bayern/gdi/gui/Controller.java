@@ -303,7 +303,7 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        this.dataBean.addAttribute("format",
+        this.dataBean.addAttribute("outputformat",
             this.dataFormatChooser.getValue() != null
                 ? this.dataFormatChooser.getValue().toString()
                 : "");
@@ -450,7 +450,10 @@ public class Controller {
                 String savePath = selectedDir.getPath();
                 DownloadStep ds = dataBean.convertToDownloadStep(savePath);
                 try {
-                    JobList jl = DownloadStepConverter.convert(ds);
+                    DownloadStepConverter dsc = new DownloadStepConverter(
+                        dataBean.getUserName(),
+                        dataBean.getPassword());
+                    JobList jl = dsc.convert(ds);
                     Processor p = Processor.getInstance();
                     p.addJob(jl);
                 } catch (final ConverterException ce) {
@@ -708,6 +711,10 @@ public class Controller {
                     outputFormats =
                         this.dataBean.getWFSService()
                             .findOperation("GetFeature").outputFormats;
+                    if (outputFormats.isEmpty()) {
+                        outputFormats =
+                            this.dataBean.getWFSService().outputFormats;
+                    }
                 }
                 ObservableList<String> formats =
                     FXCollections.observableArrayList(outputFormats);

@@ -32,7 +32,6 @@ import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.ServiceSetting;
-import de.bayern.gdi.utils.StringUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,6 +62,7 @@ public class DataBean extends Observable {
     public DataBean() {
         this.namePwMap = new HashMap<>();
         this.staticServices = ServiceSetting.getInstance().getServices();
+
         this.catalogServices = new ArrayList<ServiceModel>();
         this.catalogService = new CatalogService(ServiceSetting.getInstance()
                 .getCatalogueURL());
@@ -111,20 +111,6 @@ public class DataBean extends Observable {
     public void addServiceToList(ServiceModel service) {
         this.catalogServices.add(service);
     }
-
-    /**
-     * Returns the Service URL for a given Service Name.
-     *
-    public String getServiceURL(String serviceName) {
-        String returnStr = null;
-        if (this.staticServices.containsKey(serviceName)) {
-            returnStr = this.staticServices.get(serviceName);
-        }
-        if (this.catalogServices.containsKey(serviceName)) {
-            returnStr = this.catalogServices.get(serviceName);
-        }
-        return returnStr;
-    }/
 
     /**
      * Set the data type.
@@ -276,14 +262,6 @@ public class DataBean extends Observable {
      */
     public String getPassword() {
         return this.password;
-    }
-
-    /**
-     * gets the username and password as base64 encrypted string.
-     * @return the base 64 encrypted username and password string
-     */
-    public String getBase64EncAuth() {
-        return StringUtils.getBase64EncAuth(this.userName, this.password);
     }
 
     /**

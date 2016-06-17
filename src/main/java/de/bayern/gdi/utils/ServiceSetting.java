@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.gui.ServiceModel;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,13 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.gui.ServiceModel;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -43,22 +41,25 @@ public class ServiceSetting {
     private static final Logger log
         = Logger.getLogger(ServiceSetting.class.getName());
 
-    private InputStream settingStream;
-    private List<ServiceModel> services;
-    private Document xmlSettingFile;
-    private static final String SERVICE_SETTING_FILEPATH =
+    /** Name of the config file. */
+    public static final String SERVICE_SETTING_FILE =
             "serviceSetting.xml";
+
+    private List<ServiceModel> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
     private static ServiceSetting serviceSetting;
+    private InputStream settingStream;
+    private Document xmlSettingFile;
 
     /**
      * gets the instance.
      * @return the service Settings
      */
+
     public static ServiceSetting getInstance() {
         if (serviceSetting == null) {
-            serviceSetting = new ServiceSetting(SERVICE_SETTING_FILEPATH);
+            serviceSetting = new ServiceSetting(SERVICE_SETTING_FILE);
         }
         return serviceSetting;
     }
@@ -68,10 +69,10 @@ public class ServiceSetting {
      * @param filePath Path the the serviceSettings.xml
      */
     private ServiceSetting(String filePath) {
-        this.settingStream = getFileStream(filePath);
-        this.xmlSettingFile = XML.getDocument(this.settingStream);
-        parseDocument(this.xmlSettingFile);
-    }
+            this.settingStream = getFileStream(filePath);
+            this.xmlSettingFile = XML.getDocument(this.settingStream);
+            parseDocument(this.xmlSettingFile);
+        }
 
     /**
      * gets the Catalogue URL as String.
@@ -136,8 +137,6 @@ public class ServiceSetting {
     public String getWMSLayer() {
         return this.wms.get("layer");
     }
-
-
 
     private void parseDocument(Document xmlDocument) {
         this.services = parseService(xmlDocument);
@@ -223,7 +222,6 @@ public class ServiceSetting {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
-                boolean restricted = false;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
                     serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {

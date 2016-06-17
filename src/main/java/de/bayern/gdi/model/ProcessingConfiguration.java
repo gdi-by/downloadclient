@@ -39,6 +39,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingConfiguration {
 
+    /** Name of the config file. */
+    public static final String PROCESSING_CONFIG_FILE =
+        "verarbeitungsschritte.xml";
+
     @XmlElementWrapper(name = "Formate")
     @XmlElement(name = "Format")
     private List<ProcessingFormat> formats;

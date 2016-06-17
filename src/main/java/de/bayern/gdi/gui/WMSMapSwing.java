@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+
 import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
@@ -27,7 +28,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -116,8 +116,6 @@ public class WMSMapSwing extends Parent {
     private VBox vBox;
     private MapContent mapContent;
     private String title;
-    //private ObservableList<String> layerList;
-    //private ListView wmsLayers;
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
@@ -267,7 +265,6 @@ public class WMSMapSwing extends Parent {
             this.mapContent = new MapContent();
             this.title = this.wms.getCapabilities().getService().getTitle();
             this.mapContent.setTitle(this.title);
-
             this.mapNode = new SwingNode();
             //this.add(this.layerLabel);
             //this.add(this.wmsLayers);
@@ -310,6 +307,7 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+<<<<<<< HEAD
      * represents the actions for the cursor.
      **/
     private class CursorAction extends NoToolAction {
@@ -319,7 +317,7 @@ public class WMSMapSwing extends Parent {
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(java.awt.event.ActionEvent ev) {
             ZoomInTool tool = new ZoomInTool() {
                 private Point start;
                 private Point end;
@@ -485,7 +483,7 @@ public class WMSMapSwing extends Parent {
                         .layers()) {
                     if (layers.getTitle() != null) {
                         if (layers.getTitle().equals(POLYGON_LAYER_TITLE)) {
-                           layer = layers;
+                            layer = layers;
                         }
                     }
                 }
@@ -494,7 +492,6 @@ public class WMSMapSwing extends Parent {
             }
         }
     }
-
     private Style createSelectedStyle(FeatureId ids) {
         Rule selectedRule = createRule(SELECTED_COLOUR, SELECTED_COLOUR);
         selectedRule.setFilter(ff.id(ids));
@@ -537,7 +534,6 @@ public class WMSMapSwing extends Parent {
         return this.selectedPolygonID;
     }
 
-
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -551,6 +547,7 @@ public class WMSMapSwing extends Parent {
                         stringBuilder.toString()));
 
                 mapPane = new ExtJMapPane(mapContent);
+
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
