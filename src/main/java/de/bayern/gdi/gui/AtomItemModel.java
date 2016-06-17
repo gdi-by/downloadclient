@@ -18,6 +18,7 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.services.Atom;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 /**
  * Wrapper for Atom service items.
@@ -45,5 +46,9 @@ public class AtomItemModel implements ItemModel {
     @Override
     public String toString() {
         return this.item.title;
+    }
+
+    public ReferencedEnvelope getEnvelope() {
+        return this.item.bbox;
     }
 }

@@ -18,20 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.geotools.geometry.Envelope2D;
-
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
@@ -51,12 +37,25 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-
+import de.bayern.gdi.utils.ServiceSetting;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -82,6 +81,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.geotools.geometry.Envelope2D;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -632,12 +632,21 @@ public class Controller {
                     break;
                 case Atom:
                     List<Atom.Item> items =
-                        dataBean.getAtomService().getItems();
+                            dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
-                        FXCollections.observableArrayList();
+                            FXCollections.observableArrayList();
+                    List<WMSMapSwing.FeaturePolygon> polygonList = new
+                            ArrayList<WMSMapSwing.FeaturePolygon>();
                     for (Atom.Item i : items) {
                         opts.add(new AtomItemModel(i));
+                        WMSMapSwing.FeaturePolygon polygon =
+                                new WMSMapSwing.FeaturePolygon(
+                                        i.polygon,
+                                        i.title,
+                                        i.id);
+                        polygonList.add(polygon);
                     }
+                    mapAtom.drawPolygons(polygonList);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
                     serviceTypeChooser.setValue(opts.get(0));
@@ -650,8 +659,10 @@ public class Controller {
     private void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
+            statusBarText.setText(I18n.format("status.ready"));
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
+            mapAtom.highlightSelectedPolygon(item.id);
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
@@ -723,12 +734,17 @@ public class Controller {
         this.serviceList.setItems(this.dataBean.getServicesAsList());
         URL url = null;
         try {
-            url = new URL(this.dataBean.getWmsUrl());
+            url = new URL(ServiceSetting.getInstance().getWMSUrl());
         } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
-        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
+                ServiceSetting.getInstance().getWMSLayer());
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT);
+        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
+                ServiceSetting.getInstance().getWMSLayer());
+        mapAtom.addEventHandler(PolygonClickedEvent.ANY,
+                new SelectedAtomPolygon());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);
@@ -740,6 +756,44 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
+    }
+
+    /**
+     * Handels the Action, when a polygon is selected.
+     */
+    public class SelectedAtomPolygon implements
+            EventHandler<Event> {
+        @Override
+        public void handle(Event event) {
+            String polygonName = mapAtom.getClickedPolygonName();
+            String polygonID = mapAtom.getClickedPolygonID();
+
+            if (polygonName != null && polygonID != null) {
+                if (polygonName.equals("#@#")) {
+                    statusBarText.setText(I18n.format(
+                            "status.polygon-intersect",
+                            polygonID));
+                    return;
+                }
+
+                ObservableList<ItemModel> items = serviceTypeChooser.getItems();
+                int i = 0;
+                for (i = 0; i < items.size(); i++) {
+                    AtomItemModel item = (AtomItemModel) items.get(i);
+                    Atom.Item aitem = (Atom.Item) item.getItem();
+                    if (aitem.id.equals(polygonID)) {
+                        break;
+                    }
+                }
+                Atom.Item oldItem = (Atom.Item) serviceTypeChooser
+                        .getSelectionModel()
+                        .getSelectedItem().getItem();
+                if (!oldItem.id.equals(polygonID)) {
+                    serviceTypeChooser.setValue(items.get(i));
+                    chooseType(serviceTypeChooser.getValue());
+                }
+            }
+        }
     }
 
     private static final Logger log

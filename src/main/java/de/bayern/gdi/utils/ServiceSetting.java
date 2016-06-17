@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,19 +50,24 @@ public class ServiceSetting {
             "serviceSetting.xml";
     private Map<String, String> catalogues;
     private Map<String, String> wms;
+    private static ServiceSetting serviceSetting;
 
     /**
-     * Constructor.
+     * gets the instance.
+     * @return the service Settings
      */
-    public ServiceSetting() {
-        this(SERVICE_SETTING_FILEPATH);
+    public static ServiceSetting getInstance() {
+        if (serviceSetting == null) {
+            serviceSetting = new ServiceSetting(SERVICE_SETTING_FILEPATH);
+        }
+        return serviceSetting;
     }
 
     /**
      * Constructor.
      * @param filePath Path the the serviceSettings.xml
      */
-    public ServiceSetting(String filePath) {
+    private ServiceSetting(String filePath) {
         this.settingStream = getFileStream(filePath);
         this.xmlSettingFile = XML.getDocument(this.settingStream);
         parseDocument(this.xmlSettingFile);
@@ -112,10 +118,7 @@ public class ServiceSetting {
      * @return the WMS url
      */
     public String getWMSUrl() {
-        for (String url: this.wms.values()) {
-            return url;
-        }
-        return null;
+        return this.wms.get("url");
     }
 
     /**
@@ -123,18 +126,42 @@ public class ServiceSetting {
      * @return the WMS Name
      */
     public String getWMSName() {
-        for (String name: this.wms.keySet()) {
-            return name;
-        }
-        return null;
+        return this.wms.get("name");
     }
+
+    /**
+     * gets the WMS Name.
+     * @return the WMS Name
+     */
+    public String getWMSLayer() {
+        return this.wms.get("layer");
+    }
+
+
 
     private void parseDocument(Document xmlDocument) {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
-        this.wms = parseNameURLScheme(xmlDocument, "wms");
+        this.wms = parseSchema(xmlDocument,
+                "wms",
+                "url",
+                "layer",
+                "name");
     }
 
+    private Map<String, String> parseSchema(Document xmlDocument, String
+            nodeName, String... names) {
+        Map<String, String> map = new HashMap<String, String>();
+        for (String name: names) {
+            String getbyNameExpr = "//" + nodeName + "/service/" + name;
+            String value = (String) XML.xpath(xmlDocument, getbyNameExpr,
+                    XPathConstants.STRING);
+            if (value != null) {
+                map.put(name, value);
+            }
+        }
+        return map;
+    }
 
     private List<ServiceModel> parseService(Document xmlDocument) {
         List<ServiceModel> servicesList = new ArrayList<ServiceModel>();
