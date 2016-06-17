@@ -633,12 +633,12 @@ public class Controller {
                         dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
                         FXCollections.observableArrayList();
-                    List<WMSMapSwing.featurePolygon> polygonList = new
-                            ArrayList<WMSMapSwing.featurePolygon>();
+                    List<WMSMapSwing.FeaturePolygon> polygonList = new
+                            ArrayList<WMSMapSwing.FeaturePolygon>();
                     for (Atom.Item i : items) {
                         opts.add(new AtomItemModel(i));
-                        WMSMapSwing.featurePolygon polygon =
-                                new WMSMapSwing.featurePolygon(
+                        WMSMapSwing.FeaturePolygon polygon =
+                                new WMSMapSwing.FeaturePolygon(
                                         i.polygon,
                                         i.title,
                                         i.id);
