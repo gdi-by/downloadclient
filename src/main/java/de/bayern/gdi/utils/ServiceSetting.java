@@ -181,7 +181,7 @@ public class ServiceSetting {
                                 .equals("restricted")) {
                             String restr =
                              serviceValueNode.getFirstChild().getTextContent();
-                            restricted = restr.equals("true") ? true : false;
+                            restricted = restr.equals("true");
                         }
                     }
                 }
