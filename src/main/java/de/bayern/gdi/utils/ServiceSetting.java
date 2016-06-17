@@ -139,13 +139,20 @@ public class ServiceSetting {
                 "name");
     }
 
+    private static final String SERVICE_XPATH =
+        "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
+
     private Map<String, String> parseSchema(Document xmlDocument, String
             nodeName, String... names) {
         Map<String, String> map = new HashMap<String, String>();
+
+        HashMap<String, String> vars = new HashMap<>();
+        vars.put("NODE", nodeName);
+
         for (String name: names) {
-            String getbyNameExpr = "//" + nodeName + "/service/" + name;
-            String value = (String) XML.xpath(xmlDocument, getbyNameExpr,
-                    XPathConstants.STRING);
+            vars.put("NAME", name);
+            String value = (String) XML.xpath(
+                xmlDocument, SERVICE_XPATH, XPathConstants.STRING, null, vars);
             if (value != null) {
                 map.put(name, value);
             }
