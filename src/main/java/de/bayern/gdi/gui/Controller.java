@@ -745,9 +745,6 @@ public class Controller {
         this.serviceList.setItems(this.dataBean.getServicesAsList());
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
-        if (serviceSetting == null) {
-            serviceSetting = new ServiceSetting();
-        }
 
         URL url = null;
         try {

@@ -64,9 +64,6 @@ public class DataBean extends Observable {
         this.namePwMap = new HashMap<>();
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
-        if (serviceSetting == null) {
-            serviceSetting = new ServiceSetting();
-        }
 
         this.staticServices = serviceSetting.getServices();
 

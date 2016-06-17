@@ -84,6 +84,7 @@ public class Config {
     /** Mark global config as unused. */
     public static void uninitialized() {
         synchronized (Holder.INSTANCE) {
+            Holder.INSTANCE.services = new ServiceSetting();
             Holder.INSTANCE.initialized = true;
             Holder.INSTANCE.notifyAll();
         }
@@ -128,6 +129,7 @@ public class Config {
                 throw new IOException(
                     "Cannot parse XML file '" + services + "'");
             }
+            Holder.INSTANCE.services = new ServiceSetting(doc);
         }
 
         File procConfig = new File(
