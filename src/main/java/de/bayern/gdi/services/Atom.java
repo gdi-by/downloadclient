@@ -332,11 +332,4 @@ public class Atom {
         }
         return crs;
     }
-
-    private String makeAttributeValue(String id, String categoryTerm) {
-        categoryTerm =
-            categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
-        categoryTerm = EPSG + categoryTerm;
-        return id + "_" + categoryTerm;
-    }
 }
