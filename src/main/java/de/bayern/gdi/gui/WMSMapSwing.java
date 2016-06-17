@@ -453,9 +453,14 @@ public class WMSMapSwing extends Parent {
         }
     }
 
+    /**
+     * sets name and id of the selected polygon.
+     * @param name name
+     * @param id id
+     */
     private void setNameAndId(String name, String id) {
-        selectedPolygonName = name;
-        selectedPolygonID = id;
+        this.selectedPolygonName = name;
+        this.selectedPolygonID = id;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -465,13 +470,13 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
-     * hightlight the selected Polygon
-     * @param selectedPolygonID the selected Polygon
+     * hightlight the selected Polygon.
+     * @param polygonID the selected Polygon
      */
-    public void highlightSelectedPolygon(String selectedPolygonID) {
+    public void highlightSelectedPolygon(String polygonID) {
         for (SimpleFeature simpleFeature : polygonFeatureCollection) {
             String featureID = (String) simpleFeature.getAttribute("id");
-            if (featureID.equals(selectedPolygonID)) {
+            if (featureID.equals(polygonID)) {
                 Style style;
 
                 style = createSelectedStyle(simpleFeature.getIdentifier());
@@ -490,9 +495,9 @@ public class WMSMapSwing extends Parent {
         }
     }
 
-    private Style createSelectedStyle(FeatureId IDs) {
+    private Style createSelectedStyle(FeatureId ids) {
         Rule selectedRule = createRule(SELECTED_COLOUR, SELECTED_COLOUR);
-        selectedRule.setFilter(ff.id(IDs));
+        selectedRule.setFilter(ff.id(ids));
 
         Rule otherRule = createRule(OUTLINE_COLOR, FILL_COLOR);
         otherRule.setElseFilter(true);
@@ -509,11 +514,12 @@ public class WMSMapSwing extends Parent {
     private Rule createRule(Color outlineColor, Color fillColor) {
         Symbolizer symbolizer = null;
         Fill fill = null;
-        Stroke stroke = sf.createStroke(ff.literal(outlineColor), ff.literal
-                (OUTLINE_WIDTH));
+        Stroke stroke = sf.createStroke(
+                ff.literal(outlineColor),
+                ff.literal(OUTLINE_WIDTH));
 
-        fill = sf.createFill(ff.literal(fillColor), ff.literal
-                        (FILL_TRANSPARACY));
+        fill = sf.createFill(ff.literal(fillColor),
+                ff.literal(FILL_TRANSPARACY));
         symbolizer = sf.createPolygonSymbolizer(stroke, fill,
                 geometryAttributeName);
 
