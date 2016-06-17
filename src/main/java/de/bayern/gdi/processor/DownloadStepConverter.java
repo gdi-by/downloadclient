@@ -243,7 +243,7 @@ public class DownloadStepConverter {
         = "/wfs:FeatureCollection/@numberMatched";
 
     private int numFeatures(String wfsURL) throws ConverterException {
-        URL url = newURL(wfsURL + "&returnType=hits");
+        URL url = newURL(wfsURL + "&resultType=hits");
         Document hitsDoc = XML.getDocument(url, user, password);
         if (hitsDoc == null) {
             // TODO: I18n
@@ -270,6 +270,7 @@ public class DownloadStepConverter {
     throws ConverterException {
         StringBuilder sb = new StringBuilder(wfsURL)
             .append("&startIndex=").append(ofs)
+            // TODO: WFS < 2.x "maxFeatures"
             .append("&count=").append(count);
         return newURL(sb.toString());
     }
