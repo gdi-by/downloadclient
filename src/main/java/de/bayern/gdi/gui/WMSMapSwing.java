@@ -70,12 +70,15 @@ import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
+import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.MapPane;
 import org.geotools.swing.action.InfoAction;
@@ -92,7 +95,9 @@ import org.geotools.swing.tool.InfoToolResult;
 import org.geotools.swing.tool.ZoomInTool;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -125,6 +130,7 @@ public class WMSMapSwing extends Parent {
     private StyleBuilder sb;
     private StyleFactory sf;
     private FilterFactory2 ff;
+    DefaultFeatureCollection polygonFeatureCollection;
 
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
@@ -145,12 +151,15 @@ public class WMSMapSwing extends Parent {
     private static final String INITIAL_CRS = "EPSG:3857";
 
     private static final Color OUTLINE_COLOR = Color.BLACK;
+    private static final Color SELECTED_COLOUR = Color.YELLOW;
     private static final Color FILL_COLOR = Color.CYAN;
     private static final Float OUTLINE_WIDTH = 0.3f;
     private static final Float FILL_TRANSPARACY = 0.4f;
     private static final Float STROKY_TRANSPARACY = 0.8f;
     private String selectedPolygonName;
     private String selectedPolygonID;
+    private GeometryDescriptor geomDesc;
+    private String geometryAttributeName;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -412,8 +421,10 @@ public class WMSMapSwing extends Parent {
                                                             "name");
                                             String id = (String)
                                                     featureData.get("id");
+                                            //highlightSelectedPolygon(id);
                                             setNameAndId(name, id);
                                         } else if (numFeatures > 1) {
+                                            //Yup, this is dirty.
                                             setNameAndId("#@#", Integer
                                                     .toString(numFeatures));
                                         }
@@ -451,6 +462,65 @@ public class WMSMapSwing extends Parent {
                 fireEvent(new PolygonClickedEvent());
             }
         });
+    }
+
+    /**
+     * hightlight the selected Polygon
+     * @param selectedPolygonID the selected Polygon
+     */
+    public void highlightSelectedPolygon(String selectedPolygonID) {
+        for (SimpleFeature simpleFeature : polygonFeatureCollection) {
+            String featureID = (String) simpleFeature.getAttribute("id");
+            if (featureID.equals(selectedPolygonID)) {
+                Style style;
+
+                style = createSelectedStyle(simpleFeature.getIdentifier());
+                org.geotools.map.Layer layer = null;
+                for (org.geotools.map.Layer layers : mapPane.getMapContent()
+                        .layers()) {
+                    if (layers.getTitle() != null) {
+                        if (layers.getTitle().equals(POLYGON_LAYER_TITLE)) {
+                           layer = layers;
+                        }
+                    }
+                }
+                ((FeatureLayer) layer).setStyle(style);
+                mapPane.repaint();
+            }
+        }
+    }
+
+    private Style createSelectedStyle(FeatureId IDs) {
+        Rule selectedRule = createRule(SELECTED_COLOUR, SELECTED_COLOUR);
+        selectedRule.setFilter(ff.id(IDs));
+
+        Rule otherRule = createRule(OUTLINE_COLOR, FILL_COLOR);
+        otherRule.setElseFilter(true);
+
+        FeatureTypeStyle fts = sf.createFeatureTypeStyle();
+        fts.rules().add(selectedRule);
+        fts.rules().add(otherRule);
+
+        Style style = sf.createStyle();
+        style.featureTypeStyles().add(fts);
+        return style;
+    }
+
+    private Rule createRule(Color outlineColor, Color fillColor) {
+        Symbolizer symbolizer = null;
+        Fill fill = null;
+        Stroke stroke = sf.createStroke(ff.literal(outlineColor), ff.literal
+                (OUTLINE_WIDTH));
+
+        fill = sf.createFill(ff.literal(fillColor), ff.literal
+                        (FILL_TRANSPARACY));
+        symbolizer = sf.createPolygonSymbolizer(stroke, fill,
+                geometryAttributeName);
+
+
+        Rule rule = sf.createRule();
+        rule.symbolizers().add(symbolizer);
+        return rule;
     }
 
     public String getClickedPolygonName() {
@@ -551,8 +621,8 @@ public class WMSMapSwing extends Parent {
      */
     public void drawPolygons(List<FeaturePolygon> featurePolygons) {
         try {
+
             SimpleFeatureType polygonFeatureType;
-            DefaultFeatureCollection polygonFeatureCollection;
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
                     "geometry:Geometry:srid=4326,"
@@ -562,6 +632,9 @@ public class WMSMapSwing extends Parent {
             polygonFeatureCollection =
                     new DefaultFeatureCollection("internal",
                             polygonFeatureType);
+            geomDesc = polygonFeatureCollection.getSchema()
+                    .getGeometryDescriptor();
+            geometryAttributeName = geomDesc.getLocalName();
 
             for (FeaturePolygon fp : featurePolygons) {
                 SimpleFeatureBuilder featureBuilder =

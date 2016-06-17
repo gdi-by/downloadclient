@@ -659,8 +659,10 @@ public class Controller {
     private void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
+            statusBarText.setText(I18n.format("status.ready"));
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
+            mapAtom.highlightSelectedPolygon(item.id);
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
@@ -773,6 +775,7 @@ public class Controller {
                             polygonID));
                     return;
                 }
+
                 ObservableList<ItemModel> items = serviceTypeChooser.getItems();
                 int i = 0;
                 for (i = 0; i < items.size(); i++) {
