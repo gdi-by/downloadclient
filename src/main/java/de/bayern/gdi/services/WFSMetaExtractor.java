@@ -205,7 +205,8 @@ public class WFSMetaExtractor {
         url += "?request=" + request
             + "&service=wfs"
             + "&version="
-            + StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+            + StringUtils.urlEncode(
+                meta.highestVersion(WFSMeta.WFS2_0_0).toString());
         if (post.length() > 0) {
             url += "&" + post;
         }
@@ -270,7 +271,8 @@ public class WFSMetaExtractor {
             capDoc, XPATH_OPERATIONS_VERSIONS,
             XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = versions.getLength(); i < n; i++) {
-            meta.versions.add(versions.item(i).getTextContent());
+            meta.versions.add(
+                new WFSMeta.Version(versions.item(i).getTextContent()));
         }
         Collections.sort(meta.versions);
 

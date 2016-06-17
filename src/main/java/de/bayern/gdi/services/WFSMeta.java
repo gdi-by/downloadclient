@@ -19,6 +19,8 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -27,6 +29,9 @@ import de.bayern.gdi.utils.StringUtils;
 
 /** Stores meta data about WFS. */
 public class WFSMeta {
+
+    private static final Logger log
+        = Logger.getLogger(WFSMeta.class.getName());
 
     /** operation. */
     public static class Operation {
@@ -171,6 +176,67 @@ public class WFSMeta {
         }
     }
 
+    /** Version. */
+    public static class Version implements Comparable<Version> {
+        /** version. */
+        public String version;
+        /** parsed. */
+        public int[] parsed;
+
+        /** Version. */
+        public Version() {
+        }
+
+        /** @param version. The version. */
+        public Version(String version) {
+            this.version = version;
+            parse();
+        }
+
+        /** Parses the version string to numbers. */
+        public void parse() {
+            try {
+                String[] parts = version.split("\\.");
+                int[] converted = new int[parts.length];
+                for (int i = 0; i < converted.length; i++) {
+                    converted[i] = Integer.parseInt(parts[i]);
+                }
+                this.parsed = converted;
+            } catch (NumberFormatException nfe) {
+                log.log(Level.SEVERE, nfe.getMessage(), nfe);
+            }
+        }
+
+        @Override
+        public int compareTo(Version other) {
+            if (other.parsed == null && this.parsed == null) {
+                return this.version.compareTo(other.version);
+            }
+            if (this.parsed == null) {
+                return +1;
+            }
+            if (other.parsed == null) {
+                return -1;
+            }
+            int n = Math.min(this.parsed.length, other.parsed.length);
+            for (int i = 0; i < n; i++) {
+                int diff = this.parsed[i] - other.parsed[i];
+                if (diff != 0) {
+                    return diff;
+                }
+            }
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return this.version;
+        }
+    }
+
+    /** WFS 2.0.0. */
+    public static final Version WFS2_0_0 = new Version("2.0.0");
+
     /** title. */
     public String title;
     /** URL. */
@@ -188,7 +254,7 @@ public class WFSMeta {
     /** output formats. */
     public List<String> outputFormats;
     /** versions. */
-    public List<String> versions;
+    public List<Version> versions;
     /** namespaces. */
     public NamespaceContextMap namespaces;
 
@@ -230,7 +296,7 @@ public class WFSMeta {
      * @param def The default. Used if there are no version informations.
      * @return The highest version.
      */
-    public String highestVersion(String def) {
+    public Version highestVersion(Version def) {
         return versions.size() > 0
             ? versions.get(versions.size() - 1)
             : def;
@@ -263,7 +329,7 @@ public class WFSMeta {
         }
         sb.append("\t}\n");
         sb.append("\tversions: {\n");
-        for (String version: versions) {
+        for (Version version: versions) {
             sb.append("\t\t").append(version).append("\n");
         }
         sb.append("\t}\n");

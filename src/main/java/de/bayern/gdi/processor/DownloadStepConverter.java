@@ -161,7 +161,8 @@ public class DownloadStepConverter {
         String url = dls.getServiceURL();
         String base = baseURL(url);
 
-        String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
+        String version = StringUtils.urlEncode(
+            meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
@@ -266,12 +267,11 @@ public class DownloadStepConverter {
         }
     }
 
-    private URL pagedFeatureURL(String wfsURL, int ofs, int count)
+    private URL pagedFeatureURL(String wfsURL, int ofs, int count, boolean wfs2)
     throws ConverterException {
         StringBuilder sb = new StringBuilder(wfsURL)
             .append("&startIndex=").append(ofs)
-            // TODO: WFS < 2.x "maxFeatures"
-            .append("&count=").append(count);
+            .append(wfs2 ? "&count=" : "&maxFeatures=").append(count);
         return newURL(sb.toString());
     }
 
@@ -322,11 +322,15 @@ public class DownloadStepConverter {
         int numFiles = Math.max(1, numFeatures / fpp);
         String format = "%0" + StringUtils.places(numFiles) + "d-%d.gml";
 
+        boolean wfs2 =
+            meta.highestVersion(WFSMeta.WFS2_0_0)
+                .compareTo(WFSMeta.WFS2_0_0) >= 0;
+
         for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
             log.info("download to file: " + file);
-            fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp));
+            fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             gcj.add(file);
         }
 
