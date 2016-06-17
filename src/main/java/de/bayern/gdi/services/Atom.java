@@ -95,10 +95,17 @@ public class Atom {
          */
         public String format;
 
+        private NamespaceContext context;
+
         public Item() {
             otherCRSs = new ArrayList<>();
             fields = new ArrayList<>();
             format = null;
+            context = new NamespaceContextMap(
+                    "", "http://www.w3.org/2005/Atom",
+                    "georss", "http://www.georss.org/georss",
+                    "inspire_dls",
+                    "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
         }
         @Override
         public String toString() {
@@ -124,24 +131,34 @@ public class Atom {
          * Loads the "costly" details.
          */
         public void load() {
-            format = getFormat(this.describedBy);
+            Document entryDoc = XML.getDocument(this.describedBy);
+            format = getFormat(entryDoc);
+            fields = getFieldForEntry(entryDoc);
         }
 
-        private String getFormat(String itemid) {
-            NamespaceContext nscontext = new NamespaceContextMap(
-                    "", "http://www.w3.org/2005/Atom",
-                    "georss", "http://www.georss.org/georss",
-                    "inspire_dls",
-                    "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
-            String itemformat = null;
-            String attributeURL = itemid;
-            Document entryDoc = XML.getDocument(attributeURL);
+        private String getFormat(Document entryDoc) {
             String getType = "//entry/link/@type";
-            itemformat = (String) XML.xpath(entryDoc,
+            String itemformat = (String) XML.xpath(entryDoc,
                     getType,
                     XPathConstants.STRING,
-                    nscontext);
+                    context);
             return itemformat;
+        }
+
+        private ArrayList<Field> getFieldForEntry(Document entryDoc) {
+            ArrayList<Field> attrFields = new ArrayList<>();
+            //Predefined in ATOM Service
+            String getCategories = "//entry/id";
+            NodeList cL = (NodeList) XML.xpath(entryDoc,
+                    getCategories,
+                    XPathConstants.NODESET,
+                    this.context);
+            for (int i = 0; i < cL.getLength(); i++) {
+                Node cat = cL.item(i);
+                Field field = new Field(ATTRIBUTENAME, cat.getTextContent());
+                attrFields.add(field);
+            }
+            return attrFields;
         }
     }
 
@@ -246,7 +263,7 @@ public class Atom {
             //        + " ms\tformat: " + it.format);
             it.bbox = new ReferencedEnvelope();
             //TODO: Calculate Bounding Box
-            it.fields = getFieldForEntry(entry, it.id);
+            //it.fields = getFieldForEntry(entry, it.id);
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tfields: " + it.fields);
             items.add(it);
@@ -314,39 +331,5 @@ public class Atom {
             }
         }
         return crs;
-    }
-
-    private ArrayList<Field> getFieldForEntry(Node entry, String id) {
-        ArrayList<Field> fields = new ArrayList<>();
-        //Predefined in ATOM Service
-        String getCategories = "category";
-        NodeList cL = (NodeList) XML.xpath(entry,
-                getCategories,
-                XPathConstants.NODESET,
-                this.nscontext);
-        for (int i = 0; i < cL.getLength(); i++) {
-            Node cat = cL.item(i);
-            NamedNodeMap catAttributes = cat.getAttributes();
-            String epsg = null;
-            String attrVal = null;
-            String csr = null;
-            for (int j = 0; j < catAttributes.getLength(); j++) {
-                Node catAttr = catAttributes.item(j);
-                if (catAttr.getNodeName().equals("term")) {
-                    epsg = catAttr.getTextContent();
-                    attrVal = makeAttributeValue(id, epsg);
-                    Field f = new Field(ATTRIBUTENAME, attrVal);
-                    fields.add(f);
-                }
-            }
-        }
-        return fields;
-    }
-
-    private String makeAttributeValue(String id, String categoryTerm) {
-        categoryTerm =
-            categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
-        categoryTerm = EPSG + categoryTerm;
-        return id + "_" + categoryTerm;
     }
 }
