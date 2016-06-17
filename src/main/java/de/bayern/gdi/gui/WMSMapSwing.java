@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,19 +36,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -55,18 +49,16 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-
 import net.miginfocom.swing.MigLayout;
-
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
-import org.geotools.map.MapViewport;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
+import org.geotools.referencing.CRS;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
@@ -78,10 +70,9 @@ import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
-import com.vividsolutions.jts.geom.Polygon;
-
-import de.bayern.gdi.utils.I18n;
 import org.opengis.referencing.FactoryException;
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -99,8 +90,6 @@ public class WMSMapSwing extends Parent {
     private String title;
     //private ObservableList<String> layerList;
     //private ListView wmsLayers;
-    private ComboBox wmsLayers;
-    private Label layerLabel;
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
@@ -108,6 +97,7 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateY1;
     private TextField coordinateX2;
     private TextField coordinateY2;
+    private ExtJMapPane mapPane;
 
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -120,6 +110,12 @@ public class WMSMapSwing extends Parent {
             = "ToolbarZoomInButton";
     private static final String TOOLBAR_ZOOMOUT_BUTTON_NAME
             = "ToolbarZoomOutButton";
+    private static final double INITIAL_EXTEND_X1 = 850028;
+    private static final double INITIAL_EXTEND_Y1 = 6560409;
+    private static final double INITIAL_EXTEND_X2 = 1681693;
+    private static final double INITIAL_EXTEND_Y2 = 5977713;
+    private static final String INITIAL_CRS = "EPSG:3857";
+
 
     /**
      * Initializes geotools localisation system with our default I18n locale.
@@ -164,9 +160,10 @@ public class WMSMapSwing extends Parent {
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
-    public WMSMapSwing(String mapURL, int width, int heigth) throws
+    public WMSMapSwing(String mapURL, int width, int heigth, String layer)
+            throws
             MalformedURLException {
-        this(new URL(mapURL), width, heigth);
+        this(new URL(mapURL), width, heigth, layer);
     }
 
     /**
@@ -174,7 +171,7 @@ public class WMSMapSwing extends Parent {
      *
      * @param mapURL The URL of the WMS Service
      */
-    public WMSMapSwing(URL mapURL, int width, int heigth) {
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
         initGeotoolsLocale();
         try {
             this.mapHeight = heigth;
@@ -182,35 +179,24 @@ public class WMSMapSwing extends Parent {
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
-            ObservableList<String> layerList = FXCollections
-                    .observableArrayList();
-            for (Layer layer : layers) {
-                layerList.add(layer.getName());
-            }
-            if (layers == null) {
-                throw new ServiceException("could not connect to url");
+            Layer myLayer = null;
+            for (Layer wmsLayer: layers) {
+                if (wmsLayer.getTitle().toLowerCase().equals(
+                        layer.toLowerCase())) {
+                    myLayer = wmsLayer;
+                    break;
+                }
             }
             this.mapContent = new MapContent();
             this.title = this.wms.getCapabilities().getService().getTitle();
             this.mapContent.setTitle(this.title);
-            this.wmsLayers = new ComboBox(layerList);
-            this.layerLabel = new Label();
-            this.layerLabel.setLabelFor(this.wmsLayers);
-            this.layerLabel.setText(I18n.getMsg("gui.layer") + ": ");
+
             this.mapNode = new SwingNode();
             //this.add(this.layerLabel);
             //this.add(this.wmsLayers);
             this.add(this.mapNode);
             this.getChildren().add(vBox);
-            this.wmsLayers.setOnAction(new SelectLayer());
-
-            //Actually select the second entry, because the first is null
-            this.wmsLayers.getSelectionModel().select(0);
-            this.wmsLayers.getSelectionModel().selectNext();
-            //Maually fire the Event, because we "selected" something
-            ActionEvent layerSelected = new ActionEvent();
-            SelectLayer selLay = new SelectLayer();
-            selLay.handle(layerSelected);
+            displayMap(myLayer);
         } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -244,29 +230,6 @@ public class WMSMapSwing extends Parent {
         this.coordinateY2 = y2;
     }
 
-    /**
-     * Event Handler for the Layer Combobox.
-     */
-    private class SelectLayer
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            if (wmsLayers.getSelectionModel().getSelectedItem() != null) {
-                String layerName = (String) wmsLayers.getSelectionModel()
-                        .getSelectedItem();
-                List<Layer> layers = wms.getCapabilities().getLayerList();
-                Layer layer = null;
-                for (Layer lay : layers) {
-                    if (layerName == lay.getName()) {
-                        layer = lay;
-                        break;
-                    }
-                }
-                displayMap(layer);
-            }
-        }
-    }
-
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -274,22 +237,18 @@ public class WMSMapSwing extends Parent {
                 StringBuilder sb = new StringBuilder();
                 sb.append("[]");
                 sb.append("[min!]");
-
                 JPanel panel = new JPanel(new MigLayout(
                         "wrap 1, insets 0",
-
                         "[grow]",
-
                         sb.toString()));
 
-                ExtJMapPane mapPane = new ExtJMapPane(mapContent);
+                mapPane = new ExtJMapPane(mapContent);
                 mapPane.setPreferredSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.setSize(mapWidth, mapHeight);
                 mapPane.setMinimumSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.addFocusListener(new FocusAdapter() {
-
                     @Override
                     public void focusGained(FocusEvent e) {
                         mapPane.setBorder(
@@ -302,23 +261,18 @@ public class WMSMapSwing extends Parent {
                               BorderFactory.createLineBorder(Color.LIGHT_GRAY));
                     }
                 });
-
                 mapPane.addMouseListener(new MouseAdapter() {
-
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         mapPane.requestFocusInWindow();
                     }
                 });
-
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
-
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
-
                 NoToolAction noAction = new NoToolAction(mapPane) {
                     @Override
                     public void actionPerformed(java.awt.event.ActionEvent ev) {
@@ -377,33 +331,25 @@ public class WMSMapSwing extends Parent {
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new PanAction(mapPane));
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 tbtn = new JToggleButton(new InfoAction(mapPane));
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
-
                 toolBar.addSeparator();
-
                 btn = new JButton(new ResetAction(mapPane));
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
@@ -412,28 +358,49 @@ public class WMSMapSwing extends Parent {
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
+                setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
+                        INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
             }
         });
     }
 
+    /**
+     * sets the viewport of the map to the given extend
+     * @param envelope the extend
+     */
     public void setToExtend(ReferencedEnvelope envelope) {
-        MapViewport oldViewPort = this.mapContent.getViewport();
+        setToExtend(envelope);
+    }
+
+
+    private void setExtend(Envelope env) {
+        mapPane.setDisplayArea(env);
+    }
+
+    private void setExtend(ReferencedEnvelope extend) {
         try {
-            envelope = envelope.transform(
-                    oldViewPort.getCoordinateReferenceSystem(), true);
-            MapViewport newViewPort = new MapViewport(envelope, false);
-            this.mapContent.setViewport(newViewPort);
+            extend = extend.transform(this.mapContent.getViewport()
+                .getCoordinateReferenceSystem(), true);
+            setExtend((Envelope) extend);
         } catch (FactoryException | TransformException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-
     }
 
-    public void drawBoxes(List<ReferencedEnvelope> envelopes) {
-
-    }
-
-    public void drawPolygon(Polygon polygon) {
+    private void setExtend(Double x1, Double x2, Double y1, Double y2, String
+            crs) {
+        CoordinateReferenceSystem coordinateReferenceSystem = null;
+        try {
+            coordinateReferenceSystem = CRS.decode(crs);
+            ReferencedEnvelope initExtend =
+                    new ReferencedEnvelope(x1,
+                            x2,
+                            y1,
+                            y2, coordinateReferenceSystem);
+            setExtend(initExtend);
+        } catch (FactoryException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
 
     }
     /**
