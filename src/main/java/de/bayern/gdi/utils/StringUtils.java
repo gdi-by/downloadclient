@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Base64;
-
 /**
  * Common string operations.
  */
@@ -38,20 +36,6 @@ public class StringUtils {
         = Logger.getLogger(StringUtils.class.getName());
 
     private StringUtils() {
-    }
-
-    /**
-     * Encodes user name and password into base64 encoded string.
-     * @param user The user name.
-     * @param password The passord.
-     * @return The encoded password. null if user or password is null.
-     */
-    public static String getBase64EncAuth(String user, String password) {
-        if (user == null || password == null) {
-            return null;
-        }
-        String auth = user + ":" + password;
-        return new String(Base64.encodeBase64(auth.getBytes()));
     }
 
     /**
@@ -231,12 +215,12 @@ public class StringUtils {
     }
 
     /**
-     * Joins a list of strings with a separator.
-     * @param s The string list.
+     * Joins a list of objects with a separator to a string.
+     * @param s The list of objects.
      * @param sep The separator.
      * @return the joined string.
      */
-    public static String join(List<String> s, String sep) {
+    public static String join(List<?> s, String sep) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = s.size(); i < n; i++) {
             if (i > 0) {
@@ -245,5 +229,19 @@ public class StringUtils {
             sb.append(s.get(i));
         }
         return sb.toString();
+    }
+
+    private static final int TEN = 10;
+
+    /** How many digit place does a number need?
+     * @param n The number.
+     * @return the number of digits.
+     */
+    public static int places(int n) {
+        int places = 1;
+        for (int value = TEN; n > value; value *= TEN) {
+            places++;
+        }
+        return places;
     }
 }

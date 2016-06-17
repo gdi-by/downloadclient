@@ -450,7 +450,10 @@ public class Controller {
                 String savePath = selectedDir.getPath();
                 DownloadStep ds = dataBean.convertToDownloadStep(savePath);
                 try {
-                    JobList jl = DownloadStepConverter.convert(ds);
+                    DownloadStepConverter dsc = new DownloadStepConverter(
+                        dataBean.getUserName(),
+                        dataBean.getPassword());
+                    JobList jl = dsc.convert(ds);
                     Processor p = Processor.getInstance();
                     p.addJob(jl);
                 } catch (final ConverterException ce) {
@@ -697,6 +700,10 @@ public class Controller {
                     outputFormats =
                         this.dataBean.getWFSService()
                             .findOperation("GetFeature").outputFormats;
+                    if (outputFormats.isEmpty()) {
+                        outputFormats =
+                            this.dataBean.getWFSService().outputFormats;
+                    }
                 }
                 ObservableList<String> formats =
                     FXCollections.observableArrayList(outputFormats);

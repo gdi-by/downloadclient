@@ -56,9 +56,11 @@ public class Headless implements ProcessorListener {
 
     /**
      * @param args The command line arguments.
+     * @param user Optional user name.
+     * @param password Optional user name.
      * @return Non zero if the operation fails.
      */
-    public static int main(String [] args) {
+    public static int main(String [] args, String user, String password) {
         log.info("Running in headless mode");
 
         ArrayList<File> files = new ArrayList<>();
@@ -93,8 +95,11 @@ public class Headless implements ProcessorListener {
             log.info("Download steps: " + dls);
             JobList jobs;
 
+            DownloadStepConverter dsc =
+                new DownloadStepConverter(user, password);
+
             try {
-                jobs = DownloadStepConverter.convert(dls);
+                jobs = dsc.convert(dls);
             } catch (ConverterException ce) {
                 log.log(
                     Level.WARNING,

@@ -24,8 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
@@ -36,20 +34,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.DocumentResponseHandler;
-import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.WrapInputStreamFactory;
+import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
 /** AtomDownloadJob is a job to download things from a ATOM service. */
-public class AtomDownloadJob extends AbstractDownloadJob {
-
-    private static final Logger log
-        = Logger.getLogger(AtomDownloadJob.class.getName());
+public class AtomDownloadJob extends MultipleFileDownloadJob {
 
     private static final String XPATH_LINKS =
         "//atom:entry[atom:id/text()=$VARIATION]/atom:link";
@@ -61,9 +54,6 @@ public class AtomDownloadJob extends AbstractDownloadJob {
     private String dataset;
     private String variation;
     private File workingDir;
-
-    private long currentCount;
-    private long totalCount;
 
     public AtomDownloadJob() {
     }
@@ -106,13 +96,6 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         }
     }
 
-    @Override
-    public void bytesCounted(long count) {
-        broadcastMessage(
-            I18n.format("atom.bytes.downloaded", this.totalCount + count));
-        this.currentCount = count;
-    }
-
     private Document getDocument(String urlString)
         throws JobExecutionException {
 
@@ -143,60 +126,6 @@ public class AtomDownloadJob extends AbstractDownloadJob {
         type = type.toLowerCase();
         return MIMETYPE2EXT.getProperty(type, "dat");
     }
-
-    private static final int TEN = 10;
-
-    private static int places(int n) {
-        int places = 1;
-        for (int value = TEN; n > value; value *= TEN) {
-            places++;
-        }
-        return places;
-    }
-
-    /** Stores a file location to down from and to. */
-    private static class DLFile {
-
-        /** Destination location of the file. */
-        File file;
-        /** The url to download from. */
-        URL url;
-        /** The number of tries yet. */
-        int tries;
-
-        DLFile(File file, URL url) {
-            this.file = file;
-            this.url = url;
-        }
-    }
-
-    private boolean downloadFile(DLFile dlf) throws JobExecutionException {
-
-        log.log(Level.INFO,
-            "Downloading '" + dlf.url + "' to '" + dlf.file + "'");
-        this.currentCount = 0;
-
-        CloseableHttpClient client = getClient(dlf.url);
-        HttpGet httpget = getGetRequest(dlf.url);
-
-        WrapInputStreamFactory wrapFactory
-            = CountingInputStream.createWrapFactory(this);
-
-        try {
-            FileResponseHandler frh
-                = new FileResponseHandler(dlf.file, wrapFactory);
-            client.execute(httpget, frh);
-            return true;
-        } catch (IOException ioe) {
-            return false;
-        } finally {
-            HTTP.closeGraceful(client);
-            this.totalCount += this.currentCount;
-        }
-    }
-
-    private static final int MAX_TRIES = 5;
-    private static final long FAIL_SLEEP = 30 * 1000;
 
     private static final String DATASOURCE_XPATH
         = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
@@ -235,7 +164,7 @@ public class AtomDownloadJob extends AbstractDownloadJob {
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
-        String format = "%0" + places(nl.getLength()) + "d.%s";
+        String format = "%0" + StringUtils.places(nl.getLength()) + "d.%s";
         for (int i = 0, j = 0, n = nl.getLength(); i < n; i++) {
             Element link = (Element)nl.item(i);
             String href = link.getAttribute("href");
@@ -266,47 +195,6 @@ public class AtomDownloadJob extends AbstractDownloadJob {
             files.add(new DLFile(file, dataURL));
         }
 
-        int failed = 0;
-        int numFiles = files.size();
-
-        for (;;) {
-            for (int i = 0; i < files.size();) {
-                DLFile file = files.get(i);
-                if (downloadFile(file)) {
-                    files.remove(i);
-                } else {
-                    if (++file.tries < MAX_TRIES) {
-                        i++;
-                    } else {
-                        failed++;
-                        files.remove(i);
-                    }
-                }
-                broadcastMessage(
-                    I18n.format(
-                        "atom.downloaded.files",
-                        numFiles - failed - files.size(),
-                        files.size()));
-            }
-            if (files.isEmpty()) {
-                break;
-            }
-            try {
-                Thread.sleep(FAIL_SLEEP);
-            } catch (InterruptedException ie) {
-                break;
-            }
-        }
-
-        log.log(Level.INFO, "Bytes downloaded: " + this.totalCount);
-
-        if (failed > 0) {
-            throw new JobExecutionException(
-                I18n.format("atom.downloaded.failed",
-                    numFiles - failed, failed));
-        }
-
-        broadcastMessage(
-            I18n.format("atom.downloaded.success", numFiles));
+        downloadFiles(files);
     }
 }
