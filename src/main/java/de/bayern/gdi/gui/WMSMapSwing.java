@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
@@ -56,7 +57,6 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.Layer;
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -125,7 +125,6 @@ public class WMSMapSwing extends Parent {
     private StyleBuilder sb;
     private StyleFactory sf;
     private FilterFactory2 ff;
-    private SimpleFeatureCollection featureSource;
 
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
@@ -150,6 +149,8 @@ public class WMSMapSwing extends Parent {
     private static final Float OUTLINE_WIDTH = 0.3f;
     private static final Float FILL_TRANSPARACY = 0.4f;
     private static final Float STROKY_TRANSPARACY = 0.8f;
+    private String selectedPolygonName;
+    private String selectedPolygonID;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -411,15 +412,7 @@ public class WMSMapSwing extends Parent {
                                                             "name");
                                             String id = (String)
                                                     featureData.get("id");
-                                            //TODO: Call Function to
-                                            // frontend
-                                            System.out.println(
-                                                    "Selected:\n"
-                                                            + " "
-                                                            + "\tName:\t"
-                                                            + name
-                                                            + "\n\tid:\t"
-                                                            + id);
+                                            setNameAndId(name, id);
                                         }
                                     }
 
@@ -444,6 +437,26 @@ public class WMSMapSwing extends Parent {
             mapPane.setCursorTool(tool);
         }
     }
+
+    private void setNameAndId(String name, String id) {
+        selectedPolygonName = name;
+        selectedPolygonID = id;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                fireEvent(new PolygonClickedEvent());
+            }
+        });
+    }
+
+    public String getClickedPolygonName() {
+        return this.selectedPolygonName;
+    }
+
+    public String getClickedPolygonID() {
+        return this.selectedPolygonID;
+    }
+
 
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -555,7 +568,6 @@ public class WMSMapSwing extends Parent {
                 SimpleFeature feature = featureBuilder.buildFeature(null);
                 polygonFeatureCollection.add(feature);
             }
-            featureSource = (SimpleFeatureCollection) polygonFeatureCollection;
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
                     polygonFeatureCollection, createPolygonStyle());
             polygonLayer.setTitle(POLYGON_LAYER_TITLE);

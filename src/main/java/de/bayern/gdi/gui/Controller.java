@@ -54,6 +54,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -630,9 +632,9 @@ public class Controller {
                     break;
                 case Atom:
                     List<Atom.Item> items =
-                        dataBean.getAtomService().getItems();
+                            dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
-                        FXCollections.observableArrayList();
+                            FXCollections.observableArrayList();
                     List<WMSMapSwing.FeaturePolygon> polygonList = new
                             ArrayList<WMSMapSwing.FeaturePolygon>();
                     for (Atom.Item i : items) {
@@ -659,7 +661,6 @@ public class Controller {
         if (type == ServiceType.Atom) {
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
-            //this.mapAtom.setExtend(item.bbox);
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
@@ -740,6 +741,8 @@ public class Controller {
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
         mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
                 ServiceSetting.getInstance().getWMSLayer());
+        mapAtom.addEventHandler(PolygonClickedEvent.ANY,
+                new SelectedAtomPolygon());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
 
         this.mapNodeWFS.getChildren().add(mapWFS);
@@ -751,6 +754,36 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
+    }
+
+    /**
+     * Handels the Action, when a polygon is selected.
+     */
+    public class SelectedAtomPolygon implements
+            EventHandler<Event> {
+        @Override
+        public void handle(Event event) {
+            String polygonName = mapAtom.getClickedPolygonName();
+            String polygonID = mapAtom.getClickedPolygonID();
+            if (polygonName != null && polygonID != null) {
+                ObservableList<ItemModel> items = serviceTypeChooser.getItems();
+                int i = 0;
+                for (i = 0; i < items.size(); i++) {
+                    AtomItemModel item = (AtomItemModel) items.get(i);
+                    Atom.Item aitem = (Atom.Item) item.getItem();
+                    if (aitem.id.equals(polygonID)) {
+                        break;
+                    }
+                }
+                Atom.Item oldItem = (Atom.Item) serviceTypeChooser
+                        .getSelectionModel()
+                        .getSelectedItem().getItem();
+                if (!oldItem.id.equals(polygonID)) {
+                    serviceTypeChooser.setValue(items.get(i));
+                    chooseType(serviceTypeChooser.getValue());
+                }
+            }
+        }
     }
 
     private static final Logger log
