@@ -53,8 +53,8 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.Layer;
-//import org.geotools.map.Layer;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -66,8 +66,12 @@ import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
+import org.geotools.styling.Fill;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Stroke;
+import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
+import org.geotools.styling.StyleFactory;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
@@ -81,10 +85,13 @@ import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+
+//import org.geotools.map.Layer;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -111,6 +118,7 @@ public class WMSMapSwing extends Parent {
     private ExtJMapPane mapPane;
     private Layer baseLayer;
 
+    private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
             = "ToolbarPanButton";
@@ -136,9 +144,10 @@ public class WMSMapSwing extends Parent {
         public String name;
         /** id of the polygon. **/
         public String id;
-
         /** Constructor. **/
-        public featurePolygon(Polygon polygon, String name, String id) {
+        public featurePolygon(Polygon polygon,
+                              String name,
+                              String id) {
             this.polygon = polygon;
             this.name = name;
             this.id = id;
@@ -212,6 +221,7 @@ public class WMSMapSwing extends Parent {
                 if (wmsLayer.getTitle().toLowerCase().equals(
                         layer.toLowerCase())) {
                     baseLayer = wmsLayer;
+                    baseLayer.setTitle(layer);
                     break;
                 }
             }
@@ -407,10 +417,7 @@ public class WMSMapSwing extends Parent {
             polygonFeatureCollection =
                     new DefaultFeatureCollection("internal",
                             polygonFeatureType);
-            StyleBuilder builder = new StyleBuilder();
 
-            PolygonSymbolizer polygonSymbolizer =
-                    builder.createPolygonSymbolizer(Color.gray, Color.BLACK, 2);
             for(featurePolygon fp: featurePolygons) {
                 SimpleFeatureBuilder featureBuilder =
                         new SimpleFeatureBuilder(polygonFeatureType);
@@ -421,12 +428,15 @@ public class WMSMapSwing extends Parent {
                 polygonFeatureCollection.add(feature);
             }
             org.geotools.map.Layer polygonLayer = new FeatureLayer
-                    (polygonFeatureCollection,
-                            builder.createStyle(polygonSymbolizer));
+                    (polygonFeatureCollection, createPolygonStyle());
+            polygonLayer.setTitle(POLYGON_LAYER_TITLE);
             List<org.geotools.map.Layer> layers = mapContent.layers();
-            for(org.geotools.map.Layer layer: layers) {
-                if(layer.getTitle() != baseLayer.getTitle()) {
-                    mapContent.removeLayer(layer);
+            for(org.geotools.map.Layer layer : layers) {
+                if(layer.getTitle() != null) {
+                    if (layer.getTitle().equals(POLYGON_LAYER_TITLE)) {
+                        System.out.println("Removing layer: " + layer.getTitle());
+                        mapContent.removeLayer(layer);
+                    }
                 }
             }
             mapContent.addLayer(polygonLayer);
@@ -434,6 +444,25 @@ public class WMSMapSwing extends Parent {
         catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private Style createPolygonStyle() {
+        Color outlineColor = Color.BLACK;
+        Color fillColor = Color.CYAN;
+        Float lineWidth = 0.3f;
+        Float fillTransparicy = 0.4f;
+        Float strokeTransparicy = 0.8f;
+        StyleBuilder builder = new StyleBuilder();
+        StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
+        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
+        Fill fill = sf.createFill(ff.literal(fillColor),
+                ff.literal(fillTransparicy));
+        Stroke stroke = sf.createStroke(ff.literal(outlineColor),
+                ff.literal(lineWidth),
+                ff.literal(strokeTransparicy));
+        PolygonSymbolizer polygonSymbolizer =
+                sf.createPolygonSymbolizer(stroke, fill, null);
+        return builder.createStyle(polygonSymbolizer);
     }
 
     /**

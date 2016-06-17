@@ -18,21 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.ServiceSetting;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.geotools.geometry.Envelope2D;
-
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
@@ -52,7 +37,18 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-
+import de.bayern.gdi.utils.ServiceSetting;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -83,6 +79,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.geotools.geometry.Envelope2D;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
