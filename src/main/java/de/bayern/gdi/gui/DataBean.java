@@ -31,6 +31,7 @@ import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import javafx.collections.FXCollections;
@@ -61,11 +62,17 @@ public class DataBean extends Observable {
      */
     public DataBean() {
         this.namePwMap = new HashMap<>();
-        this.staticServices = ServiceSetting.getInstance().getServices();
+
+        ServiceSetting serviceSetting = Config.getInstance().getServices();
+        if (serviceSetting == null) {
+            serviceSetting = new ServiceSetting();
+        }
+
+        this.staticServices = serviceSetting.getServices();
 
         this.catalogServices = new ArrayList<ServiceModel>();
-        this.catalogService = new CatalogService(ServiceSetting.getInstance()
-                .getCatalogueURL());
+        this.catalogService =
+            new CatalogService(serviceSetting.getCatalogueURL());
         this.processingSteps = new ArrayList<>();
     }
 

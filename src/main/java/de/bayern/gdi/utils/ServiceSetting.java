@@ -48,31 +48,21 @@ public class ServiceSetting {
     private List<ServiceModel> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
-    private static ServiceSetting serviceSetting;
-    private InputStream settingStream;
-    private Document xmlSettingFile;
 
-    /**
-     * gets the instance.
-     * @return the service Settings
-     */
-
-    public static ServiceSetting getInstance() {
-        if (serviceSetting == null) {
-            serviceSetting = new ServiceSetting(SERVICE_SETTING_FILE);
-        }
-        return serviceSetting;
+    public ServiceSetting() {
     }
 
     /**
      * Constructor.
      * @param filePath Path the the serviceSettings.xml
      */
-    private ServiceSetting(String filePath) {
-            this.settingStream = getFileStream(filePath);
-            this.xmlSettingFile = XML.getDocument(this.settingStream);
-            parseDocument(this.xmlSettingFile);
-        }
+    public ServiceSetting(String filePath) {
+        this(XML.getDocument(getFileStream(filePath)));
+    }
+
+    public ServiceSetting(Document doc) {
+        parseDocument(doc);
+    }
 
     /**
      * gets the Catalogue URL as String.
@@ -250,5 +240,4 @@ public class ServiceSetting {
 
         return stream;
     }
-
 }

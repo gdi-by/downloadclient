@@ -18,6 +18,20 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.geometry.Envelope2D;
+
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
@@ -35,20 +49,11 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,7 +86,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.geotools.geometry.Envelope2D;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -739,17 +743,23 @@ public class Controller {
     public void setDataBean(DataBean dataBean) {
         this.dataBean = dataBean;
         this.serviceList.setItems(this.dataBean.getServicesAsList());
+
+        ServiceSetting serviceSetting = Config.getInstance().getServices();
+        if (serviceSetting == null) {
+            serviceSetting = new ServiceSetting();
+        }
+
         URL url = null;
         try {
-            url = new URL(ServiceSetting.getInstance().getWMSUrl());
+            url = new URL(serviceSetting.getWMSUrl());
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                ServiceSetting.getInstance().getWMSLayer());
+                serviceSetting.getWMSLayer());
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
         mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                ServiceSetting.getInstance().getWMSLayer());
+                serviceSetting.getWMSLayer());
         mapAtom.addEventHandler(PolygonClickedEvent.ANY,
                 new SelectedAtomPolygon());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
@@ -795,7 +805,7 @@ public class Controller {
                 Atom.Item oldItem = (Atom.Item) serviceTypeChooser
                         .getSelectionModel()
                         .getSelectedItem().getItem();
-                if (!oldItem.id.equals(polygonID)) {
+                if (i < items.size() && !oldItem.id.equals(polygonID)) {
                     serviceTypeChooser.setValue(items.get(i));
                     chooseType(serviceTypeChooser.getValue());
                 }

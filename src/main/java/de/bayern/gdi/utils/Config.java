@@ -17,11 +17,14 @@
  */
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.model.ProcessingConfiguration;
-import de.bayern.gdi.model.ProxyConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import org.w3c.dom.Document;
+
+import de.bayern.gdi.model.ProcessingConfiguration;
+import de.bayern.gdi.model.ProxyConfiguration;
 
 //import java.util.logging.Level;
 
@@ -118,8 +121,6 @@ public class Config {
             proxyConfig.apply();
         }
 
-        /**
-         * Servicesettings are implemented as Singleton
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
         if (services.isFile() && services.canRead()) {
             Document doc = XML.getDocument(services);
@@ -127,8 +128,8 @@ public class Config {
                 throw new IOException(
                     "Cannot parse XML file '" + services + "'");
             }
-            //Holder.INSTANCE.services = new ServiceSetting(doc);
-        }**/
+        }
+
         File procConfig = new File(
             dir, ProcessingConfiguration.PROCESSING_CONFIG_FILE);
         if (procConfig.isFile() && procConfig.canRead()) {
