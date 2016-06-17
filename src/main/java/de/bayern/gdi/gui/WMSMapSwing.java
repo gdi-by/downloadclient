@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
 import java.awt.Component;
@@ -50,15 +51,23 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.Layer;
+//import org.geotools.map.Layer;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.map.WMSLayer;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.swing.JMapPane;
 import org.geotools.swing.action.InfoAction;
 import org.geotools.swing.action.NoToolAction;
@@ -70,8 +79,10 @@ import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.ZoomInTool;
-import org.opengis.referencing.FactoryException;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -98,6 +109,7 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateX2;
     private TextField coordinateY2;
     private ExtJMapPane mapPane;
+    private Layer baseLayer;
 
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -116,6 +128,22 @@ public class WMSMapSwing extends Parent {
     private static final double INITIAL_EXTEND_Y2 = 5977713;
     private static final String INITIAL_CRS = "EPSG:3857";
 
+    /** Represents all Infos needed for drawing a Polyon **/
+    public static class featurePolygon {
+        /** the polygon. **/
+        public Polygon polygon;
+        /** name of the polygon. **/
+        public String name;
+        /** id of the polygon. **/
+        public String id;
+
+        /** Constructor. **/
+        public featurePolygon(Polygon polygon, String name, String id) {
+            this.polygon = polygon;
+            this.name = name;
+            this.id = id;
+        }
+    }
 
     /**
      * Initializes geotools localisation system with our default I18n locale.
@@ -179,11 +207,11 @@ public class WMSMapSwing extends Parent {
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
-            Layer myLayer = null;
+            baseLayer = null;
             for (Layer wmsLayer: layers) {
                 if (wmsLayer.getTitle().toLowerCase().equals(
                         layer.toLowerCase())) {
-                    myLayer = wmsLayer;
+                    baseLayer = wmsLayer;
                     break;
                 }
             }
@@ -196,7 +224,8 @@ public class WMSMapSwing extends Parent {
             //this.add(this.wmsLayers);
             this.add(this.mapNode);
             this.getChildren().add(vBox);
-            displayMap(myLayer);
+            displayMap(baseLayer);
+
         } catch (IOException | ServiceException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -209,6 +238,7 @@ public class WMSMapSwing extends Parent {
         //JMapPane mapPane = new JMapPane(this.mapContent);
 
     }
+
 
     /**
      * Set TextFields to display the selected coordinates.
@@ -362,6 +392,48 @@ public class WMSMapSwing extends Parent {
                         INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
             }
         });
+    }
+
+    public void drawPolygons(List<featurePolygon> featurePolygons) {
+        try {
+            SimpleFeatureType polygonFeatureType;
+            DefaultFeatureCollection polygonFeatureCollection;
+            polygonFeatureType = DataUtilities.createType(
+                    "Dataset",
+                    "geometry:Geometry:srid=4326,"
+                            + "name:String,"
+                            + "id:String"
+            );
+            polygonFeatureCollection =
+                    new DefaultFeatureCollection("internal",
+                            polygonFeatureType);
+            StyleBuilder builder = new StyleBuilder();
+
+            PolygonSymbolizer polygonSymbolizer =
+                    builder.createPolygonSymbolizer(Color.gray, Color.BLACK, 2);
+            for(featurePolygon fp: featurePolygons) {
+                SimpleFeatureBuilder featureBuilder =
+                        new SimpleFeatureBuilder(polygonFeatureType);
+                featureBuilder.add(fp.polygon);
+                featureBuilder.add(fp.name);
+                featureBuilder.add(fp.id);
+                SimpleFeature feature = featureBuilder.buildFeature(null);
+                polygonFeatureCollection.add(feature);
+            }
+            org.geotools.map.Layer polygonLayer = new FeatureLayer
+                    (polygonFeatureCollection,
+                            builder.createStyle(polygonSymbolizer));
+            List<org.geotools.map.Layer> layers = mapContent.layers();
+            for(org.geotools.map.Layer layer: layers) {
+                if(layer.getTitle() != baseLayer.getTitle()) {
+                    mapContent.removeLayer(layer);
+                }
+            }
+            mapContent.addLayer(polygonLayer);
+        }
+        catch (SchemaException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     /**

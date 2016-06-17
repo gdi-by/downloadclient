@@ -636,9 +636,18 @@ public class Controller {
                         dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
                         FXCollections.observableArrayList();
+                    List<WMSMapSwing.featurePolygon> polygonList = new
+                            ArrayList<WMSMapSwing.featurePolygon>();
                     for (Atom.Item i : items) {
                         opts.add(new AtomItemModel(i));
+                        WMSMapSwing.featurePolygon polygon =
+                                new WMSMapSwing.featurePolygon(
+                                        i.polygon,
+                                        i.title,
+                                        i.id);
+                        polygonList.add(polygon);
                     }
+                    mapAtom.drawPolygons(polygonList);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
                     serviceTypeChooser.setValue(opts.get(0));
@@ -653,7 +662,7 @@ public class Controller {
         if (type == ServiceType.Atom) {
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
-            this.mapAtom.setExtend(item.bbox);
+            //this.mapAtom.setExtend(item.bbox);
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
