@@ -50,6 +50,7 @@ public class ServiceSetting {
     private Map<String, String> wms;
 
     public ServiceSetting() {
+        this(SERVICE_SETTING_FILE);
     }
 
     /**
