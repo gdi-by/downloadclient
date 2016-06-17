@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
@@ -54,6 +56,7 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -84,6 +87,8 @@ import org.geotools.swing.action.ZoomOutAction;
 import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
+import org.geotools.swing.tool.InfoToolHelper;
+import org.geotools.swing.tool.InfoToolResult;
 import org.geotools.swing.tool.ZoomInTool;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -92,8 +97,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-
-//import org.geotools.map.Layer;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -119,6 +122,10 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateY2;
     private ExtJMapPane mapPane;
     private Layer baseLayer;
+    private StyleBuilder sb;
+    private StyleFactory sf;
+    private FilterFactory2 ff;
+    private SimpleFeatureCollection featureSource;
 
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
@@ -144,15 +151,26 @@ public class WMSMapSwing extends Parent {
     private static final Float FILL_TRANSPARACY = 0.4f;
     private static final Float STROKY_TRANSPARACY = 0.8f;
 
-    /** Represents all Infos needed for drawing a Polyon. **/
+    /**
+     * Represents all Infos needed for drawing a Polyon.
+     **/
     public static class FeaturePolygon {
-        /** the polygon. **/
+        /**
+         * the polygon.
+         **/
         public Polygon polygon;
-        /** name of the polygon. **/
+        /**
+         * name of the polygon.
+         **/
         public String name;
-        /** id of the polygon. **/
+        /**
+         * id of the polygon.
+         **/
         public String id;
-        /** Constructor. **/
+
+        /**
+         * Constructor.
+         **/
         public FeaturePolygon(Polygon polygon,
                               String name,
                               String id) {
@@ -219,13 +237,16 @@ public class WMSMapSwing extends Parent {
     public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
         initGeotoolsLocale();
         try {
+            this.sb = new StyleBuilder();
+            this.sf = CommonFactoryFinder.getStyleFactory(null);
+            this.ff = CommonFactoryFinder.getFilterFactory2(null);
             this.mapHeight = heigth;
             this.mapWidth = width;
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
             baseLayer = null;
-            for (Layer wmsLayer: layers) {
+            for (Layer wmsLayer : layers) {
                 if (wmsLayer.getTitle().toLowerCase().equals(
                         layer.toLowerCase())) {
                     baseLayer = wmsLayer;
@@ -267,10 +288,10 @@ public class WMSMapSwing extends Parent {
      * @param y2 Y2
      */
     public void setCoordinateDisplay(
-        TextField x1,
-        TextField y1,
-        TextField x2,
-        TextField y2
+            TextField x1,
+            TextField y1,
+            TextField x2,
+            TextField y2
     ) {
         this.coordinateX1 = x1;
         this.coordinateY1 = y1;
@@ -278,7 +299,9 @@ public class WMSMapSwing extends Parent {
         this.coordinateY2 = y2;
     }
 
-    /** represents the actions for the cursor. **/
+    /**
+     * represents the actions for the cursor.
+     **/
     private class CursorAction extends NoToolAction {
 
         public CursorAction(MapPane mapPane) {
@@ -287,14 +310,20 @@ public class WMSMapSwing extends Parent {
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-                ZoomInTool tool = new ZoomInTool() {
-                    private Point start;
-                    private Point end;
-                    private DirectPosition2D mapStartPos;
-                    private DirectPosition2D mapEndPos;
-                    private int clickCount = 0;
-                    @Override
-                    public void onMouseClicked(MapMouseEvent ev) {
+            ZoomInTool tool = new ZoomInTool() {
+                private Point start;
+                private Point end;
+                private DirectPosition2D mapStartPos;
+                private DirectPosition2D mapEndPos;
+                private int clickCount = 0;
+                private WeakHashMap<Layer, InfoToolHelper> helperTable;
+
+                @Override
+                public void onMouseClicked(MapMouseEvent ev) {
+                    List<org.geotools.map.Layer> layers =
+                            mapPane.getMapContent().layers();
+                    if (layers.size() == 1) {
+                        //"normal" bounding Box selection
                         if (clickCount == 0) {
                             end = null;
                             mapEndPos = null;
@@ -328,28 +357,105 @@ public class WMSMapSwing extends Parent {
                             clickCount = 0;
                         }
                         mapPane.repaint();
+                    } else {
+                        DirectPosition2D pos = ev.getWorldPos();
+                        MapContent content = mapPane.getMapContent();
+                        final int nlayers = content.layers().size();
+                        helperTable = new WeakHashMap<Layer,
+                                InfoToolHelper>();
+                        for (org.geotools.map.Layer layer : content.layers()) {
+                            if (layer.isSelected()) {
+                                InfoToolHelper helper = null;
+
+                                String layerName = layer.getTitle();
+                                if (layerName == null
+                                        || layerName.length() == 0) {
+                                    layerName = layer.
+                                            getFeatureSource().
+                                            getName().
+                                            getLocalPart();
+                                }
+                                if (layerName == null
+                                        || layerName.length() == 0) {
+                                    layerName = layer.
+                                            getFeatureSource().
+                                            getSchema().
+                                            getName().
+                                            getLocalPart();
+                                }
+                                if (helper == null) {
+                                    helper = InfoToolHelperLookup.
+                                            getHelper(layer);
+
+                                    if (helper == null) {
+                                        return;
+                                    }
+
+                                    helper.setMapContent(content);
+                                    helper.setLayer(layer);
+                                }
+
+                                try {
+                                    if (layerName.
+                                            equals(POLYGON_LAYER_TITLE)) {
+                                        InfoToolResult result =
+                                                helper.getInfo(pos);
+                                        int numFeatures =
+                                                result.getNumFeatures();
+                                        if (numFeatures == 1) {
+                                            Map<String, Object> featureData
+                                                    = result.
+                                                    getFeatureData(0);
+                                            String name = (String)
+                                                    featureData.get(
+                                                            "name");
+                                            String id = (String)
+                                                    featureData.get("id");
+                                            //TODO: Call Function to
+                                            // frontend
+                                            System.out.println(
+                                                    "Selected:\n"
+                                                            + " "
+                                                            + "\tName:\t"
+                                                            + name
+                                                            + "\n\tid:\t"
+                                                            + id);
+                                        }
+                                    }
+
+                                } catch (Exception e) {
+                                    log.log(Level.SEVERE, e.getMessage(),
+                                            e);
+                                }
+
+                            }
+                        }
                     }
-                    @Override
-                    public void onMousePressed(MapMouseEvent ev) { }
-                    @Override
-                    public void onMouseDragged(MapMouseEvent ev) {
-                    }
-                };
-                mapPane.setCursorTool(tool);
-            }
-        };
+                }
+
+                @Override
+                public void onMousePressed(MapMouseEvent ev) {
+                }
+
+                @Override
+                public void onMouseDragged(MapMouseEvent ev) {
+                }
+            };
+            mapPane.setCursorTool(tool);
+        }
+    }
 
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                StringBuilder sb = new StringBuilder();
-                sb.append("[]");
-                sb.append("[min!]");
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("[]");
+                stringBuilder.append("[min!]");
                 JPanel panel = new JPanel(new MigLayout(
                         "wrap 1, insets 0",
                         "[grow]",
-                        sb.toString()));
+                        stringBuilder.toString()));
 
                 mapPane = new ExtJMapPane(mapContent);
                 mapPane.setPreferredSize(new Dimension(mapWidth,
@@ -367,7 +473,8 @@ public class WMSMapSwing extends Parent {
                     @Override
                     public void focusLost(FocusEvent e) {
                         mapPane.setBorder(
-                              BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                                BorderFactory.createLineBorder(
+                                        Color.LIGHT_GRAY));
                     }
                 });
                 mapPane.addMouseListener(new MouseAdapter() {
@@ -422,6 +529,7 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Draws Polygons on the maps.
+     *
      * @param featurePolygons List of drawable Polygons
      */
     public void drawPolygons(List<FeaturePolygon> featurePolygons) {
@@ -447,8 +555,9 @@ public class WMSMapSwing extends Parent {
                 SimpleFeature feature = featureBuilder.buildFeature(null);
                 polygonFeatureCollection.add(feature);
             }
+            featureSource = (SimpleFeatureCollection) polygonFeatureCollection;
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
-                            polygonFeatureCollection, createPolygonStyle());
+                    polygonFeatureCollection, createPolygonStyle());
             polygonLayer.setTitle(POLYGON_LAYER_TITLE);
             List<org.geotools.map.Layer> layers = mapContent.layers();
             for (org.geotools.map.Layer layer : layers) {
@@ -465,9 +574,6 @@ public class WMSMapSwing extends Parent {
     }
 
     private Style createPolygonStyle() {
-        StyleBuilder builder = new StyleBuilder();
-        StyleFactory sf = CommonFactoryFinder.getStyleFactory(null);
-        FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);
         Fill fill = sf.createFill(ff.literal(FILL_COLOR),
                 ff.literal(FILL_TRANSPARACY));
         Stroke stroke = sf.createStroke(ff.literal(OUTLINE_COLOR),
@@ -475,11 +581,12 @@ public class WMSMapSwing extends Parent {
                 ff.literal(STROKY_TRANSPARACY));
         PolygonSymbolizer polygonSymbolizer =
                 sf.createPolygonSymbolizer(stroke, fill, null);
-        return builder.createStyle(polygonSymbolizer);
+        return this.sb.createStyle(polygonSymbolizer);
     }
 
     /**
      * sets the viewport of the map to the given extend.
+     *
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
@@ -488,12 +595,13 @@ public class WMSMapSwing extends Parent {
 
     /**
      * sets the viewport of the map to the given extend.
+     *
      * @param envelope the extend
      */
     public void setExtend(ReferencedEnvelope envelope) {
         try {
             envelope = envelope.transform(this.mapContent.getViewport()
-                .getCoordinateReferenceSystem(), true);
+                    .getCoordinateReferenceSystem(), true);
             setExtend((Envelope) envelope);
         } catch (FactoryException | TransformException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -516,15 +624,17 @@ public class WMSMapSwing extends Parent {
         }
 
     }
+
     /**
      * return the Bounds of the Map.
+     *
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
         Component[] components = this.mapNode.getContent().getComponents();
         for (Component c : components) {
             if (c.getClass().equals(ExtJMapPane.class)) {
-                return ((ExtJMapPane)c).getSelectedEnvelope();
+                return ((ExtJMapPane) c).getSelectedEnvelope();
             }
         }
         return null;
@@ -560,16 +670,17 @@ public class WMSMapSwing extends Parent {
             super.repaint();
             if (this.rect != null) {
                 Graphics2D graphic =
-                    (Graphics2D)this.getGraphics();
+                        (Graphics2D) this.getGraphics();
                 graphic.setColor(Color.WHITE);
                 graphic.setXORMode(Color.RED);
                 graphic.drawRect(
-                    rect.x,
-                    rect.y,
-                    rect.width,
-                    rect.height);
+                        rect.x,
+                        rect.y,
+                        rect.width,
+                        rect.height);
             }
         }
+
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -577,10 +688,10 @@ public class WMSMapSwing extends Parent {
                 g.setColor(Color.WHITE);
                 g.setXORMode(Color.RED);
                 g.drawRect(
-                    rect.x,
-                    rect.y,
-                    rect.width,
-                    rect.height);
+                        rect.x,
+                        rect.y,
+                        rect.width,
+                        rect.height);
             }
         }
     }
