@@ -726,6 +726,7 @@ public class Controller {
         try {
             url = new URL(ServiceSetting.getInstance().getWMSUrl());
         } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
         mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
                 ServiceSetting.getInstance().getWMSLayer());
