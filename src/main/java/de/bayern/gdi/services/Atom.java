@@ -100,7 +100,7 @@ public class Atom {
         public String describedBy;
 
         /**
-         * bounding Polygon
+         * bounding Polygon.
          */
         public Polygon polygon;
 
@@ -248,7 +248,7 @@ public class Atom {
             //        + " ms\tDescirption: " + description.getTextContent());
             String borderPolygonExpr = "*[local-name()"
                                        + "='polygon']";
-            Node borderPolyGonN= (Node) XML.xpath(entry,
+            Node borderPolyGonN = (Node) XML.xpath(entry,
                     borderPolygonExpr,
                     XPathConstants.NODE,
                     this.nscontext);
@@ -266,15 +266,17 @@ public class Atom {
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tformat: " + it.format);
             it.bbox = new ReferencedEnvelope();
-            String bboxSepStr[] = borderPolyGonN.getTextContent().split(" ");
+            String[] bboxSepStr = borderPolyGonN.getTextContent().split(" ");
             String bboxStr = "";
-            for(int j = 0; j< bboxSepStr.length ; j = j + 2) {
-                bboxStr += bboxSepStr[j] + " " + bboxSepStr[j+1] + ", ";
+            for (int j = 0; j < bboxSepStr.length; j = j + 2) {
+                bboxStr = bboxStr + bboxSepStr[j] + " " + bboxSepStr[j + 1]
+                        + ", ";
             }
-            bboxStr = bboxStr.substring(0,bboxStr.length()-2);
-            WKTReader reader = new WKTReader( JTSFactoryFinder.getGeometryFactory( null ) );
+            bboxStr = bboxStr.substring(0, bboxStr.length() - 2);
+            WKTReader reader = new WKTReader(
+                    JTSFactoryFinder.getGeometryFactory(null));
             Geometry polygon = null;
-            try{
+            try {
                 polygon = reader.read("POLYGON((" + bboxStr
                         + "))");
                 it.polygon = (Polygon) polygon;
@@ -285,11 +287,11 @@ public class Atom {
                         XPathConstants.STRING,
                         this.nscontext);
                 String epsgNumber = categoryTerm.substring(categoryTerm
-                        .lastIndexOf("/")+1, categoryTerm.length());
+                        .lastIndexOf("/") + 1, categoryTerm.length());
                 String epsgUnit = categoryTerm.substring(0, categoryTerm
-                        .lastIndexOf(epsgNumber)-1);
+                        .lastIndexOf(epsgNumber) - 1);
                 epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf("/"));
-                epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf("/")+1,
+                epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf("/") + 1,
                         epsgUnit.length());
                 String defaultCRS = epsgUnit + ":" + epsgNumber;
                 CoordinateReferenceSystem crs = CRS.decode(defaultCRS);

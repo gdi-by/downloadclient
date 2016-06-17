@@ -653,7 +653,7 @@ public class Controller {
         if (type == ServiceType.Atom) {
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
-            this.mapAtom.setToExtend(item.bbox);
+            this.mapAtom.setExtend(item.bbox);
             List<Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();

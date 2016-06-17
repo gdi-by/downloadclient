@@ -365,23 +365,22 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
-     * sets the viewport of the map to the given extend
+     * sets the viewport of the map to the given extend.
      * @param envelope the extend
      */
-    public void setToExtend(ReferencedEnvelope envelope) {
-        setToExtend(envelope);
+    public void setExtend(Envelope envelope) {
+        mapPane.setDisplayArea(envelope);
     }
 
-
-    private void setExtend(Envelope env) {
-        mapPane.setDisplayArea(env);
-    }
-
-    private void setExtend(ReferencedEnvelope extend) {
+    /**
+     * sets the viewport of the map to the given extend.
+     * @param envelope the extend
+     */
+    public void setExtend(ReferencedEnvelope envelope) {
         try {
-            extend = extend.transform(this.mapContent.getViewport()
+            envelope = envelope.transform(this.mapContent.getViewport()
                 .getCoordinateReferenceSystem(), true);
-            setExtend((Envelope) extend);
+            setExtend((Envelope) envelope);
         } catch (FactoryException | TransformException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
