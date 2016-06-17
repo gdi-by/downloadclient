@@ -30,7 +30,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
@@ -49,12 +48,19 @@ public class WFSMetaExtractor {
             throw new RuntimeException(e);
         }
     }
-    private static final NamespaceContext NAMESPACES =
+
+    private static final String OWS = "http://www.opengis.net/ows/1.1";
+    private static final String WFS = "http://www.opengis.net/wfs/2.0";
+    private static final String XLINK = "http://www.w3.org/1999/xlink";
+    private static final String XSD = "http://www.w3.org/2001/XMLSchema";
+
+    /** Common namespaces for WFS documents. */
+    public static final NamespaceContext NAMESPACES =
         new NamespaceContextMap(
-            "ows", "http://www.opengis.net/ows/1.1",
-            "wfs", "http://www.opengis.net/wfs/2.0",
-            "xlink", "http://www.w3.org/1999/xlink",
-            "xsd", "http://www.w3.org/2001/XMLSchema");
+            "ows",   OWS,
+            "wfs",   WFS,
+            "xlink", XLINK,
+            "xsd",   XSD);
 
     private static final String XPATH_TITLE
         = "//ows:ServiceIdentification/ows:Title/text()";
@@ -65,13 +71,8 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATIONS
         = "//ows:OperationsMetadata/ows:Operation";
 
-    private static final String XPATH_SUPPORTED_CONSTRAINTS
-        = "//ows:OperationsMetadata/ows:Constraint"
-        + "[ows:DefaultValue/text()='TRUE']/@name";
-
-    private static final String XPATH_UNSUPPORTED_CONSTRAINTS
-        = "//ows:OperationsMetadata/ows:Constraint"
-        + "[ows:DefaultValue/text()='FALSE']/@name";
+    private static final String XPATH_CONSTRAINTS
+        = "//ows:OperationsMetadata/ows:Constraint";
 
     private static final String XPATH_FEATURETYPES
         = "//wfs:FeatureTypeList/wfs:FeatureType";
@@ -91,6 +92,11 @@ public class WFSMetaExtractor {
 
     private static final String XPATH_OPERATION_OUT_FORMATS
         = "ows:Parameter[@name='outputFormat']"
+        + "/ows:AllowedValues/ows:Value/text()";
+
+    private static final String XPATH_OUT_FORMATS
+        = "/wfs:WFS_Capabilities"
+        + "/ows:OperationsMetadata/ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
 
     private static final String XPATH_FEATURE_OUT_FORMATS
@@ -225,22 +231,20 @@ public class WFSMetaExtractor {
             dsqDoc, XPATH_STORED_QUERIES,
             XPathConstants.NODESET, NAMESPACES);
 
-        String wfs = "http://www.opengis.net/wfs/2.0";
-
         for (int i = 0, n = storedQueriesDesc.getLength(); i < n; i++) {
             Element sqd = (Element)storedQueriesDesc.item(i);
             WFSMeta.StoredQuery sq = new WFSMeta.StoredQuery();
             sq.id = sqd.getAttribute("id");
-            NodeList titles = sqd.getElementsByTagNameNS(wfs, "Title");
+            NodeList titles = sqd.getElementsByTagNameNS(WFS, "Title");
             if (titles.getLength() > 0) {
                 sq.title = titles.item(0).getTextContent();
             }
-            NodeList abstracts = sqd.getElementsByTagNameNS(wfs, "Abstract");
+            NodeList abstracts = sqd.getElementsByTagNameNS(WFS, "Abstract");
             if (abstracts.getLength() > 0) {
                 sq.abstractDescription = abstracts.item(0).getTextContent();
             }
             NodeList parameters =
-                sqd.getElementsByTagNameNS(wfs, "Parameter");
+                sqd.getElementsByTagNameNS(WFS, "Parameter");
             for (int j = 0, m = parameters.getLength(); j < m; j++) {
                 Element parameter = (Element)parameters.item(j);
                 Field p = new Field(
@@ -270,6 +274,13 @@ public class WFSMetaExtractor {
         }
         Collections.sort(meta.versions);
 
+        NodeList outputFormats = (NodeList)XML.xpath(
+            capDoc, XPATH_OUT_FORMATS,
+            XPathConstants.NODESET, NAMESPACES);
+        for (int i = 0, n = outputFormats.getLength(); i < n; i++) {
+            meta.outputFormats.add(outputFormats.item(i).getTextContent());
+        }
+
         NodeList nl = (NodeList)XML.xpath(
             capDoc, XPATH_OPERATIONS, XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
@@ -285,23 +296,36 @@ public class WFSMetaExtractor {
             for (int j = 0, m = outs.getLength(); j < m; j++) {
                 operation.outputFormats.add(outs.item(j).getTextContent());
             }
+
+            NodeList constraints =
+                (NodeList)node.getElementsByTagNameNS(OWS, "Constraint");
+
+            for (int j = 0, m = constraints.getLength(); j < m; j++) {
+                Element c = (Element)constraints.item(j);
+                WFSMeta.Constraint constraint = new WFSMeta.Constraint();
+                constraint.name = c.getAttribute("name");
+                NodeList defVals = c.getElementsByTagNameNS(
+                    OWS, "DefaultValue");
+                if (defVals.getLength() > 0) {
+                    constraint.value = defVals.item(0).getTextContent();
+                }
+                operation.constraints.add(constraint);
+            }
             meta.operations.add(operation);
         }
 
         nl = (NodeList)XML.xpath(
-            capDoc, XPATH_SUPPORTED_CONSTRAINTS,
+            capDoc, XPATH_CONSTRAINTS,
             XPathConstants.NODESET, NAMESPACES);
         for (int i = 0, n = nl.getLength(); i < n; i++) {
-            Node node = nl.item(i);
-            meta.supportedConstraints.add(node.getTextContent());
-        }
-
-        nl = (NodeList)XML.xpath(
-            capDoc, XPATH_UNSUPPORTED_CONSTRAINTS,
-            XPathConstants.NODESET, NAMESPACES);
-        for (int i = 0, n = nl.getLength(); i < n; i++) {
-            Node node = nl.item(i);
-            meta.unsupportedConstraints.add(node.getTextContent());
+            Element el = (Element)nl.item(i);
+            WFSMeta.Constraint constraint = new WFSMeta.Constraint();
+            constraint.name = el.getAttribute("name");
+            NodeList defVals = el.getElementsByTagNameNS(OWS, "DefaultValue");
+            if (defVals.getLength() > 0) {
+                constraint.value = defVals.item(0).getTextContent();
+            }
+            meta.constraints.add(constraint);
         }
 
         nl = (NodeList)XML.xpath(
@@ -311,29 +335,29 @@ public class WFSMetaExtractor {
 
             WFSMeta.Feature feature = new WFSMeta.Feature();
 
-            NodeList names = el.getElementsByTagName("Name");
+            NodeList names = el.getElementsByTagNameNS(WFS, "Name");
             if (names.getLength() > 0) {
                 feature.name = names.item(0).getTextContent();
             }
 
-            NodeList titles = el.getElementsByTagName("Title");
+            NodeList titles = el.getElementsByTagNameNS(WFS, "Title");
             if (titles.getLength() > 0) {
                 feature.title = titles.item(0).getTextContent();
             }
 
-            NodeList abstracts = el.getElementsByTagName("Abstract");
+            NodeList abstracts = el.getElementsByTagNameNS(WFS, "Abstract");
             if (abstracts.getLength() > 0) {
                 feature.abstractDescription
                     = abstracts.item(0).getTextContent();
             }
 
-            NodeList defaultCRS = el.getElementsByTagName("DefaultCRS");
+            NodeList defaultCRS = el.getElementsByTagNameNS(WFS, "DefaultCRS");
             if (defaultCRS.getLength() > 0) {
                 feature.defaultCRS
                     = defaultCRS.item(0).getTextContent();
             }
 
-            NodeList otherCRSs = el.getElementsByTagName("OtherCRS");
+            NodeList otherCRSs = el.getElementsByTagNameNS(WFS, "OtherCRS");
             for (int j = 0, m = otherCRSs.getLength(); j < m; j++) {
                 feature.otherCRSs.add(otherCRSs.item(j).getTextContent());
             }

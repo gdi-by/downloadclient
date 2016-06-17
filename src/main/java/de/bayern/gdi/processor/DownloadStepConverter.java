@@ -20,29 +20,32 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.XML;
 
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
-
-    private static ProcessingConfiguration processingConfig;
-
-    private DownloadStepConverter() {
-    }
 
     private static final String[][] SERVICE2TYPE = {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
@@ -51,6 +54,64 @@ public class DownloadStepConverter {
         {"WFS1", "DATASET"},
         {"WFS", "DATASET"}
     };
+
+    private static ProcessingConfiguration processingConfig;
+
+    private String user;
+    private String password;
+
+    public DownloadStepConverter() {
+    }
+
+    /**
+     * Creates a converter with given user name and password.
+     * @param user The user name.
+     * @param password The password.
+     */
+    public DownloadStepConverter(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    /**
+     * Converts a DownloadStep into a sequence of jobs for the processor.
+     * @param dls DownloadStep the configuration to be converted.
+     * @return A job list for the download processor.
+     * @throws ConverterException If the conversion went wrong.
+     */
+    public JobList convert(DownloadStep dls) throws ConverterException {
+
+        ProcessingStepConverter psc =
+            new ProcessingStepConverter(getProcessingConfiguration());
+
+        File path = new File(dls.getPath());
+
+        if (!path.exists()) {
+            if (!path.mkdirs()) {
+                throw new ConverterException(
+                    I18n.format("dls.converter.cant.create.dir", path));
+            }
+        } else if (!path.isDirectory()) {
+            throw new ConverterException(
+                I18n.format("dls.converter.not.dir", path));
+        }
+
+        psc.convert(dls, path);
+
+        JobList jl = new JobList();
+
+
+        if (dls.getServiceType().equals("ATOM")) {
+            createAtomDownload(jl, path, dls);
+        } else {
+            createWFSDownload(jl, path, psc.getUsedVars(), dls);
+        }
+
+        jl.addJobs(psc.getJobs());
+
+        return jl;
+    }
+
 
     private static String findQueryType(String type) {
         String t = type.toUpperCase();
@@ -68,9 +129,7 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (usedVars.contains(p.getKey())
-            || p.getKey().equals("user")
-            || p.getKey().equals("password")) {
+            if (usedVars.contains(p.getKey())) {
                 continue;
             }
             if (sb.length() > 0) {
@@ -95,22 +154,12 @@ public class DownloadStepConverter {
 
     private static String wfsURL(
         DownloadStep dls,
-        Set<String>  usedVars
+        Set<String>  usedVars,
+        WFSMeta      meta
     ) throws ConverterException {
 
         String url = dls.getServiceURL();
         String base = baseURL(url);
-        String cap = capURL(base);
-
-        WFSMetaExtractor extractor = new WFSMetaExtractor(cap);
-
-        WFSMeta meta;
-        try {
-            meta = extractor.parse();
-        } catch (IOException ioe) {
-            // TODO: I18n
-            throw new ConverterException("Cannot load meta data", ioe);
-        }
 
         String version = StringUtils.urlEncode(meta.highestVersion("2.0.0"));
 
@@ -118,7 +167,7 @@ public class DownloadStepConverter {
         String queryType = findQueryType(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
-        sb.append(url)
+        sb.append(base)
           .append('?')
           .append("service=wfs&")
           .append("request=GetFeature&")
@@ -160,24 +209,129 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
-    private static void createWfsDownload(
-        JobList jl,
-        File workingDir,
-        Set<String> usedVars,
-        DownloadStep dls
+    private void unpagedWFSDownload(
+        JobList      jl,
+        File         workingDir,
+        Set<String>  usedVars,
+        DownloadStep dls,
+        WFSMeta      meta
     ) throws ConverterException {
-        String url = wfsURL(dls, usedVars);
+
+        String url = wfsURL(dls, usedVars, meta);
         log.log(Level.INFO, "url: " + url);
 
         File gml = new File(workingDir, "download.gml");
-        log.log(Level.INFO, "Download to file \"" + gml + "\"");
+        log.info("Download to file \"" + gml + "\"");
 
-        String user = dls.findParameter("user");
-        String password = dls.findParameter("password");
+        FileDownloadJob fdj = new FileDownloadJob(
+            url, gml,
+            this.user, this.password);
 
-        FileDownloadJob fdj = new FileDownloadJob(url, gml, user, password);
         jl.addJob(fdj);
         jl.addJob(new GMLCheckJob(gml));
+    }
+
+    private static URL newURL(String url) throws ConverterException {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException mfe) {
+            throw new ConverterException(mfe.getMessage(), mfe);
+        }
+    }
+
+    private static final String XPATH_NUMBER_MATCHED
+        = "/wfs:FeatureCollection/@numberMatched";
+
+    private int numFeatures(String wfsURL) throws ConverterException {
+        URL url = newURL(wfsURL + "&resultType=hits");
+        Document hitsDoc = XML.getDocument(url, user, password);
+        if (hitsDoc == null) {
+            // TODO: I18n
+            throw new ConverterException("cannot load hits document");
+        }
+        String numberMatchedString = (String)XML.xpath(
+            hitsDoc, XPATH_NUMBER_MATCHED,
+            XPathConstants.STRING,
+            WFSMetaExtractor.NAMESPACES);
+
+        if (numberMatchedString == null || numberMatchedString.isEmpty()) {
+            // TODO: I18n
+            throw new ConverterException("numberMatched not found");
+        }
+        try {
+            return Integer.parseInt(numberMatchedString);
+        } catch (NumberFormatException nfe) {
+            // TODO: I18n
+            throw new ConverterException(nfe.getMessage(), nfe);
+        }
+    }
+
+    private URL pagedFeatureURL(String wfsURL, int ofs, int count)
+    throws ConverterException {
+        StringBuilder sb = new StringBuilder(wfsURL)
+            .append("&startIndex=").append(ofs)
+            // TODO: WFS < 2.x "maxFeatures"
+            .append("&count=").append(count);
+        return newURL(sb.toString());
+    }
+
+    private void createWFSDownload(
+        JobList      jl,
+        File         workingDir,
+        Set<String>  usedVars,
+        DownloadStep dls
+    ) throws ConverterException {
+
+        String url = dls.getServiceURL();
+        String base = baseURL(url);
+        String cap = capURL(base);
+
+        WFSMetaExtractor extractor =
+            new WFSMetaExtractor(cap, this.user, this.password);
+
+        WFSMeta meta;
+        try {
+            meta = extractor.parse();
+        } catch (IOException ioe) {
+            // TODO: I18n
+            throw new ConverterException("Cannot load meta data", ioe);
+        }
+
+        Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
+
+        if (fpp == null) {
+            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            return;
+        }
+
+        String wfsURL = wfsURL(dls, usedVars, meta);
+        int numFeatures = numFeatures(wfsURL);
+
+        // Page size greater than number features -> Normal download.
+        if (numFeatures < fpp) {
+            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            return;
+        }
+
+        log.info("total number of features: " + numFeatures);
+
+        FilesDownloadJob fdj =
+            new FilesDownloadJob(this.user, this.password);
+        GMLCheckJob gcj = new GMLCheckJob();
+
+        int numFiles = Math.max(1, numFeatures / fpp);
+        String format = "%0" + StringUtils.places(numFiles) + "d-%d.gml";
+
+        for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
+            String filename = String.format(format, i, ofs);
+            File file = new File(workingDir, filename);
+            log.info("download to file: " + file);
+            fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp));
+            gcj.add(file);
+        }
+
+        jl.addJob(fdj);
+        jl.addJob(gcj);
     }
 
 
@@ -189,7 +343,7 @@ public class DownloadStepConverter {
         }
     }
 
-    private static void createAtomDownload(
+    private void createAtomDownload(
         JobList jl,
         File workingDir,
         DownloadStep dls
@@ -203,54 +357,13 @@ public class DownloadStepConverter {
         check(dataset, "dataset");
         check(variation, "VARIATION");
 
-        String user = dls.findParameter("user");
-        String password = dls.findParameter("password");
-
         AtomDownloadJob job = new AtomDownloadJob(
             url,
             dataset,
             variation,
             workingDir,
-            user, password);
+            this.user, this.password);
         jl.addJob(job);
-    }
-
-    /**
-     * Converts a DownloadStep into a sequence of jobs for the processor.
-     * @param dls DownloadStep the configuration to be converted.
-     * @return A job list for the download processor.
-     * @throws ConverterException If the conversion went wrong.
-     */
-    public static JobList convert(DownloadStep dls) throws ConverterException {
-
-        ProcessingStepConverter psc =
-            new ProcessingStepConverter(getProcessingConfiguration());
-
-        File path = new File(dls.getPath());
-
-        if (!path.exists()) {
-            if (!path.mkdirs()) {
-                throw new ConverterException(
-                    I18n.format("dls.converter.cant.create.dir", path));
-            }
-        } else if (!path.isDirectory()) {
-            throw new ConverterException(
-                I18n.format("dls.converter.not.dir", path));
-        }
-
-        psc.convert(dls, path);
-
-        JobList jl = new JobList();
-
-        if (dls.getServiceType().equals("ATOM")) {
-            createAtomDownload(jl, path, dls);
-        } else {
-            createWfsDownload(jl, path, psc.getUsedVars(), dls);
-        }
-
-        jl.addJobs(psc.getJobs());
-
-        return jl;
     }
 
     private static
@@ -258,9 +371,11 @@ public class DownloadStepConverter {
         InputStream in = null;
         try {
             in = DownloadStepConverter.class.getResourceAsStream(
-                "Verarbeitungsschritte.xml");
+                ProcessingConfiguration.PROCESSING_CONFIG_FILE);
             if (in == null) {
-                log.log(Level.SEVERE, "Verarbeitungsschritte.xml not found");
+                log.log(Level.SEVERE,
+                    ProcessingConfiguration.PROCESSING_CONFIG_FILE
+                    + " not found");
                 return new ProcessingConfiguration();
             }
             return ProcessingConfiguration.read(in);
@@ -284,7 +399,10 @@ public class DownloadStepConverter {
     public static synchronized
     ProcessingConfiguration getProcessingConfiguration() {
         if (processingConfig == null) {
-            processingConfig = loadProcessingConfiguration();
+            processingConfig = Config.getInstance().getProcessingConfig();
+            if (processingConfig == null) {
+                processingConfig = loadProcessingConfiguration();
+            }
         }
         return processingConfig;
     }
