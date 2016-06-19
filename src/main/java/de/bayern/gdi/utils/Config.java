@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
+import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
 
@@ -42,6 +43,8 @@ public class Config {
     private boolean initialized;
 
     private ServiceSetting services;
+
+    private MIMETypes mimeTypes;
 
     private ProcessingConfiguration processingConfig;
 
@@ -75,6 +78,13 @@ public class Config {
     }
 
     /**
+     * @return the mimeTypes
+     */
+    public MIMETypes getMimeTypes() {
+        return mimeTypes;
+    }
+
+    /**
      * @return the processingConfig
      */
     public ProcessingConfiguration getProcessingConfig() {
@@ -85,6 +95,9 @@ public class Config {
     public static void uninitialized() {
         synchronized (Holder.INSTANCE) {
             Holder.INSTANCE.services = new ServiceSetting();
+            Holder.INSTANCE.processingConfig =
+                ProcessingConfiguration.loadDefault();
+            Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
             Holder.INSTANCE.initialized = true;
             Holder.INSTANCE.notifyAll();
         }
@@ -137,6 +150,18 @@ public class Config {
         if (procConfig.isFile() && procConfig.canRead()) {
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.read(procConfig);
+        } else {
+            Holder.INSTANCE.processingConfig =
+                ProcessingConfiguration.loadDefault();
+        }
+
+        File mimeTypes = new File(
+            dir, MIMETypes.MIME_TYPES_FILE);
+        if (mimeTypes.isFile() && mimeTypes.canRead()) {
+            Holder.INSTANCE.mimeTypes =
+                MIMETypes.read(mimeTypes);
+        } else {
+            Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
         }
 
         // TODO: MIME types -> file extensions.

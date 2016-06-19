@@ -62,4 +62,9 @@ public class MIMEType {
     public void setExt(String ext) {
         this.ext = ext;
     }
+
+    @Override
+    public String toString() {
+        return "[name: '" + name + "' ext: '" + ext + "']";
+    }
 }

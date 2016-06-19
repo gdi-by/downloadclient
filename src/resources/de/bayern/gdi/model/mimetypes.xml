@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MIMETypes>
+    <Type name="image/tiff" ext=" tiff"/>
+    <Type name="image/jpeg" ext=" jpg"/>
+    <Type name="image/png" ext=" png"/>
+    <Type name="image/gif" ext=" gif"/>
+    <Type name="application/pdf" ext=" pdf"/>
+    <Type name="text/csv" ext=" csv"/>
+    <Type name="text/xml" ext=" xml"/>
+</MIMETypes>

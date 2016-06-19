@@ -19,7 +19,6 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import org.w3c.dom.Document;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
-import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
@@ -54,8 +52,6 @@ public class DownloadStepConverter {
         {"WFS1", "DATASET"},
         {"WFS", "DATASET"}
     };
-
-    private static ProcessingConfiguration processingConfig;
 
     private String user;
     private String password;
@@ -81,8 +77,7 @@ public class DownloadStepConverter {
      */
     public JobList convert(DownloadStep dls) throws ConverterException {
 
-        ProcessingStepConverter psc =
-            new ProcessingStepConverter(getProcessingConfiguration());
+        ProcessingStepConverter psc = new ProcessingStepConverter();
 
         File path = new File(dls.getPath());
 
@@ -221,7 +216,9 @@ public class DownloadStepConverter {
         String url = wfsURL(dls, usedVars, meta);
         log.log(Level.INFO, "url: " + url);
 
-        File gml = new File(workingDir, "download.gml");
+        String ext = extension(dls);
+
+        File gml = new File(workingDir, "download." + ext);
         log.info("Download to file \"" + gml + "\"");
 
         FileDownloadJob fdj = new FileDownloadJob(
@@ -229,7 +226,9 @@ public class DownloadStepConverter {
             this.user, this.password);
 
         jl.addJob(fdj);
-        jl.addJob(new GMLCheckJob(gml));
+        if (ext.equals("gml")) {
+            jl.addJob(new GMLCheckJob(gml));
+        }
     }
 
     private static URL newURL(String url) throws ConverterException {
@@ -273,6 +272,12 @@ public class DownloadStepConverter {
             .append("&startIndex=").append(ofs)
             .append(wfs2 ? "&count=" : "&maxFeatures=").append(count);
         return newURL(sb.toString());
+    }
+
+    private static String extension(DownloadStep dls) {
+        String mimeType = dls.findParameter("outputformat");
+        return  Config.getInstance().getMimeTypes()
+            .findExtension(mimeType, "gml");
     }
 
     private void createWFSDownload(
@@ -319,8 +324,12 @@ public class DownloadStepConverter {
             new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob();
 
+        String ext = extension(dls);
+
+        boolean isGML = ext.equals("gml");
+
         int numFiles = Math.max(1, numFeatures / fpp);
-        String format = "%0" + StringUtils.places(numFiles) + "d-%d.gml";
+        String format = "%0" + StringUtils.places(numFiles) + "d-%d." + ext;
 
         boolean wfs2 =
             meta.highestVersion(WFSMeta.WFS2_0_0)
@@ -331,7 +340,9 @@ public class DownloadStepConverter {
             File file = new File(workingDir, filename);
             log.info("download to file: " + file);
             fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
-            gcj.add(file);
+            if (isGML) {
+                gcj.add(file);
+            }
         }
 
         jl.addJob(fdj);
@@ -368,46 +379,5 @@ public class DownloadStepConverter {
             workingDir,
             this.user, this.password);
         jl.addJob(job);
-    }
-
-    private static
-    ProcessingConfiguration loadProcessingConfiguration() {
-        InputStream in = null;
-        try {
-            in = DownloadStepConverter.class.getResourceAsStream(
-                ProcessingConfiguration.PROCESSING_CONFIG_FILE);
-            if (in == null) {
-                log.log(Level.SEVERE,
-                    ProcessingConfiguration.PROCESSING_CONFIG_FILE
-                    + " not found");
-                return new ProcessingConfiguration();
-            }
-            return ProcessingConfiguration.read(in);
-        } catch (IOException ioe) {
-            log.log(Level.SEVERE, "Failed to load configuration", ioe);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ioe) {
-                }
-            }
-        }
-        return new ProcessingConfiguration();
-    }
-
-    /**
-     * Returns the processing step configuration.
-     * @return the processing step configuration.
-     */
-    public static synchronized
-    ProcessingConfiguration getProcessingConfiguration() {
-        if (processingConfig == null) {
-            processingConfig = Config.getInstance().getProcessingConfig();
-            if (processingConfig == null) {
-                processingConfig = loadProcessingConfiguration();
-            }
-        }
-        return processingConfig;
     }
 }
