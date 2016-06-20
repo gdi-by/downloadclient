@@ -131,9 +131,8 @@
             <Beschreibung>[MOCK] Verschickt die heruntergeladenen Dateien per E-Mail</Beschreibung>
             <Befehl>send_email.py</Befehl>
             <ParameterSet>
-                <Parameter glob="delta">
-                    -attachment *.*
-                </Parameter>
+                <Parameter>-attachment</Parameter>
+                <Parameter glob="delta">*.*</Parameter>
                 <Parameter verpflichtend="true" eingabeelement="text">
                     -to {TEXT}
                 </Parameter>

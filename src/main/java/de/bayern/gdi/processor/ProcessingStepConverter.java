@@ -28,6 +28,9 @@ import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.processor.ExternalProcessJob.Arg;
+import de.bayern.gdi.processor.ExternalProcessJob.DeltaGlob;
+import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
+import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.StringUtils;
@@ -79,6 +82,29 @@ public class ProcessingStepConverter {
 
             parameters:
             for (ConfigurationParameter cp: psc.getParameters()) {
+                String ext = cp.getExt();
+                if (ext != null) { // The <Parameter ext="gml"/> case.
+                    params.add(new UniqueArg(ext));
+                    continue;
+                }
+
+                String glob = cp.getGlob();
+                if (glob != null) {
+                    switch (glob) {
+                        case "delta":
+                            params.add(new DeltaGlob(cp.getValue()));
+                            break;
+                        case "global":
+                            params.add(new GlobalGlob(cp.getValue()));
+                            break;
+                        default:
+                            // TODO: I18n
+                            throw new ConverterException(
+                                "Unknown glob mode '" + glob + "'.");
+                    }
+                    continue;
+                }
+
                 String value = cp.getValue();
                 if (value == null) {
                     continue;
