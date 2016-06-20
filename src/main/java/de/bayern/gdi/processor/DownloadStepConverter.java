@@ -35,6 +35,7 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
@@ -91,7 +92,14 @@ public class DownloadStepConverter {
                 I18n.format("dls.converter.not.dir", path));
         }
 
-        psc.convert(dls, path);
+        FileTracker fileTracker = new FileTracker(path);
+        if (!fileTracker.scan()) {
+            // TODO: i18n
+            throw new ConverterException(
+                "Inital scan of download file failed.");
+        }
+
+        psc.convert(dls, fileTracker);
 
         JobList jl = new JobList();
 
