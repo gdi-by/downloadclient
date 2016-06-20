@@ -20,6 +20,7 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /** Misc helper functions. */
 public final class Misc {
@@ -28,7 +29,7 @@ public final class Misc {
         = new SimpleDateFormat("yyyyMMddHHmmss");
 
     /** Number of tries before giving up searching for collisions. */
-    private static final int MAX_TRIES = 1000;
+    private static final int MAX_TRIES = 5000;
 
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
@@ -51,7 +52,7 @@ public final class Misc {
     /**
      * Creates a directory in the parent directory. The name
      * is created from the given prefix and the current time.
-     * To avoid collisions a integer is append in case.
+     * To avoid collisions an integer is appended in case.
      * @param parent The parent directory.
      * @param prefix The used prefix.
      * @return The new created directory or null if the creation
@@ -71,5 +72,35 @@ public final class Misc {
         }
 
         return count < MAX_TRIES && path.mkdirs() ? path : null;
+    }
+
+    /**
+     * Creates a unique file name in the parent directory. The name
+     * is created from the prefix, the extension and the current time.
+     * To avoid collisions an integer is appended in case.
+     * @param parent The parent directory.
+     * @param prefix The used prefix.
+     * @param ext The used extension.
+     * @param tmpFiles Temporary files not in file system.
+     * @return The unique or null if the creation failed.
+     */
+    public static File uniqueFile(
+        File      parent,
+        String    prefix,
+        String    ext,
+        Set<File> tmpFiles
+    ) {
+        Date now = new Date();
+
+        String dir = prefix + DF_FORMAT.format(now);
+        File path = new File(parent, dir);
+        int count = 0;
+        while (count < MAX_TRIES && path.exists() && tmpFiles.contains(path)) {
+            ++count;
+            dir = prefix + DF_FORMAT.format(now) + "-" + count;
+            path = new File(parent, dir);
+        }
+
+        return count < MAX_TRIES ? path : null;
     }
 }

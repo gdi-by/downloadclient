@@ -21,10 +21,13 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 
 /**
  * Starts an external process with optional arguments and
@@ -44,10 +47,35 @@ public class ExternalProcessJob implements Job {
         /**
          * Expands the argument.
          * @param fileTracker The fileTracker used to expand the argument.
+         * @param tmpNames A set of temporary names.
          * @return The expanded argument.
          */
-        public String[] getArgs(FileTracker fileTracker) {
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
             return new String[] {this.arg};
+        }
+    }
+
+    /** Generate a unique file name with an extension. */
+
+    public static class UniqueArg extends Arg {
+        public UniqueArg(String arg) {
+            super(arg);
+        }
+
+        @Override
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
+            if (fileTracker == null) {
+                return super.getArgs(fileTracker, tmpNames);
+            }
+            File file = Misc.uniqueFile(
+                fileTracker.getDirectory(), "download-", this.arg, tmpNames);
+
+            if (file == null) {
+                throw new IllegalArgumentException("No unique name available.");
+            }
+            tmpNames.add(file);
+
+            return new String[] {file.getName()};
         }
     }
 
@@ -71,10 +99,10 @@ public class ExternalProcessJob implements Job {
         }
 
         @Override
-        public String[] getArgs(FileTracker fileTracker) {
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
             return fileTracker != null
                 ? toString(fileTracker.globalGlob(arg))
-                : super.getArgs(fileTracker);
+                : super.getArgs(fileTracker, tmpNames);
         }
     }
 
@@ -85,10 +113,10 @@ public class ExternalProcessJob implements Job {
         }
 
         @Override
-        public String[] getArgs(FileTracker fileTracker) {
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
             return fileTracker != null
                 ? toString(fileTracker.deltaGlob(arg))
-                : super.getArgs(fileTracker);
+                : super.getArgs(fileTracker, tmpNames);
         }
     }
 
@@ -117,8 +145,9 @@ public class ExternalProcessJob implements Job {
         List<String> list = new ArrayList<String>(n + 1);
         list.add(command);
         if (n > 0) {
+            Set<File> tmpNames = new HashSet<>();
             for (Arg argument: arguments) {
-                String[] args = argument.getArgs(this.fileTracker);
+                String[] args = argument.getArgs(this.fileTracker, tmpNames);
                 for (String arg: args) {
                     list.add(arg);
                 }
