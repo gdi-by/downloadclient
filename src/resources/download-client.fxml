@@ -202,46 +202,6 @@
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Group>
-                                                <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
-                                                   <children>
-                                                      <Label text="%gui.x1">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <TextField fx:id="atomX1" minWidth="-Infinity" prefWidth="140.0" />
-                                                      <Label text="%gui.y1">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <TextField fx:id="atomY1" minWidth="-Infinity" prefWidth="140.0" />
-                                                   </children>
-                                                </HBox>
-                                                <HBox prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
-                                                   <children>
-                                                      <Label text="%gui.x2">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <TextField fx:id="atomX2" minWidth="-Infinity" prefWidth="140.0">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" />
-                                                         </HBox.margin>
-                                                      </TextField>
-                                                      <Label text="%gui.y2">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <TextField fx:id="atomY2" minWidth="-Infinity" prefWidth="140.0">
-                                                         <HBox.margin>
-                                                            <Insets bottom="5.0" />
-                                                         </HBox.margin>
-                                                      </TextField>
-                                                   </children>
-                                                </HBox>
                                                 <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
                                                 <Label text="%gui.description" VBox.vgrow="NEVER">
                                                    <font>

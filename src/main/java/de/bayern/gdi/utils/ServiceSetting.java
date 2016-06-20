@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.gui.ServiceModel;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,12 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.gui.ServiceModel;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -50,9 +49,6 @@ public class ServiceSetting {
     private Map<String, String> catalogues;
     private Map<String, String> wms;
 
-    /**
-     * Constructor.
-     */
     public ServiceSetting() {
         this(SERVICE_SETTING_FILE);
     }
@@ -62,13 +58,9 @@ public class ServiceSetting {
      * @param filePath Path the the serviceSettings.xml
      */
     public ServiceSetting(String filePath) {
-        parseDocument(XML.getDocument(getFileStream(filePath)));
+        this(XML.getDocument(getFileStream(filePath)));
     }
 
-    /**
-     * Constructor.
-     * @param document The XML document to parse.
-     */
     public ServiceSetting(Document doc) {
         parseDocument(doc);
     }
@@ -118,10 +110,7 @@ public class ServiceSetting {
      * @return the WMS url
      */
     public String getWMSUrl() {
-        for (String url: this.wms.values()) {
-            return url;
-        }
-        return null;
+        return this.wms.get("url");
     }
 
     /**
@@ -129,18 +118,47 @@ public class ServiceSetting {
      * @return the WMS Name
      */
     public String getWMSName() {
-        for (String name: this.wms.keySet()) {
-            return name;
-        }
-        return null;
+        return this.wms.get("name");
+    }
+
+    /**
+     * gets the WMS Name.
+     * @return the WMS Name
+     */
+    public String getWMSLayer() {
+        return this.wms.get("layer");
     }
 
     private void parseDocument(Document xmlDocument) {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
-        this.wms = parseNameURLScheme(xmlDocument, "wms");
+        this.wms = parseSchema(xmlDocument,
+                "wms",
+                "url",
+                "layer",
+                "name");
     }
 
+    private static final String SERVICE_XPATH =
+        "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
+
+    private Map<String, String> parseSchema(Document xmlDocument, String
+            nodeName, String... names) {
+        Map<String, String> map = new HashMap<String, String>();
+
+        HashMap<String, String> vars = new HashMap<>();
+        vars.put("NODE", nodeName);
+
+        for (String name: names) {
+            vars.put("NAME", name);
+            String value = (String) XML.xpath(
+                xmlDocument, SERVICE_XPATH, XPathConstants.STRING, null, vars);
+            if (value != null) {
+                map.put(name, value);
+            }
+        }
+        return map;
+    }
 
     private List<ServiceModel> parseService(Document xmlDocument) {
         List<ServiceModel> servicesList = new ArrayList<ServiceModel>();
@@ -171,7 +189,7 @@ public class ServiceSetting {
                                 .equals("restricted")) {
                             String restr =
                              serviceValueNode.getFirstChild().getTextContent();
-                            restricted = restr.equals("true") ? true : false;
+                            restricted = restr.equals("true");
                         }
                     }
                 }
@@ -230,5 +248,4 @@ public class ServiceSetting {
 
         return stream;
     }
-
 }

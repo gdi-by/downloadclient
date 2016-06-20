@@ -19,11 +19,9 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
@@ -34,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
@@ -46,9 +45,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
     private static final String XPATH_LINKS =
         "//atom:entry[atom:id/text()=$VARIATION]/atom:link";
-
-    private static final Properties
-        MIMETYPE2EXT = loadMine2Ext();
 
     private String url;
     private String dataset;
@@ -71,29 +67,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         this.dataset = dataset;
         this.variation = variation;
         this.workingDir = workingDir;
-    }
-
-    private static Properties loadMine2Ext() {
-        InputStream in = null;
-        try {
-            in = AtomDownloadJob.class.getResourceAsStream(
-                "mime2ext.properties");
-            if (in == null) {
-                throw new RuntimeException("resource not found");
-            }
-            Properties p = new Properties();
-            p.load(in);
-            return p;
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ioe) {
-                }
-            }
-        }
     }
 
     private Document getDocument(String urlString)
@@ -123,8 +96,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     }
 
     private static String mimetypeToExt(String type) {
-        type = type.toLowerCase();
-        return MIMETYPE2EXT.getProperty(type, "dat");
+        return Config.getInstance().getMimeTypes().findExtension(type, "gml");
     }
 
     private static final String DATASOURCE_XPATH

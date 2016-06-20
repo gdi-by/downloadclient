@@ -19,6 +19,17 @@ package de.bayern.gdi.gui;
 
 import java.util.List;
 
+import de.bayern.gdi.model.ConfigurationParameter;
+import de.bayern.gdi.model.InputElement;
+import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.ProcessingConfiguration;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.services.Field;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.utils.Config;
+//import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.utils.I18n;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,25 +39,14 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Separator;
-import javafx.scene.web.WebView;
-import javafx.scene.web.WebEngine;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-
-import de.bayern.gdi.model.ConfigurationParameter;
-import de.bayern.gdi.model.InputElement;
-import de.bayern.gdi.model.Option;
-import de.bayern.gdi.model.ProcessingConfiguration;
-import de.bayern.gdi.model.ProcessingStepConfiguration;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.services.Field;
-import de.bayern.gdi.services.WFSMeta;
-//import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.utils.I18n;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 /**
  * @author Raimund Renkert (raimund.renkert@intevation.de)
@@ -170,7 +170,7 @@ public class UIFactory {
         HBox subroot = new HBox();
         ComboBox box = new ComboBox();
         ProcessingConfiguration config =
-            DownloadStepConverter.getProcessingConfiguration();
+            Config.getInstance().getProcessingConfig();
         List<ProcessingStepConfiguration> steps = config.getProcessingSteps();
         ObservableList<ProcessingStepConfiguration> conf =
             FXCollections.observableArrayList(steps);

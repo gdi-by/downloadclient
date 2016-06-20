@@ -18,6 +18,11 @@
 
 package de.bayern.gdi.services;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
@@ -28,7 +33,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -91,15 +100,28 @@ public class Atom {
         public String describedBy;
 
         /**
+         * bounding Polygon.
+         */
+        public Polygon polygon;
+
+        /**
          * mimetype.
          */
         public String format;
+
+        private NamespaceContext context;
 
         public Item() {
             otherCRSs = new ArrayList<>();
             fields = new ArrayList<>();
             format = null;
+            context = new NamespaceContextMap(
+                    "", "http://www.w3.org/2005/Atom",
+                    "georss", "http://www.georss.org/georss",
+                    "inspire_dls",
+                    "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
         }
+
         @Override
         public String toString() {
             String str = null;
@@ -124,24 +146,34 @@ public class Atom {
          * Loads the "costly" details.
          */
         public void load() {
-            format = getFormat(this.describedBy);
+            Document entryDoc = XML.getDocument(this.describedBy);
+            format = getFormat(entryDoc);
+            fields = getFieldForEntry(entryDoc);
         }
 
-        private String getFormat(String itemid) {
-            NamespaceContext nscontext = new NamespaceContextMap(
-                    "", "http://www.w3.org/2005/Atom",
-                    "georss", "http://www.georss.org/georss",
-                    "inspire_dls",
-                    "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
-            String itemformat = null;
-            String attributeURL = itemid;
-            Document entryDoc = XML.getDocument(attributeURL);
+        private String getFormat(Document entryDoc) {
             String getType = "//entry/link/@type";
-            itemformat = (String) XML.xpath(entryDoc,
+            String itemformat = (String) XML.xpath(entryDoc,
                     getType,
                     XPathConstants.STRING,
-                    nscontext);
+                    context);
             return itemformat;
+        }
+
+        private ArrayList<Field> getFieldForEntry(Document entryDoc) {
+            ArrayList<Field> attrFields = new ArrayList<>();
+            //Predefined in ATOM Service
+            String getCategories = "//entry/id";
+            NodeList cL = (NodeList) XML.xpath(entryDoc,
+                    getCategories,
+                    XPathConstants.NODESET,
+                    this.context);
+            for (int i = 0; i < cL.getLength(); i++) {
+                Node cat = cL.item(i);
+                Field field = new Field(ATTRIBUTENAME, cat.getTextContent());
+                attrFields.add(field);
+            }
+            return attrFields;
         }
     }
 
@@ -202,7 +234,7 @@ public class Atom {
                 XPathConstants.NODESET,
                 this.nscontext);
         for (int i = 0; i < entries.getLength(); i++) {
-            //Long beginRead = System.currentTimeMillis();
+            //ong beginRead = System.currentTimeMillis();
             Node entry = entries.item(i);
             String getEntryTitle = "title";
             Node titleN = (Node) XML.xpath(entry,
@@ -231,6 +263,12 @@ public class Atom {
                     this.nscontext);
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tDescirption: " + description.getTextContent());
+            String borderPolygonExpr = "*[local-name()"
+                                       + "='polygon']";
+            Node borderPolyGonN = (Node) XML.xpath(entry,
+                    borderPolygonExpr,
+                    XPathConstants.NODE,
+                    this.nscontext);
             Item it = new Item();
             it.id = id.getTextContent();
             it.title = titleN.getTextContent();
@@ -245,8 +283,44 @@ public class Atom {
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tformat: " + it.format);
             it.bbox = new ReferencedEnvelope();
-            //TODO: Calculate Bounding Box
-            it.fields = getFieldForEntry(entry, it.id);
+            String[] bboxSepStr = borderPolyGonN.getTextContent().split(" ");
+            String bboxStr = "";
+            for (int j = 0; j < bboxSepStr.length; j = j + 2) {
+                bboxStr = bboxStr + bboxSepStr[j] + " " + bboxSepStr[j + 1]
+                        + ", ";
+            }
+            bboxStr = bboxStr.substring(0, bboxStr.length() - 2);
+            WKTReader reader = new WKTReader(
+                    JTSFactoryFinder.getGeometryFactory(null));
+            Geometry polygon = null;
+            try {
+                polygon = reader.read("POLYGON((" + bboxStr
+                        + "))");
+                it.polygon = (Polygon) polygon;
+                Envelope env = polygon.getEnvelopeInternal();
+                String getCategories = "(category/@term)[1]";
+                String categoryTerm = (String) XML.xpath(entry,
+                        getCategories,
+                        XPathConstants.STRING,
+                        this.nscontext);
+                String epsgNumber = categoryTerm.substring(categoryTerm
+                        .lastIndexOf("/") + 1, categoryTerm.length());
+                String epsgUnit = categoryTerm.substring(0, categoryTerm
+                        .lastIndexOf(epsgNumber) - 1);
+                epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf("/"));
+                epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf("/") + 1,
+                        epsgUnit.length());
+                String defaultCRS = epsgUnit + ":" + epsgNumber;
+                CoordinateReferenceSystem crs = CRS.decode(defaultCRS);
+                it.bbox = new ReferencedEnvelope(env, crs);
+                //it.bbox = new ReferencedEnvelope(env.getMaxX(), env.getMinX()
+                //        , env.getMaxY(), env.getMinY(), crs);
+                //System.out.println((System.currentTimeMillis() - beginRead)
+                //        + " ms\t bbox: " + it.bbox);
+            } catch (ParseException
+                    | FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tfields: " + it.fields);
             items.add(it);
@@ -314,39 +388,5 @@ public class Atom {
             }
         }
         return crs;
-    }
-
-    private ArrayList<Field> getFieldForEntry(Node entry, String id) {
-        ArrayList<Field> fields = new ArrayList<>();
-        //Predefined in ATOM Service
-        String getCategories = "category";
-        NodeList cL = (NodeList) XML.xpath(entry,
-                getCategories,
-                XPathConstants.NODESET,
-                this.nscontext);
-        for (int i = 0; i < cL.getLength(); i++) {
-            Node cat = cL.item(i);
-            NamedNodeMap catAttributes = cat.getAttributes();
-            String epsg = null;
-            String attrVal = null;
-            String csr = null;
-            for (int j = 0; j < catAttributes.getLength(); j++) {
-                Node catAttr = catAttributes.item(j);
-                if (catAttr.getNodeName().equals("term")) {
-                    epsg = catAttr.getTextContent();
-                    attrVal = makeAttributeValue(id, epsg);
-                    Field f = new Field(ATTRIBUTENAME, attrVal);
-                    fields.add(f);
-                }
-            }
-        }
-        return fields;
-    }
-
-    private String makeAttributeValue(String id, String categoryTerm) {
-        categoryTerm =
-            categoryTerm.substring(categoryTerm.lastIndexOf("/") + 1);
-        categoryTerm = EPSG + categoryTerm;
-        return id + "_" + categoryTerm;
     }
 }
