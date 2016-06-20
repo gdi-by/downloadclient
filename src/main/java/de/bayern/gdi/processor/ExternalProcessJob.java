@@ -56,7 +56,6 @@ public class ExternalProcessJob implements Job {
     }
 
     /** Generate a unique file name with an extension. */
-
     public static class UniqueArg extends Arg {
         public UniqueArg(String arg) {
             super(arg);
