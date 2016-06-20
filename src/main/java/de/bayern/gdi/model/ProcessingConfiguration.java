@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -38,6 +40,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Verarbeitungskonfiguration")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingConfiguration {
+
+    private static final Logger log
+        = Logger.getLogger(ProcessingStepConfiguration.class.getName());
 
     /** Name of the config file. */
     public static final String PROCESSING_CONFIG_FILE =
@@ -151,5 +156,33 @@ public class ProcessingConfiguration {
         } catch (JAXBException je) {
             throw new IOException("", je);
         }
+    }
+
+    /**
+     * Load configuration from ressources.
+     * @return The default configuation.
+     */
+    public static ProcessingConfiguration loadDefault() {
+        InputStream in = null;
+        try {
+            in = ProcessingStepConfiguration.class.getResourceAsStream(
+                PROCESSING_CONFIG_FILE);
+            if (in == null) {
+                log.log(Level.SEVERE,
+                    PROCESSING_CONFIG_FILE + " not found");
+                return new ProcessingConfiguration();
+            }
+            return read(in);
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE, "Failed to load configuration", ioe);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                }
+            }
+        }
+        return new ProcessingConfiguration();
     }
 }

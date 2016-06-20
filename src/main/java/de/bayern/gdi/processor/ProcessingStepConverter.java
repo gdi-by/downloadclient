@@ -28,17 +28,16 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Converts processing steps to jobs of external program calls. */
 public class ProcessingStepConverter {
 
-    private ProcessingConfiguration config;
     private Set<String> usedVars;
     private List<Job> jobs;
 
-    public ProcessingStepConverter(ProcessingConfiguration config) {
-        this.config = config;
+    public ProcessingStepConverter() {
         this.usedVars = new HashSet<>();
         this.jobs = new ArrayList<>();
     }
@@ -58,9 +57,12 @@ public class ProcessingStepConverter {
             return;
         }
 
+        ProcessingConfiguration config =
+            Config.getInstance().getProcessingConfig();
+
         for (ProcessingStep step: steps) {
             ProcessingStepConfiguration psc =
-                this.config.findProcessingStepConfiguration(step.getName());
+                config.findProcessingStepConfiguration(step.getName());
             if (psc == null) {
                 // TODO: I18n
                 throw new ConverterException(
