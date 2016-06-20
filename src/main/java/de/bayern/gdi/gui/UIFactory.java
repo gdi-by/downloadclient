@@ -211,6 +211,10 @@ public class UIFactory {
         container.getChildren().clear();
         List<ConfigurationParameter> parameters = item.getParameters();
         for (ConfigurationParameter p : parameters) {
+            if (p.getExt() != null || p.getGlob() != null) {
+                // Ignore automatic parameters.
+                continue;
+            }
             if (p.getInputElement() != null) {
                 String ie = p.getInputElement();
                 List<InputElement> inputs = config.getInputElements();

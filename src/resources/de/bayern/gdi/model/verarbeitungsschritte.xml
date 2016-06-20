@@ -102,12 +102,8 @@
                 <Parameter verpflichtend="false" eingabeelement="crs">
                     -t_srs {EPSG}
                 </Parameter>
-                <Parameter verpflichtend="true">
-                    {ZIELDATEI}
-                </Parameter>
-                <Parameter verpflichtend="true">
-                    {QUELLDATEI}
-                </Parameter>
+                <Parameter ext="shp"/>
+                <Parameter glob="delta">*.gml</Parameter>
             </ParameterSet>
         </Verarbeitungsschritt>
 
@@ -125,12 +121,8 @@
                 <Parameter verpflichtend="false" eingabeelement="crs">
                     -t_srs {EPSG}
                 </Parameter>
-                <Parameter verpflichtend="true">
-                    {QUELLDATEI}
-                </Parameter>
-                <Parameter verpflichtend="true">
-                    {ZIELDATEI}
-                </Parameter>
+                <Parameter glob="delta">*.tiff</Parameter>
+                <Parameter ext="tiff"/>
             </ParameterSet>
         </Verarbeitungsschritt>
 
@@ -139,8 +131,8 @@
             <Beschreibung>[MOCK] Verschickt die heruntergeladenen Dateien per E-Mail</Beschreibung>
             <Befehl>send_email.py</Befehl>
             <ParameterSet>
-                <Parameter verpflichtend="true">
-                    -attachment {QUELLDATEI}
+                <Parameter glob="delta">
+                    -attachment *.*
                 </Parameter>
                 <Parameter verpflichtend="true" eingabeelement="text">
                     -to {TEXT}
