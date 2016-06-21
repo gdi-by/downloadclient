@@ -103,7 +103,7 @@
                     -t_srs {EPSG}
                 </Parameter>
                 <Parameter ext="shp"/>
-                <Parameter glob="delta">*.gml</Parameter>
+                <Parameter glob="delta">*.{gml,shp}</Parameter>
             </ParameterSet>
         </Verarbeitungsschritt>
 
