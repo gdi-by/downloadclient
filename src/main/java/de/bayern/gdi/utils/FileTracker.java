@@ -24,8 +24,8 @@ import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,8 +36,8 @@ public class FileTracker {
         = Logger.getLogger(FileTracker.class.getName());
 
     private File directory;
-    private Set<File> last;
-    private Set<File> current;
+    private Map<File, Long> last;
+    private Map<File, Long> current;
 
     /**
      * @param directory The directory to track.
@@ -58,9 +58,9 @@ public class FileTracker {
             return false;
         }
 
-        this.current = new TreeSet<>();
+        this.current = new TreeMap<>();
         for (File file: files) {
-            this.current.add(file);
+            this.current.put(file, file.lastModified());
         }
         return true;
     }
@@ -79,9 +79,10 @@ public class FileTracker {
      */
     public List<File> newFiles() {
         ArrayList<File> files = new ArrayList<>();
-        for (File file: this.current) {
-            if (!this.last.contains(file)) {
-                files.add(file);
+        for (Map.Entry<File, Long> entry: this.current.entrySet()) {
+            Long time = this.last.get(entry.getKey());
+            if (time == null || time < entry.getValue()) {
+                files.add(entry.getKey());
             }
         }
         return files;
@@ -99,7 +100,7 @@ public class FileTracker {
         PathMatcher matcher =
             FileSystems.getDefault().getPathMatcher("glob:" + pattern);
         for (File file: all) {
-            if (matcher.matches(file.toPath())) {
+            if (matcher.matches(new File(file.getName()).toPath())) {
                 files.add(file);
             }
         }
@@ -121,6 +122,6 @@ public class FileTracker {
      * @return The files that match the pattern.
      */
     public List<File> globalGlob(String pattern) {
-        return glob(current, pattern);
+        return glob(current.keySet(), pattern);
     }
 }
