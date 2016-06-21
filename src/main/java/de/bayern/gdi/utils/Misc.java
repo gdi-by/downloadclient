@@ -92,13 +92,13 @@ public final class Misc {
     ) {
         Date now = new Date();
 
-        String dir = prefix + DF_FORMAT.format(now);
-        File path = new File(parent, dir);
+        String f = prefix + DF_FORMAT.format(now) + "." + ext;
+        File path = new File(parent, f);
         int count = 0;
         while (count < MAX_TRIES && path.exists() && tmpFiles.contains(path)) {
             ++count;
-            dir = prefix + DF_FORMAT.format(now) + "-" + count;
-            path = new File(parent, dir);
+            f = prefix + DF_FORMAT.format(now) + "-" + count + "." + ext;
+            path = new File(parent, f);
         }
 
         return count < MAX_TRIES ? path : null;
