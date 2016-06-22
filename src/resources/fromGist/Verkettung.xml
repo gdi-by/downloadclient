@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DownloadSchritt>
+    <ServiceTyp>WFS2_SIMPLE</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs</URL>
+    <Dataset>GemeindeByGemeindeschluesselEpsg31468</Dataset>
+    <Parameters>
+        <Parameter>
+            <Name>gemeindeschluessel</Name>
+            <Wert>09162000</Wert>
+        </Parameter>
+    </Parameters>
+    <Verarbeitungskette>
+        <Verarbeitungsschritt>
+            <Name>toShape</Name>
+            <Parameters>
+                <Parameter>
+                    <Name>EPSG</Name>
+                    <Wert>EPSG:4258</Wert>
+                </Parameter>
+            </Parameters>
+        </Verarbeitungsschritt>
+        <Verarbeitungsschritt>
+            <Name>toShape</Name>
+            <Parameters>
+                <Parameter>
+                    <Name>EPSG</Name>
+                    <Wert>EPSG:4326</Wert>
+                </Parameter>
+            </Parameters>
+        </Verarbeitungsschritt>
+    </Verarbeitungskette>    
+    <DownloadPfad>/tmp/gdibydl-Verkettung</DownloadPfad>
+</DownloadSchritt>

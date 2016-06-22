@@ -21,9 +21,13 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 
 /**
  * Starts an external process with optional arguments and
@@ -31,19 +35,106 @@ import de.bayern.gdi.utils.I18n;
  */
 public class ExternalProcessJob implements Job {
 
+    /** An argument for an external call. */
+    public static class Arg {
+
+        /** The argmuent. */
+        protected String arg;
+        public Arg(String arg) {
+            this.arg = arg;
+        }
+
+        /**
+         * Expands the argument.
+         * @param fileTracker The fileTracker used to expand the argument.
+         * @param tmpNames A set of temporary names.
+         * @return The expanded argument.
+         */
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
+            return new String[] {this.arg};
+        }
+    }
+
+    /** Generate a unique file name with an extension. */
+    public static class UniqueArg extends Arg {
+        public UniqueArg(String arg) {
+            super(arg);
+        }
+
+        @Override
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
+            if (fileTracker == null) {
+                return super.getArgs(fileTracker, tmpNames);
+            }
+            File file = Misc.uniqueFile(
+                fileTracker.getDirectory(), "download-", this.arg, tmpNames);
+
+            if (file == null) {
+                throw new IllegalArgumentException("No unique name available.");
+            }
+            tmpNames.add(file);
+
+            return new String[] {file.getName()};
+        }
+    }
+
+    /** A global globbing argument for an external call. */
+    public static class GlobalGlob extends Arg {
+        public GlobalGlob(String arg) {
+            super(arg);
+        }
+
+        /**
+         * Converts a list of files to an array of file names.
+         * @param files The list of files.
+         * @return The array of file names.
+         */
+        protected static String[] toString(List<File> files) {
+            String[] args = new String[files.size()];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = files.get(i).getName();
+            }
+            return args;
+        }
+
+        @Override
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
+            return fileTracker != null
+                ? toString(fileTracker.globalGlob(arg))
+                : super.getArgs(fileTracker, tmpNames);
+        }
+    }
+
+    /** A delta globbing argument for an external call. */
+    public static class DeltaGlob extends GlobalGlob {
+        public DeltaGlob(String arg) {
+            super(arg);
+        }
+
+        @Override
+        public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
+            return fileTracker != null
+                ? toString(fileTracker.deltaGlob(arg))
+                : super.getArgs(fileTracker, tmpNames);
+        }
+    }
+
     private String command;
-    private File workingDir;
-    private String [] arguments;
+    private Arg[] arguments;
+
+    private FileTracker fileTracker;
 
     public ExternalProcessJob() {
     }
 
     public ExternalProcessJob(
-        String command, File workingDir, String [] arguments) {
-
-        this.command = command;
-        this.workingDir = workingDir;
-        this.arguments = arguments;
+        String      command,
+        FileTracker fileTracker,
+        Arg[]       arguments
+    ) {
+        this.command     = command;
+        this.arguments   = arguments;
+        this.fileTracker = fileTracker;
     }
 
     private List<String> commandList() {
@@ -53,8 +144,12 @@ public class ExternalProcessJob implements Job {
         List<String> list = new ArrayList<String>(n + 1);
         list.add(command);
         if (n > 0) {
-            for (String argument: arguments) {
-                list.add(argument);
+            Set<File> tmpNames = new HashSet<>();
+            for (Arg argument: arguments) {
+                String[] args = argument.getArgs(this.fileTracker, tmpNames);
+                for (String arg: args) {
+                    list.add(arg);
+                }
             }
         }
         return list;
@@ -67,9 +162,21 @@ public class ExternalProcessJob implements Job {
      */
     @Override
     public void run(Processor p) throws JobExecutionException {
+
+        if (this.fileTracker != null) {
+            this.fileTracker.push();
+            if (!this.fileTracker.scan()) {
+                // TODO: i18n
+                throw new JobExecutionException(
+                    "Scanning dir '"
+                    + this.fileTracker.getDirectory() + "' failed.");
+            }
+        }
+
         ProcessBuilder builder = new ProcessBuilder(commandList());
-        if (this.workingDir != null) {
-            builder.directory(this.workingDir);
+        if (this.fileTracker != null
+        && this.fileTracker.getDirectory() != null) {
+            builder.directory(this.fileTracker.getDirectory());
         }
 
         if (p != null) {
