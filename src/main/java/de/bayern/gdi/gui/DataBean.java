@@ -43,7 +43,6 @@ import javafx.collections.ObservableList;
 public class DataBean extends Observable {
 
     private Map<String, String> namePwMap;
-    private ServiceSetting serviceSetting;
     private List<ServiceModel> staticServices;
     private List<ServiceModel> catalogServices;
     private ServiceType serviceType;
@@ -52,8 +51,6 @@ public class DataBean extends Observable {
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
     private Map<String, String> attributes;
-    private String wmsUrl;
-    private String wmsName;
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
@@ -66,17 +63,13 @@ public class DataBean extends Observable {
     public DataBean() {
         this.namePwMap = new HashMap<>();
 
-        this.serviceSetting = Config.getInstance().getServices();
-        if (this.serviceSetting == null) {
-            this.serviceSetting = new ServiceSetting();
-        }
+        ServiceSetting serviceSetting = Config.getInstance().getServices();
 
-        this.staticServices = this.serviceSetting.getServices();
+        this.staticServices = serviceSetting.getServices();
+
         this.catalogServices = new ArrayList<ServiceModel>();
-        this.catalogService = new CatalogService(this.serviceSetting
-                .getCatalogueURL());
-        this.wmsUrl = this.serviceSetting.getWMSUrl();
-        this.wmsName = this.serviceSetting.getWMSName();
+        this.catalogService =
+            new CatalogService(serviceSetting.getCatalogueURL());
         this.processingSteps = new ArrayList<>();
     }
 
@@ -241,38 +234,6 @@ public class DataBean extends Observable {
      */
     public void addAttribute(String key, String value) {
         this.attributes.put(key, value);
-    }
-
-    /**
-     * gets the WMS Url.
-     * @return WMS Url
-     */
-    public String getWmsUrl() {
-        return wmsUrl;
-    }
-
-    /**
-     * sets the WMS Url.
-     * @param wmsUrl WMS Url
-     */
-    public void setWmsUrl(String wmsUrl) {
-        this.wmsUrl = wmsUrl;
-    }
-
-    /**
-     * gets the WMS Name.
-     * @return WMS Name
-     */
-    public String getWmsName() {
-        return wmsName;
-    }
-
-    /**
-     * sets the WMS Name.
-     * @param wmsName WMS Name
-     */
-    public void setWmsName(String wmsName) {
-        this.wmsName = wmsName;
     }
 
     /**

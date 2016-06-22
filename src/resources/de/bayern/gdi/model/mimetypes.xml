@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MIMETypes>
+    <Type name="image/tiff" ext="tiff"/>
+    <Type name="image/jpeg" ext="jpg"/>
+    <Type name="image/png" ext="png"/>
+    <Type name="image/gif" ext="gif"/>
+    <Type name="application/pdf" ext="pdf"/>
+    <Type name="text/xml" ext="xml"/>
+    <Type name="csv" ext="csv"/>
+    <Type name="text/csv" ext="csv"/>
+    <Type name="json" ext="json"/>
+    <Type name="application/json" ext="json"/>
+    <Type name="kml" ext="kml"/>
+    <Type name="application/vnd.google-earth.kml xml" ext="kml"/>
+    <Type name="application/vnd.google-earth.kml+xml" ext="kml"/>
+    <Type name="gml2" ext="gml"/>
+    <Type name="gml3" ext="gml"/>
+    <Type name="gml32" ext="gml"/>
+    <Type name="application/gml+xml; version=3.2" ext="gml"/>
+    <Type name="text/xml; subtype=gml/2.1.2" ext="gml"/>
+    <Type name="text/xml; subtype=gml/3.1.1" ext="gml"/>
+    <Type name="shape-zip" ext="zip"/>
+</MIMETypes>

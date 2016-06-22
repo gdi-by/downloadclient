@@ -17,7 +17,6 @@
  */
 package de.bayern.gdi.processor;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,17 +27,21 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.processor.ExternalProcessJob.Arg;
+import de.bayern.gdi.processor.ExternalProcessJob.DeltaGlob;
+import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
+import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
+import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Converts processing steps to jobs of external program calls. */
 public class ProcessingStepConverter {
 
-    private ProcessingConfiguration config;
     private Set<String> usedVars;
     private List<Job> jobs;
 
-    public ProcessingStepConverter(ProcessingConfiguration config) {
-        this.config = config;
+    public ProcessingStepConverter() {
         this.usedVars = new HashSet<>();
         this.jobs = new ArrayList<>();
     }
@@ -47,10 +50,10 @@ public class ProcessingStepConverter {
      * Converts the processing steps from the download step to
      * a list of jobs and appends the to the given list of jobs.
      * @param dls The download step.
-     * @param workingDir The working directory of the external program calls.
+     * @param fileTracker The file tracker for the external program calls.
      * @throws ConverterException If something went wrong.
      */
-    public void convert(DownloadStep dls, File workingDir)
+    public void convert(DownloadStep dls, FileTracker fileTracker)
     throws ConverterException {
 
         ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
@@ -58,9 +61,12 @@ public class ProcessingStepConverter {
             return;
         }
 
+        ProcessingConfiguration config =
+            Config.getInstance().getProcessingConfig();
+
         for (ProcessingStep step: steps) {
             ProcessingStepConfiguration psc =
-                this.config.findProcessingStepConfiguration(step.getName());
+                config.findProcessingStepConfiguration(step.getName());
             if (psc == null) {
                 // TODO: I18n
                 throw new ConverterException(
@@ -72,10 +78,33 @@ public class ProcessingStepConverter {
                 throw new ConverterException(
                     "config " + step.getName() + " has no command.");
             }
-            ArrayList<String> params = new ArrayList<>();
+            ArrayList<Arg> params = new ArrayList<>();
 
             parameters:
             for (ConfigurationParameter cp: psc.getParameters()) {
+                String ext = cp.getExt();
+                if (ext != null) { // The <Parameter ext="gml"/> case.
+                    params.add(new UniqueArg(ext));
+                    continue;
+                }
+
+                String glob = cp.getGlob();
+                if (glob != null) {
+                    switch (glob) {
+                        case "delta":
+                            params.add(new DeltaGlob(cp.getValue()));
+                            break;
+                        case "global":
+                            params.add(new GlobalGlob(cp.getValue()));
+                            break;
+                        default:
+                            // TODO: I18n
+                            throw new ConverterException(
+                                "Unknown glob mode '" + glob + "'.");
+                    }
+                    continue;
+                }
+
                 String value = cp.getValue();
                 if (value == null) {
                     continue;
@@ -88,7 +117,7 @@ public class ProcessingStepConverter {
 
                 for (String part: parts) {
 
-                    ArrayList<String> row = new ArrayList<>();
+                    ArrayList<Arg> row = new ArrayList<>();
 
                     String[] atoms = StringUtils.split(
                         part, ConfigurationParameter.VARS_RE, true);
@@ -98,7 +127,7 @@ public class ProcessingStepConverter {
                             ConfigurationParameter.extractVariable(atom);
 
                         if (var == null) {
-                            row.add(atom);
+                            row.add(new Arg(atom));
                             continue;
                         }
 
@@ -113,7 +142,7 @@ public class ProcessingStepConverter {
                             continue parameters;
                         }
                         usedVars.add(var);
-                        row.add(val);
+                        row.add(new Arg(val));
                     } // for all atoms
 
                     params.addAll(row);
@@ -122,8 +151,8 @@ public class ProcessingStepConverter {
 
             ExternalProcessJob epj = new ExternalProcessJob(
                 command,
-                workingDir,
-                params.toArray(new String[params.size()]));
+                fileTracker,
+                params.toArray(new Arg[params.size()]));
 
             jobs.add(epj);
         }

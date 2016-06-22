@@ -41,6 +41,12 @@ public class ConfigurationParameter {
     @XmlAttribute(name = "eingabeelement")
     private String inputElement;
 
+    @XmlAttribute(name = "glob")
+    private String glob;
+
+    @XmlAttribute(name = "ext")
+    private String ext;
+
     @XmlValue
     private String value;
 
@@ -73,6 +79,34 @@ public class ConfigurationParameter {
      */
     public void setInputElement(String inputElement) {
         this.inputElement = inputElement;
+    }
+
+    /**
+     * @return the glob
+     */
+    public String getGlob() {
+        return glob;
+    }
+
+    /**
+     * @param glob the glob to set
+     */
+    public void setGlob(String glob) {
+        this.glob = glob;
+    }
+
+    /**
+     * @return the ext
+     */
+    public String getExt() {
+        return ext;
+    }
+
+    /**
+     * @param ext the ext to set
+     */
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 
     /**
