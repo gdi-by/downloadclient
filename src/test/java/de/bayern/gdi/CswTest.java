@@ -17,11 +17,11 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.services.WFSMeta.Feature;
-import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.gui.ServiceModel;
+import de.bayern.gdi.services.CatalogService;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 import junit.framework.TestCase;
 import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
@@ -37,11 +37,14 @@ import org.junit.Test;
  *
  * @author Juergen Weichand
  */
-public class WfsTest extends TestCase {
+public class CswTest extends TestCase {
 
     public static final int HTTP_OKAY = 200;
 
-    public WfsTest(String testName) {
+    public static final String
+            PATH_GETCAPABILITIES = "/csw/csw-getcapabilities";
+
+    public CswTest(String testName) {
         super(testName);
     }
 
@@ -58,55 +61,31 @@ public class WfsTest extends TestCase {
     }
 
     @Test
-    public void testGeoServer() throws IOException {
-        System.out.println("... Testing virtuell GeoServer");
-        run("/geoserver/wfs", "/wfs20/geoserver/geoserver-capabilities.xml");
+    public void testCswClient() throws IOException {
+        System.out.println("... Testing virtuell search");
+        run("/csw/atom-feeds", "/csw202/atom-feeds.xml");
     }
-
-    @Test
-    public void testXtraServer() throws IOException {
-        System.out.println("... Testing virtuell XtraServer");
-        run("/xtraserver/wfs", "/wfs20/xtraserver/xtraserver-capabilities.xml");
-    }
-
 
 
     private void run(String queryPath, String queryResource)
                 throws IOException {
 
         String body = IOUtils.toString(
-                WfsTest.class.getResourceAsStream(queryResource), "UTF-8"
+                CswTest.class.getResourceAsStream(queryResource), "UTF-8"
         );
 
-        body = body.replace("{DESCRIBESTOREDQUERIES_URL}",
-                buildDescribeStoredQueriesUrl(port()));
+        prepareGetCapabilities(queryPath);
+        prepareResource(queryPath, body);
 
-        prepareResource(queryPath, body); // prepare GetCapabilities-Response
-        prepareDescribeStoredQueries();
+        CatalogService catalogService =
+                new CatalogService(buildGetCapabilitiesUrl(port()));
 
+        List<ServiceModel> services = catalogService.
+                getServicesByFilter("not-required-because-mocked");
 
-        WFSMeta wfsMeta = new WFSMetaExtractor(
-                buildGetCapabilitiesUrl(queryPath, port())).parse();
-
-        checkFeatureTypes(wfsMeta);
+        assertFalse(services.isEmpty());
     }
 
-    /*
-        Checks
-    */
-    private void checkFeatureTypes(WFSMeta wfsMeta) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.title);
-        sb.append(" - ");
-        sb.append("FeatureType parsing failed.");
-
-        for (Feature feature : wfsMeta.features) {
-            boolean condition =
-                    feature.title == null || feature.title.isEmpty();
-            assertFalse(sb.toString(), condition);
-        }
-    }
 
 
     /*
@@ -116,7 +95,7 @@ public class WfsTest extends TestCase {
                 throws IOException {
 
         onRequest()
-                .havingMethodEqualTo("GET")
+                // .havingMethodEqualTo("GET")
                 .havingPathEqualTo(queryPath)
                 // .havingBody(isEmptyOrNullString())
                 // .havingHeaderEqualTo("Accept", "application/xml")
@@ -129,40 +108,43 @@ public class WfsTest extends TestCase {
     }
 
 
-    private void prepareDescribeStoredQueries() throws IOException {
+    private void prepareGetCapabilities(String queryPath) throws IOException {
 
-        String queryResource = "/wfs20/desc-storedqueries.xml";
+        String queryResource = "/csw202/csw-capabilities.xml";
 
         String body = IOUtils.toString(
                 WfsTest.class.getResourceAsStream(queryResource), "UTF-8"
         );
 
-        prepareResource("/wfs/wfs", body);
-    }
+        body = body.replace("{GETRECORDS_URL}",
+                buildGetRecordsUrl(queryPath, port()));
 
+        prepareResource(PATH_GETCAPABILITIES, body);
+    }
 
     /*
         URL-Helper
     */
-    private String buildGetCapabilitiesUrl(String queryPath, int port) {
+    private String buildGetCapabilitiesUrl(int port) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("http://localhost:");
         sb.append(port);
-        sb.append(queryPath);
+        sb.append(PATH_GETCAPABILITIES);
         System.out.println("GetCapabilities-URL: " + sb.toString());
         return sb.toString();
     }
 
 
-    private String buildDescribeStoredQueriesUrl(int port) {
+    private String buildGetRecordsUrl(String queryPath, int port) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("http://localhost:");
         sb.append(port);
-        sb.append("/wfs/wfs");
-        System.out.println("DescribeStoredQueries-URL: " + sb.toString());
+        sb.append(queryPath);
+        System.out.println("GetRecords-URL: " + sb.toString());
         return sb.toString();
     }
+
 
 }
