@@ -23,6 +23,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
@@ -33,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
-import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -124,8 +125,7 @@ public class Atom {
 
         @Override
         public String toString() {
-            String str = null;
-            str += "title: " + title + "\n";
+            String str = "title: " + title + "\n";
             str += "id: " + id + "\n";
             str += "description: " + description + "\n";
             str += "described by: " + describedBy + "\n";
@@ -203,6 +203,7 @@ public class Atom {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+        System.out.println(this.serviceURL);
         this.mainDoc = XML.getDocument(url,
                 this.username,
                 this.password,
@@ -237,6 +238,7 @@ public class Atom {
             //ong beginRead = System.currentTimeMillis();
             Node entry = entries.item(i);
             String getEntryTitle = "title";
+            System.out.println("title: " + title);
             Node titleN = (Node) XML.xpath(entry,
                     getEntryTitle,
                     XPathConstants.NODE,
@@ -283,49 +285,73 @@ public class Atom {
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tformat: " + it.format);
             it.bbox = new ReferencedEnvelope();
-            String[] bboxSepStr = borderPolyGonN.getTextContent().split(" ");
-            String bboxStr = "";
-            for (int j = 0; j < bboxSepStr.length; j = j + 2) {
-                bboxStr = bboxStr + bboxSepStr[j] + " " + bboxSepStr[j + 1]
-                        + ", ";
-            }
-            bboxStr = bboxStr.substring(0, bboxStr.length() - 2);
-            WKTReader reader = new WKTReader(
-                    JTSFactoryFinder.getGeometryFactory(null));
+
+            WKTReader reader = new WKTReader(new GeometryFactory());
+
+            // XXX: GML, anyone?
+            String bboxStr = convertPolygonToWKT(
+                borderPolyGonN.getTextContent());
+
             Geometry polygon = null;
             try {
-                polygon = reader.read("POLYGON((" + bboxStr
-                        + "))");
-                it.polygon = (Polygon) polygon;
-                Envelope env = polygon.getEnvelopeInternal();
-                String getCategories = "(category/@term)[1]";
-                String categoryTerm = (String) XML.xpath(entry,
-                        getCategories,
-                        XPathConstants.STRING,
-                        this.nscontext);
-                String epsgNumber = categoryTerm.substring(categoryTerm
-                        .lastIndexOf("/") + 1, categoryTerm.length());
-                String epsgUnit = categoryTerm.substring(0, categoryTerm
-                        .lastIndexOf(epsgNumber) - 1);
-                epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf("/"));
-                epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf("/") + 1,
-                        epsgUnit.length());
-                String defaultCRS = epsgUnit + ":" + epsgNumber;
-                CoordinateReferenceSystem crs = CRS.decode(defaultCRS);
-                it.bbox = new ReferencedEnvelope(env, crs);
-                //it.bbox = new ReferencedEnvelope(env.getMaxX(), env.getMinX()
-                //        , env.getMaxY(), env.getMinY(), crs);
-                //System.out.println((System.currentTimeMillis() - beginRead)
-                //        + " ms\t bbox: " + it.bbox);
-            } catch (ParseException
-                    | FactoryException e) {
+                polygon = reader.read(bboxStr);
+            } catch (ParseException | IllegalArgumentException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
+                continue;
             }
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + " ms\tfields: " + it.fields);
+
+            Envelope env = polygon.getEnvelopeInternal();
+            if (env == null || !(polygon instanceof Polygon)) {
+                continue;
+            }
+
+            it.polygon = (Polygon)polygon;
+
+            String getCategories = "(category/@term)[1]";
+            String categoryTerm = (String)XML.xpath(entry,
+                getCategories,
+                XPathConstants.STRING,
+                this.nscontext);
+
+            CoordinateReferenceSystem crs = null;
+            try {
+                crs = decodeCRS(categoryTerm);
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+                continue;
+            }
+            it.bbox = new ReferencedEnvelope(env, crs);
             items.add(it);
         }
     }
+
+    // XXX: This should be coded more defensively!
+    private static CoordinateReferenceSystem decodeCRS(String term)
+    throws FactoryException {
+        String epsgNumber =
+            term.substring(term.lastIndexOf('/') + 1, term.length());
+        String epsgUnit = term.substring(0, term.lastIndexOf(epsgNumber) - 1);
+        epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf('/'));
+        epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf('/') + 1,
+            epsgUnit.length());
+        String defaultCRS = epsgUnit + ":" + epsgNumber;
+        return CRS.decode(defaultCRS);
+    }
+
+    private static String convertPolygonToWKT(String text) {
+        String[] sep = text.split(" ");
+
+        StringBuilder sb = new StringBuilder("POLYGON((");
+
+        for (int j = 0; j < sep.length; j += 2) {
+            if (j > 0) {
+                sb.append(", ");
+            }
+            sb.append(sep[j]).append(' ').append(sep[j + 1]);
+        }
+        return sb.append("))").toString();
+    }
+
     /**
      * Items of the services.
      * @return the Items of the service
