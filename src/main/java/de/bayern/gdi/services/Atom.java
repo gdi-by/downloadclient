@@ -31,8 +31,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -325,17 +327,24 @@ public class Atom {
         }
     }
 
+    private static final Pattern CRS_RE
+        = Pattern.compile("/([^/]+)/([^/]+)/([^/]+)$");
+
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
+
     // XXX: This should be coded more defensively!
     private static CoordinateReferenceSystem decodeCRS(String term)
     throws FactoryException {
-        String epsgNumber =
-            term.substring(term.lastIndexOf('/') + 1, term.length());
-        String epsgUnit = term.substring(0, term.lastIndexOf(epsgNumber) - 1);
-        epsgUnit = epsgUnit.substring(0, epsgUnit.lastIndexOf('/'));
-        epsgUnit = epsgUnit.substring(epsgUnit.lastIndexOf('/') + 1,
-            epsgUnit.length());
-        String defaultCRS = epsgUnit + ":" + epsgNumber;
-        return CRS.decode(defaultCRS);
+        Matcher m = CRS_RE.matcher(term);
+        if (m.find()) {
+            if (m.group(TWO).equals("EPSG")) {
+                return CRS.decode(m.group(TWO) + ":" + m.group(THREE));
+            }
+            return CRS.decode(m.group(ONE) + ":" + m.group(THREE));
+        }
+        throw new FactoryException("Cannot parse '" + term + "'");
     }
 
     private static String convertPolygonToWKT(String text) {
