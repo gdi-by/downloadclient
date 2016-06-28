@@ -40,6 +40,7 @@ import org.junit.Test;
 public class WfsTest extends TestCase {
 
     public static final int HTTP_OKAY = 200;
+    public static final int FEATURES_PER_PAGE = 1037;
 
     public WfsTest(String testName) {
         super(testName);
@@ -89,6 +90,7 @@ public class WfsTest extends TestCase {
                 buildGetCapabilitiesUrl(queryPath, port())).parse();
 
         checkFeatureTypes(wfsMeta);
+        checkFeaturesPerPage(wfsMeta);
     }
 
     /*
@@ -103,8 +105,24 @@ public class WfsTest extends TestCase {
 
         for (Feature feature : wfsMeta.features) {
             boolean condition =
-                    feature.title == null || feature.title.isEmpty();
+                    feature.name == null || feature.name.isEmpty();
             assertFalse(sb.toString(), condition);
+        }
+    }
+
+
+    private void checkFeaturesPerPage(WFSMeta wfsMeta) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(wfsMeta.title);
+        sb.append(" - ");
+        sb.append("FeaturesPerPage parsing failed.");
+
+
+        WFSMeta.Operation getFeature = wfsMeta.findOperation("GetFeature");
+        if (getFeature.featuresPerPage() == null ||
+                getFeature.featuresPerPage() != FEATURES_PER_PAGE) {
+            assertFalse(sb.toString(), true);
         }
     }
 

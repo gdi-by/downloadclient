@@ -44,8 +44,8 @@
         <ows:Operation name="GetCapabilities">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
-                    <ows:Post xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="AcceptVersions">
@@ -73,8 +73,8 @@
         <ows:Operation name="DescribeFeatureType">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
-                    <ows:Post xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="outputFormat">
@@ -91,8 +91,8 @@
         <ows:Operation name="GetFeature">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
-                    <ows:Post xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="outputFormat">
@@ -109,8 +109,8 @@
         <ows:Operation name="GetPropertyValue">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
-                    <ows:Post xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="outputFormat">
@@ -127,16 +127,16 @@
         <ows:Operation name="ListStoredQueries">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
-                    <ows:Post xlink:href="http://localhost/aaa-suite/cgi-bin/alkis/sf/wfs"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
         </ows:Operation>
         <ows:Operation name="DescribeStoredQueries">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="{DESCRIBESTOREDQUERIES_URL}"/>
-                    <ows:Post xlink:href="{DESCRIBESTOREDQUERIES_URL}"/>
+                    <ows:Get xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs?"/>
+                    <ows:Post xlink:href="http://geofs2.bvv.bayern.de/aaa-suite/cgi-bin/alkis/sf/wfs"/>
                 </ows:HTTP>
             </ows:DCP>
         </ows:Operation>
@@ -241,6 +241,10 @@
         <ows:Constraint name="PreservesSiblingOrder">
             <ows:NoValues/>
             <ows:DefaultValue>TRUE</ows:DefaultValue>
+        </ows:Constraint>
+        <ows:Constraint name="CountDefault">
+            <ows:NoValues/>
+            <ows:DefaultValue>1037</ows:DefaultValue>
         </ows:Constraint>
         <ows:Constraint name="ResolveLocalScope">
             <ows:NoValues/>
@@ -4293,4 +4297,4 @@
             </fes:Function>
         </fes:Functions>
     </fes:Filter_Capabilities>
-</wfs:WFS_Capabilities>
+</wfs:WFS_Capabilities>    
