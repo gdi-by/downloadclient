@@ -120,8 +120,8 @@ public class WfsTest extends TestCase {
 
 
         WFSMeta.Operation getFeature = wfsMeta.findOperation("GetFeature");
-        if (getFeature.featuresPerPage() == null ||
-                getFeature.featuresPerPage() != FEATURES_PER_PAGE) {
+        if (getFeature.featuresPerPage() == null
+                || getFeature.featuresPerPage() != FEATURES_PER_PAGE) {
             assertFalse(sb.toString(), true);
         }
     }
