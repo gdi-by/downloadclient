@@ -43,6 +43,8 @@ public class FeatureModel implements ItemModel {
 
     @Override
     public String toString() {
-        return this.feature.title;
+        return this.feature.title != null && !this.feature.title.isEmpty()
+            ? this.feature.title
+            : this.feature.name;
     }
 }

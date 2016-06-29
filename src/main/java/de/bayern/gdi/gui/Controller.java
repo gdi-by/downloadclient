@@ -656,8 +656,10 @@ public class Controller {
                     mapAtom.drawPolygons(polygonList);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
-                    serviceTypeChooser.setValue(opts.get(0));
-                    chooseType(serviceTypeChooser.getValue());
+                    if (!opts.isEmpty()) {
+                        serviceTypeChooser.setValue(opts.get(0));
+                        chooseType(serviceTypeChooser.getValue());
+                    }
                 default:
             }
         }
