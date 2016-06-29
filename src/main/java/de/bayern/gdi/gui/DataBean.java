@@ -298,7 +298,11 @@ public class DataBean extends Observable {
             : getWFSService().url;
         int idx = serviceURL.indexOf('?');
         if (idx >= 0) {
-            serviceURL = serviceURL.substring(0, idx);
+            // Do not cripple ATOM URLs.
+            // Why is this done in the first place?
+            if (type !=  ServiceType.Atom) {
+                serviceURL = serviceURL.substring(0, idx);
+            }
         }
         Map<String, String> paramMap = getAttributes();
         ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
