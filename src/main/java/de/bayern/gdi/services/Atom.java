@@ -65,6 +65,7 @@ public class Atom {
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
 
+    /** Field for the Atom Item. */
     public static class Field {
         /**
          * name.
@@ -217,11 +218,11 @@ public class Atom {
                     this.context);
             for (int i = 0; i < cL.getLength(); i++) {
                 Node entryNode = cL.item(i);
-                String id = (String) XML.xpath(entryNode,
+                String entryId = (String) XML.xpath(entryNode,
                         "id",
                         XPathConstants.STRING,
                         this.context);
-                String description = (String) XML.xpath(entryNode,
+                String entryDescription = (String) XML.xpath(entryNode,
                         "title",
                         XPathConstants.STRING,
                         this.context);
@@ -234,10 +235,10 @@ public class Atom {
                         XPathConstants.STRING,
                         this.context);
                 Field field = new Field(ATTRIBUTENAME,
-                        id,
+                        entryId,
                         crs,
                         type,
-                        description);
+                        entryDescription);
                 attrFields.add(field);
             }
             return attrFields;

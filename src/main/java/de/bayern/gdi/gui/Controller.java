@@ -346,7 +346,7 @@ public class Controller {
         //        .getValue();
         Atom.Item item = (Atom.Item) im.getItem();
         List <Atom.Field> fields = item.fields;
-        for(Atom.Field field: fields) {
+        for (Atom.Field field: fields) {
             if (field.type == this.atomVariationChooser.getValue()) {
                 this.valueAtomFormat.setText(field.format);
                 this.valueAtomRefsys.setText(field.crs);
