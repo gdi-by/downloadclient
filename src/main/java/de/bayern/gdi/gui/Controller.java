@@ -82,6 +82,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.geotools.geometry.Envelope2D;
+import org.opengis.referencing.FactoryException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -327,7 +328,32 @@ public class Controller {
         this.dataBean.addAttribute("srsName",
             referenceSystemChooser.getValue() != null
                 ? referenceSystemChooser.getValue().toString()
-                : "EPSG:38468");
+                : "EPSG:4326");
+        if(referenceSystemChooser.getValue() != null ) {
+            try {
+                String crs = referenceSystemChooser.getValue().toString();
+                String seperator = null;
+                if (crs.contains("::")) {
+                    seperator = "::";
+                } else if (crs.contains("/")) {
+                    seperator = "/";
+                }
+                if (seperator != null) {
+                    crs = "EPSG:" + crs.substring(crs.lastIndexOf(seperator) +
+                            seperator.length(), crs.length());
+                }
+                this.mapWFS.setDisplayCRS(crs);
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        } else {
+            try {
+                this.mapWFS.setDisplayCRS(
+                        this.dataBean.getAttributes().get("srsName"));
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
     }
 
     /**

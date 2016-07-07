@@ -22,7 +22,6 @@ package de.bayern.gdi.gui;
 import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -119,16 +118,19 @@ public class WMSMapSwing extends Parent {
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
-    private TextField coordinateX1;
-    private TextField coordinateY1;
-    private TextField coordinateX2;
-    private TextField coordinateY2;
+    private TextField coordinateX1TextField;
+    private TextField coordinateY1TextField;
+    private TextField coordinateX2TextField;
+    private TextField coordinateY2TextField;
     private ExtJMapPane mapPane;
     private Layer baseLayer;
     private StyleBuilder sb;
     private StyleFactory sf;
     private FilterFactory2 ff;
     DefaultFeatureCollection polygonFeatureCollection;
+    private CoordinateReferenceSystem displayCRS;
+    private CoordinateReferenceSystem oldDisplayCRS;
+    private CoordinateReferenceSystem mapCRS;
 
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
@@ -237,14 +239,24 @@ public class WMSMapSwing extends Parent {
         this(new URL(mapURL), width, heigth, layer);
     }
 
+
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
+        this(mapURL, width, heigth, layer, null);
+    }
     /**
      * Constructor.
      *
      * @param mapURL The URL of the WMS Service
      */
-    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
+                       CoordinateReferenceSystem displayCRS) {
         initGeotoolsLocale();
         try {
+            if (displayCRS == null) {
+                setDisplayCRS(INITIAL_CRS);
+            } else {
+                setDisplayCRS(displayCRS);
+            }
             this.sb = new StyleBuilder();
             this.sf = CommonFactoryFinder.getStyleFactory(null);
             this.ff = CommonFactoryFinder.getFilterFactory2(null);
@@ -263,7 +275,6 @@ public class WMSMapSwing extends Parent {
                 }
             }
             this.mapContent = new MapContent();
-            this.title = this.wms.getCapabilities().getService().getTitle();
             this.mapContent.setTitle(this.title);
             this.mapNode = new SwingNode();
             //this.add(this.layerLabel);
@@ -272,45 +283,183 @@ public class WMSMapSwing extends Parent {
             this.getChildren().add(vBox);
             displayMap(baseLayer);
 
-        } catch (IOException | ServiceException e) {
+        } catch (IOException | ServiceException | FactoryException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * sets the CRS the coords under the map should be displayed in.
+     * @param crs Coordinate Reference System
+     * @throws FactoryException when the CRS can't be found
+     */
+    public void setDisplayCRS(String crs) throws FactoryException {
+        CoordinateReferenceSystem coordinateReferenceSystem = null;
+        coordinateReferenceSystem = CRS.decode(crs);
+        setDisplayCRS(coordinateReferenceSystem);
+    }
+
+
+    private void setMapCRS(CoordinateReferenceSystem crs) {
+        this.mapCRS = crs;
+    }
+
+    /**
+     * Sets the CRS to Display the coordinates under the map.
+     * @param crs CoordinateReferenceSystem
+     */
+    public void setDisplayCRS(CoordinateReferenceSystem crs) {
+        if (this.displayCRS == null) {
+            this.oldDisplayCRS = crs;
+        }
+        this.oldDisplayCRS = this.displayCRS;
+        this.displayCRS = crs;
+        if (this.coordinateX1TextField != null
+                && this.coordinateY1TextField != null
+                && this.coordinateX2TextField != null
+                && this.coordinateY2TextField != null) {
+            //System.out.println("TextFields not null");
+            if (!this.coordinateX1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateX2TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY2TextField.getText().
+                    toString().equals("")) {
+                //System.out.println("TextFields not empty");
+                Double x1Coordinate = Double.parseDouble(
+                        this.coordinateX1TextField.getText().toString());
+                Double x2Coordinate = Double.parseDouble(
+                        this.coordinateX2TextField.getText().toString());
+                Double y1Coordinate = Double.parseDouble(
+                        this.coordinateY1TextField.getText().toString());
+                Double y2Coordinate = Double.parseDouble(
+                        this.coordinateY2TextField.getText().toString());
+                if (x1Coordinate != null
+                        && x2Coordinate != null
+                        && y1Coordinate != null
+                        && y2Coordinate != null) {
+                    try {
+                        //System.out.println("Textfield Values not null");
+                        ReferencedEnvelope oldRE = new ReferencedEnvelope(
+                                x1Coordinate,
+                                y1Coordinate,
+                                x2Coordinate,
+                                y2Coordinate,
+                                this.oldDisplayCRS);
+                        ReferencedEnvelope newRE = oldRE.transform(
+                                this.displayCRS, true);
+                        setDisplayCoordinates(newRE.getMaxX(),
+                                newRE.getMaxY(),
+                                newRE.getMinX(),
+                                newRE.getMinY());
+                    } catch (FactoryException | TransformException e) {
+                        clearCoordinateDisplay();
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                } else {
+                    clearCoordinateDisplay();
+                }
+            } else {
+                clearCoordinateDisplay();
+            }
         }
     }
 
     private void displayMap(Layer wmsLayer) {
         WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
         this.mapContent.addLayer(displayLayer);
+        setMapCRS(this
+                .mapContent
+                .getViewport()
+                .getCoordinateReferenceSystem());
         createSwingContent(this.mapNode);
         //JMapPane mapPane = new JMapPane(this.mapContent);
 
     }
 
-
-    /**
-     * Set TextFields to display the selected coordinates.
-     *
-     * @param x1 X1
-     * @param y1 Y1
-     * @param x2 X2
-     * @param y2 Y2
-     */
     public void setCoordinateDisplay(
             TextField x1,
             TextField y1,
             TextField x2,
-            TextField y2
-    ) {
-        this.coordinateX1 = x1;
-        this.coordinateY1 = y1;
-        this.coordinateX2 = x2;
-        this.coordinateY2 = y2;
+            TextField y2) {
+        this.coordinateX1TextField = x1;
+        this.coordinateY1TextField = y1;
+        this.coordinateX2TextField = x2;
+        this.coordinateY2TextField = y2;
     }
 
+    private void setDisplayCoordinates(
+            Double x1,
+            Double y1,
+            Double x2,
+            Double y2
+    ) {
+        try {
+            /*
+            System.out.println("Before Transform\n"
+                    + "x1: " + x1 + "\n"
+                    + "y1: " + y1 + "\n"
+                    + "x2: " + x2 + "\n"
+                    + "y2: " + y2);
+                    */
+            ReferencedEnvelope oldRE = new ReferencedEnvelope(
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    this.mapCRS);
+            ReferencedEnvelope newRE = oldRE.transform(
+                    this.displayCRS, true);
+            /*
+            System.out.println("After Transform\n"
+                    + "x1: " + newRE.getMaxX() + "\n"
+                    + "y1: " + newRE.getMaxY() + "\n"
+                    + "x2: " + newRE.getMinX() + "\n"
+                    + "y2: " + newRE.getMinY());
+                    */
+            /*
+            System.out.println("String Value of\n"
+                    + "x1: " + String.valueOf(newRE.getMaxX()) + "\n"
+                    + "y1: " + String.valueOf(newRE.getMaxY()) + "\n"
+                    + "x2: " + String.valueOf(newRE.getMinX()) + "\n"
+                    + "y2: " + String.valueOf(newRE.getMinY()));
+                    */
+            this.coordinateX1TextField.setText(String.valueOf(newRE.getMaxX()));
+            this.coordinateY1TextField.setText(String.valueOf(newRE.getMaxY()));
+            this.coordinateX2TextField.setText(String.valueOf(newRE.getMinX()));
+            this.coordinateY2TextField.setText(String.valueOf(newRE.getMinY()));
+            /*
+            System.out.println("Text Fields\n"
+                    + "x1: " + this.coordinateX1TextField.getText() + "\n"
+                    + "y1: " + this.coordinateY1TextField.getText() + "\n"
+                    + "x2: " + this.coordinateX2TextField.getText() + "\n"
+                    + "y2: " + this.coordinateY2TextField.getText());
+                    */
+        } catch (FactoryException | TransformException e) {
+            clearCoordinateDisplay();
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void clearCoordinateDisplay() {
+        System.out.println("clear Coords");
+        this.coordinateX1TextField.setText("");
+        this.coordinateY1TextField.setText("");
+        this.coordinateX2TextField.setText("");
+        this.coordinateY2TextField.setText("");
+        //setDisplayCoordinates(empty, empty, empty, empty);
+    }
     /**
-<<<<<<< HEAD
      * represents the actions for the cursor.
      **/
     private class CursorAction extends NoToolAction {
+
+        private Double x1Coordinate;
+        private Double x2Coordinate;
+        private Double y1Coordinate;
+        private Double y2Coordinate;
 
         public CursorAction(MapPane mapPane) {
             super(mapPane);
@@ -338,20 +487,19 @@ public class WMSMapSwing extends Parent {
                             mapPane.setSelectedEnvelope(null);
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
-                            coordinateX1.setText(
-                                    String.valueOf(mapStartPos.getX()));
-                            coordinateY1.setText(
-                                    String.valueOf(mapStartPos.getY()));
-                            coordinateX2.setText("");
-                            coordinateY2.setText("");
+                            clearCoordinateDisplay();
+                            x1Coordinate = mapStartPos.getX();
+                            y1Coordinate = mapStartPos.getY();
+                            x2Coordinate = null;
+                            y2Coordinate = null;
                             clickCount++;
                         } else if (clickCount == 1) {
                             end = ev.getPoint();
                             mapEndPos = ev.getWorldPos();
-                            coordinateX2.setText(
-                                    String.valueOf(mapEndPos.getX()));
-                            coordinateY2.setText(
-                                    String.valueOf(mapEndPos.getY()));
+                            x2Coordinate = mapEndPos.getX();
+                            y2Coordinate = mapEndPos.getY();
+                            setDisplayCoordinates(x1Coordinate, y1Coordinate,
+                                    x2Coordinate, y2Coordinate);
                             Rectangle rect = new Rectangle();
                             rect.setFrameFromDiagonal(start, end);
                             mapPane.setDrawRect(rect);
@@ -723,6 +871,33 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
+        if (!this.coordinateX1TextField.getText()
+                .toString().equals("")
+                && !this.coordinateY1TextField.getText()
+                .toString().equals("")
+                && !this.coordinateX2TextField.getText()
+                .toString().equals("")
+                && !this.coordinateY2TextField.getText().
+                toString().equals("")) {
+            //System.out.println("TextFields not empty");
+            Double x1Coordinate = Double.parseDouble(
+                    this.coordinateX1TextField.getText().toString());
+            Double x2Coordinate = Double.parseDouble(
+                    this.coordinateX2TextField.getText().toString());
+            Double y1Coordinate = Double.parseDouble(
+                    this.coordinateY1TextField.getText().toString());
+            Double y2Coordinate = Double.parseDouble(
+                    this.coordinateY2TextField.getText().toString());
+            Envelope env
+                    = new ReferencedEnvelope(x1Coordinate,
+                    x2Coordinate,
+                    y1Coordinate,
+                    y2Coordinate, this.displayCRS);
+            Envelope2D env2D = new Envelope2D(env);
+            return env2D;
+        }
+        return null;
+        /*
         Component[] components = this.mapNode.getContent().getComponents();
         for (Component c : components) {
             if (c.getClass().equals(ExtJMapPane.class)) {
@@ -730,6 +905,7 @@ public class WMSMapSwing extends Parent {
             }
         }
         return null;
+        */
     }
 
     //TODO - Destructor for Swing Item with Maplayer Dispose
