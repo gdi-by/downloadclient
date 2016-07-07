@@ -82,7 +82,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -113,7 +115,7 @@ public class Controller {
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
     @FXML private ComboBox atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
-    @FXML private ComboBox referenceSystemChooser;
+    @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
@@ -327,25 +329,12 @@ public class Controller {
     @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
         this.dataBean.addAttribute("srsName",
             referenceSystemChooser.getValue() != null
-                ? referenceSystemChooser.getValue().toString()
+                ? referenceSystemChooser.
+                    getValue().getCRS().getIdentifiers().toArray()[0].toString()
                 : "EPSG:4326");
         if (referenceSystemChooser.getValue() != null) {
-            try {
-                String crs = referenceSystemChooser.getValue().toString();
-                String seperator = null;
-                if (crs.contains("::")) {
-                    seperator = "::";
-                } else if (crs.contains("/")) {
-                    seperator = "/";
-                }
-                if (seperator != null) {
-                    crs = "EPSG:" + crs.substring(crs.lastIndexOf(seperator)
-                            + seperator.length(), crs.length());
-                }
-                this.mapWFS.setDisplayCRS(crs);
-            } catch (FactoryException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
+            this.mapWFS.setDisplayCRS(
+                    referenceSystemChooser.getValue().getCRS());
         } else {
             try {
                 this.mapWFS.setDisplayCRS(
@@ -742,12 +731,35 @@ public class Controller {
                 this.basicWFSContainer.setVisible(true);
                 this.atomContainer.setVisible(false);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
-                ObservableList<String> list =
-                    FXCollections.observableArrayList();
+                ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);
-                this.referenceSystemChooser.setItems(list);
-                this.referenceSystemChooser.setValue(feature.defaultCRS);
+                ObservableList<CRSModel> crsList =
+                        FXCollections.observableArrayList();
+                for (String crsStr: list) {
+                    try {
+                        String seperator = null;
+                        if (crsStr.contains("::")) {
+                            seperator = "::";
+                        } else if (crsStr.contains("/")) {
+                            seperator = "/";
+                        }
+                        if (seperator != null) {
+                            crsStr = "EPSG:"
+                                    + crsStr.substring(
+                                    crsStr.lastIndexOf(seperator)
+                                    + seperator.length(),
+                                    crsStr.length());
+                        }
+                        CoordinateReferenceSystem crs = CRS.decode(crsStr);
+                        CRSModel crsm = new CRSModel(crs);
+                        crsList.add(crsm);
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                }
+                this.referenceSystemChooser.setItems(crsList);
+                this.referenceSystemChooser.setValue(crsList.get(0));
                 List<String> outputFormats = feature.outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
