@@ -63,6 +63,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
@@ -100,6 +101,7 @@ import org.opengis.filter.identity.FeatureId;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -341,19 +343,32 @@ public class WMSMapSwing extends Parent {
                         && y1Coordinate != null
                         && y2Coordinate != null) {
                     try {
-                        //System.out.println("Textfield Values not null");
-                        ReferencedEnvelope oldRE = new ReferencedEnvelope(
-                                x1Coordinate,
-                                y1Coordinate,
-                                x2Coordinate,
-                                y2Coordinate,
-                                this.oldDisplayCRS);
-                        ReferencedEnvelope newRE = oldRE.transform(
-                                this.displayCRS, true);
-                        setDisplayCoordinates(newRE.getMaxX(),
-                                newRE.getMaxY(),
-                                newRE.getMinX(),
-                                newRE.getMinY());
+                        com.vividsolutions.jts.geom.GeometryFactory gf = new
+                                com.vividsolutions.jts.geom.GeometryFactory();
+                        com.vividsolutions.jts.geom.Coordinate coo1 = new com
+                                .vividsolutions.jts.geom.Coordinate(
+                                x1Coordinate, y1Coordinate);
+                        com.vividsolutions.jts.geom.Coordinate coo2 = new com
+                                .vividsolutions.jts.geom.Coordinate(
+                                x2Coordinate, y2Coordinate);
+                        com.vividsolutions.jts.geom.Point p1 = gf.createPoint(
+                                coo1);
+                        com.vividsolutions.jts.geom.Point p2 = gf.createPoint(
+                                coo2);
+                        MathTransform transform = CRS.findMathTransform(
+                                this.oldDisplayCRS, this.displayCRS);
+                        p1 = (com.vividsolutions.jts.geom.Point)
+                                JTS.transform(p1, transform);
+                        p2 = (com.vividsolutions.jts.geom.Point)
+                                JTS.transform(p2, transform);
+                        this.coordinateX1TextField.setText(
+                                String.valueOf(p1.getX()));
+                        this.coordinateY1TextField.setText(
+                                String.valueOf(p1.getY()));
+                        this.coordinateX2TextField.setText(
+                                String.valueOf(p2.getX()));
+                        this.coordinateY2TextField.setText(
+                                String.valueOf(p2.getY()));
                     } catch (FactoryException | TransformException e) {
                         clearCoordinateDisplay();
                         log.log(Level.SEVERE, e.getMessage(), e);
@@ -375,8 +390,6 @@ public class WMSMapSwing extends Parent {
                 .getViewport()
                 .getCoordinateReferenceSystem());
         createSwingContent(this.mapNode);
-        //JMapPane mapPane = new JMapPane(this.mapContent);
-
     }
 
     /**
@@ -404,46 +417,28 @@ public class WMSMapSwing extends Parent {
             Double y2
     ) {
         try {
-            /*
-            System.out.println("Before Transform\n"
-                    + "x1: " + x1 + "\n"
-                    + "y1: " + y1 + "\n"
-                    + "x2: " + x2 + "\n"
-                    + "y2: " + y2);
-                    */
-            ReferencedEnvelope oldRE = new ReferencedEnvelope(
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    this.mapCRS);
-            ReferencedEnvelope newRE = oldRE.transform(
-                    this.displayCRS, true);
-            /*
-            System.out.println("After Transform\n"
-                    + "x1: " + newRE.getMaxX() + "\n"
-                    + "y1: " + newRE.getMaxY() + "\n"
-                    + "x2: " + newRE.getMinX() + "\n"
-                    + "y2: " + newRE.getMinY());
-                    */
-            /*
-            System.out.println("String Value of\n"
-                    + "x1: " + String.valueOf(newRE.getMaxX()) + "\n"
-                    + "y1: " + String.valueOf(newRE.getMaxY()) + "\n"
-                    + "x2: " + String.valueOf(newRE.getMinX()) + "\n"
-                    + "y2: " + String.valueOf(newRE.getMinY()));
-                    */
-            this.coordinateX1TextField.setText(String.valueOf(newRE.getMaxX()));
-            this.coordinateY1TextField.setText(String.valueOf(newRE.getMaxY()));
-            this.coordinateX2TextField.setText(String.valueOf(newRE.getMinX()));
-            this.coordinateY2TextField.setText(String.valueOf(newRE.getMinY()));
-            /*
-            System.out.println("Text Fields\n"
-                    + "x1: " + this.coordinateX1TextField.getText() + "\n"
-                    + "y1: " + this.coordinateY1TextField.getText() + "\n"
-                    + "x2: " + this.coordinateX2TextField.getText() + "\n"
-                    + "y2: " + this.coordinateY2TextField.getText());
-                    */
+            com.vividsolutions.jts.geom.GeometryFactory gf = new
+                    com.vividsolutions.jts.geom.GeometryFactory();
+            com.vividsolutions.jts.geom.Coordinate coo1 = new com
+                    .vividsolutions.jts.geom.Coordinate(x1, y1);
+            com.vividsolutions.jts.geom.Coordinate coo2 = new com
+                    .vividsolutions.jts.geom.Coordinate(x2, y2);
+            com.vividsolutions.jts.geom.Point p1 = gf.createPoint(coo1);
+            com.vividsolutions.jts.geom.Point p2 = gf.createPoint(coo2);
+            MathTransform transform = CRS.findMathTransform(
+                    this.mapCRS, this.displayCRS);
+            p1 = (com.vividsolutions.jts.geom.Point)
+                    JTS.transform(p1, transform);
+            p2 = (com.vividsolutions.jts.geom.Point)
+                    JTS.transform(p2, transform);
+            this.coordinateX1TextField.setText(
+                    String.valueOf(p1.getX()));
+            this.coordinateY1TextField.setText(
+                    String.valueOf(p1.getY()));
+            this.coordinateX2TextField.setText(
+                    String.valueOf(p2.getX()));
+            this.coordinateY2TextField.setText(
+                    String.valueOf(p2.getY()));
         } catch (FactoryException | TransformException e) {
             clearCoordinateDisplay();
             log.log(Level.SEVERE, e.getMessage(), e);
