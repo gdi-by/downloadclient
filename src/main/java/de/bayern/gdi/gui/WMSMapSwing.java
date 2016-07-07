@@ -451,7 +451,7 @@ public class WMSMapSwing extends Parent {
     }
 
     private void clearCoordinateDisplay() {
-        System.out.println("clear Coords");
+        //System.out.println("clear Coords");
         this.coordinateX1TextField.setText("");
         this.coordinateY1TextField.setText("");
         this.coordinateX2TextField.setText("");
