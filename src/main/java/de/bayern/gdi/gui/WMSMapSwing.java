@@ -343,24 +343,16 @@ public class WMSMapSwing extends Parent {
                         && y1Coordinate != null
                         && y2Coordinate != null) {
                     try {
-                        com.vividsolutions.jts.geom.GeometryFactory gf = new
-                                com.vividsolutions.jts.geom.GeometryFactory();
-                        com.vividsolutions.jts.geom.Coordinate coo1 = new com
-                                .vividsolutions.jts.geom.Coordinate(
-                                x1Coordinate, y1Coordinate);
-                        com.vividsolutions.jts.geom.Coordinate coo2 = new com
-                                .vividsolutions.jts.geom.Coordinate(
-                                x2Coordinate, y2Coordinate);
-                        com.vividsolutions.jts.geom.Point p1 = gf.createPoint(
-                                coo1);
-                        com.vividsolutions.jts.geom.Point p2 = gf.createPoint(
-                                coo2);
-                        MathTransform transform = CRS.findMathTransform(
-                                this.oldDisplayCRS, this.displayCRS);
-                        p1 = (com.vividsolutions.jts.geom.Point)
-                                JTS.transform(p1, transform);
-                        p2 = (com.vividsolutions.jts.geom.Point)
-                                JTS.transform(p2, transform);
+                        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+                                x1Coordinate,
+                                y1Coordinate,
+                                this.oldDisplayCRS,
+                                this.displayCRS);
+                        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+                                x2Coordinate,
+                                y2Coordinate,
+                                this.mapCRS,
+                                this.displayCRS);
                         this.coordinateX1TextField.setText(
                                 String.valueOf(p1.getX()));
                         this.coordinateY1TextField.setText(
@@ -417,20 +409,16 @@ public class WMSMapSwing extends Parent {
             Double y2
     ) {
         try {
-            com.vividsolutions.jts.geom.GeometryFactory gf = new
-                    com.vividsolutions.jts.geom.GeometryFactory();
-            com.vividsolutions.jts.geom.Coordinate coo1 = new com
-                    .vividsolutions.jts.geom.Coordinate(x1, y1);
-            com.vividsolutions.jts.geom.Coordinate coo2 = new com
-                    .vividsolutions.jts.geom.Coordinate(x2, y2);
-            com.vividsolutions.jts.geom.Point p1 = gf.createPoint(coo1);
-            com.vividsolutions.jts.geom.Point p2 = gf.createPoint(coo2);
-            MathTransform transform = CRS.findMathTransform(
-                    this.mapCRS, this.displayCRS);
-            p1 = (com.vividsolutions.jts.geom.Point)
-                    JTS.transform(p1, transform);
-            p2 = (com.vividsolutions.jts.geom.Point)
-                    JTS.transform(p2, transform);
+            com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+                    x1,
+                    y1,
+                    this.mapCRS,
+                    this.displayCRS);
+            com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+                    x2,
+                    y2,
+                    this.mapCRS,
+                    this.displayCRS);
             this.coordinateX1TextField.setText(
                     String.valueOf(p1.getX()));
             this.coordinateY1TextField.setText(
@@ -443,6 +431,22 @@ public class WMSMapSwing extends Parent {
             clearCoordinateDisplay();
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
+            Double x,
+            Double y,
+            CoordinateReferenceSystem sourceCRS,
+            CoordinateReferenceSystem targetCRS)
+    throws TransformException, FactoryException {
+        com.vividsolutions.jts.geom.GeometryFactory gf = new
+                com.vividsolutions.jts.geom.GeometryFactory();
+        com.vividsolutions.jts.geom.Coordinate coo = new com
+                .vividsolutions.jts.geom.Coordinate(x, y);
+        com.vividsolutions.jts.geom.Point p = gf.createPoint(coo);
+        MathTransform transform = CRS.findMathTransform(
+                sourceCRS, targetCRS);
+        return (com.vividsolutions.jts.geom.Point) JTS.transform(p, transform);
     }
 
     private void clearCoordinateDisplay() {
@@ -890,11 +894,12 @@ public class WMSMapSwing extends Parent {
                     this.coordinateY1TextField.getText().toString());
             Double y2Coordinate = Double.parseDouble(
                     this.coordinateY2TextField.getText().toString());
-            Envelope env
-                    = new ReferencedEnvelope(x1Coordinate,
+            Envelope env = new ReferencedEnvelope(
+                    x1Coordinate,
                     x2Coordinate,
                     y1Coordinate,
-                    y2Coordinate, this.displayCRS);
+                    y2Coordinate,
+                    this.displayCRS);
             Envelope2D env2D = new Envelope2D(env);
             return env2D;
         }

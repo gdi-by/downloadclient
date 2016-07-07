@@ -52,4 +52,11 @@ public class CRSModel {
     public String toString() {
         return this.crs.getName().toString();
     }
+
+    public boolean equals(CRSModel crsModel) {
+        if(this.toString().equals(crsModel.toString())) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -759,20 +759,24 @@ public class Controller {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
-                this.referenceSystemChooser.setItems(crsList);
-                CoordinateReferenceSystem initCRS = crsList.get(0).getCRS();
-                CRSModel crsm = new CRSModel(initCRS);
-                try {
-                    initCRS = CRS.decode(INITIAL_CRS_DISPLAY);
-                    CRSModel initCRSM = new CRSModel(initCRS);
-                    crsm = new CRSModel(initCRS);
-                    if (crsList.contains(initCRSM)) {
-                        crsm = initCRSM;
+                if (!crsList.isEmpty()) {
+                    this.referenceSystemChooser.setItems(crsList);
+                    CRSModel crsm = crsList.get(0);
+                    try {
+                        CoordinateReferenceSystem initCRS = CRS.decode(
+                                INITIAL_CRS_DISPLAY);
+                        CRSModel initCRSM = new CRSModel(initCRS);
+                        for (int i= 0; i < crsList.size(); i++) {
+                            if (crsList.get(i).equals(initCRSM)) {
+                                crsm = crsList.get(i);
+                                break;
+                            }
+                        }
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
                     }
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    this.referenceSystemChooser.setValue(crsm);
                 }
-                this.referenceSystemChooser.setValue(crsm);
                 List<String> outputFormats = feature.outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
