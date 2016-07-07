@@ -94,6 +94,7 @@ public class Controller {
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
+    private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
 
     // DataBean
     private DataBean dataBean;
@@ -759,7 +760,19 @@ public class Controller {
                     }
                 }
                 this.referenceSystemChooser.setItems(crsList);
-                this.referenceSystemChooser.setValue(crsList.get(0));
+                CoordinateReferenceSystem initCRS = crsList.get(0).getCRS();
+                CRSModel crsm = new CRSModel(initCRS);
+                try {
+                    initCRS = CRS.decode(INITIAL_CRS_DISPLAY);
+                    CRSModel initCRSM = new CRSModel(initCRS);
+                    crsm = new CRSModel(initCRS);
+                    if (crsList.contains(initCRSM)) {
+                        crsm = initCRSM;
+                    }
+                } catch (FactoryException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+                this.referenceSystemChooser.setValue(crsm);
                 List<String> outputFormats = feature.outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
