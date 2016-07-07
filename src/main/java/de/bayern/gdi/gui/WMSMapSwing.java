@@ -379,6 +379,13 @@ public class WMSMapSwing extends Parent {
 
     }
 
+    /**
+     * sets text fields for coordinates.
+     * @param x1 x1
+     * @param y1 y1
+     * @param x2 x2
+     * @param y2 y2
+     */
     public void setCoordinateDisplay(
             TextField x1,
             TextField y1,

@@ -329,7 +329,7 @@ public class Controller {
             referenceSystemChooser.getValue() != null
                 ? referenceSystemChooser.getValue().toString()
                 : "EPSG:4326");
-        if(referenceSystemChooser.getValue() != null ) {
+        if (referenceSystemChooser.getValue() != null) {
             try {
                 String crs = referenceSystemChooser.getValue().toString();
                 String seperator = null;
@@ -339,8 +339,8 @@ public class Controller {
                     seperator = "/";
                 }
                 if (seperator != null) {
-                    crs = "EPSG:" + crs.substring(crs.lastIndexOf(seperator) +
-                            seperator.length(), crs.length());
+                    crs = "EPSG:" + crs.substring(crs.lastIndexOf(seperator)
+                            + seperator.length(), crs.length());
                 }
                 this.mapWFS.setDisplayCRS(crs);
             } catch (FactoryException e) {
