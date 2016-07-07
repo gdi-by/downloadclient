@@ -343,16 +343,18 @@ public class WMSMapSwing extends Parent {
                         && y1Coordinate != null
                         && y2Coordinate != null) {
                     try {
-                        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
-                                x1Coordinate,
-                                y1Coordinate,
-                                this.oldDisplayCRS,
-                                this.displayCRS);
-                        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
-                                x2Coordinate,
-                                y2Coordinate,
-                                this.mapCRS,
-                                this.displayCRS);
+                        com.vividsolutions.jts.geom.Point p1 =
+                                convertDoublesToPoint(
+                                        x1Coordinate,
+                                        y1Coordinate,
+                                        this.oldDisplayCRS,
+                                        this.displayCRS);
+                        com.vividsolutions.jts.geom.Point p2 =
+                                convertDoublesToPoint(
+                                        x2Coordinate,
+                                        y2Coordinate,
+                                        this.mapCRS,
+                                        this.displayCRS);
                         this.coordinateX1TextField.setText(
                                 String.valueOf(p1.getX()));
                         this.coordinateY1TextField.setText(

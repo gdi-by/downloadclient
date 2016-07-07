@@ -53,10 +53,24 @@ public class CRSModel {
         return this.crs.getName().toString();
     }
 
+    /**
+     * Checks of another crsModel is equal.
+     * @param crsModel crsModel
+     * @return true if equal; false if not
+     */
     public boolean equals(CRSModel crsModel) {
-        if(this.toString().equals(crsModel.toString())) {
+        if (this.hashCode() == crsModel.hashCode()) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * returns the hashCode for the object.
+     * @return hashcode
+     */
+    @Override
+    public int hashCode() {
+        return this.getCRS().toString().hashCode();
     }
 }

@@ -766,7 +766,7 @@ public class Controller {
                         CoordinateReferenceSystem initCRS = CRS.decode(
                                 INITIAL_CRS_DISPLAY);
                         CRSModel initCRSM = new CRSModel(initCRS);
-                        for (int i= 0; i < crsList.size(); i++) {
+                        for (int i = 0; i < crsList.size(); i++) {
                             if (crsList.get(i).equals(initCRSM)) {
                                 crsm = crsList.get(i);
                                 break;
