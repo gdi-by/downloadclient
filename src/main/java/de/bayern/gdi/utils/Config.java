@@ -94,6 +94,7 @@ public class Config {
     /** Mark global config as unused. */
     public static void uninitialized() {
         synchronized (Holder.INSTANCE) {
+            common();
             Holder.INSTANCE.services = new ServiceSetting();
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
@@ -111,6 +112,7 @@ public class Config {
     public static void load(String dirname) throws IOException {
         synchronized (Holder.INSTANCE) {
             try {
+                common();
                 loadInternal(dirname);
             } finally {
                 Holder.INSTANCE.initialized = true;
@@ -119,12 +121,15 @@ public class Config {
         }
     }
 
+    private static void common() {
+        // http://docs.geotools.org/latest/userguide/library/referencing/
+        // order.html
+        System.setProperty("org.geotools.referencing.forceXY", "true");
+    }
+
     private static void loadInternal(String dirname) throws IOException {
 
         log.info("config directory: " + dirname);
-
-    //http://docs.geotools.org/latest/userguide/library/referencing/order.html
-        System.setProperty("org.geotools.referencing.forceXY", "true");
 
         File dir = new File(dirname);
 
