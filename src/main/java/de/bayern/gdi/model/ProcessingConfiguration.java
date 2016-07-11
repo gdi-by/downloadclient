@@ -79,6 +79,28 @@ public class ProcessingConfiguration {
     }
 
     /**
+     * Generate a on-the-fly list of ProcessingConfigurations
+     * matching given type.
+     * @param type The type to match,
+     * @return a list of ProcessingConfigurations matching.
+     */
+    public List<ProcessingStepConfiguration> filterStepsByType(String type) {
+        ArrayList<ProcessingStepConfiguration> steps = new ArrayList<>();
+        for (ProcessingStepConfiguration psc: this.processingSteps) {
+            String t = psc.getFormatType();
+            if (t != null) {
+                for (String u: type.split(",")) {
+                    if (u.trim().equals(type)) {
+                        steps.add(psc);
+                    }
+                }
+
+            }
+        }
+        return steps;
+    }
+
+    /**
      * @return the inputElements
      */
     public List<InputElement> getInputElements() {
