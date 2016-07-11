@@ -48,10 +48,6 @@ public class ProcessingConfiguration {
     public static final String PROCESSING_CONFIG_FILE =
         "verarbeitungsschritte.xml";
 
-    @XmlElementWrapper(name = "Formate")
-    @XmlElement(name = "Format")
-    private List<ProcessingFormat> formats;
-
     @XmlElementWrapper(name = "Eingabeelemente")
     @XmlElement(name = "Eingabeelement")
     private List<InputElement> inputElements;
@@ -61,7 +57,6 @@ public class ProcessingConfiguration {
     private List<ProcessingStepConfiguration> processingSteps;
 
     public ProcessingConfiguration() {
-        this.formats = new ArrayList<>();
         this.inputElements = new ArrayList<>();
         this.processingSteps = new ArrayList<>();
     }
@@ -81,20 +76,6 @@ public class ProcessingConfiguration {
             }
         }
         return null;
-    }
-
-    /**
-     * @return the formats
-     */
-    public List<ProcessingFormat> getFormats() {
-        return formats;
-    }
-
-    /**
-     * @param formats the formats to set
-     */
-    public void setFormats(List<ProcessingFormat> formats) {
-        this.formats = formats;
     }
 
     /**

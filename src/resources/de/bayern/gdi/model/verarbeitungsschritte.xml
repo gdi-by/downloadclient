@@ -23,24 +23,6 @@
 
 <Verarbeitungskonfiguration>
 
-    <Formate>
-        <Format formattyp="vektor">
-            <MimeType>application/x-shapefile</MimeType>
-        </Format>
-        <Format formattyp="vektor">
-            <MimeType>application/gml+xml</MimeType>
-        </Format>
-        <Format formattyp="vektor">
-            <MimeType>application/vnd.google-earth.kml+xml</MimeType>
-        </Format>
-        <Format formattyp="raster">
-            <MimeType>image/tiff</MimeType>
-        </Format>
-        <Format formattyp="raster">
-            <MimeType>image/jp2</MimeType>
-        </Format>
-    </Formate>
-
     <Eingabeelemente>
 
         <Eingabeelement name="text" typ="TextField" />

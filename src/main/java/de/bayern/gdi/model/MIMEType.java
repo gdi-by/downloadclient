@@ -31,6 +31,8 @@ public class MIMEType {
     private String name;
     @XmlAttribute(name = "ext")
     private String ext;
+    @XmlAttribute(name = "formattyp")
+    private String type;
 
     public MIMEType() {
     }
@@ -63,8 +65,22 @@ public class MIMEType {
         this.ext = ext;
     }
 
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
-        return "[name: '" + name + "' ext: '" + ext + "']";
+        return "[name: '" + name + "' ext: '" + ext + "' type: '" + type + "']";
     }
 }
