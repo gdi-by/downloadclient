@@ -106,9 +106,7 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //http://docs.geotools.org/latest/userguide/library/
-        // referencing/order.html
-        System.setProperty("org.geotools.referencing.forceXY", "true");
+
         if (help(args)) {
             helpAndExit();
         }

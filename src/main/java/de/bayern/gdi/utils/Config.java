@@ -123,6 +123,9 @@ public class Config {
 
         log.info("config directory: " + dirname);
 
+    //http://docs.geotools.org/latest/userguide/library/referencing/order.html
+        System.setProperty("org.geotools.referencing.forceXY", "true");
+
         File dir = new File(dirname);
 
         if (!dir.isDirectory()) {
