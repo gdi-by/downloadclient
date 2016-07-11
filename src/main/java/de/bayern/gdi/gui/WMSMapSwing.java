@@ -343,26 +343,12 @@ public class WMSMapSwing extends Parent {
                         && y1Coordinate != null
                         && y2Coordinate != null) {
                     try {
-                        com.vividsolutions.jts.geom.Point p1 =
-                                convertDoublesToPoint(
-                                        x1Coordinate,
-                                        y1Coordinate,
-                                        this.oldDisplayCRS,
-                                        this.displayCRS);
-                        com.vividsolutions.jts.geom.Point p2 =
-                                convertDoublesToPoint(
-                                        x2Coordinate,
-                                        y2Coordinate,
-                                        this.mapCRS,
-                                        this.displayCRS);
-                        this.coordinateX1TextField.setText(
-                                String.valueOf(p1.getX()));
-                        this.coordinateY1TextField.setText(
-                                String.valueOf(p1.getY()));
-                        this.coordinateX2TextField.setText(
-                                String.valueOf(p2.getX()));
-                        this.coordinateY2TextField.setText(
-                                String.valueOf(p2.getY()));
+                        convertAndDisplayBoundingBox(x1Coordinate,
+                                x2Coordinate,
+                                y1Coordinate,
+                                y2Coordinate,
+                                this.oldDisplayCRS,
+                                this.displayCRS);
                     } catch (FactoryException | TransformException e) {
                         clearCoordinateDisplay();
                         log.log(Level.SEVERE, e.getMessage(), e);
@@ -411,28 +397,44 @@ public class WMSMapSwing extends Parent {
             Double y2
     ) {
         try {
-            com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
-                    x1,
-                    y1,
-                    this.mapCRS,
-                    this.displayCRS);
-            com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+            convertAndDisplayBoundingBox(x1,
                     x2,
+                    y1,
                     y2,
                     this.mapCRS,
                     this.displayCRS);
-            this.coordinateX1TextField.setText(
-                    String.valueOf(p1.getX()));
-            this.coordinateY1TextField.setText(
-                    String.valueOf(p1.getY()));
-            this.coordinateX2TextField.setText(
-                    String.valueOf(p2.getX()));
-            this.coordinateY2TextField.setText(
-                    String.valueOf(p2.getY()));
         } catch (FactoryException | TransformException e) {
             clearCoordinateDisplay();
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private void convertAndDisplayBoundingBox(
+            Double x1,
+            Double x2,
+            Double y1,
+            Double y2,
+            CoordinateReferenceSystem sourceCRS,
+            CoordinateReferenceSystem targetCRS
+    ) throws TransformException, FactoryException {
+        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+                x1,
+                y1,
+                sourceCRS,
+                targetCRS);
+        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+                x2,
+                y2,
+                sourceCRS,
+                targetCRS);
+        this.coordinateX1TextField.setText(
+                String.valueOf(p1.getX()));
+        this.coordinateY1TextField.setText(
+                String.valueOf(p1.getY()));
+        this.coordinateX2TextField.setText(
+                String.valueOf(p2.getX()));
+        this.coordinateY2TextField.setText(
+                String.valueOf(p2.getY()));
     }
 
     private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
@@ -452,13 +454,12 @@ public class WMSMapSwing extends Parent {
     }
 
     private void clearCoordinateDisplay() {
-        //System.out.println("clear Coords");
         this.coordinateX1TextField.setText("");
         this.coordinateY1TextField.setText("");
         this.coordinateX2TextField.setText("");
         this.coordinateY2TextField.setText("");
-        //setDisplayCoordinates(empty, empty, empty, empty);
     }
+
     /**
      * represents the actions for the cursor.
      **/
