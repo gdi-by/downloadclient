@@ -134,12 +134,14 @@ public class CatalogService {
         Document xml = XML.getDocument(this.catalogURL,
                 this.userName,
                 this.password);
-        String getProviderExpr = "//ows:ServiceIdentification/ows:Title";
-        Node providerNameNode = (Node) XML.xpath(xml,
-                getProviderExpr,
-                XPathConstants.NODE,
-                context);
-        this.providerName = providerNameNode.getTextContent();
+        if (xml != null) {
+            String getProviderExpr = "//ows:ServiceIdentification/ows:Title";
+            Node providerNameNode = (Node) XML.xpath(xml,
+                    getProviderExpr,
+                    XPathConstants.NODE,
+                    context);
+            this.providerName = providerNameNode.getTextContent();
+        }
     }
 
     /**
