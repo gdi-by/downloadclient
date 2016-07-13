@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.Validation;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -38,13 +37,10 @@ import org.reflections.util.FilterBuilder;
  */
 
 public class Validator {
-    private javax.validation.Validator validator;
     private Map<String, Reflections> reflectionsList;
     private static Validator instance;
 
     private Validator() {
-        this.validator = Validation
-                .buildDefaultValidatorFactory().getValidator();
         this.reflectionsList = new HashMap<String, Reflections>();
     }
 
@@ -126,16 +122,16 @@ public class Validator {
         List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
         classLoadersList.add(ClasspathHelper.contextClassLoader());
         classLoadersList.add(ClasspathHelper.staticClassLoader());
-        Reflections refl = new Reflections(new
-                ConfigurationBuilder().setScanners(
+        Reflections refl = new Reflections(
+                new ConfigurationBuilder().setScanners(
                 new SubTypesScanner(false
                                 /* don't exclude Object.class */),
                 new ResourcesScanner()
-        ).setUrls(ClasspathHelper.forClassLoader(
+            ).setUrls(ClasspathHelper.forClassLoader(
                 classLoadersList.toArray(new ClassLoader[0])
-        )).filterInputsBy(new FilterBuilder().
+            )).filterInputsBy(new FilterBuilder().
                 include(FilterBuilder.prefix(pacakgeName))
-        )
+            )
         );
         this.reflectionsList.put(pacakgeName, refl);
         return refl;
