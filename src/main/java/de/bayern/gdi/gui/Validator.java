@@ -39,7 +39,7 @@ import org.reflections.util.FilterBuilder;
 
 public class Validator {
     private javax.validation.Validator validator;
-    private Map<String,Reflections> reflectionsList;
+    private Map<String, Reflections> reflectionsList;
     private static Validator instance;
 
     private Validator() {
@@ -50,6 +50,7 @@ public class Validator {
 
     /**
      * returns an instance of the class
+     *
      * @return the class
      */
     public static Validator getInstance() {
@@ -61,7 +62,8 @@ public class Validator {
 
     /**
      * Checks if the value can be casted to the class with the classname.
-     * @param value value to be casted
+     *
+     * @param value     value to be casted
      * @param className to classname
      * @return true if it works; false if not
      */
@@ -80,26 +82,18 @@ public class Validator {
     }
 
     private boolean isCastableTo(Class myClass, String value) {
-        //java.lang.IllegalArgumentException
-        //Set constraintViolations;
-        try {
-            Constructor test = myClass.getConstructor();
-            myClass.getConstructor().newInstance(value);
-            /*
-            constraintViolations = validator.validateValue(myClass,
-                    "value",
-                    value);
-        */
-        } catch (IllegalArgumentException | InstantiationException |
-                IllegalAccessException | InvocationTargetException |
-                NoSuchMethodException e
-                ) {
-            return false;
+        boolean constructorTest = false;
+        for (Constructor constructor : myClass.getConstructors()) {
+            try {
+                constructor.newInstance(value);
+                constructorTest = true;
+                break;
+            } catch (IllegalArgumentException | InstantiationException
+                    | IllegalAccessException | InvocationTargetException e) {
+                constructorTest = false;
+            }
         }
-        //if (constraintViolations.isEmpty()) {
-        //    return true;
-        //}
-        return false;
+        return constructorTest;
     }
 
     private Class classByName(String className) throws
@@ -112,8 +106,8 @@ public class Validator {
             //others are in the java.utils package
             Reflections utilsreflections = reflectionForPackage("java.utils");
             allClasses.addAll(utilsreflections.getSubTypesOf(Object.class));
-            for(Class oneClass: allClasses) {
-                if(oneClass.getName().toLowerCase().endsWith("." + className
+            for (Class oneClass : allClasses) {
+                if (oneClass.getName().toLowerCase().endsWith("." + className
                         .toLowerCase())) {
                     return oneClass;
                 }
@@ -126,7 +120,7 @@ public class Validator {
     }
 
     private Reflections reflectionForPackage(String pacakgeName) {
-        if(this.reflectionsList.containsKey(pacakgeName)) {
+        if (this.reflectionsList.containsKey(pacakgeName)) {
             return this.reflectionsList.get(pacakgeName);
         }
         List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
@@ -134,15 +128,15 @@ public class Validator {
         classLoadersList.add(ClasspathHelper.staticClassLoader());
         Reflections refl = new Reflections(new
                 ConfigurationBuilder().setScanners(
-                    new SubTypesScanner(false
+                new SubTypesScanner(false
                                 /* don't exclude Object.class */),
-                    new ResourcesScanner()
-                ).setUrls(ClasspathHelper.forClassLoader(
-                    classLoadersList.toArray(new ClassLoader[0])
-                )).filterInputsBy(new FilterBuilder().
-                    include(FilterBuilder.prefix(pacakgeName))
-                )
-            );
+                new ResourcesScanner()
+        ).setUrls(ClasspathHelper.forClassLoader(
+                classLoadersList.toArray(new ClassLoader[0])
+        )).filterInputsBy(new FilterBuilder().
+                include(FilterBuilder.prefix(pacakgeName))
+        )
+        );
         this.reflectionsList.put(pacakgeName, refl);
         return refl;
     }
