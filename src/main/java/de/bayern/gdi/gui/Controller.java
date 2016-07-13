@@ -95,7 +95,8 @@ public class Controller {
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
     private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
-
+    private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
 
@@ -656,16 +657,24 @@ public class Controller {
                             FXCollections.observableArrayList();
                     List<WMSMapSwing.FeaturePolygon> polygonList = new
                             ArrayList<WMSMapSwing.FeaturePolygon>();
-                    for (Atom.Item i : items) {
-                        opts.add(new AtomItemModel(i));
-                        WMSMapSwing.FeaturePolygon polygon =
-                                new WMSMapSwing.FeaturePolygon(
-                                        i.polygon,
-                                        i.title,
-                                        i.id);
-                        polygonList.add(polygon);
+                    //Polygons are always epsg:4326
+                    // (http://www.georss.org/gml.html)
+                    try {
+                        atomCRS = CRS.decode(ATOM_CRS_STRING);
+                        for (Atom.Item i : items) {
+                            opts.add(new AtomItemModel(i));
+                            WMSMapSwing.FeaturePolygon polygon =
+                                    new WMSMapSwing.FeaturePolygon(
+                                            i.polygon,
+                                            i.title,
+                                            i.id,
+                                            this.atomCRS);
+                            polygonList.add(polygon);
+                        }
+                        mapAtom.drawPolygons(polygonList);
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
                     }
-                    mapAtom.drawPolygons(polygonList);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
                     if (!opts.isEmpty()) {

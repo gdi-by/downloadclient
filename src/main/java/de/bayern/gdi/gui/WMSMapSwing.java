@@ -181,14 +181,21 @@ public class WMSMapSwing extends Parent {
         public String id;
 
         /**
+         * crs of the polygon.
+         */
+        public CoordinateReferenceSystem crs;
+
+        /**
          * Constructor.
          **/
         public FeaturePolygon(Polygon polygon,
                               String name,
-                              String id) {
+                              String id,
+                              CoordinateReferenceSystem crs) {
             this.polygon = polygon;
             this.name = name;
             this.id = id;
+            this.crs = crs;
         }
     }
 
@@ -783,9 +790,19 @@ public class WMSMapSwing extends Parent {
         try {
 
             SimpleFeatureType polygonFeatureType;
+
+            String epsgCode = this
+                    .mapCRS
+                    .getIdentifiers()
+                    .toArray()[0]
+                    .toString();
+            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(":") + 1,
+                    epsgCode.length());
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
-                    "geometry:Geometry:srid=4326,"
+                    "geometry:Geometry:srid="
+                            + epsgCode
+                            + ","
                             + "name:String,"
                             + "id:String"
             );
@@ -799,11 +816,18 @@ public class WMSMapSwing extends Parent {
             for (FeaturePolygon fp : featurePolygons) {
                 SimpleFeatureBuilder featureBuilder =
                         new SimpleFeatureBuilder(polygonFeatureType);
-                featureBuilder.add(fp.polygon);
-                featureBuilder.add(fp.name);
-                featureBuilder.add(fp.id);
-                SimpleFeature feature = featureBuilder.buildFeature(null);
-                polygonFeatureCollection.add(feature);
+                try {
+                    MathTransform transform = CRS.findMathTransform(
+                            fp.crs, this.mapCRS);
+                    featureBuilder.add((Polygon) JTS.transform(fp.polygon,
+                            transform));
+                    featureBuilder.add(fp.name);
+                    featureBuilder.add(fp.id);
+                    SimpleFeature feature = featureBuilder.buildFeature(null);
+                    polygonFeatureCollection.add(feature);
+                } catch (FactoryException | TransformException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
             }
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
                     polygonFeatureCollection, createPolygonStyle());
