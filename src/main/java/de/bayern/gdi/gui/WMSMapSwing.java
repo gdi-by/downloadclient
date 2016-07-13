@@ -880,31 +880,36 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
-        if (!this.coordinateX1TextField.getText()
-                .toString().equals("")
-                && !this.coordinateY1TextField.getText()
-                .toString().equals("")
-                && !this.coordinateX2TextField.getText()
-                .toString().equals("")
-                && !this.coordinateY2TextField.getText().
-                toString().equals("")) {
-            //System.out.println("TextFields not empty");
-            Double x1Coordinate = Double.parseDouble(
-                    this.coordinateX1TextField.getText().toString());
-            Double x2Coordinate = Double.parseDouble(
-                    this.coordinateX2TextField.getText().toString());
-            Double y1Coordinate = Double.parseDouble(
-                    this.coordinateY1TextField.getText().toString());
-            Double y2Coordinate = Double.parseDouble(
-                    this.coordinateY2TextField.getText().toString());
-            Envelope env = new ReferencedEnvelope(
-                    x1Coordinate,
-                    x2Coordinate,
-                    y1Coordinate,
-                    y2Coordinate,
-                    this.displayCRS);
-            Envelope2D env2D = new Envelope2D(env);
-            return env2D;
+        if (this.coordinateX1TextField != null
+                && this.coordinateX2TextField != null
+                && this.coordinateY1TextField != null
+                && this.coordinateY2TextField != null) {
+            if (!this.coordinateX1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateX2TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY2TextField.getText().
+                    toString().equals("")) {
+                //System.out.println("TextFields not empty");
+                Double x1Coordinate = Double.parseDouble(
+                        this.coordinateX1TextField.getText().toString());
+                Double x2Coordinate = Double.parseDouble(
+                        this.coordinateX2TextField.getText().toString());
+                Double y1Coordinate = Double.parseDouble(
+                        this.coordinateY1TextField.getText().toString());
+                Double y2Coordinate = Double.parseDouble(
+                        this.coordinateY2TextField.getText().toString());
+                Envelope env = new ReferencedEnvelope(
+                        x1Coordinate,
+                        x2Coordinate,
+                        y1Coordinate,
+                        y2Coordinate,
+                        this.displayCRS);
+                Envelope2D env2D = new Envelope2D(env);
+                return env2D;
+            }
         }
         return null;
         /*
