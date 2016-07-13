@@ -330,7 +330,7 @@ public class Controller {
         this.dataBean.addAttribute("srsName",
             referenceSystemChooser.getValue() != null
                 ? referenceSystemChooser.
-                    getValue().getCRS().getIdentifiers().toArray()[0].toString()
+                    getValue().getOldName()
                 : "EPSG:4326");
         if (referenceSystemChooser.getValue() != null) {
             this.mapWFS.setDisplayCRS(
@@ -723,21 +723,23 @@ public class Controller {
                         FXCollections.observableArrayList();
                 for (String crsStr: list) {
                     try {
+                        String newcrsStr = crsStr;
                         String seperator = null;
-                        if (crsStr.contains("::")) {
+                        if (newcrsStr.contains("::")) {
                             seperator = "::";
-                        } else if (crsStr.contains("/")) {
+                        } else if (newcrsStr.contains("/")) {
                             seperator = "/";
                         }
                         if (seperator != null) {
-                            crsStr = "EPSG:"
-                                    + crsStr.substring(
-                                    crsStr.lastIndexOf(seperator)
+                            newcrsStr = "EPSG:"
+                                    + newcrsStr.substring(
+                                    newcrsStr.lastIndexOf(seperator)
                                     + seperator.length(),
-                                    crsStr.length());
+                                    newcrsStr.length());
                         }
-                        CoordinateReferenceSystem crs = CRS.decode(crsStr);
+                        CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
                         CRSModel crsm = new CRSModel(crs);
+                        crsm.setOldName(crsStr);
                         crsList.add(crsm);
                     } catch (FactoryException e) {
                         log.log(Level.SEVERE, e.getMessage(), e);
