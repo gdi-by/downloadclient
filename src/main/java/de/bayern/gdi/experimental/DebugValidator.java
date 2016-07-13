@@ -50,13 +50,15 @@ public class DebugValidator {
         map.put("String", "Test12");
         map.put("Integer", "Test12");
         map.put("Double", "12,25");
+        map.put("Float", "42.23");
+        map.put("Short", "8000");
         Set<Map.Entry<String, String>> entries = map.entrySet();
         Iterator it = entries.iterator();
         while(it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             boolean ret = validator.isValid((String) pair.getKey(),
                     (String) pair.getValue());
-            System.out.println(pair.getValue() + "\t try to fit in " + pair
+            System.out.println(pair.getValue() + "\t\t try to fit in " + pair
                     .getKey() + ":\t" + ret);
             it.remove(); // avoids a ConcurrentModificationException
         }
