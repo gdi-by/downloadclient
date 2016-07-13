@@ -27,6 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class CRSModel {
     private CoordinateReferenceSystem crs;
+    private String oldName;
 
     /**
      * Constructor.
@@ -72,5 +73,21 @@ public class CRSModel {
     @Override
     public int hashCode() {
         return this.getCRS().toString().hashCode();
+    }
+
+    /**
+     * gets the old name of the crs.
+     * @return old name of crs
+     */
+    public String getOldName() {
+        return oldName;
+    }
+
+    /**
+     * sets the old name of the crs.
+     * @param oldName old name of the crs
+     */
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
     }
 }

@@ -181,14 +181,21 @@ public class WMSMapSwing extends Parent {
         public String id;
 
         /**
+         * crs of the polygon.
+         */
+        public CoordinateReferenceSystem crs;
+
+        /**
          * Constructor.
          **/
         public FeaturePolygon(Polygon polygon,
                               String name,
-                              String id) {
+                              String id,
+                              CoordinateReferenceSystem crs) {
             this.polygon = polygon;
             this.name = name;
             this.id = id;
+            this.crs = crs;
         }
     }
 
@@ -783,9 +790,19 @@ public class WMSMapSwing extends Parent {
         try {
 
             SimpleFeatureType polygonFeatureType;
+
+            String epsgCode = this
+                    .mapCRS
+                    .getIdentifiers()
+                    .toArray()[0]
+                    .toString();
+            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(":") + 1,
+                    epsgCode.length());
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
-                    "geometry:Geometry:srid=4326,"
+                    "geometry:Geometry:srid="
+                            + epsgCode
+                            + ","
                             + "name:String,"
                             + "id:String"
             );
@@ -799,11 +816,18 @@ public class WMSMapSwing extends Parent {
             for (FeaturePolygon fp : featurePolygons) {
                 SimpleFeatureBuilder featureBuilder =
                         new SimpleFeatureBuilder(polygonFeatureType);
-                featureBuilder.add(fp.polygon);
-                featureBuilder.add(fp.name);
-                featureBuilder.add(fp.id);
-                SimpleFeature feature = featureBuilder.buildFeature(null);
-                polygonFeatureCollection.add(feature);
+                try {
+                    MathTransform transform = CRS.findMathTransform(
+                            fp.crs, this.mapCRS);
+                    featureBuilder.add((Polygon) JTS.transform(fp.polygon,
+                            transform));
+                    featureBuilder.add(fp.name);
+                    featureBuilder.add(fp.id);
+                    SimpleFeature feature = featureBuilder.buildFeature(null);
+                    polygonFeatureCollection.add(feature);
+                } catch (FactoryException | TransformException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
             }
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
                     polygonFeatureCollection, createPolygonStyle());
@@ -880,31 +904,36 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
-        if (!this.coordinateX1TextField.getText()
-                .toString().equals("")
-                && !this.coordinateY1TextField.getText()
-                .toString().equals("")
-                && !this.coordinateX2TextField.getText()
-                .toString().equals("")
-                && !this.coordinateY2TextField.getText().
-                toString().equals("")) {
-            //System.out.println("TextFields not empty");
-            Double x1Coordinate = Double.parseDouble(
-                    this.coordinateX1TextField.getText().toString());
-            Double x2Coordinate = Double.parseDouble(
-                    this.coordinateX2TextField.getText().toString());
-            Double y1Coordinate = Double.parseDouble(
-                    this.coordinateY1TextField.getText().toString());
-            Double y2Coordinate = Double.parseDouble(
-                    this.coordinateY2TextField.getText().toString());
-            Envelope env = new ReferencedEnvelope(
-                    x1Coordinate,
-                    x2Coordinate,
-                    y1Coordinate,
-                    y2Coordinate,
-                    this.displayCRS);
-            Envelope2D env2D = new Envelope2D(env);
-            return env2D;
+        if (this.coordinateX1TextField != null
+                && this.coordinateX2TextField != null
+                && this.coordinateY1TextField != null
+                && this.coordinateY2TextField != null) {
+            if (!this.coordinateX1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateX2TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY2TextField.getText().
+                    toString().equals("")) {
+                //System.out.println("TextFields not empty");
+                Double x1Coordinate = Double.parseDouble(
+                        this.coordinateX1TextField.getText().toString());
+                Double x2Coordinate = Double.parseDouble(
+                        this.coordinateX2TextField.getText().toString());
+                Double y1Coordinate = Double.parseDouble(
+                        this.coordinateY1TextField.getText().toString());
+                Double y2Coordinate = Double.parseDouble(
+                        this.coordinateY2TextField.getText().toString());
+                Envelope env = new ReferencedEnvelope(
+                        x1Coordinate,
+                        x2Coordinate,
+                        y1Coordinate,
+                        y2Coordinate,
+                        this.displayCRS);
+                Envelope2D env2D = new Envelope2D(env);
+                return env2D;
+            }
         }
         return null;
         /*
