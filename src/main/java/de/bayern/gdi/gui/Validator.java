@@ -18,21 +18,44 @@
 
 package de.bayern.gdi.gui;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
 public class Validator {
 
-    public static boolean isValid(String value, String className) {
+    private Validator() {
+
+    }
+
+    /**
+     * Checks if the value can be casted to the class with the classname.
+     * @param value value to be casted
+     * @param className to classname
+     * @return true if it works; false if not
+     */
+    public boolean isValid(String value, String className) {
         if (value != null || !value.equals("")) {
+            javax.validation.Validator jxvalidator = Validation
+                    .buildDefaultValidatorFactory().getValidator();
             try {
                 Class<?> aClass = Class.forName(className);
-                return true;
+                Set<? extends ConstraintViolation<?>> constraintViolations =
+                        jxvalidator.validateValue(aClass,
+                                value,
+                                null);
+                if (constraintViolations.size() == 0) {
+                    return true;
+                }
+                return false;
             } catch (ClassNotFoundException ex) {
                 return false;
             }
-        } else{
+        } else {
             return true;
         }
     }
