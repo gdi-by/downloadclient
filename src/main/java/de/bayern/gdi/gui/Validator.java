@@ -18,12 +18,11 @@
 
 package de.bayern.gdi.gui;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -65,21 +64,22 @@ public class Validator {
      * @return true if it works; false if not
      */
     public boolean isValid(String className, String value) {
-        if (value != null || !value.equals("")) {
-            try {
-                Class<?> aClass = classByName(className);
-                return isCastableTo(aClass, value);
-            } catch (ClassNotFoundException ex) {
-                return false;
+        if (value != null) {
+            if (!value.equals("")) {
+                try {
+                    Class<?> aClass = classByName(className);
+                    return isCastableTo(aClass, value);
+                } catch (ClassNotFoundException ex) {
+                    return false;
+                }
             }
-        } else {
-            return true;
         }
+        return true;
     }
 
     private boolean isCastableTo(Class myClass, String value) {
         //java.lang.IllegalArgumentException
-        Set<? extends ConstraintViolation<?>> constraintViolations;
+        Set constraintViolations;
         try {
             constraintViolations = validator.validateValue(myClass,
                     "value",
