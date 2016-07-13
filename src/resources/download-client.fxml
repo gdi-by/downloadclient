@@ -234,7 +234,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomFormat" text="format" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomFormat" text="" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>
@@ -248,7 +248,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="refsys" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>

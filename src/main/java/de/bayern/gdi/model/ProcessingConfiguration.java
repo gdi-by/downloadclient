@@ -48,10 +48,6 @@ public class ProcessingConfiguration {
     public static final String PROCESSING_CONFIG_FILE =
         "verarbeitungsschritte.xml";
 
-    @XmlElementWrapper(name = "Formate")
-    @XmlElement(name = "Format")
-    private List<ProcessingFormat> formats;
-
     @XmlElementWrapper(name = "Eingabeelemente")
     @XmlElement(name = "Eingabeelement")
     private List<InputElement> inputElements;
@@ -61,7 +57,6 @@ public class ProcessingConfiguration {
     private List<ProcessingStepConfiguration> processingSteps;
 
     public ProcessingConfiguration() {
-        this.formats = new ArrayList<>();
         this.inputElements = new ArrayList<>();
         this.processingSteps = new ArrayList<>();
     }
@@ -84,17 +79,25 @@ public class ProcessingConfiguration {
     }
 
     /**
-     * @return the formats
+     * Generate a on-the-fly list of ProcessingConfigurations
+     * matching given type.
+     * @param type The type to match,
+     * @return a list of ProcessingConfigurations matching.
      */
-    public List<ProcessingFormat> getFormats() {
-        return formats;
-    }
+    public List<ProcessingStepConfiguration> filterStepsByType(String type) {
+        ArrayList<ProcessingStepConfiguration> steps = new ArrayList<>();
+        for (ProcessingStepConfiguration psc: this.processingSteps) {
+            String t = psc.getFormatType();
+            if (t != null) {
+                for (String u: type.split(",")) {
+                    if (u.trim().equals(type)) {
+                        steps.add(psc);
+                    }
+                }
 
-    /**
-     * @param formats the formats to set
-     */
-    public void setFormats(List<ProcessingFormat> formats) {
-        this.formats = formats;
+            }
+        }
+        return steps;
     }
 
     /**

@@ -18,20 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.geotools.geometry.Envelope2D;
-
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
@@ -44,7 +30,6 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
@@ -53,7 +38,17 @@ import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
-
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -86,6 +81,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -95,6 +94,7 @@ public class Controller {
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
+    private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
 
     // DataBean
     private DataBean dataBean;
@@ -116,7 +116,7 @@ public class Controller {
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
     @FXML private ComboBox atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
-    @FXML private ComboBox referenceSystemChooser;
+    @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
@@ -330,8 +330,20 @@ public class Controller {
     @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
         this.dataBean.addAttribute("srsName",
             referenceSystemChooser.getValue() != null
-                ? referenceSystemChooser.getValue().toString()
-                : "EPSG:38468");
+                ? referenceSystemChooser.
+                    getValue().getCRS().getIdentifiers().toArray()[0].toString()
+                : "EPSG:4326");
+        if (referenceSystemChooser.getValue() != null) {
+            this.mapWFS.setDisplayCRS(
+                    referenceSystemChooser.getValue().getCRS());
+        } else {
+            try {
+                this.mapWFS.setDisplayCRS(
+                        this.dataBean.getAttributes().get("srsName"));
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
     }
 
     /**
@@ -344,6 +356,20 @@ public class Controller {
             this.atomVariationChooser.getValue() != null
                 ? this.atomVariationChooser.getValue().toString()
                 : "");
+        ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
+                .getSelectedItem();
+        //AtomItemModel aim = (AtomItemModel) this.atomVariationChooser
+        //        .getValue();
+        Atom.Item item = (Atom.Item) im.getItem();
+        List <Atom.Field> fields = item.fields;
+        for (Atom.Field field: fields) {
+            if (field.type == this.atomVariationChooser.getValue()) {
+                this.valueAtomFormat.setText(field.format);
+                this.valueAtomRefsys.setText(field.crs);
+            }
+        }
+
+
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
@@ -672,10 +698,10 @@ public class Controller {
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
             mapAtom.highlightSelectedPolygon(item.id);
-            List<Field> fields = item.fields;
+            List<Atom.Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
-            for (Field f : fields) {
+            for (Atom.Field f : fields) {
                 list.add(f.type);
             }
             this.atomVariationChooser.setItems(list);
@@ -695,8 +721,8 @@ public class Controller {
                 // Displays the webview with white background...
             }
             engine.loadContent(item.description);
-            this.valueAtomFormat.setText(item.format);
-            this.valueAtomRefsys.setText(item.defaultCRS);
+            //this.valueAtomFormat.setText(item.format);
+            //this.valueAtomRefsys.setText(item.defaultCRS);
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
@@ -706,12 +732,51 @@ public class Controller {
                 this.basicWFSContainer.setVisible(true);
                 this.atomContainer.setVisible(false);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
-                ObservableList<String> list =
-                    FXCollections.observableArrayList();
+                ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);
-                this.referenceSystemChooser.setItems(list);
-                this.referenceSystemChooser.setValue(feature.defaultCRS);
+                ObservableList<CRSModel> crsList =
+                        FXCollections.observableArrayList();
+                for (String crsStr: list) {
+                    try {
+                        String seperator = null;
+                        if (crsStr.contains("::")) {
+                            seperator = "::";
+                        } else if (crsStr.contains("/")) {
+                            seperator = "/";
+                        }
+                        if (seperator != null) {
+                            crsStr = "EPSG:"
+                                    + crsStr.substring(
+                                    crsStr.lastIndexOf(seperator)
+                                    + seperator.length(),
+                                    crsStr.length());
+                        }
+                        CoordinateReferenceSystem crs = CRS.decode(crsStr);
+                        CRSModel crsm = new CRSModel(crs);
+                        crsList.add(crsm);
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                }
+                if (!crsList.isEmpty()) {
+                    this.referenceSystemChooser.setItems(crsList);
+                    CRSModel crsm = crsList.get(0);
+                    try {
+                        CoordinateReferenceSystem initCRS = CRS.decode(
+                                INITIAL_CRS_DISPLAY);
+                        CRSModel initCRSM = new CRSModel(initCRS);
+                        for (int i = 0; i < crsList.size(); i++) {
+                            if (crsList.get(i).equals(initCRSM)) {
+                                crsm = crsList.get(i);
+                                break;
+                            }
+                        }
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                    this.referenceSystemChooser.setValue(crsm);
+                }
                 List<String> outputFormats = feature.outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =

@@ -65,6 +65,52 @@ public class Atom {
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
 
+    /** Field for the Atom Item. */
+    public static class Field {
+        /**
+         * name.
+         */
+        public String name;
+        /**
+         * type.
+         */
+        public String type;
+        /**
+         * description.
+         */
+        public String description;
+        /**
+         * crs.
+         */
+        public String crs;
+        /**
+         * format.
+         */
+        public String format;
+
+        public Field() {
+        }
+
+        /**
+         * @param name name.
+         * @param type type.
+         */
+        public Field(String name, String type, String crs, String format,
+                     String description) {
+            this.name = name;
+            this.type = type;
+            this.crs = crs;
+            this.format = format;
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return "field: { name: " + name + " type: " + type
+                    + " crs:" + crs + " format: " + format
+                    + "descrption: " + description + " }";
+        }
+    }
 
     /** feature. */
     public static class Item {
@@ -165,14 +211,34 @@ public class Atom {
         private ArrayList<Field> getFieldForEntry(Document entryDoc) {
             ArrayList<Field> attrFields = new ArrayList<>();
             //Predefined in ATOM Service
-            String getCategories = "//entry/id";
+            String getCategories = "//entry";
             NodeList cL = (NodeList) XML.xpath(entryDoc,
                     getCategories,
                     XPathConstants.NODESET,
                     this.context);
             for (int i = 0; i < cL.getLength(); i++) {
-                Node cat = cL.item(i);
-                Field field = new Field(ATTRIBUTENAME, cat.getTextContent());
+                Node entryNode = cL.item(i);
+                String entryId = (String) XML.xpath(entryNode,
+                        "id",
+                        XPathConstants.STRING,
+                        this.context);
+                String entryDescription = (String) XML.xpath(entryNode,
+                        "title",
+                        XPathConstants.STRING,
+                        this.context);
+                String type = (String) XML.xpath(entryNode,
+                        "link/@type",
+                        XPathConstants.STRING,
+                        this.context);
+                String crs = (String) XML.xpath(entryNode,
+                        "category/@label",
+                        XPathConstants.STRING,
+                        this.context);
+                Field field = new Field(ATTRIBUTENAME,
+                        entryId,
+                        crs,
+                        type,
+                        entryDescription);
                 attrFields.add(field);
             }
             return attrFields;
@@ -205,7 +271,7 @@ public class Atom {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        System.out.println(this.serviceURL);
+        //System.out.println(this.serviceURL);
         this.mainDoc = XML.getDocument(url,
                 this.username,
                 this.password,
@@ -240,7 +306,7 @@ public class Atom {
             //ong beginRead = System.currentTimeMillis();
             Node entry = entries.item(i);
             String getEntryTitle = "title";
-            System.out.println("title: " + title);
+            //System.out.println("title: " + title);
             Node titleN = (Node) XML.xpath(entry,
                     getEntryTitle,
                     XPathConstants.NODE,
