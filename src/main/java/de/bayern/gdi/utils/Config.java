@@ -124,7 +124,7 @@ public class Config {
     private static void common() {
         // http://docs.geotools.org/latest/userguide/library/referencing/
         // order.html
-        System.setProperty("org.geotools.referencing.forceXY", "true");
+        //System.setProperty("org.geotools.referencing.forceXY", "true");
     }
 
     private static void loadInternal(String dirname) throws IOException {
