@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,17 +81,24 @@ public class Validator {
 
     private boolean isCastableTo(Class myClass, String value) {
         //java.lang.IllegalArgumentException
-        Set constraintViolations;
+        //Set constraintViolations;
         try {
+            Constructor test = myClass.getConstructor();
+            myClass.getConstructor().newInstance(value);
+            /*
             constraintViolations = validator.validateValue(myClass,
                     "value",
                     value);
-        } catch (IllegalArgumentException e ) {
+        */
+        } catch (IllegalArgumentException | InstantiationException |
+                IllegalAccessException | InvocationTargetException |
+                NoSuchMethodException e
+                ) {
             return false;
         }
-        if (constraintViolations.isEmpty()) {
-            return true;
-        }
+        //if (constraintViolations.isEmpty()) {
+        //    return true;
+        //}
         return false;
     }
 
