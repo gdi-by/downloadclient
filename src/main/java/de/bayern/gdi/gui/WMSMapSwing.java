@@ -790,9 +790,19 @@ public class WMSMapSwing extends Parent {
         try {
 
             SimpleFeatureType polygonFeatureType;
+
+            String epsgCode = this
+                    .mapCRS
+                    .getIdentifiers()
+                    .toArray()[0]
+                    .toString();
+            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(":")+1,
+                    epsgCode.length());
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
-                    "geometry:Geometry:srid=4326,"
+                    "geometry:Geometry:srid="
+                            + epsgCode
+                            + ","
                             + "name:String,"
                             + "id:String"
             );
