@@ -24,4 +24,17 @@ package de.bayern.gdi.gui;
 
 public class Validator {
 
+    public static boolean isValid(String value, String className) {
+        if (value != null || !value.equals("")) {
+            try {
+                Class<?> aClass = Class.forName(className);
+                return true;
+            } catch (ClassNotFoundException ex) {
+                return false;
+            }
+        } else{
+            return true;
+        }
+    }
+
 }
