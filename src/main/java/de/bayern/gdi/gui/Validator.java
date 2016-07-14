@@ -45,7 +45,7 @@ public class Validator {
     }
 
     /**
-     * returns an instance of the class
+     * returns an instance of the class.
      *
      * @return the class
      */
@@ -103,13 +103,15 @@ public class Validator {
             Reflections utilsreflections = reflectionForPackage("java.utils");
             allClasses.addAll(utilsreflections.getSubTypesOf(Object.class));
             //Stuff like QName is in javax.xml.namespace
-            Reflections javaxNamespaceReflection = reflectionForPackage
-                    ("javax.xml.namespace");
+            Reflections javaxNamespaceReflection = reflectionForPackage(
+                    "javax.xml.namespace"
+            );
             allClasses.addAll(javaxNamespaceReflection
                     .getSubTypesOf(Object.class));
             //Geometries will also be found: com.vividsolutions.jts.geom
-            Reflections geometryReflection = reflectionForPackage
-                    ("com.vividsolutions.jts.geom");
+            Reflections geometryReflection = reflectionForPackage(
+                    "com.vividsolutions.jts.geom"
+            );
             allClasses.addAll(geometryReflection.getSubTypesOf(Object.class));
             for (Class oneClass : allClasses) {
                 if (oneClass.getName().toLowerCase().endsWith("." + className
@@ -118,8 +120,9 @@ public class Validator {
                 }
             }
             //When not returned yet, we won't find it
-            throw new ClassNotFoundException("Class " + className + "not in " +
-                    "java.utils or java.lang found");
+            throw new ClassNotFoundException("Class " + className + "not in "
+                    + "java.utils, java.lang found or "
+                    + "com.vividsolutions.jts.geom");
         }
         return Class.forName(className);
     }

@@ -57,11 +57,25 @@ public class DataBean extends Observable {
 
     private CatalogService catalogService;
 
+    /**
+     * Attribute representation.
+     */
     public class Attribute {
+        /** name. */
         public String name;
+
+        /** value. */
         public String value;
+
+        /** type. */
         public String type;
 
+        /**
+         * Constructor.
+         * @param name the name
+         * @param value the value
+         * @param type the type of the value
+         */
         public Attribute(String name, String value, String type) {
             this.name = name;
             this.value = value;
@@ -243,6 +257,7 @@ public class DataBean extends Observable {
      * Adds an attribute for a selected Service.
      * @param key The key
      * @param value The value
+     * @param type the type of the value
      */
     public void addAttribute(String key, String value, String type) {
         if (this.attributes == null) {
@@ -252,6 +267,11 @@ public class DataBean extends Observable {
         this.attributes.add(attr);
     }
 
+    /**
+     * gets the attributevlaue by key.
+     * @param key the key
+     * @return the value for the key
+     */
     public String getAttributeValue(String key) {
         for (Attribute attr: this.attributes) {
             if (attr.name.equals(key)) {
@@ -330,24 +350,12 @@ public class DataBean extends Observable {
             }
         }
 
-        ArrayList<Attribute> attributes = getAttributes();
-        ArrayList<Parameter> parameters = new ArrayList<>(attributes.size());
-        for(Attribute attribute: attributes) {
-            Parameter param = new Parameter(
-                    attribute.name, attribute.value);
+        ArrayList<Attribute> attrs = getAttributes();
+        ArrayList<Parameter> parameters = new ArrayList<>(attrs.size());
+        for (Attribute attr: attrs) {
+            Parameter param = new Parameter(attr.name, attr.value);
             parameters.add(param);
         }
-        /*
-        Map<String, String> paramMap = getAttributes();
-        ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
-        for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-            if (!entry.getValue().equals("")) {
-                Parameter param = new Parameter(
-                        entry.getKey(), entry.getValue());
-                parameters.add(param);
-            }
-        }
-        */
         String serviceTypeStr = null;
         switch (type) {
             case WFSOne:

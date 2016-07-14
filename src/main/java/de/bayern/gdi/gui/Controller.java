@@ -452,7 +452,7 @@ public class Controller {
                     }
                     name = tf.getUserData().toString();
                     value = tf.getText();
-                    if(l1.getText().equals(name)) {
+                    if (l1.getText().equals(name)) {
                         type = l2.getText();
                     } else {
                         type = l1.getText();
@@ -492,7 +492,7 @@ public class Controller {
                                 = this.dataBean.getAttributes();
         boolean ret = true;
         Validator validator = Validator.getInstance();
-        for(DataBean.Attribute attribute: attributes) {
+        for (DataBean.Attribute attribute: attributes) {
             if (!attribute.type.equals("")) {
                 if (!validator.isValid(attribute.type, attribute.value)) {
                     ret = false;
@@ -505,7 +505,9 @@ public class Controller {
             }
         }
         if (!failed.equals("")) {
-            statusBarText.setText(I18n.format("status.validation-fail", failed));
+            statusBarText.setText(
+                    I18n.format("status.validation-fail", failed)
+            );
         }
         return ret;
     }
@@ -518,7 +520,7 @@ public class Controller {
     @FXML protected void handleDownload(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if(validateInput()) {
+        if (validateInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             File selectedDir = dirChooser.showDialog(getPrimaryStage());
@@ -562,7 +564,7 @@ public class Controller {
     protected void handleSaveConfig(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if(validateInput()) {
+        if (validateInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             File downloadDir = dirChooser.showDialog(getPrimaryStage());
