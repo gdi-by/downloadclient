@@ -38,7 +38,13 @@ import org.reflections.util.FilterBuilder;
 
 public class Validator {
     private Map<String, Reflections> reflectionsList;
-    private static Validator instance;
+
+    private static final long FIVEHUNDRED = 500;
+
+
+    private static final class Holder {
+        static final Validator INSTANCE = new Validator();
+    }
 
     private Validator() {
         this.reflectionsList = new HashMap<String, Reflections>();
@@ -50,10 +56,9 @@ public class Validator {
      * @return the class
      */
     public static Validator getInstance() {
-        if (instance == null) {
-            instance = new Validator();
+        synchronized (Holder.INSTANCE) {
+            return Holder.INSTANCE;
         }
-        return instance;
     }
 
     /**
@@ -128,9 +133,6 @@ public class Validator {
     }
 
     private Reflections reflectionForPackage(String packageName) {
-        if (this.reflectionsList.containsKey(packageName)) {
-            return this.reflectionsList.get(packageName);
-        }
         List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
         classLoadersList.add(ClasspathHelper.contextClassLoader());
         classLoadersList.add(ClasspathHelper.staticClassLoader());
