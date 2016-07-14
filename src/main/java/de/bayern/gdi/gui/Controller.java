@@ -493,16 +493,20 @@ public class Controller {
         boolean ret = true;
         Validator validator = Validator.getInstance();
         for(DataBean.Attribute attribute: attributes) {
-            if (!validator.isValid(attribute.type, attribute.value)) {
-                ret = false;
-                if (failed.equals("") ) {
-                    failed = attribute.name;
-                } else {
-                    failed = failed + ", " + attribute.name;
+            if (!attribute.type.equals("")) {
+                if (!validator.isValid(attribute.type, attribute.value)) {
+                    ret = false;
+                    if (failed.equals("")) {
+                        failed = attribute.name;
+                    } else {
+                        failed = failed + ", " + attribute.name;
+                    }
                 }
             }
         }
-        statusBarText.setText(I18n.format("status.validation-fail", failed));
+        if (!failed.equals("")) {
+            statusBarText.setText(I18n.format("status.validation-fail", failed));
+        }
         return ret;
     }
 
