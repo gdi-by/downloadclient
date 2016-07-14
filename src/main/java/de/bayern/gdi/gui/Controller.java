@@ -487,9 +487,23 @@ public class Controller {
 
 
     private boolean validateInput() {
-
-        statusBarText.setText("RIGHT INPUT!");
-        return true;
+        String failed = "";
+        ArrayList<DataBean.Attribute> attributes
+                                = this.dataBean.getAttributes();
+        boolean ret = true;
+        Validator validator = Validator.getInstance();
+        for(DataBean.Attribute attribute: attributes) {
+            if (!validator.isValid(attribute.type, attribute.value)) {
+                ret = false;
+                if (failed.equals("") ) {
+                    failed = attribute.name;
+                } else {
+                    failed = failed + ", " + attribute.name;
+                }
+            }
+        }
+        statusBarText.setText(I18n.format("status.validation-fail", failed));
+        return ret;
     }
 
     /**
