@@ -527,32 +527,20 @@ public class Controller {
             if (selectedDir == null) {
                 return;
             }
-
             this.dataBean.setProcessingSteps(extractProcessingSteps());
 
-            Task task = new Task() {
-                @Override
-                protected Integer call() {
-                    String savePath = selectedDir.getPath();
-                    DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                    try {
-                        DownloadStepConverter dsc = new DownloadStepConverter(
-                                dataBean.getUserName(),
-                                dataBean.getPassword());
-                        JobList jl = dsc.convert(ds);
-                        Processor p = Processor.getInstance();
-                        p.addJob(jl);
-                    } catch (final ConverterException ce) {
-                        Platform.runLater(() -> {
-                            statusBarText.setText(ce.getMessage());
-                        });
-                    }
-                    return 0;
-                }
-            };
-            Thread th = new Thread(task);
-            th.setDaemon(true);
-            th.start();
+            String savePath = selectedDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                DownloadStepConverter dsc = new DownloadStepConverter(
+                        dataBean.getUserName(),
+                        dataBean.getPassword());
+                JobList jl = dsc.convert(ds);
+                Processor p = Processor.getInstance();
+                p.addJob(jl);
+            } catch (final ConverterException ce) {
+                statusBarText.setText(ce.getMessage());
+            }
         }
     }
 
