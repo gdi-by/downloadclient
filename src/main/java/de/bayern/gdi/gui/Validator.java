@@ -102,6 +102,15 @@ public class Validator {
             //others are in the java.utils package
             Reflections utilsreflections = reflectionForPackage("java.utils");
             allClasses.addAll(utilsreflections.getSubTypesOf(Object.class));
+            //Stuff like QName is in javax.xml.namespace
+            Reflections javaxNamespaceReflection = reflectionForPackage
+                    ("javax.xml.namespace");
+            allClasses.addAll(javaxNamespaceReflection
+                    .getSubTypesOf(Object.class));
+            //Geometries will also be found: com.vividsolutions.jts.geom
+            Reflections geometryReflection = reflectionForPackage
+                    ("com.vividsolutions.jts.geom");
+            allClasses.addAll(geometryReflection.getSubTypesOf(Object.class));
             for (Class oneClass : allClasses) {
                 if (oneClass.getName().toLowerCase().endsWith("." + className
                         .toLowerCase())) {
@@ -115,9 +124,9 @@ public class Validator {
         return Class.forName(className);
     }
 
-    private Reflections reflectionForPackage(String pacakgeName) {
-        if (this.reflectionsList.containsKey(pacakgeName)) {
-            return this.reflectionsList.get(pacakgeName);
+    private Reflections reflectionForPackage(String packageName) {
+        if (this.reflectionsList.containsKey(packageName)) {
+            return this.reflectionsList.get(packageName);
         }
         List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
         classLoadersList.add(ClasspathHelper.contextClassLoader());
@@ -130,10 +139,10 @@ public class Validator {
             ).setUrls(ClasspathHelper.forClassLoader(
                 classLoadersList.toArray(new ClassLoader[0])
             )).filterInputsBy(new FilterBuilder().
-                include(FilterBuilder.prefix(pacakgeName))
+                include(FilterBuilder.prefix(packageName))
             )
         );
-        this.reflectionsList.put(pacakgeName, refl);
+        this.reflectionsList.put(packageName, refl);
         return refl;
     }
 

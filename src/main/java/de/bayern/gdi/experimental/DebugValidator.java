@@ -52,6 +52,7 @@ public class DebugValidator {
         map.put("Double", "12,25");
         map.put("Float", "42.23");
         map.put("Short", "8000");
+        map.put("QName", "Test12");
         Set<Map.Entry<String, String>> entries = map.entrySet();
         Iterator it = entries.iterator();
         while(it.hasNext()) {
