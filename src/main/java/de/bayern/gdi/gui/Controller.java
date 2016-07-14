@@ -451,47 +451,54 @@ public class Controller {
         }
     }
 
+
+    private boolean validateInput() {
+        statusBarText.setText("RIGHT INPUT!");
+        return true;
+    }
+
     /**
      * Start the download.
      *
      * @param event The event
      */
     @FXML protected void handleDownload(ActionEvent event) {
-
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        File selectedDir = dirChooser.showDialog(getPrimaryStage());
-        if (selectedDir == null) {
-            return;
-        }
-
-        extractStoredQuery();
-        extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
-
-        Task task = new Task() {
-            @Override
-            protected Integer call() {
-                String savePath = selectedDir.getPath();
-                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                try {
-                    DownloadStepConverter dsc = new DownloadStepConverter(
-                        dataBean.getUserName(),
-                        dataBean.getPassword());
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (final ConverterException ce) {
-                    Platform.runLater(() -> {
-                        statusBarText.setText(ce.getMessage());
-                    });
-                }
-                return 0;
+        if(validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File selectedDir = dirChooser.showDialog(getPrimaryStage());
+            if (selectedDir == null) {
+                return;
             }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+
+            extractStoredQuery();
+            extractBoundingBox();
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+            Task task = new Task() {
+                @Override
+                protected Integer call() {
+                    String savePath = selectedDir.getPath();
+                    DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+                    try {
+                        DownloadStepConverter dsc = new DownloadStepConverter(
+                                dataBean.getUserName(),
+                                dataBean.getPassword());
+                        JobList jl = dsc.convert(ds);
+                        Processor p = Processor.getInstance();
+                        p.addJob(jl);
+                    } catch (final ConverterException ce) {
+                        Platform.runLater(() -> {
+                            statusBarText.setText(ce.getMessage());
+                        });
+                    }
+                    return 0;
+                }
+            };
+            Thread th = new Thread(task);
+            th.setDaemon(true);
+            th.start();
+        }
     }
 
     /**
@@ -500,31 +507,32 @@ public class Controller {
      */
     @FXML
     protected void handleSaveConfig(ActionEvent event) {
+        if(validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File downloadDir = dirChooser.showDialog(getPrimaryStage());
+            if (downloadDir == null) {
+                return;
+            }
 
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        File downloadDir = dirChooser.showDialog(getPrimaryStage());
-        if (downloadDir == null) {
-            return;
-        }
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+            File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-        if (configFile == null) {
-            return;
-        }
+            extractStoredQuery();
+            extractBoundingBox();
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
 
-        extractStoredQuery();
-        extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
-
-        String savePath = downloadDir.getPath();
-        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-        try {
-            ds.write(configFile);
-        } catch (IOException ex) {
-            log.log(Level.WARNING, ex.getMessage() , ex);
+            String savePath = downloadDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                ds.write(configFile);
+            } catch (IOException ex) {
+                log.log(Level.WARNING, ex.getMessage(), ex);
+            }
         }
     }
 
