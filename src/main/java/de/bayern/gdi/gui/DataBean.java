@@ -50,12 +50,24 @@ public class DataBean extends Observable {
     private Atom atomService;
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
-    private Map<String, String> attributes;
+    private ArrayList<Attribute> attributes;
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
+
+    public class Attribute {
+        public String name;
+        public String value;
+        public String type;
+
+        public Attribute(String name, String value, String type) {
+            this.name = name;
+            this.value = value;
+            this.type = type;
+        }
+    }
 
     /**
      * Constructor.
@@ -215,7 +227,7 @@ public class DataBean extends Observable {
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public Map<String, String> getAttributes() {
+    public ArrayList<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -223,7 +235,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(ArrayList<Attribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -232,8 +244,21 @@ public class DataBean extends Observable {
      * @param key The key
      * @param value The value
      */
-    public void addAttribute(String key, String value) {
-        this.attributes.put(key, value);
+    public void addAttribute(String key, String value, String type) {
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<Attribute>();
+        }
+        Attribute attr = new Attribute(key, value, type);
+        this.attributes.add(attr);
+    }
+
+    public String getAttributeValue(String key) {
+        for (Attribute attr: this.attributes) {
+            if (attr.name.equals(key)) {
+                return attr.value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -304,6 +329,15 @@ public class DataBean extends Observable {
                 serviceURL = serviceURL.substring(0, idx);
             }
         }
+
+        ArrayList<Attribute> attributes = getAttributes();
+        ArrayList<Parameter> parameters = new ArrayList<>(attributes.size());
+        for(Attribute attribute: attributes) {
+            Parameter param = new Parameter(
+                    attribute.name, attribute.value);
+            parameters.add(param);
+        }
+        /*
         Map<String, String> paramMap = getAttributes();
         ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
         for (Map.Entry<String, String> entry: paramMap.entrySet()) {
@@ -313,6 +347,7 @@ public class DataBean extends Observable {
                 parameters.add(param);
             }
         }
+        */
         String serviceTypeStr = null;
         switch (type) {
             case WFSOne:
