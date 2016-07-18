@@ -18,7 +18,25 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.MIMEType;
+import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
@@ -38,16 +56,7 @@ import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,10 +90,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -369,8 +374,6 @@ public class Controller {
                 this.valueAtomRefsys.setText(field.crs);
             }
         }
-
-
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
@@ -383,13 +386,39 @@ public class Controller {
         Set<Node> parameter =
             this.chainContainer.lookupAll("#process_parameter");
 
+        if (parameter.isEmpty()) {
+            return steps;
+        }
+
+        String format = this.dataBean.getAttributeValue("outputformat");
+        if (format == null || format.isEmpty()) {
+            // TODO: i18n
+            statusBarText.setText("No format set.");
+            return steps;
+        }
+
+        MIMETypes mtypes = Config.getInstance().getMimeTypes();
+        MIMEType mtype = mtypes.findByName(format);
+        if (mtype == null) {
+            // TODO: i18n
+            statusBarText.setText("No matching MIME type found.");
+            return steps;
+        }
+
         for (Node n: parameter) {
             Set<Node> vars = n.lookupAll("#process_var");
             Node nameNode = n.lookup("#process_name");
             ComboBox namebox = (ComboBox)nameNode;
-            String name =
-                ((ProcessingStepConfiguration)namebox.getValue())
-                    .getName();
+            ProcessingStepConfiguration psc =
+                (ProcessingStepConfiguration)namebox.getValue();
+
+            String name = psc.getName();
+
+            if (!psc.isCompatibleWithFormat(mtype.getType())) {
+                // TODO: i18n
+                statusBarText.setText(name + " is not compatible with format.");
+                continue;
+            }
 
             ProcessingStep step = new ProcessingStep();
             steps.add(step);

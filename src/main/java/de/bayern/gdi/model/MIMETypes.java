@@ -108,6 +108,27 @@ public class MIMETypes {
     }
 
     /**
+     * Find the MIME type for a given type name.
+     * @param name The name of the type.
+     * @return The MIME type if found null otherwise.
+     */
+    public MIMEType findByName(String name) {
+
+        if (name == null) {
+            return null;
+        }
+
+        for (MIMEType type: types) {
+            String n = type.getName();
+            if (n != null && n.equalsIgnoreCase(name)) {
+                return type;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Loads MIME from a file.
      * @param file The file to load the MIMETypes from.
      * @return The restored MIME.
