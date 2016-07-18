@@ -490,12 +490,11 @@ public class Controller {
         String failed = "";
         ArrayList<DataBean.Attribute> attributes
                                 = this.dataBean.getAttributes();
-        boolean ret = true;
+
         Validator validator = Validator.getInstance();
         for (DataBean.Attribute attribute: attributes) {
             if (!attribute.type.equals("")) {
                 if (!validator.isValid(attribute.type, attribute.value)) {
-                    ret = false;
                     if (failed.equals("")) {
                         failed = attribute.name;
                     } else {
@@ -508,8 +507,9 @@ public class Controller {
             statusBarText.setText(
                     I18n.format("status.validation-fail", failed)
             );
+            return false;
         }
-        return ret;
+        return true;
     }
 
     /**

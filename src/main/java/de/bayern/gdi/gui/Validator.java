@@ -38,10 +38,8 @@ import org.reflections.util.FilterBuilder;
 
 public class Validator {
     private Map<String, Reflections> reflectionsList;
-
-    private static final long FIVEHUNDRED = 500;
-
-
+    
+    /** Holds the instance. */
     private static final class Holder {
         static final Validator INSTANCE = new Validator();
     }
