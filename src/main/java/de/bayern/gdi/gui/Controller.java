@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +73,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -296,7 +296,7 @@ public class Controller {
                 getSelectionModel().getSelectedItem();
         if (item != null) {
             dataBean.setDataType(item);
-            dataBean.setAttributes(new HashMap<String, String>());
+            dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
             chooseType(item);
         }
     }
@@ -310,7 +310,8 @@ public class Controller {
         this.dataBean.addAttribute("outputformat",
             this.dataFormatChooser.getValue() != null
                 ? this.dataFormatChooser.getValue().toString()
-                : "");
+                : "",
+                "");
     }
 
     /**
@@ -332,14 +333,15 @@ public class Controller {
             referenceSystemChooser.getValue() != null
                 ? referenceSystemChooser.
                     getValue().getOldName()
-                : "EPSG:4326");
+                : "EPSG:4326",
+                "");
         if (referenceSystemChooser.getValue() != null) {
             this.mapWFS.setDisplayCRS(
                     referenceSystemChooser.getValue().getCRS());
         } else {
             try {
                 this.mapWFS.setDisplayCRS(
-                        this.dataBean.getAttributes().get("srsName"));
+                        this.dataBean.getAttributeValue("srsName"));
             } catch (FactoryException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -355,7 +357,8 @@ public class Controller {
         this.dataBean.addAttribute("VARIATION",
             this.atomVariationChooser.getValue() != null
                 ? this.atomVariationChooser.getValue().toString()
-                : "");
+                : "",
+                "");
         ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
                 .getSelectedItem();
         Atom.Item item = (Atom.Item) im.getItem();
@@ -420,14 +423,45 @@ public class Controller {
     private void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
         if (data instanceof StoredQueryModel) {
-            this.dataBean.setAttributes(new HashMap<String, String>());
-            Set<Node> textfields =
-                this.simpleWFSContainer.lookupAll("#parameter");
-            for (Node n: textfields) {
-                TextField f = (TextField)n;
-                this.dataBean.addAttribute(
-                    f.getUserData().toString(),
-                    f.getText());
+            this.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
+
+            ObservableList<Node> children
+                    = this.simpleWFSContainer.getChildren();
+            for (Node n: children) {
+                if (n.getClass() == HBox.class) {
+                    HBox hbox = (HBox) n;
+                    ObservableList<Node> hboxChildren = hbox.getChildren();
+                    String value = "";
+                    String name = "";
+                    String type = "";
+                    Label l1 = null;
+                    Label l2 = null;
+                    TextField tf = null;
+                    for (Node hn: hboxChildren) {
+                        if (hn.getClass() == TextField.class) {
+                            tf = (TextField) hn;
+                        }
+                        if (hn.getClass() == Label.class) {
+                            if (l1 == null) {
+                                l1 = (Label) hn;
+                            }
+                            if (l1 != (Label) hn) {
+                                l2 = (Label) hn;
+                            }
+                        }
+                    }
+                    name = tf.getUserData().toString();
+                    value = tf.getText();
+                    if (l1.getText().equals(name)) {
+                        type = l2.getText();
+                    } else {
+                        type = l1.getText();
+                    }
+                    this.dataBean.addAttribute(
+                            name,
+                            value,
+                            type);
+                }
             }
         }
     }
@@ -445,10 +479,37 @@ public class Controller {
             bbox += envelope.getY() + ",";
             bbox += (envelope.getX() + envelope.getWidth()) + ",";
             bbox += (envelope.getY() + envelope.getHeight());
-            this.dataBean.addAttribute("bbox", bbox);
+            this.dataBean.addAttribute("bbox", bbox, "");
         } else {
             // Raise an error?
         }
+    }
+
+
+    private boolean validateInput() {
+        String failed = "";
+        ArrayList<DataBean.Attribute> attributes
+                                = this.dataBean.getAttributes();
+
+        Validator validator = Validator.getInstance();
+        for (DataBean.Attribute attribute: attributes) {
+            if (!attribute.type.equals("")) {
+                if (!validator.isValid(attribute.type, attribute.value)) {
+                    if (failed.equals("")) {
+                        failed = attribute.name;
+                    } else {
+                        failed = failed + ", " + attribute.name;
+                    }
+                }
+            }
+        }
+        if (!failed.equals("")) {
+            statusBarText.setText(
+                    I18n.format("status.validation-fail", failed)
+            );
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -457,41 +518,30 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDownload(ActionEvent event) {
-
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        File selectedDir = dirChooser.showDialog(getPrimaryStage());
-        if (selectedDir == null) {
-            return;
-        }
-
         extractStoredQuery();
         extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
+        if (validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File selectedDir = dirChooser.showDialog(getPrimaryStage());
+            if (selectedDir == null) {
+                return;
+            }
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
 
-        Task task = new Task() {
-            @Override
-            protected Integer call() {
-                String savePath = selectedDir.getPath();
-                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                try {
-                    DownloadStepConverter dsc = new DownloadStepConverter(
+            String savePath = selectedDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                DownloadStepConverter dsc = new DownloadStepConverter(
                         dataBean.getUserName(),
                         dataBean.getPassword());
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (final ConverterException ce) {
-                    Platform.runLater(() -> {
-                        statusBarText.setText(ce.getMessage());
-                    });
-                }
-                return 0;
+                JobList jl = dsc.convert(ds);
+                Processor p = Processor.getInstance();
+                p.addJob(jl);
+            } catch (final ConverterException ce) {
+                statusBarText.setText(ce.getMessage());
             }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+        }
     }
 
     /**
@@ -500,31 +550,32 @@ public class Controller {
      */
     @FXML
     protected void handleSaveConfig(ActionEvent event) {
-
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        File downloadDir = dirChooser.showDialog(getPrimaryStage());
-        if (downloadDir == null) {
-            return;
-        }
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-        if (configFile == null) {
-            return;
-        }
-
         extractStoredQuery();
         extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
+        if (validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File downloadDir = dirChooser.showDialog(getPrimaryStage());
+            if (downloadDir == null) {
+                return;
+            }
 
-        String savePath = downloadDir.getPath();
-        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-        try {
-            ds.write(configFile);
-        } catch (IOException ex) {
-            log.log(Level.WARNING, ex.getMessage() , ex);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+            File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (configFile == null) {
+                return;
+            }
+
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+            String savePath = downloadDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                ds.write(configFile);
+            } catch (IOException ex) {
+                log.log(Level.WARNING, ex.getMessage(), ex);
+            }
         }
     }
 

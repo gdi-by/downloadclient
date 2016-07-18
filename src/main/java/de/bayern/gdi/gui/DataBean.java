@@ -50,12 +50,38 @@ public class DataBean extends Observable {
     private Atom atomService;
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
-    private Map<String, String> attributes;
+    private ArrayList<Attribute> attributes;
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
 
     private CatalogService catalogService;
+
+    /**
+     * Attribute representation.
+     */
+    public class Attribute {
+        /** name. */
+        public String name;
+
+        /** value. */
+        public String value;
+
+        /** type. */
+        public String type;
+
+        /**
+         * Constructor.
+         * @param name the name
+         * @param value the value
+         * @param type the type of the value
+         */
+        public Attribute(String name, String value, String type) {
+            this.name = name;
+            this.value = value;
+            this.type = type;
+        }
+    }
 
     /**
      * Constructor.
@@ -215,7 +241,7 @@ public class DataBean extends Observable {
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public Map<String, String> getAttributes() {
+    public ArrayList<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -223,7 +249,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(ArrayList<Attribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -231,9 +257,28 @@ public class DataBean extends Observable {
      * Adds an attribute for a selected Service.
      * @param key The key
      * @param value The value
+     * @param type the type of the value
      */
-    public void addAttribute(String key, String value) {
-        this.attributes.put(key, value);
+    public void addAttribute(String key, String value, String type) {
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<Attribute>();
+        }
+        Attribute attr = new Attribute(key, value, type);
+        this.attributes.add(attr);
+    }
+
+    /**
+     * gets the attributevlaue by key.
+     * @param key the key
+     * @return the value for the key
+     */
+    public String getAttributeValue(String key) {
+        for (Attribute attr: this.attributes) {
+            if (attr.name.equals(key)) {
+                return attr.value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -304,14 +349,12 @@ public class DataBean extends Observable {
                 serviceURL = serviceURL.substring(0, idx);
             }
         }
-        Map<String, String> paramMap = getAttributes();
-        ArrayList<Parameter> parameters = new ArrayList<>(paramMap.size());
-        for (Map.Entry<String, String> entry: paramMap.entrySet()) {
-            if (!entry.getValue().equals("")) {
-                Parameter param = new Parameter(
-                        entry.getKey(), entry.getValue());
-                parameters.add(param);
-            }
+
+        ArrayList<Attribute> attrs = getAttributes();
+        ArrayList<Parameter> parameters = new ArrayList<>(attrs.size());
+        for (Attribute attr: attrs) {
+            Parameter param = new Parameter(attr.name, attr.value);
+            parameters.add(param);
         }
         String serviceTypeStr = null;
         switch (type) {

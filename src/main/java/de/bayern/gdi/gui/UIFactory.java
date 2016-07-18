@@ -144,6 +144,7 @@ public class UIFactory {
         textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
+        //TODO - Save the type w/o the replace
         type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
         type.setMinWidth(LABEL_MIN_WIDTH);
         root.setMargin(label,

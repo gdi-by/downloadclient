@@ -186,6 +186,11 @@
       <artifactId>jts</artifactId>
       <version>1.13</version>
     </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
