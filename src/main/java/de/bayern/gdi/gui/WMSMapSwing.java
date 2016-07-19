@@ -282,6 +282,7 @@ public class WMSMapSwing extends Parent {
                             .toLowerCase())) {
                         baseLayer = outerLayer;
                         baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
                         layerFound = true;
                     }
                 }
@@ -290,6 +291,7 @@ public class WMSMapSwing extends Parent {
                             layer.toLowerCase())) {
                         baseLayer = wmsLayer.getParent();
                         baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
                         layerFound = true;
                         break;
                     }
