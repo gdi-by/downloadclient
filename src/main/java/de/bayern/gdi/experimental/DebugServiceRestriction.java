@@ -24,15 +24,22 @@ import java.net.URL;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
+
+/**
+ * Helper Class to Debug a Service Restriction easily.
+ */
 public class DebugServiceRestriction {
+
+    private DebugServiceRestriction() {
+
+    }
+    /**
+     * main.
+     * @param args 0 Argument will be URL
+     */
     public static void main(String[] args) {
         try {
-            URL url = new URL("http://www.geodaten.bayern.de/ogc/ogc_dtk25.cgi?" +
-                    "service=WMS&version=1.1.1&request=GetMap&width=1935&" +
-                    "height=1828&srs=EPSG:31468&" +
-                    "bbox=4367801.572000001,5606637.276000001," +
-                    "4370220.99,5608922.61&" +
-                    "layers=by_dtk25&styles=&format=image/tiff&");
+            URL url = new URL(args[0]);
             ServiceChecker.isRestricted(url);
         } catch (Exception e) {
             System.err.println(e);

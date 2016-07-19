@@ -267,6 +267,9 @@ public class Controller {
                 }
                 this.serviceURL.setText(url);
                 if (service.isRestricted()) {
+                    statusBarText.setText(
+                            I18n.format("status.service-needs-auth")
+                    );
                     this.serviceAuthenticationCbx.setSelected(true);
                     this.serviceUser.setDisable(false);
                     this.servicePW.setDisable(false);
@@ -616,6 +619,17 @@ public class Controller {
      */
     private void chooseService() {
         Task task = new Task() {
+            private void setAuth() {
+                Platform.runLater(() -> {
+                    statusBarText.setText(
+                            I18n.format("status.service-needs-auth")
+                    );
+                });
+                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                serviceAuthenticationCbx.setSelected(true);
+                serviceUser.setDisable(false);
+                servicePW.setDisable(false);
+            }
             @Override
             protected Integer call() throws Exception {
                 serviceURL.getScene().setCursor(Cursor.WAIT);
@@ -628,6 +642,21 @@ public class Controller {
                     dataBean.setUsername(username);
                     password = servicePW.getText();
                     dataBean.setPassword(password);
+                }
+                if (ServiceChecker.isRestricted(new URL(url))) {
+                    if (dataBean.getPassword() == null
+                            && dataBean.getUserName() == null) {
+                        setAuth();
+                        return 0;
+                    } else if (!dataBean.getPassword().equals("")
+                            && !dataBean.getUserName().equals("")) {
+                        setAuth();
+                        return 0;
+                    }
+                } else {
+                    serviceAuthenticationCbx.setSelected(false);
+                    serviceUser.setDisable(true);
+                    servicePW.setDisable(true);
                 }
                 if (url != null && !"".equals(url)) {
                     ServiceType st = ServiceChecker.checkService(
@@ -650,7 +679,9 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.atom"));
                                 });
-                                Atom atom = new Atom(url);
+                                Atom atom = new Atom(url,
+                                        dataBean.getUserName(),
+                                        dataBean.getPassword());
                                 dataBean.setAtomService(atom);
                                 break;
                             case WFSOne:
