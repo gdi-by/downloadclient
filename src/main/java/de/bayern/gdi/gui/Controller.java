@@ -644,12 +644,11 @@ public class Controller {
                     dataBean.setPassword(password);
                 }
                 if (ServiceChecker.isRestricted(new URL(url))) {
-                    if (dataBean.getPassword() == null
-                            && dataBean.getUserName() == null) {
-                        setAuth();
-                        return 0;
-                    } else if (dataBean.getPassword().equals("")
-                            && dataBean.getUserName().equals("")) {
+                    String pw = dataBean.getPassword();
+                    String un = dataBean.getUserName();
+
+                    if ((pw == null && un == null)
+                            || (pw.isEmpty() && un.isEmpty())) {
                         setAuth();
                         return 0;
                     }
