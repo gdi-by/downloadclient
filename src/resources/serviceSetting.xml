@@ -7,9 +7,9 @@
     </catalogues>
     <wms>
         <service>
-            <name>WMS Webaltas DE</name>
-            <url>http://sg.geodatenzentrum.de/wms_webatlasde.light</url>
-            <layer>webatlasde.light</layer>
+            <name>WMS WebAtlasDE.light Graustufen</name>
+            <url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
+            <layer>webatlasde.light_grau</layer>
         </service>
     </wms>
     <services>
