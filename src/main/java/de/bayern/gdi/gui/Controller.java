@@ -648,8 +648,8 @@ public class Controller {
                             && dataBean.getUserName() == null) {
                         setAuth();
                         return 0;
-                    } else if (!dataBean.getPassword().equals("")
-                            && !dataBean.getUserName().equals("")) {
+                    } else if (dataBean.getPassword().equals("")
+                            && dataBean.getUserName().equals("")) {
                         setAuth();
                         return 0;
                     }
