@@ -18,17 +18,20 @@
 
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.services.ServiceType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -111,5 +114,20 @@ public class ServiceChecker {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
+    }
+
+    public static boolean isRestricted(URL url) {
+        try{
+            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
+            HttpGet getRequest = HTTP.getGetRequest(url);
+            CloseableHttpResponse execute = httpCl.execute(getRequest);
+            StatusLine statusLine = execute.getStatusLine();
+            if(statusLine.getStatusCode() != 200) {
+                return true;
+            }
+        } catch (URISyntaxException | IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
     }
 }
