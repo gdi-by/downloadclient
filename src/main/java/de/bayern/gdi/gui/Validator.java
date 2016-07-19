@@ -64,7 +64,7 @@ public class Validator {
             if (!value.equals("")) {
                 try {
                     Class<?> aClass = classByName(className);
-                    if(aClass != null ) {
+                    if (aClass != null) {
                         return isCastableTo(aClass, value);
                     } else {
                         //https://github.com/gdi-by/downloadclient-test/
