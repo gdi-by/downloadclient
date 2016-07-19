@@ -64,7 +64,13 @@ public class Validator {
             if (!value.equals("")) {
                 try {
                     Class<?> aClass = classByName(className);
-                    return isCastableTo(aClass, value);
+                    if(aClass != null ) {
+                        return isCastableTo(aClass, value);
+                    } else {
+                        //https://github.com/gdi-by/downloadclient-test/
+                        // issues/24#issuecomment-233619602
+                        return true;
+                    }
                 } catch (ClassNotFoundException ex) {
                     return false;
                 }
