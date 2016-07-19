@@ -281,6 +281,8 @@ public class WMSMapSwing extends Parent {
                     if (outerLayer.getName().toLowerCase().equals(layer
                             .toLowerCase())) {
                         baseLayer = outerLayer;
+                        // we actually need to set both by hand, else the
+                        // request will fail
                         baseLayer.setTitle(layer);
                         baseLayer.setName(layer);
                         layerFound = true;
