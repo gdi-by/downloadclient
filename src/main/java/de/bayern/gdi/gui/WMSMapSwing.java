@@ -275,11 +275,26 @@ public class WMSMapSwing extends Parent {
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
             baseLayer = null;
-            for (Layer wmsLayer : layers) {
-                if (wmsLayer.getTitle().toLowerCase().equals(
-                        layer.toLowerCase())) {
-                    baseLayer = wmsLayer;
-                    baseLayer.setTitle(layer);
+            boolean layerFound = false;
+            for (Layer outerLayer : layers) {
+                if (outerLayer.getName() != null) {
+                    if (outerLayer.getName().toLowerCase().equals(layer
+                            .toLowerCase())) {
+                        baseLayer = outerLayer;
+                        baseLayer.setTitle(layer);
+                        layerFound = true;
+                    }
+                }
+                for (Layer wmsLayer : outerLayer.getChildren()) {
+                    if (wmsLayer.getName().toLowerCase().equals(
+                            layer.toLowerCase())) {
+                        baseLayer = wmsLayer.getParent();
+                        baseLayer.setTitle(layer);
+                        layerFound = true;
+                        break;
+                    }
+                }
+                if (layerFound) {
                     break;
                 }
             }
