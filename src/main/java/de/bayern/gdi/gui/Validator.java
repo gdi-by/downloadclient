@@ -39,7 +39,7 @@ public class Validator {
         javaSpaces.add("java.lang.");
         javaSpaces.add("java.util.");
         javaSpaces.add("javax.xml.namespace.");
-        javaSpaces.add("com.vividsolutions.jts.geom");
+        javaSpaces.add("com.vividsolutions.jts.geom.");
     }
 
     /**
