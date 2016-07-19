@@ -20,24 +20,14 @@ package de.bayern.gdi.gui;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
+import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
 public class Validator {
-    private Map<String, Reflections> reflectionsList;
+    private ArrayList<String> javaSpaces;
 
     /** Holds the instance. */
     private static final class Holder {
@@ -45,7 +35,11 @@ public class Validator {
     }
 
     private Validator() {
-        this.reflectionsList = new HashMap<String, Reflections>();
+        this.javaSpaces = new ArrayList<String>();
+        javaSpaces.add("java.lang.");
+        javaSpaces.add("java.util.");
+        javaSpaces.add("javax.xml.namespace.");
+        javaSpaces.add("com.vividsolutions.jts.geom");
     }
 
     /**
@@ -98,55 +92,22 @@ public class Validator {
     private Class classByName(String className) throws
             ClassNotFoundException {
         if (!className.contains(".")) {
-            // Some Basetypes are present in the java.lang package
-            Reflections langreflections = reflectionForPackage("java.lang");
-            Set<Class<? extends Object>> allClasses =
-                    langreflections.getSubTypesOf(Object.class);
-            //others are in the java.utils package
-            Reflections utilsreflections = reflectionForPackage("java.utils");
-            allClasses.addAll(utilsreflections.getSubTypesOf(Object.class));
-            //Stuff like QName is in javax.xml.namespace
-            Reflections javaxNamespaceReflection = reflectionForPackage(
-                    "javax.xml.namespace"
-            );
-            allClasses.addAll(javaxNamespaceReflection
-                    .getSubTypesOf(Object.class));
-            //Geometries will also be found: com.vividsolutions.jts.geom
-            Reflections geometryReflection = reflectionForPackage(
-                    "com.vividsolutions.jts.geom"
-            );
-            allClasses.addAll(geometryReflection.getSubTypesOf(Object.class));
-            for (Class oneClass : allClasses) {
-                if (oneClass.getName().toLowerCase().endsWith("." + className
-                        .toLowerCase())) {
-                    return oneClass;
+            className = className.substring(0, 1).toUpperCase()
+                   + className.substring(1, className.length());
+            ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+            for (String namespace: javaSpaces) {
+                try {
+                    Class<?> aClass =
+                            systemClassLoader.loadClass(namespace + className);
+                    return aClass;
+                } catch (ClassNotFoundException e) {
+
                 }
             }
-            //When not returned yet, we won't find it
-            throw new ClassNotFoundException("Class " + className + "not in "
-                    + "java.utils, java.lang found or "
-                    + "com.vividsolutions.jts.geom");
         }
-        return Class.forName(className);
+        return null;
     }
 
-    private Reflections reflectionForPackage(String packageName) {
-        List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
-        classLoadersList.add(ClasspathHelper.contextClassLoader());
-        classLoadersList.add(ClasspathHelper.staticClassLoader());
-        Reflections refl = new Reflections(
-                new ConfigurationBuilder().setScanners(
-                new SubTypesScanner(false
-                                /* don't exclude Object.class */),
-                new ResourcesScanner()
-            ).setUrls(ClasspathHelper.forClassLoader(
-                classLoadersList.toArray(new ClassLoader[0])
-            )).filterInputsBy(new FilterBuilder().
-                include(FilterBuilder.prefix(packageName))
-            )
-        );
-        this.reflectionsList.put(packageName, refl);
-        return refl;
-    }
+
 
 }
