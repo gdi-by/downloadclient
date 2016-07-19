@@ -263,6 +263,12 @@ public class DataBean extends Observable {
         if (this.attributes == null) {
             this.attributes = new ArrayList<Attribute>();
         }
+        for (Attribute attr: this.attributes) {
+            if (attr.name.equals(key)) {
+                attr.value = value;
+                return;
+            }
+        }
         Attribute attr = new Attribute(key, value, type);
         this.attributes.add(attr);
     }
