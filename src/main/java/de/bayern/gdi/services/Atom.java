@@ -20,21 +20,21 @@ package de.bayern.gdi.services;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
 import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.XML;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -158,6 +158,16 @@ public class Atom {
          */
         public String format;
 
+        /**
+         * username.
+         */
+        public String username;
+
+        /**
+         * password.
+         */
+        public String password;
+
         private NamespaceContext context;
 
         public Item() {
@@ -194,7 +204,16 @@ public class Atom {
          * Loads the "costly" details.
          */
         public void load() {
-            Document entryDoc = XML.getDocument(this.describedBy);
+            Document entryDoc = null;
+            try {
+                URL url = new URL(this.describedBy);
+                entryDoc = Atom.getDocument(url, this.username, this.password);
+            } catch (MalformedURLException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+            if (entryDoc == null) {
+                entryDoc = XML.getDocument(this.describedBy);
+            }
             format = getFormat(entryDoc);
             fields = getFieldForEntry(entryDoc);
         }
@@ -254,6 +273,28 @@ public class Atom {
         this(serviceURL, null, null);
     }
 
+    private static Document getDocument(URL url,
+                                        String username,
+                                        String password) {
+        Document doc = null;
+        if (ServiceChecker.simpleRestricted(url)) {
+            if (username == null && password == null) {
+                //This case shouldn't happen, we check for this beforehand
+                return null;
+            } else {
+                doc = XML.getDocument(url,
+                        username,
+                        password,
+                        false);
+            }
+        } else {
+            doc = XML.getDocument(url,
+                    null,
+                    null,
+                    false);
+        }
+        return doc;
+    }
     /**
      * Constuctor.
      * @param serviceURL the URL to the service
@@ -272,15 +313,12 @@ public class Atom {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         //System.out.println(this.serviceURL);
-        this.mainDoc = XML.getDocument(url,
-                this.username,
-                this.password,
-                false);
         this.nscontext = new NamespaceContextMap(
                 null , "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
                 "inspire_dls",
                 "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
+        this.mainDoc = getDocument(url, this.username, this.password);
         items = new ArrayList<>();
         String getTitle = "//title";
         this.title = (String) XML.xpath(this.mainDoc,
@@ -345,6 +383,8 @@ public class Atom {
             it.description = description.getTextContent();
             it.describedBy = describedBy.getTextContent();
             it.otherCRSs = getCRS(entry);
+            it.username = this.username;
+            it.password = this.password;
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\totherCRS: " + it.otherCRSs);
             it.defaultCRS = it.otherCRSs.get(0);

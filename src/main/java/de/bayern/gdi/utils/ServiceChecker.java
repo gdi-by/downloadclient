@@ -18,17 +18,23 @@
 
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.xml.xpath.XPathConstants;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.services.ServiceType;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -44,19 +50,56 @@ public class ServiceChecker {
     /**
      * checks the service type.
      * @param serviceURL the service url
+     * @return the type of service; null if failed
+     */
+    public static ServiceType checkService(
+            URL serviceURL
+    ) {
+        return checkService(serviceURL, null, null);
+    }
+
+    /**
+     * checks the service type.
+     * @param serviceURL the service url
      * @param user The optional user name.
      * @param password The optional password.
      * @return the type of service; null if failed
      */
     public static ServiceType checkService(
-        String serviceURL,
+            String serviceURL,
+            String user,
+            String password
+    ) {
+        try {
+            return checkService(new URL(serviceURL), user, password);
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
+    /**
+     * checks the service type.
+     * @param serviceURL the service url
+     * @param user The optional user name.
+     * @param password The optional password.
+     * @return the type of service; null if failed
+     */
+    public static ServiceType checkService(
+        URL serviceURL,
         String user,
         String password
     ) {
-        try {
-            Document doc = XML.getDocument(
-                new URL(serviceURL),
-                user, password);
+
+            Document doc = null;
+            if (simpleRestricted(serviceURL)) {
+                doc = XML.getDocument(
+                    serviceURL,
+                    user, password);
+            } else {
+                doc = XML.getDocument(
+                        serviceURL,
+                        null, null);
+            }
             if (doc == null) {
                 return null;
             }
@@ -107,9 +150,71 @@ public class ServiceChecker {
                     return ServiceType.Atom;
                 }
             }
-        } catch (IOException e) {
+
+        return null;
+    }
+
+    /**
+     * Checks if a Service is restricted.
+     * @param url the URL of the service
+     * @return true if restriced; false if not
+     */
+    public static boolean isRestricted(URL url) {
+        if (checkService(url) == ServiceType.Atom) {
+            if (simpleRestricted(url)) {
+                return true;
+            }
+            Document mainXML = XML.getDocument(url, false);
+            String describedByExpr =
+                    "/feed/entry/link[@rel='alternate']/@href[1]";
+            String describedBy = (String) XML.xpath(mainXML,
+                    describedByExpr,
+                    XPathConstants.STRING);
+            if (describedBy == null) {
+                return false;
+            }
+            try {
+                URL entryURL = new URL(describedBy);
+                if (simpleRestricted(url)) {
+                    return true;
+                }
+                Document entryDoc = XML.getDocument(entryURL, false);
+                String downloadURLExpr =
+                        "/feed/entry/link/@href[1]";
+                String downloadURLStr = (String) XML.xpath(entryDoc,
+                        downloadURLExpr,
+                        XPathConstants.STRING);
+                if (describedBy == null) {
+                    return false;
+                }
+                URL downloadURL = new URL(downloadURLStr);
+                return simpleRestricted(downloadURL);
+            } catch (MalformedURLException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        } else {
+            return simpleRestricted(url);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a URL is restricted.
+     * @param url the url
+     * @return true if restricted; false if not
+     */
+    public static boolean simpleRestricted(URL url) {
+        try {
+            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
+            HttpGet getRequest = HTTP.getGetRequest(url);
+            CloseableHttpResponse execute = httpCl.execute(getRequest);
+            StatusLine statusLine = execute.getStatusLine();
+            if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+                return true;
+            }
+        } catch (URISyntaxException | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return null;
+        return false;
     }
 }
