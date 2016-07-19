@@ -20,14 +20,18 @@ package de.bayern.gdi.gui;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
 public class Validator {
-    private ArrayList<String> javaSpaces;
+    private static final String[] JAVASPACES = {
+            "java.lang.",
+            "java.util.",
+            "javax.xml.namespace.",
+            "com.vividsolutions.jts.geom."
+    };
 
     /** Holds the instance. */
     private static final class Holder {
@@ -35,11 +39,6 @@ public class Validator {
     }
 
     private Validator() {
-        this.javaSpaces = new ArrayList<String>();
-        javaSpaces.add("java.lang.");
-        javaSpaces.add("java.util.");
-        javaSpaces.add("javax.xml.namespace.");
-        javaSpaces.add("com.vividsolutions.jts.geom.");
     }
 
     /**
@@ -95,7 +94,7 @@ public class Validator {
             className = className.substring(0, 1).toUpperCase()
                    + className.substring(1, className.length());
             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-            for (String namespace: javaSpaces) {
+            for (String namespace: JAVASPACES) {
                 try {
                     Class<?> aClass =
                             systemClassLoader.loadClass(namespace + className);
