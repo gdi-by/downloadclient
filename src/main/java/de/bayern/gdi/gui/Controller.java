@@ -18,22 +18,6 @@
 
 package de.bayern.gdi.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
@@ -56,7 +40,16 @@ import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
-
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -90,6 +83,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -262,6 +259,12 @@ public class Controller {
                     (ServiceModel)this.serviceList.getSelectionModel()
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
+                try {
+                    URL servUrl = new URL(url);
+                    service.setRestricted(ServiceChecker.isRestricted(servUrl));
+                } catch (MalformedURLException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
                 this.serviceURL.setText(url);
                 if (service.isRestricted()) {
                     this.serviceAuthenticationCbx.setSelected(true);
