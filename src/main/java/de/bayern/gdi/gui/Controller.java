@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import com.vividsolutions.jts.geom.Geometry;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
@@ -84,6 +85,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -749,6 +751,7 @@ public class Controller {
             switch (dataBean.getServiceType()) {
                 case WFSOne:
                 case WFSTwo:
+                    ReferencedEnvelope extendWFS = null;
                     List<WFSMeta.Feature> features =
                         dataBean.getWFSService().features;
                     List<WFSMeta.StoredQuery> queries =
@@ -757,6 +760,16 @@ public class Controller {
                         FXCollections.observableArrayList();
                     for (WFSMeta.Feature f : features) {
                         types.add(new FeatureModel(f));
+                        if (f.bbox != null) {
+                            if (extendWFS == null) {
+                                extendWFS = f.bbox;
+                            } else {
+                                extendWFS.expandToInclude(f.bbox);
+                            }
+                        }
+                    }
+                    if (extendWFS != null) {
+                        mapWFS.setExtend(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
                         types.add(new StoredQueryModel(s));
@@ -776,7 +789,9 @@ public class Controller {
                     //Polygons are always epsg:4326
                     // (http://www.georss.org/gml.html)
                     try {
+                        ReferencedEnvelope extendATOM = null;
                         atomCRS = CRS.decode(ATOM_CRS_STRING);
+                        Geometry all = null;
                         for (Atom.Item i : items) {
                             opts.add(new AtomItemModel(i));
                             WMSMapSwing.FeaturePolygon polygon =
@@ -786,6 +801,18 @@ public class Controller {
                                             i.id,
                                             this.atomCRS);
                             polygonList.add(polygon);
+                            if (i.polygon != null) {
+                                if (all == null) {
+                                    all = i.polygon;
+                                } else {
+                                    all = all.union(i.polygon);
+                                }
+                            }
+                        }
+                        if (all != null) {
+                            extendATOM = new ReferencedEnvelope(
+                                    all.getEnvelopeInternal(), atomCRS);
+                            mapAtom.setExtend(extendATOM);
                         }
                         mapAtom.drawPolygons(polygonList);
                     } catch (FactoryException e) {

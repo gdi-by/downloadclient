@@ -73,17 +73,19 @@ public class GMLCheckJob implements Job {
         this.files.add(file);
     }
 
-    private static void checkForProblems(File file)
+    private void checkForProblems(File file)
     throws JobExecutionException {
         Document doc = XML.getDocument(file);
         if (doc == null) {
-            throw new JobExecutionException(
-                I18n.format("gml.check.parsing.failed", file));
+            String msg = I18n.format("gml.check.parsing.failed", file);
+            logger.log(msg);
+            throw new JobExecutionException(msg);
         }
         String message = XML.xpathString(doc, ERROR_MESSAGE, null);
         if (message != null && !message.isEmpty()) {
-            throw new JobExecutionException(
-                I18n.format("gml.check.wfs.problem", message));
+            String msg = I18n.format("gml.check.wfs.problem", message);
+            logger.log(msg);
+            throw new JobExecutionException(msg);
         }
     }
 
@@ -94,8 +96,9 @@ public class GMLCheckJob implements Job {
             p.broadcastMessage(I18n.format("gml.check.start", file));
 
             if (!file.isFile() || !file.canRead()) {
-                throw new JobExecutionException(
-                    I18n.format("gml.check.not.accessible", file));
+                String msg = I18n.format("gml.check.not.accessible", file);
+                logger.log(msg);
+                throw new JobExecutionException(msg);
             }
 
             // If the document is large screen for
@@ -105,16 +108,22 @@ public class GMLCheckJob implements Job {
                 try {
                     if (XML.containsTags(file, EXCEPTION_INDICATORS) == null) {
                         // No indicators no cry ...
-                        p.broadcastMessage(I18n.getMsg("gml.check.passed"));
+                        String msg = I18n.getMsg("gml.check.passed");
+                        logger.log(msg);
+                        p.broadcastMessage(msg);
                         return;
                     }
                 } catch (XMLStreamException | IOException e) {
-                    throw new JobExecutionException(
-                        I18n.format("gml.check.processing.failed", file));
+                    String msg =
+                        I18n.format("gml.check.processing.failed", file);
+                    logger.log(msg);
+                    throw new JobExecutionException(msg);
                 }
             }
             checkForProblems(file);
-            p.broadcastMessage(I18n.getMsg("gml.check.passed"));
+            String msg = I18n.getMsg("gml.check.passed");
+            logger.log(msg);
+            p.broadcastMessage(msg);
         }
     }
 }
