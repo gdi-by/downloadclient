@@ -37,7 +37,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -134,10 +133,6 @@ public class Atom {
          * other CRSs.
          */
         public List<String> otherCRSs;
-        /**
-         * bbox.
-         */
-        public ReferencedEnvelope bbox;
         /**
          * fields.
          */
@@ -392,8 +387,6 @@ public class Atom {
             //        + " ms\tdefaultCRS: " + it.defaultCRS);
             //System.out.println((System.currentTimeMillis() - beginRead)
             //        + " ms\tformat: " + it.format);
-            it.bbox = new ReferencedEnvelope();
-
             WKTReader reader = new WKTReader(new GeometryFactory());
 
             // XXX: GML, anyone?
@@ -415,23 +408,7 @@ public class Atom {
 
             it.polygon = (Polygon)polygon;
 
-            String getCategories = "(category/@term)[1]";
-            String categoryTerm = (String)XML.xpath(entry,
-                getCategories,
-                XPathConstants.STRING,
-                this.nscontext);
-
-            CoordinateReferenceSystem crs = null;
-            try {
-                crs = decodeCRS(categoryTerm);
-                it.bbox = new ReferencedEnvelope(env, crs);
-            } catch (FactoryException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                it.bbox = null;
-                continue;
-            } finally {
-                items.add(it);
-            }
+            items.add(it);
         }
     }
 
