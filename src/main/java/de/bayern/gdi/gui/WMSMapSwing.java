@@ -821,7 +821,7 @@ public class WMSMapSwing extends Parent {
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
                 panel.add(mapPane, "grow");
-                if(source != null ) {
+                if (source != null) {
                     JLabel sourceLabel = new JLabel(source);
                     panel.add(sourceLabel, "grow");
                 }
