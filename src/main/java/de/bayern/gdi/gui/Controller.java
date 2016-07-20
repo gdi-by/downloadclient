@@ -643,19 +643,22 @@ public class Controller {
                     password = servicePW.getText();
                     dataBean.setPassword(password);
                 }
-                if (ServiceChecker.isRestricted(new URL(url))) {
-                    String pw = dataBean.getPassword();
-                    String un = dataBean.getUserName();
+                if ((username == null && password == null)
+                        || (username.equals("") && password.equals(""))) {
+                    if (ServiceChecker.isRestricted(new URL(url))) {
+                        String pw = dataBean.getPassword();
+                        String un = dataBean.getUserName();
 
-                    if ((pw == null && un == null)
-                            || (pw.isEmpty() && un.isEmpty())) {
-                        setAuth();
-                        return 0;
+                        if ((pw == null && un == null)
+                                || (pw.isEmpty() && un.isEmpty())) {
+                            setAuth();
+                            return 0;
+                        }
+                    } else {
+                        serviceAuthenticationCbx.setSelected(false);
+                        serviceUser.setDisable(true);
+                        servicePW.setDisable(true);
                     }
-                } else {
-                    serviceAuthenticationCbx.setSelected(false);
-                    serviceUser.setDisable(true);
-                    servicePW.setDisable(true);
                 }
                 if (url != null && !"".equals(url)) {
                     ServiceType st = ServiceChecker.checkService(

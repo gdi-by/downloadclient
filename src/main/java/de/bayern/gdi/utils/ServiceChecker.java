@@ -92,9 +92,13 @@ public class ServiceChecker {
 
             Document doc = null;
             if (simpleRestricted(serviceURL)) {
-                doc = XML.getDocument(
-                    serviceURL,
-                    user, password);
+                if (user != null && password != null) {
+                    doc = XML.getDocument(
+                            serviceURL,
+                            user, password);
+                } else {
+                    return null;
+                }
             } else {
                 doc = XML.getDocument(
                         serviceURL,
