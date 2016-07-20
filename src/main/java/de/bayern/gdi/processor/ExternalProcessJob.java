@@ -160,6 +160,20 @@ public class ExternalProcessJob implements Job {
         return list;
     }
 
+    private void broadcastMessage(Processor p, String msg) {
+        logger.log(msg);
+        if (p != null) {
+            p.broadcastMessage(msg);
+        }
+    }
+
+    private void broadcastException(Processor p, JobExecutionException jee) {
+        logger.log(jee.getMessage());
+        if (p != null) {
+            p.broadcastException(jee);
+        }
+    }
+
     /**
      * Runs the external process.
      * @throws JobExecutionException Thrown
@@ -172,9 +186,12 @@ public class ExternalProcessJob implements Job {
             this.fileTracker.push();
             if (!this.fileTracker.scan()) {
                 // TODO: i18n
-                throw new JobExecutionException(
-                    "Scanning dir '"
-                    + this.fileTracker.getDirectory() + "' failed.");
+                String msg =
+                    "Scanning dir '" + this.fileTracker.getDirectory()
+                    + "' failed.";
+                JobExecutionException jee = new JobExecutionException(msg);
+                broadcastException(p, jee);
+                throw jee;
             }
         }
 
@@ -184,27 +201,26 @@ public class ExternalProcessJob implements Job {
             builder.directory(this.fileTracker.getDirectory());
         }
 
-        if (p != null) {
-            p.broadcastMessage(
-                I18n.format("external.process.start", command));
-        }
+        broadcastMessage(p, I18n.format("external.process.start", command));
 
         try {
             Process process = builder.start();
             // XXX: Implement some kind of cancellation mechanism.
             int exitcode = process.waitFor();
             if (exitcode != 0) {
-                throw new JobExecutionException(
+                JobExecutionException jee = new JobExecutionException(
                     I18n.format("external.process.error", command, exitcode));
+                broadcastException(p, jee);
+                throw jee;
             }
         } catch (IOException | InterruptedException e) {
-            throw new JobExecutionException(
+            JobExecutionException jee = new JobExecutionException(
                 I18n.format("external.process.failed", command), e);
+            broadcastException(p, jee);
+            throw jee;
         }
 
-        if (p != null) {
-            p.broadcastMessage(
-                I18n.format("external.process.end", command));
-        }
+        broadcastMessage(p,
+            I18n.format("external.process.end", command));
     }
 }
