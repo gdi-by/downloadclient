@@ -121,6 +121,15 @@ public class ServiceSetting {
         return this.wms.get("name");
     }
 
+
+    /**
+     * gets the WMS Name.
+     * @return the WMS Name
+     */
+    public String getWMSSource() {
+        return this.wms.get("source");
+    }
+
     /**
      * gets the WMS Name.
      * @return the WMS Name
@@ -136,7 +145,8 @@ public class ServiceSetting {
                 "wms",
                 "url",
                 "layer",
-                "name");
+                "name",
+                "source");
     }
 
     private static final String SERVICE_XPATH =
