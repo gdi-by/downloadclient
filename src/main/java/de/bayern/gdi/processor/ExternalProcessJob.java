@@ -27,6 +27,7 @@ import java.util.Set;
 
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.Misc;
 
 /**
@@ -124,17 +125,21 @@ public class ExternalProcessJob implements Job {
 
     private FileTracker fileTracker;
 
+    private Log logger;
+
     public ExternalProcessJob() {
     }
 
     public ExternalProcessJob(
         String      command,
         FileTracker fileTracker,
-        Arg[]       arguments
+        Arg[]       arguments,
+        Log         logger
     ) {
         this.command     = command;
         this.arguments   = arguments;
         this.fileTracker = fileTracker;
+        this.logger      = logger;
     }
 
     private List<String> commandList() {

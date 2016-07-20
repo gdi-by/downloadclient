@@ -15,36 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.gui;
+package de.bayern.gdi.processor;
 
-import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.utils.Log;
 
 /**
- * Wrapper for Atom service items.
+ * A deferred job which ensures that a download logger is closed.
  */
-public class AtomItemModel implements ItemModel {
+public class CloseLogJob implements DeferredJob {
 
-    private Atom.Item item;
+    private Log logger;
 
-    /**
-     * Construct the wrapper.
-     * @param i the wrapped item
-     */
-    public AtomItemModel(Atom.Item i) {
-        this.item = i;
-    }
-
-    public Object getItem() {
-        return this.item;
-    }
-
-    public String getDataset() {
-        return item.id;
+    public CloseLogJob(Log logger) {
+        this.logger = logger;
     }
 
     @Override
-    public String toString() {
-        return this.item.title;
+    public void run(Processor p) {
+        logger.close();
     }
-
 }

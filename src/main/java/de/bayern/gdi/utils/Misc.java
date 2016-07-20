@@ -96,7 +96,7 @@ public final class Misc {
         File path = new File(parent, f);
         int count = 0;
         while (count < MAX_TRIES
-        && (path.exists() || tmpFiles.contains(path))) {
+        && (path.exists() || (tmpFiles != null && tmpFiles.contains(path)))) {
             ++count;
             f = prefix + DF_FORMAT.format(now) + "-" + count + "." + ext;
             path = new File(parent, f);

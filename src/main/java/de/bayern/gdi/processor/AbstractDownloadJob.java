@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob
@@ -38,13 +39,16 @@ public abstract class AbstractDownloadJob
     protected String password;
     /** Processor executing this job. */
     protected Processor processor;
+    /** The logger to log to. */
+    protected Log logger;
 
     public AbstractDownloadJob() {
     }
 
-    public AbstractDownloadJob(String user, String password) {
+    public AbstractDownloadJob(String user, String password, Log logger) {
         this.user = user;
         this.password = password;
+        this.logger = logger;
     }
 
     /**

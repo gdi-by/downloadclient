@@ -31,6 +31,7 @@ import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** Abstract class to do multiple file downloads. */
@@ -68,8 +69,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     public MultipleFileDownloadJob() {
     }
 
-    public MultipleFileDownloadJob(String user, String password) {
-        super(user, password);
+    public MultipleFileDownloadJob(String user, String password, Log logger) {
+        super(user, password, logger);
     }
 
     @Override
