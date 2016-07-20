@@ -30,7 +30,9 @@ import javafx.scene.control.ButtonType;
  */
 public class WarningPopup extends Alert {
 
-
+    /**
+     * Constructor.
+     */
     public WarningPopup() {
         this(Alert.AlertType.CONFIRMATION);
     }
@@ -39,6 +41,10 @@ public class WarningPopup extends Alert {
         super(alertType);
     }
 
+    /**
+     * Opens the Popup-Window with the given text.
+     * @param text the text
+     */
     public void popup(String text) {
         setTitle(I18n.getMsg("gui.confirm-exit"));
         setContentText(text);
