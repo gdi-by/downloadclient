@@ -18,8 +18,10 @@
 
 package de.bayern.gdi.processor;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -201,10 +203,38 @@ public class ExternalProcessJob implements Job {
             builder.directory(this.fileTracker.getDirectory());
         }
 
+        builder.redirectErrorStream(true);
+
         broadcastMessage(p, I18n.format("external.process.start", command));
 
         try {
             Process process = builder.start();
+            // Copy output of sub-process to log.
+            final BufferedReader in =
+                new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        String line;
+                        while ((line = in.readLine()) != null) {
+                            logger.log(line);
+                        }
+                    } catch (IOException ioe) {
+                        logger.log(ioe.getMessage());
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (IOException ioe) {
+                        }
+                    }
+
+                }
+            };
+            t.setDaemon(true);
+            t.start();
+
             // XXX: Implement some kind of cancellation mechanism.
             int exitcode = process.waitFor();
             if (exitcode != 0) {
