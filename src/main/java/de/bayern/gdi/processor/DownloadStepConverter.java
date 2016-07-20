@@ -37,6 +37,8 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
@@ -92,6 +94,18 @@ public class DownloadStepConverter {
                 I18n.format("dls.converter.not.dir", path));
         }
 
+        File dlLog = Misc.uniqueFile(path, "download-", ".log", null);
+        if (dlLog == null) {
+            // TODO: i18n
+            throw new ConverterException(
+                "Cannot create unique download filename");
+        }
+
+        Log logger = new Log(dlLog);
+
+        OpenLogJob olj = new OpenLogJob(logger);
+        CloseLogJob clj = new CloseLogJob(logger);
+
         FileTracker fileTracker = new FileTracker(path);
         if (!fileTracker.scan()) {
             // TODO: i18n
@@ -103,6 +117,7 @@ public class DownloadStepConverter {
 
         JobList jl = new JobList();
 
+        jl.addJob(olj);
 
         if (dls.getServiceType().equals("ATOM")) {
             createAtomDownload(jl, path, dls);
@@ -111,6 +126,8 @@ public class DownloadStepConverter {
         }
 
         jl.addJobs(psc.getJobs());
+
+        jl.addJob(clj);
 
         return jl;
     }
