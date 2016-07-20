@@ -164,7 +164,6 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             throw jee;
         }
         msg = I18n.format("atom.downloaded.success", numFiles);
-        logger.log(msg);
         broadcastMessage(msg);
     }
 }
