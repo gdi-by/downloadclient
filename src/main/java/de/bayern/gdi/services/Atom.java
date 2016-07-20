@@ -434,21 +434,50 @@ public class Atom {
     }
 
     private static final Pattern CRS_RE
-        = Pattern.compile("/([^/]+)/([^/]+)/([^/]+)$");
+        = Pattern.compile("(/([^/]+)/([^/]+)/([^/]+)$)" +
+            "|(EPSG:[0-9]*)");
 
+    private static final Pattern CRS_CODE
+            = Pattern.compile("[0-9]{2,}");
+
+    private static final int ZERO = 0;
     private static final int ONE = 1;
     private static final int TWO = 2;
     private static final int THREE = 3;
+    private static final int FOUR = 4;
 
     // XXX: This should be coded more defensively!
     private static CoordinateReferenceSystem decodeCRS(String term)
     throws FactoryException {
         Matcher m = CRS_RE.matcher(term);
         if (m.find()) {
-            if (m.group(TWO).equals("EPSG")) {
-                return CRS.decode(m.group(TWO) + ":" + m.group(THREE));
+            String authority = null;
+            String code = null;
+            if (m.group(TWO) != null && m.group(TWO).equals("EPSG")) {
+                authority = m.group(TWO);
+                Matcher c = CRS_CODE.matcher(m.group(THREE));
+                if (c.find()) {
+                    code = m.group(THREE);
+                } else {
+                    code = m.group(FOUR);
+                }
+            } else {
+                if (m.group(ONE) != null) {
+                    authority = m.group(ONE);
+                    Matcher c = CRS_CODE.matcher(m.group(THREE));
+                    if (c.find()) {
+                        code = m.group(THREE);
+                    } else {
+                        code = m.group(TWO);
+                    }
+                } else {
+                    authority = m.group(ZERO).substring(0,
+                            m.group(ZERO).lastIndexOf(":") );
+                    code = m.group(ZERO).substring(authority.length()+1,
+                            m.group(ZERO).length());
+                }
             }
-            return CRS.decode(m.group(ONE) + ":" + m.group(THREE));
+            return CRS.decode(authority + ":" + code);
         }
         throw new FactoryException("Cannot parse '" + term + "'");
     }
