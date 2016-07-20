@@ -34,7 +34,7 @@ public class WarningPopup extends Alert {
      * Constructor.
      */
     public WarningPopup() {
-        this(Alert.AlertType.CONFIRMATION);
+        this(AlertType.ERROR);
     }
 
     private WarningPopup(@NamedArg("alertType") AlertType alertType) {
@@ -46,7 +46,7 @@ public class WarningPopup extends Alert {
      * @param text the text
      */
     public void popup(String text) {
-        setTitle(I18n.getMsg("gui.confirm-exit"));
+        setTitle(I18n.getMsg("gui.failure"));
         setContentText(text);
         ButtonType confirm = new ButtonType(I18n.getMsg("gui.ok"),
                 ButtonBar.ButtonData.CANCEL_CLOSE);
