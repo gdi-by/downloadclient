@@ -434,8 +434,8 @@ public class Atom {
     }
 
     private static final Pattern CRS_RE
-        = Pattern.compile("(/([^/]+)/([^/]+)/([^/]+)$)" +
-            "|(EPSG:[0-9]*)");
+        = Pattern.compile("(/([^/]+)/([^/]+)/([^/]+)$)"
+            + "|(EPSG:[0-9]*)");
 
     private static final Pattern CRS_CODE
             = Pattern.compile("[0-9]{2,}");
@@ -472,8 +472,8 @@ public class Atom {
                     }
                 } else {
                     authority = m.group(ZERO).substring(0,
-                            m.group(ZERO).lastIndexOf(":") );
-                    code = m.group(ZERO).substring(authority.length()+1,
+                            m.group(ZERO).lastIndexOf(":"));
+                    code = m.group(ZERO).substring(authority.length() + 1,
                             m.group(ZERO).length());
                 }
             }
