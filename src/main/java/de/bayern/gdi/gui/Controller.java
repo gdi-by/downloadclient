@@ -928,10 +928,10 @@ public class Controller {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer());
+                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
         mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer());
+                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
         mapAtom.addEventHandler(PolygonClickedEvent.ANY,
                 new SelectedAtomPolygon());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
