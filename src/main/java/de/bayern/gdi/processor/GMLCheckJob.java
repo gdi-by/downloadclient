@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Document;
 
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.XML;
 
 /**
@@ -43,20 +44,25 @@ public class GMLCheckJob implements Job {
 
     private List<File> files;
 
+    private Log logger;
+
     private static final String[] EXCEPTION_INDICATORS = {
         "ExceptionReport"
     };
 
-    public GMLCheckJob() {
+    public GMLCheckJob(Log logger) {
+        this.logger = logger;
         this.files = new ArrayList<>();
     }
 
-    public GMLCheckJob(File file) {
+    public GMLCheckJob(File file, Log logger) {
+        this.logger = logger;
         this.files = new ArrayList<>();
         this.files.add(file);
     }
 
-    public GMLCheckJob(List<File> files) {
+    public GMLCheckJob(List<File> files, Log logger) {
+        this.logger = logger;
         this.files = files;
     }
 

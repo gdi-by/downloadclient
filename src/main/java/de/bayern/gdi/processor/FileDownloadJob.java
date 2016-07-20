@@ -28,6 +28,7 @@ import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** FileDownloadJob is a job to download features from a service. */
@@ -40,8 +41,12 @@ public class FileDownloadJob extends AbstractDownloadJob {
     }
 
     public FileDownloadJob(
-        String urlString, File file, String user, String password) {
-        super(user, password);
+        String urlString,
+        File   file,
+        String user,
+        String password,
+        Log    logger) {
+        super(user, password, logger);
         this.urlString = urlString;
         this.file = file;
     }

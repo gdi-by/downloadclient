@@ -33,6 +33,7 @@ import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Converts processing steps to jobs of external program calls. */
@@ -51,9 +52,10 @@ public class ProcessingStepConverter {
      * a list of jobs and appends the to the given list of jobs.
      * @param dls The download step.
      * @param fileTracker The file tracker for the external program calls.
+     * @param logger The logger to log to.
      * @throws ConverterException If something went wrong.
      */
-    public void convert(DownloadStep dls, FileTracker fileTracker)
+    public void convert(DownloadStep dls, FileTracker fileTracker, Log logger)
     throws ConverterException {
 
         ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
@@ -152,7 +154,8 @@ public class ProcessingStepConverter {
             ExternalProcessJob epj = new ExternalProcessJob(
                 command,
                 fileTracker,
-                params.toArray(new Arg[params.size()]));
+                params.toArray(new Arg[params.size()]),
+                logger);
 
             jobs.add(epj);
         }
