@@ -56,8 +56,18 @@ public class JobList implements Job {
     @Override
     public void run(Processor p) throws JobExecutionException {
         log.info("Executing job list");
-        for (Job job: jobs) {
-            job.run(p);
+        int i = 0;
+        try {
+            for (; i < jobs.size(); i++) {
+                jobs.get(i).run(p);
+            }
+        } finally {
+            for (i++; i < jobs.size(); i++) {
+                Job job = jobs.get(i);
+                if (job instanceof DeferredJob) {
+                    job.run(p);
+                }
+            }
         }
     }
 
