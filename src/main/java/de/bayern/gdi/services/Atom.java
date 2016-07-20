@@ -424,12 +424,14 @@ public class Atom {
             CoordinateReferenceSystem crs = null;
             try {
                 crs = decodeCRS(categoryTerm);
+                it.bbox = new ReferencedEnvelope(env, crs);
             } catch (FactoryException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
+                it.bbox = null;
                 continue;
+            } finally {
+                items.add(it);
             }
-            it.bbox = new ReferencedEnvelope(env, crs);
-            items.add(it);
         }
     }
 

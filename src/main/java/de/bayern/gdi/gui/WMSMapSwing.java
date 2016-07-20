@@ -859,7 +859,9 @@ public class WMSMapSwing extends Parent {
                     }
                 }
             }
+            //polygonLayer.setVisible(false);
             mapContent.addLayer(polygonLayer);
+            mapPane.repaint();
         } catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
