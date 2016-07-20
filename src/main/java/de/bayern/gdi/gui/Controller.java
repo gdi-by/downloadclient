@@ -400,16 +400,14 @@ public class Controller {
 
         String format = this.dataBean.getAttributeValue("outputformat");
         if (format == null || format.isEmpty()) {
-            // TODO: i18n
-            statusBarText.setText("No format set.");
+            statusBarText.setText(I18n.getMsg("gui.process.no.format"));
             return steps;
         }
 
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
-            // TODO: i18n
-            statusBarText.setText("No matching MIME type found.");
+            statusBarText.setText(I18n.getMsg("gui.process.format.not.found"));
             return steps;
         }
 
@@ -423,8 +421,8 @@ public class Controller {
             String name = psc.getName();
 
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
-                // TODO: i18n
-                statusBarText.setText(name + " is not compatible with format.");
+                statusBarText.setText(
+                        I18n.format("gui.process.not.compatible", name));
                 continue;
             }
 
