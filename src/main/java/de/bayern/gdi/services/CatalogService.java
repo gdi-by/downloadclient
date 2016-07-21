@@ -357,4 +357,12 @@ public class CatalogService {
         String xmlStr = writer.toString();
         return xmlStr.replace("{SUCHBEGRIFF}", search);
     }
+
+    /**
+     * returns the catalog url.
+     * @return the url of the catalog
+     */
+    public URL getUrl() {
+        return this.catalogURL;
+    }
 }

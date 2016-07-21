@@ -228,19 +228,31 @@ public class ServiceChecker {
      * @param url url
      * @return true if reachable; false if not
      */
+    public static boolean isReachable(String url) {
+        try {
+            return isReachable(new URL(url));
+        } catch (MalformedURLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return false;
+        }
+    }
+    /**
+     * Checks if a URL is reachable.
+     * @param url url
+     * @return true if reachable; false if not
+     */
     public static boolean isReachable(URL url) {
         try {
             HttpURLConnection huc = (HttpURLConnection) url.openConnection();
             huc.setRequestMethod("HEAD");
             int responseCode = huc.getResponseCode();
 
-            if (responseCode != HttpStatus.SC_NOT_FOUND) {
+            if (responseCode == HttpStatus.SC_NOT_FOUND) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            //log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }

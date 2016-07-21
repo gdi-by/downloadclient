@@ -108,6 +108,8 @@ public class Controller {
 
     private UIFactory factory;
 
+    private boolean catalogReachable;
+
     @FXML private Button buttonClose;
     @FXML private MenuBar mainMenu;
     @FXML private ListView serviceList;
@@ -192,6 +194,10 @@ public class Controller {
      * @param event the event
      */
     @FXML protected void handleSearch(KeyEvent event) {
+        if (!catalogReachable) {
+            statusBarText.setText(I18n.getMsg("status.catalog-not-available"));
+            return;
+        }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
         this.dataBean.reset();
@@ -261,6 +267,12 @@ public class Controller {
                     (ServiceModel)this.serviceList.getSelectionModel()
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
+                if (!ServiceChecker.isReachable(url)) {
+                    statusBarText.setText(
+                            I18n.format("status.service-not-available")
+                    );
+                    return;
+                }
                 try {
                     URL servUrl = new URL(url);
                     service.setRestricted(ServiceChecker.isRestricted(servUrl));
@@ -632,6 +644,16 @@ public class Controller {
                 serviceUser.setDisable(false);
                 servicePW.setDisable(false);
             }
+
+            private void setUnreachable() {
+                Platform.runLater(() -> {
+                    statusBarText.setText(
+                            I18n.format("status.service-not-available")
+                    );
+                });
+                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+            }
+
             @Override
             protected Integer call() throws Exception {
                 serviceURL.getScene().setCursor(Cursor.WAIT);
@@ -639,6 +661,10 @@ public class Controller {
                 String username = null;
                 String password = null;
                 url = serviceURL.getText();
+                if (!ServiceChecker.isReachable(url)) {
+                    setUnreachable();
+                    return 0;
+                }
                 if (serviceAuthenticationCbx.isSelected()) {
                     username = serviceUser.getText();
                     dataBean.setUsername(username);
@@ -950,29 +976,54 @@ public class Controller {
         this.serviceList.setItems(this.dataBean.getServicesAsList());
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
-
+        if (dataBean.getCatalogService() != null) {
+            catalogReachable = ServiceChecker.isReachable(
+                    dataBean.getCatalogService().getUrl()
+            );
+        } else {
+            catalogReachable = false;
+        }
         URL url = null;
         try {
             url = new URL(serviceSetting.getWMSUrl());
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
-        mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
-        mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
-        mapAtom.addEventHandler(PolygonClickedEvent.ANY,
-                new SelectedAtomPolygon());
-        mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
+        if (ServiceChecker.isReachable(url)) {
+            mapWFS = new WMSMapSwing(url,
+                    MAP_WIDTH,
+                    MAP_HEIGHT,
+                    serviceSetting.getWMSLayer(),
+                    serviceSetting.getWMSSource());
+            mapWFS.setCoordinateDisplay(basicX1,
+                    basicY1,
+                    basicX2,
+                    basicY2);
+            this.mapNodeWFS.getChildren().add(mapWFS);
+            this.simpleWFSContainer.setVisible(false);
+            this.basicWFSContainer.setVisible(false);
+            mapAtom = new WMSMapSwing(url,
+                    MAP_WIDTH,
+                    MAP_HEIGHT,
+                    serviceSetting.getWMSLayer(),
+                    serviceSetting.getWMSSource());
+            mapAtom.addEventHandler(PolygonClickedEvent.ANY,
+                    new SelectedAtomPolygon());
+            mapAtom.setCoordinateDisplay(atomX1,
+                    atomY1,
+                    atomX2,
+                    atomY2);
 
-        this.mapNodeWFS.getChildren().add(mapWFS);
-        this.mapNodeAtom.getChildren().add(mapAtom);
-
-        this.simpleWFSContainer.setVisible(false);
-        this.basicWFSContainer.setVisible(false);
-        this.atomContainer.setVisible(false);
-        this.progressSearch.setVisible(false);
+            this.mapNodeAtom.getChildren().add(mapAtom);
+            this.atomContainer.setVisible(false);
+            this.progressSearch.setVisible(false);
+        } else {
+            this.simpleWFSContainer.setVisible(false);
+            this.basicWFSContainer.setVisible(false);
+            this.atomContainer.setVisible(false);
+            this.progressSearch.setVisible(false);
+            statusBarText.setText(I18n.format("status.wms-not-available"));
+        }
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
     }
