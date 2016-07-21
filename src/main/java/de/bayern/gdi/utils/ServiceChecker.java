@@ -20,6 +20,7 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -220,5 +221,27 @@ public class ServiceChecker {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return false;
+    }
+
+    /**
+     * Checks if a URL is reachable.
+     * @param url url
+     * @return true if reachable; false if not
+     */
+    public static boolean isReachable(URL url) {
+        try {
+            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+            huc.setRequestMethod("HEAD");
+            int responseCode = huc.getResponseCode();
+
+            if (responseCode != HttpStatus.SC_NOT_FOUND) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return false;
+        }
     }
 }
