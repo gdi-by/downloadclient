@@ -17,9 +17,11 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.gui.WarningPopup;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javafx.application.Platform;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -64,6 +66,12 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         int status = response.getStatusLine().getStatusCode();
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
+            if (status == HttpStatus.SC_UNAUTHORIZED) {
+                Platform.runLater(() -> {
+                    WarningPopup wp = new WarningPopup();
+                    wp.popup(I18n.format("gui.wrong.user.and.pw"));
+                });
+            }
             throw new ClientProtocolException("Unexpected response status: "
                     + status);
         }

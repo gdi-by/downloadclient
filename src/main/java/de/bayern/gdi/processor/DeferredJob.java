@@ -15,36 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.gui;
-
-import de.bayern.gdi.services.Atom;
+package de.bayern.gdi.processor;
 
 /**
- * Wrapper for Atom service items.
+ * Job which is executed in a JobList even if a prior job failed.
  */
-public class AtomItemModel implements ItemModel {
-
-    private Atom.Item item;
-
-    /**
-     * Construct the wrapper.
-     * @param i the wrapped item
-     */
-    public AtomItemModel(Atom.Item i) {
-        this.item = i;
-    }
-
-    public Object getItem() {
-        return this.item;
-    }
-
-    public String getDataset() {
-        return item.id;
-    }
-
-    @Override
-    public String toString() {
-        return this.item.title;
-    }
-
+public interface DeferredJob extends Job {
 }

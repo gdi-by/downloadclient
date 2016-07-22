@@ -15,36 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.gui;
+package de.bayern.gdi.processor;
 
-import de.bayern.gdi.services.Atom;
+import java.io.IOException;
+
+import de.bayern.gdi.utils.Log;
 
 /**
- * Wrapper for Atom service items.
+ * A job to open a log file.
  */
-public class AtomItemModel implements ItemModel {
+public class OpenLogJob implements Job {
 
-    private Atom.Item item;
+    private Log logger;
 
-    /**
-     * Construct the wrapper.
-     * @param i the wrapped item
-     */
-    public AtomItemModel(Atom.Item i) {
-        this.item = i;
-    }
-
-    public Object getItem() {
-        return this.item;
-    }
-
-    public String getDataset() {
-        return item.id;
+    public OpenLogJob(Log logger) {
+        this.logger = logger;
     }
 
     @Override
-    public String toString() {
-        return this.item.title;
+    public void run(Processor p) throws JobExecutionException {
+        try {
+            logger.open();
+        } catch (IOException ioe) {
+            // TODO: i18n
+            throw new JobExecutionException("Cannot open log file", ioe);
+        }
     }
-
 }
+

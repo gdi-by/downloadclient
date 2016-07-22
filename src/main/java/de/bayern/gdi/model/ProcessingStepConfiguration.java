@@ -143,4 +143,25 @@ public class ProcessingStepConfiguration {
     public String toString() {
         return this.title;
     }
+
+    /**
+     * Checks if the format type of this processing step is compatible with
+     * a given type.
+     * @param format the format to check.
+     * @return true if the format is compatible false otherwise.
+     */
+    public boolean isCompatibleWithFormat(String format) {
+        if (format == null || this.formatType == null) {
+            return false;
+        }
+        for (String a: format.split(",")) {
+            a = a.trim();
+            for (String b: this.formatType.split(",")) {
+                if (a.equals(b.trim())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

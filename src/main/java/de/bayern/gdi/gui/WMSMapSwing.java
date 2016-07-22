@@ -49,6 +49,7 @@ import javafx.scene.layout.VBox;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -162,6 +163,7 @@ public class WMSMapSwing extends Parent {
     private String selectedPolygonID;
     private GeometryDescriptor geomDesc;
     private String geometryAttributeName;
+    private String source;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -238,7 +240,10 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Constructor.
-     *
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
@@ -248,17 +253,41 @@ public class WMSMapSwing extends Parent {
         this(new URL(mapURL), width, heigth, layer);
     }
 
-
-    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
-        this(mapURL, width, heigth, layer, null);
-    }
     /**
      * Constructor.
-     *
-     * @param mapURL The URL of the WMS Service
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
+     */
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
+        this(mapURL, width, heigth, layer, null, null);
+    }
+
+    /**
+     * Constructor.
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
+     * @param source source
      */
     public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
-                       CoordinateReferenceSystem displayCRS) {
+                       String source) {
+        this(mapURL, width, heigth, layer, null, source);
+    }
+
+    /**
+     * Constructor.
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
+     * @param source source
+     * @param displayCRS crs of display
+     */
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
+                       CoordinateReferenceSystem displayCRS, String source) {
         initGeotoolsLocale();
         try {
             if (displayCRS == null) {
@@ -266,6 +295,7 @@ public class WMSMapSwing extends Parent {
             } else {
                 setDisplayCRS(displayCRS);
             }
+            this.source = source;
             this.sb = new StyleBuilder();
             this.sf = CommonFactoryFinder.getStyleFactory(null);
             this.ff = CommonFactoryFinder.getFilterFactory2(null);
@@ -275,11 +305,30 @@ public class WMSMapSwing extends Parent {
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
             baseLayer = null;
-            for (Layer wmsLayer : layers) {
-                if (wmsLayer.getTitle().toLowerCase().equals(
-                        layer.toLowerCase())) {
-                    baseLayer = wmsLayer;
-                    baseLayer.setTitle(layer);
+            boolean layerFound = false;
+            for (Layer outerLayer : layers) {
+                if (outerLayer.getName() != null) {
+                    if (outerLayer.getName().toLowerCase().equals(layer
+                            .toLowerCase())) {
+                        baseLayer = outerLayer;
+                        // we actually need to set both by hand, else the
+                        // request will fail
+                        baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
+                        layerFound = true;
+                    }
+                }
+                for (Layer wmsLayer : outerLayer.getChildren()) {
+                    if (wmsLayer.getName().toLowerCase().equals(
+                            layer.toLowerCase())) {
+                        baseLayer = wmsLayer.getParent();
+                        baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
+                        layerFound = true;
+                        break;
+                    }
+                }
+                if (layerFound) {
                     break;
                 }
             }
@@ -772,6 +821,10 @@ public class WMSMapSwing extends Parent {
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
                 panel.add(mapPane, "grow");
+                if (source != null) {
+                    JLabel sourceLabel = new JLabel(source);
+                    panel.add(sourceLabel, "grow");
+                }
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
@@ -840,7 +893,9 @@ public class WMSMapSwing extends Parent {
                     }
                 }
             }
+            //polygonLayer.setVisible(false);
             mapContent.addLayer(polygonLayer);
+            mapPane.repaint();
         } catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }

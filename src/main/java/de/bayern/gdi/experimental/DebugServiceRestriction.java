@@ -15,36 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.gui;
 
-import de.bayern.gdi.services.Atom;
+package de.bayern.gdi.experimental;
+
+import de.bayern.gdi.utils.ServiceChecker;
+import java.net.URL;
 
 /**
- * Wrapper for Atom service items.
+ * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class AtomItemModel implements ItemModel {
 
-    private Atom.Item item;
+/**
+ * Helper Class to Debug a Service Restriction easily.
+ */
+public class DebugServiceRestriction {
 
+    private DebugServiceRestriction() {
+
+    }
     /**
-     * Construct the wrapper.
-     * @param i the wrapped item
+     * main.
+     * @param args 0 Argument will be URL
      */
-    public AtomItemModel(Atom.Item i) {
-        this.item = i;
+    public static void main(String[] args) {
+        try {
+            URL url = new URL(args[0]);
+            ServiceChecker.isRestricted(url);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
-
-    public Object getItem() {
-        return this.item;
-    }
-
-    public String getDataset() {
-        return item.id;
-    }
-
-    @Override
-    public String toString() {
-        return this.item.title;
-    }
-
 }

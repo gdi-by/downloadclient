@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob
@@ -38,13 +39,16 @@ public abstract class AbstractDownloadJob
     protected String password;
     /** Processor executing this job. */
     protected Processor processor;
+    /** The logger to log to. */
+    protected Log logger;
 
     public AbstractDownloadJob() {
     }
 
-    public AbstractDownloadJob(String user, String password) {
+    public AbstractDownloadJob(String user, String password, Log logger) {
         this.user = user;
         this.password = password;
+        this.logger = logger;
     }
 
     /**
@@ -72,6 +76,7 @@ public abstract class AbstractDownloadJob
      * @param message The message to broadcast.
      */
     protected void broadcastMessage(String message) {
+        logger.log(message);
         if (this.processor != null) {
             this.processor.broadcastMessage(message);
         }
@@ -82,6 +87,7 @@ public abstract class AbstractDownloadJob
      * @param e The exception to broadcast.
      */
     protected void broadcastException(JobExecutionException e) {
+        logger.log(e.getMessage());
         if (this.processor != null) {
             this.processor.broadcastException(e);
         }
@@ -100,12 +106,13 @@ public abstract class AbstractDownloadJob
      * @return an URL.
      * @throws JobExecutionException If the URL is not valid.
      */
-    protected static URL toURL(String urlString) throws JobExecutionException {
+    protected URL toURL(String urlString) throws JobExecutionException {
         try {
             return new URL(urlString);
         } catch (MalformedURLException mue) {
-            throw new JobExecutionException(
-                I18n.format("file.download.bad.url", urlString));
+            String msg = I18n.format("file.download.bad.url", urlString);
+            logger.log(msg);
+            throw new JobExecutionException(msg);
         }
     }
 
@@ -115,13 +122,14 @@ public abstract class AbstractDownloadJob
      * @return The GET request object.
      * @throws JobExecutionException If the URL is not valid.
      */
-    protected static HttpGet getGetRequest(URL url)
+    protected HttpGet getGetRequest(URL url)
         throws JobExecutionException {
         try {
             return HTTP.getGetRequest(url);
         } catch (URISyntaxException use) {
-            throw new JobExecutionException(
-                I18n.format("file.download.bad.url", url));
+            String msg = I18n.format("file.download.bad.url", url);
+            logger.log(msg);
+            throw new JobExecutionException(msg);
         }
     }
 }

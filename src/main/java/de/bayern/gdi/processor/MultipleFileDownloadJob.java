@@ -31,6 +31,7 @@ import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** Abstract class to do multiple file downloads. */
@@ -68,14 +69,15 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     public MultipleFileDownloadJob() {
     }
 
-    public MultipleFileDownloadJob(String user, String password) {
-        super(user, password);
+    public MultipleFileDownloadJob(String user, String password, Log logger) {
+        super(user, password, logger);
     }
 
     @Override
     public void bytesCounted(long count) {
-        broadcastMessage(
-            I18n.format("atom.bytes.downloaded", this.totalCount + count));
+        String msg = I18n.format(
+            "atom.bytes.downloaded", this.totalCount + count);
+        broadcastMessage(msg);
         this.currentCount = count;
     }
 
@@ -87,8 +89,9 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      */
     protected boolean downloadFile(DLFile dlf) throws JobExecutionException {
 
-        log.log(Level.INFO,
-            "Downloading '" + dlf.url + "' to '" + dlf.file + "'");
+        // TODO: i18n
+        String msg = "Downloading '" + dlf.url + "' to '" + dlf.file + "'";
+        log.log(Level.INFO, msg);
         this.currentCount = 0;
 
         CloseableHttpClient client = getClient(dlf.url);
@@ -133,11 +136,10 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
                         files.remove(i);
                     }
                 }
-                broadcastMessage(
-                    I18n.format(
-                        "atom.downloaded.files",
-                        numFiles - failed - files.size(),
-                        files.size()));
+                broadcastMessage(I18n.format(
+                    "atom.downloaded.files",
+                    numFiles - failed - files.size(),
+                    files.size()));
             }
             if (files.isEmpty()) {
                 break;
@@ -149,14 +151,19 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             }
         }
 
-        log.log(Level.INFO, "Bytes downloaded: " + this.totalCount);
+        // TODO: i18n
+        String msg = "Bytes downloaded: " + this.totalCount;
+        logger.log(msg);
+        log.log(Level.INFO, msg);
 
         if (failed > 0) {
-            throw new JobExecutionException(
-                I18n.format("atom.downloaded.failed",
-                    numFiles - failed, failed));
+            msg = I18n.format(
+                "atom.downloaded.failed", numFiles - failed, failed);
+            JobExecutionException jee = new JobExecutionException(msg);
+            broadcastException(jee);
+            throw jee;
         }
-        broadcastMessage(
-            I18n.format("atom.downloaded.success", numFiles));
+        msg = I18n.format("atom.downloaded.success", numFiles);
+        broadcastMessage(msg);
     }
 }

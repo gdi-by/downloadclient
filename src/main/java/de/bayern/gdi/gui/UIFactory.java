@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.gui;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.bayern.gdi.model.ConfigurationParameter;
@@ -144,6 +146,7 @@ public class UIFactory {
         textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
+        //TODO - Save the type w/o the replace
         type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
         type.setMinWidth(LABEL_MIN_WIDTH);
         root.setMargin(label,
@@ -201,6 +204,21 @@ public class UIFactory {
         root.setId("process_parameter");
 
         container.getChildren().add(root);
+    }
+
+    /**
+     * removes all Processing attributes.
+     * @param dataBean the databean
+     * @param container the container they should be removed from
+     */
+    public void removeAllChainAttributes(DataBean dataBean, VBox container) {
+        Collection<Node> nodeColl = new ArrayList<>();
+        for (Node node : container.getChildren()) {
+            if (node.getId().equals("process_parameter")) {
+                nodeColl.add(node);
+            }
+        }
+        container.getChildren().removeAll(nodeColl);
     }
 
     private void generateChainItem(

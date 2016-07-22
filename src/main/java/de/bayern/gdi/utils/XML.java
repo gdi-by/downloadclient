@@ -133,6 +133,17 @@ public class XML {
     /**
      * Gets an XML Document from a remote location.
      *
+     * @param url the URL
+     * @param nameSpaceaware if namespace aware or not
+     * @return and XML Document
+     */
+    public static Document getDocument(URL url, boolean nameSpaceaware) {
+        return getDocument(url, null, null, nameSpaceaware);
+    }
+
+    /**
+     * Gets an XML Document from a remote location.
+     *
      * @param url            the URL
      * @param userName       the Username {NULL if none needed}
      * @param password       the Password {NULLL if none needed}
