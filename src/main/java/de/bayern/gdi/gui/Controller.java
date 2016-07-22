@@ -224,7 +224,8 @@ public class Controller {
                         progressSearch.setVisible(true);
                     });
                     if (catalogReachable) {
-                        List<ServiceModel> catalog = dataBean.getCatalogService()
+                        List<ServiceModel> catalog =
+                                dataBean.getCatalogService()
                                 .getServicesByFilter(currentText);
                         for (ServiceModel entry : catalog) {
                             dataBean.addCatalogServiceToList(entry);
