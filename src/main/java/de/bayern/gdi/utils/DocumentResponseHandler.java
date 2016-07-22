@@ -53,9 +53,9 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
      * @param unauthorized The handler to set.
      */
     public static synchronized void setUnauthorized(
-        Unauthorized unauthorized, boolean headless) {
+        Unauthorized unauthorized) {
         DocumentResponseHandler.unauthorized = unauthorized;
-        DocumentResponseHandler.headless = headless;
+
     }
 
     private static synchronized void callUnauthorized() {
@@ -64,9 +64,16 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         }
     }
 
+    /**
+     * Constructor.
+     */
     public DocumentResponseHandler() {
     }
 
+    /**
+     * Constructor.
+     * @param wrapFactory the factory
+     */
     public DocumentResponseHandler(WrapInputStreamFactory wrapFactory) {
         this.wrapFactory = wrapFactory;
     }

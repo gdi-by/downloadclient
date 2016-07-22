@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import java.util.Optional;
 import javafx.beans.NamedArg;
@@ -28,7 +29,8 @@ import javafx.scene.control.ButtonType;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WarningPopup extends Alert {
+public class WarningPopup extends Alert
+        implements DocumentResponseHandler.Unauthorized {
 
     /**
      * Constructor.
@@ -41,6 +43,12 @@ public class WarningPopup extends Alert {
         super(alertType);
     }
 
+    /**
+     * Displays Poput Windows when the creds are wrong.
+     */
+    public void unauthorized() {
+        popup(I18n.getMsg("gui.wrong.user.and.pw"));
+    }
     /**
      * Opens the Popup-Window with the given text.
      * @param text the text

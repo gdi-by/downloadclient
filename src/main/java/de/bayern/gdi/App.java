@@ -17,11 +17,13 @@
  */
 package de.bayern.gdi;
 
-import java.io.IOException;
-
 import de.bayern.gdi.gui.Start;
+import de.bayern.gdi.gui.WarningPopup;
 import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.UnauthorizedLog;
+import java.io.IOException;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
@@ -124,10 +126,16 @@ public class App {
             Config.uninitialized();
         }
 
+        DocumentResponseHandler.Unauthorized unauthorized = null;
+        if (runHeadless(args)) {
+            unauthorized = new UnauthorizedLog();
+        } else {
+            unauthorized = new WarningPopup();
+        }
+        DocumentResponseHandler.setUnauthorized(unauthorized);
         if (runHeadless(args)) {
             System.exit(Headless.main(args, user(args), password(args)));
         }
-
         // Its kind of complicated to start a javafx application from
         // another class. See http://stackoverflow.com/a/25909862
         new Thread() {
