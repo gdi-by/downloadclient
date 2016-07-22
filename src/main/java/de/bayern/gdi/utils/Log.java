@@ -50,8 +50,9 @@ public class Log {
     public synchronized void open() throws IOException {
         if (this.out != null) {
             this.out.close();
-            this.out = new PrintWriter(new FileWriter(this.file), true);
+            this.out = null;
         }
+        this.out = new PrintWriter(new FileWriter(this.file), true);
     }
 
     /**
@@ -60,7 +61,7 @@ public class Log {
     public synchronized void log(String msg) {
         if (this.out != null) {
             Date now = new Date();
-            out.format("%s: %s", DF_FORMAT.format(now), msg);
+            out.format("%s: %s\n", DF_FORMAT.format(now), msg);
         }
     }
 

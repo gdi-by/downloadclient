@@ -101,7 +101,7 @@ public class DownloadStepConverter {
                 I18n.format("dls.converter.not.dir", path));
         }
 
-        File dlLog = Misc.uniqueFile(path, "download-", ".log", null);
+        File dlLog = Misc.uniqueFile(path, "download-", "log", null);
         if (dlLog == null) {
             // TODO: i18n
             throw new ConverterException(
