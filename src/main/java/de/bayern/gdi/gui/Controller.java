@@ -600,6 +600,7 @@ public class Controller {
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter xmlFilter =
                     new FileChooser.ExtensionFilter("xml files (*.xml)", "xml");
+            fileChooser.setInitialFileName("config.xml");
             fileChooser.getExtensionFilters().add(xmlFilter);
             fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
