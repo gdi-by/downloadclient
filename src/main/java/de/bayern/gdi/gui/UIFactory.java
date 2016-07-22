@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.gui;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.bayern.gdi.model.ConfigurationParameter;
@@ -202,6 +204,21 @@ public class UIFactory {
         root.setId("process_parameter");
 
         container.getChildren().add(root);
+    }
+
+    /**
+     * removes all Processing attributes.
+     * @param dataBean the databean
+     * @param container the container they should be removed from
+     */
+    public void removeAllChainAttributes(DataBean dataBean, VBox container) {
+        Collection<Node> nodeColl = new ArrayList<>();
+        for (Node node : container.getChildren()) {
+            if (node.getId().equals("process_parameter")) {
+                nodeColl.add(node);
+            }
+        }
+        container.getChildren().removeAll(nodeColl);
     }
 
     private void generateChainItem(
