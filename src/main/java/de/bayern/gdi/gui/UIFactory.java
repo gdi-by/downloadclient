@@ -204,6 +204,19 @@ public class UIFactory {
         container.getChildren().add(root);
     }
 
+    /**
+     * removes all Processing attributes.
+     * @param dataBean the databean
+     * @param container the container they should be removed from
+     */
+    public void removeAllChainAttributes(DataBean dataBean, VBox container) {
+        for (Node node : container.getChildren()) {
+            if (node.getId().equals("process_parameter")) {
+                container.getChildren().remove(node);
+            }
+        }
+    }
+
     private void generateChainItem(
         ProcessingStepConfiguration item,
         VBox container,
