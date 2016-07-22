@@ -39,6 +39,7 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 import java.io.File;
@@ -598,8 +599,20 @@ public class Controller {
             }
 
             FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(downloadDir);
+            FileChooser.ExtensionFilter xmlFilter =
+                    new FileChooser.ExtensionFilter("xml files (*.xml)",
+                            "xml");
+            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml" ,
+                    null);
+            fileChooser.setInitialFileName(uniqueName.getName());
+            fileChooser.getExtensionFilters().add(xmlFilter);
+            fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
+            }
             if (configFile == null) {
                 return;
             }
