@@ -598,8 +598,14 @@ public class Controller {
             }
 
             FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter xmlFilter = new FileChooser.ExtensionFilter("xml files (*.xml)", "xml");
+            fileChooser.getExtensionFilters().add(xmlFilter);
+            fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
+            }
             if (configFile == null) {
                 return;
             }
