@@ -196,7 +196,6 @@ public class Controller {
     @FXML protected void handleSearch(KeyEvent event) {
         if (!catalogReachable) {
             statusBarText.setText(I18n.getMsg("status.catalog-not-available"));
-            return;
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
@@ -224,13 +223,15 @@ public class Controller {
                     Platform.runLater(() -> {
                         progressSearch.setVisible(true);
                     });
-                    List<ServiceModel> catalog = dataBean.getCatalogService()
-                            .getServicesByFilter(currentText);
-                    for (ServiceModel entry: catalog) {
-                        dataBean.addCatalogServiceToList(entry);
-                        Platform.runLater(() -> {
-                            subentries.add(entry);
-                        });
+                    if (catalogReachable) {
+                        List<ServiceModel> catalog = dataBean.getCatalogService()
+                                .getServicesByFilter(currentText);
+                        for (ServiceModel entry : catalog) {
+                            dataBean.addCatalogServiceToList(entry);
+                            Platform.runLater(() -> {
+                                subentries.add(entry);
+                            });
+                        }
                     }
                     Platform.runLater(() -> {
                         progressSearch.setVisible(false);

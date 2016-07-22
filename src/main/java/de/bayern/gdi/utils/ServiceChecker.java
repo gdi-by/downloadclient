@@ -43,13 +43,14 @@ import org.w3c.dom.NodeList;
 public class ServiceChecker {
 
     private static final Logger log
-        = Logger.getLogger(ServiceChecker.class.getName());
+            = Logger.getLogger(ServiceChecker.class.getName());
 
     private ServiceChecker() {
     }
 
     /**
      * checks the service type.
+     *
      * @param serviceURL the service url
      * @return the type of service; null if failed
      */
@@ -61,9 +62,10 @@ public class ServiceChecker {
 
     /**
      * checks the service type.
+     *
      * @param serviceURL the service url
-     * @param user The optional user name.
-     * @param password The optional password.
+     * @param user       The optional user name.
+     * @param password   The optional password.
      * @return the type of service; null if failed
      */
     public static ServiceType checkService(
@@ -78,20 +80,23 @@ public class ServiceChecker {
         }
         return null;
     }
+
     /**
      * checks the service type.
+     *
      * @param serviceURL the service url
-     * @param user The optional user name.
-     * @param password The optional password.
+     * @param user       The optional user name.
+     * @param password   The optional password.
      * @return the type of service; null if failed
      */
     public static ServiceType checkService(
-        URL serviceURL,
-        String user,
-        String password
+            URL serviceURL,
+            String user,
+            String password
     ) {
+        Document doc = null;
 
-            Document doc = null;
+        if (isReachable(serviceURL)) {
             if (simpleRestricted(serviceURL)) {
                 if (user != null && password != null) {
                     doc = XML.getDocument(
@@ -105,62 +110,65 @@ public class ServiceChecker {
                         serviceURL,
                         null, null);
             }
-            if (doc == null) {
-                return null;
-            }
+        }
+        if (doc == null) {
+            return null;
+        }
 
-            //It seems that there is more than one implementation of this
-            //stuff...
-            final String wfs = "http://www.opengis.net/wfs/2.0";
-            NodeList nl = doc.getElementsByTagNameNS(wfs, "WFS_Capabilities");
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("WFS_Capabilities");
+
+        //It seems that there is more than one implementation of this
+        //stuff...
+        final String wfs = "http://www.opengis.net/wfs/2.0";
+        NodeList nl = doc.getElementsByTagNameNS(wfs, "WFS_Capabilities");
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("WFS_Capabilities");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("WFS_CAPABILITIES");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("wfs_capabilities");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("wfs:wfs_capabilities");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("WFS:wfs_capabilities");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("wfs:WFS_CAPABILITIES");
+        }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("WFS:WFS_CAPABILITIES");
+        }
+        if (nl.getLength() != 0) {
+            NamedNodeMap nnm = nl.item(0).getAttributes();
+            switch (nnm.getNamedItem("version").getNodeValue()) {
+                case "1.0.0":
+                case "1.1.0":
+                    return ServiceType.WFSOne;
+                case "2.0.0":
+                    return ServiceType.WFSTwo;
+                default:
+                    return null;
             }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("WFS_CAPABILITIES");
+        }
+        nl = doc.getElementsByTagName("feed");
+        if (nl.getLength() != 0) {
+            Node n = nl.item(0);
+            NamedNodeMap nnm = n.getAttributes();
+            String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
+            if (wfsVersion.toLowerCase().endsWith("atom")) {
+                return ServiceType.Atom;
             }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("wfs_capabilities");
-            }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("wfs:wfs_capabilities");
-            }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("WFS:wfs_capabilities");
-            }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("wfs:WFS_CAPABILITIES");
-            }
-            if (nl.getLength() == 0) {
-                nl = doc.getElementsByTagName("WFS:WFS_CAPABILITIES");
-            }
-            if (nl.getLength() != 0) {
-                NamedNodeMap nnm = nl.item(0).getAttributes();
-                switch (nnm.getNamedItem("version").getNodeValue()) {
-                    case "1.0.0":
-                    case "1.1.0":
-                        return ServiceType.WFSOne;
-                    case "2.0.0":
-                        return ServiceType.WFSTwo;
-                    default:
-                        return null;
-                }
-            }
-            nl = doc.getElementsByTagName("feed");
-            if (nl.getLength() != 0) {
-                Node n = nl.item(0);
-                NamedNodeMap nnm = n.getAttributes();
-                String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
-                if (wfsVersion.toLowerCase().endsWith("atom")) {
-                    return ServiceType.Atom;
-                }
-            }
+        }
 
         return null;
     }
 
     /**
      * Checks if a Service is restricted.
+     *
      * @param url the URL of the service
      * @return true if restriced; false if not
      */
@@ -205,6 +213,7 @@ public class ServiceChecker {
 
     /**
      * Checks if a URL is restricted.
+     *
      * @param url the url
      * @return true if restricted; false if not
      */
@@ -225,6 +234,7 @@ public class ServiceChecker {
 
     /**
      * Checks if a URL is reachable.
+     *
      * @param url url
      * @return true if reachable; false if not
      */
@@ -236,8 +246,10 @@ public class ServiceChecker {
             return false;
         }
     }
+
     /**
      * Checks if a URL is reachable.
+     *
      * @param url url
      * @return true if reachable; false if not
      */
