@@ -104,6 +104,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             FileResponseHandler frh
                 = new FileResponseHandler(dlf.file, wrapFactory);
             client.execute(httpget, frh);
+
             return true;
         } catch (IOException ioe) {
             return false;

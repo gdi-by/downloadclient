@@ -35,26 +35,18 @@ import org.w3c.dom.Document;
 public class DocumentResponseHandler implements ResponseHandler<Document> {
 
 
-    /** A hook to notify a frontend that there was an auth problem. */
-    public interface Unauthorized {
-        /** Called if an auth failed. */
-        void unauthorized();
-    }
-
     private WrapInputStreamFactory wrapFactory;
     private Boolean namespaceAware;
 
     private static Unauthorized unauthorized;
 
-    private static Boolean headless;
-
 
     /** Set the Unauthorized handler.
-     * @param unauthorized The handler to set.
+     * @param setUnauthorized The handler to set.
      */
     public static synchronized void setUnauthorized(
-        Unauthorized unauthorized) {
-        DocumentResponseHandler.unauthorized = unauthorized;
+        Unauthorized setUnauthorized) {
+        unauthorized = setUnauthorized;
 
     }
 

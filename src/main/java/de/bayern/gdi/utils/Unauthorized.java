@@ -18,27 +18,12 @@
 
 package de.bayern.gdi.utils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class UnauthorizedLog implements Unauthorized {
 
-    private static final Logger log
-            = Logger.getLogger(UnauthorizedLog.class.getName());
-
-    /**
-     * Constructor.
-     */
-    public UnauthorizedLog() {
-    }
-
-    /**
-     * writes to the log, when user and pw is wrong.
-     */
-    public void unauthorized() {
-        log.log(Level.SEVERE, I18n.getMsg("gui.wrong.user.and.pw"), this);
-    }
+/** A hook to notify a frontend that there was an auth problem. */
+public interface Unauthorized {
+    /** Called if an auth failed. */
+    void unauthorized();
 }

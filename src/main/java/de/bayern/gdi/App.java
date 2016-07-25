@@ -20,7 +20,9 @@ package de.bayern.gdi;
 import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.Unauthorized;
 import de.bayern.gdi.utils.UnauthorizedLog;
 import java.io.IOException;
 
@@ -126,7 +128,9 @@ public class App {
         }
 
         if (runHeadless(args)) {
-            DocumentResponseHandler.setUnauthorized(new UnauthorizedLog());
+            Unauthorized unauthorized = new UnauthorizedLog();
+            DocumentResponseHandler.setUnauthorized(unauthorized);
+            FileResponseHandler.setUnauthorized(unauthorized);
             System.exit(Headless.main(args, user(args), password(args)));
         }
         // Its kind of complicated to start a javafx application from

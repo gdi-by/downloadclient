@@ -37,6 +37,25 @@ import org.apache.http.client.ResponseHandler;
  */
 public class FileResponseHandler implements ResponseHandler<Boolean> {
 
+
+
+    private static Unauthorized unauthorized;
+
+    /** Set the Unauthorized handler.
+     * @param setUnauthorized The handler to set.
+     */
+    public static synchronized void setUnauthorized(
+            Unauthorized setUnauthorized) {
+        unauthorized = setUnauthorized;
+
+    }
+
+    private static synchronized void callUnauthorized() {
+        if (unauthorized != null) {
+            unauthorized.unauthorized();
+        }
+    }
+
     private static final Logger log
         = Logger.getLogger(FileResponseHandler.class.getName());
 
@@ -70,6 +89,9 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         int status = response.getStatusLine().getStatusCode();
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
+            if (status == HttpStatus.SC_UNAUTHORIZED) {
+                callUnauthorized();
+            }
             throw new ClientProtocolException("Unexpected response status: "
                     + status);
         }

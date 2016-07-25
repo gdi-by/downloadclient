@@ -18,8 +18,8 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Unauthorized;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
@@ -30,8 +30,7 @@ import javafx.scene.control.ButtonType;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WarningPopup extends Alert
-        implements DocumentResponseHandler.Unauthorized {
+public class WarningPopup extends Alert implements Unauthorized {
 
     /**
      * Constructor.
