@@ -959,7 +959,7 @@ public class Controller {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
-                if (mapWFS != null && !crsList.isEmpty()) {
+                if (!crsList.isEmpty()) {
                     this.referenceSystemChooser.setItems(crsList);
                     CRSModel crsm = crsList.get(0);
                     try {
