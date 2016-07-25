@@ -17,22 +17,22 @@
  */
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.utils.CountingInputStream;
+import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.HTTP;
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.RemoteFileState;
+import de.bayern.gdi.utils.WrapInputStreamFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-
-import de.bayern.gdi.utils.CountingInputStream;
-import de.bayern.gdi.utils.FileResponseHandler;
-import de.bayern.gdi.utils.HTTP;
-import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Log;
-import de.bayern.gdi.utils.WrapInputStreamFactory;
 
 /** Abstract class to do multiple file downloads. */
 public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
@@ -87,7 +87,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      * @return true if download succeed false otherwise.
      * @throws JobExecutionException If something went wrong.
      */
-    protected boolean downloadFile(DLFile dlf) throws JobExecutionException {
+    protected RemoteFileState downloadFile(DLFile dlf) throws
+            JobExecutionException {
 
         // TODO: i18n
         String msg = "Downloading '" + dlf.url + "' to '" + dlf.file + "'";
@@ -105,9 +106,11 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
                 = new FileResponseHandler(dlf.file, wrapFactory);
             client.execute(httpget, frh);
 
-            return true;
+            return RemoteFileState.SUCCESS;
+        } catch (ClientProtocolException cpe) {
+            return RemoteFileState.FATAL;
         } catch (IOException ioe) {
-            return false;
+            return RemoteFileState.RETRY;
         } finally {
             HTTP.closeGraceful(client);
             this.totalCount += this.currentCount;
@@ -127,8 +130,15 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         for (;;) {
             for (int i = 0; i < files.size();) {
                 DLFile file = files.get(i);
-                if (downloadFile(file)) {
+                RemoteFileState rfs = downloadFile(file);
+                if (RemoteFileState.SUCCESS == rfs) {
                     files.remove(i);
+                } else if (RemoteFileState.FATAL == rfs) {
+                    for (int j = i; j < files.size();) {
+                        files.remove(j);
+                        failed++;
+                    }
+                    i = files.size();
                 } else {
                     if (++file.tries < MAX_TRIES) {
                         i++;
