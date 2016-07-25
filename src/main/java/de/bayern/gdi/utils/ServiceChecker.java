@@ -258,11 +258,7 @@ public class ServiceChecker {
             HttpURLConnection huc = (HttpURLConnection) url.openConnection();
             huc.setRequestMethod("HEAD");
             int responseCode = huc.getResponseCode();
-
-            if (responseCode == HttpStatus.SC_NOT_FOUND) {
-                return false;
-            }
-            return true;
+            return responseCode != HttpStatus.SC_NOT_FOUND;
         } catch (IOException e) {
             //log.log(Level.SEVERE, e.getMessage(), e);
             return false;
