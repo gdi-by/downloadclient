@@ -30,7 +30,7 @@ import javax.xml.xpath.XPathConstants;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -220,7 +220,7 @@ public class ServiceChecker {
     public static boolean simpleRestricted(URL url) {
         try {
             CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
-            HttpGet getRequest = HTTP.getGetRequest(url);
+            HttpHead getRequest = HTTP.getHeadRequest(url);
             CloseableHttpResponse execute = httpCl.execute(getRequest);
             StatusLine statusLine = execute.getStatusLine();
             if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
