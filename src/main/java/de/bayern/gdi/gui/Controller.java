@@ -522,8 +522,8 @@ public class Controller {
     private void extractBoundingBox() {
         String bbox = "";
         Envelope2D envelope = null;
-        if (this.dataBean.getServiceType().equals(ServiceType.Atom) &&
-                mapAtom != null) {
+        if (this.dataBean.getServiceType().equals(ServiceType.Atom)
+                && mapAtom != null) {
             envelope = this.mapAtom.getBounds();
         } else if (mapWFS != null) {
             envelope = this.mapWFS.getBounds();
