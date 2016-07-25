@@ -74,8 +74,11 @@ public class FileDownloadJob extends AbstractDownloadJob {
             HttpGet httpget = getGetRequest(url);
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
-            throw new JobExecutionException(
-                I18n.getMsg("file.download.failed"), ioe);
+            JobExecutionException jee =
+                new JobExecutionException(
+                    I18n.getMsg("file.download.failed"), ioe);
+            broadcastException(jee);
+            throw jee;
         } finally {
             HTTP.closeGraceful(httpclient);
         }
