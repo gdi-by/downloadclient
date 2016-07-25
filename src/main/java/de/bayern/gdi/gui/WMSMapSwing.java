@@ -968,27 +968,44 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds(CoordinateReferenceSystem crs) {
-        if (this.coordinateX1TextField != null
-                && this.coordinateX2TextField != null
-                && this.coordinateY1TextField != null
-                && this.coordinateY2TextField != null) {
-            if (!this.coordinateX1TextField.getText()
-                    .toString().equals("")
-                    && !this.coordinateY1TextField.getText()
-                    .toString().equals("")
-                    && !this.coordinateX2TextField.getText()
-                    .toString().equals("")
-                    && !this.coordinateY2TextField.getText().
-                    toString().equals("")) {
+        return calculateBBox(this.coordinateX1TextField,
+                this.coordinateX2TextField,
+                this.coordinateY1TextField,
+                this.coordinateY2TextField,
+                crs);
+    }
+
+    /**
+     * Calculates the bounds for 4 different text fields.
+     * @param x1 tf with x1
+     * @param x2 tf with x2
+     * @param y1 tf with y1
+     * @param y2 tf with y2
+     * @param crs the CRS of the Bounding Box
+     * @return the bounding box
+     */
+    public static Envelope2D calculateBBox(TextField x1,
+                                           TextField x2,
+                                           TextField y1,
+                                           TextField y2,
+                                           CoordinateReferenceSystem crs) {
+        if (x1 != null
+                && x2 != null
+                && y1 != null
+                && y2 != null) {
+            if (!x1.getText().toString().equals("")
+                    && !x2.toString().equals("")
+                    && !y1.toString().equals("")
+                    && !y2.toString().equals("")) {
                 //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
-                        this.coordinateX1TextField.getText().toString());
+                        x1.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
-                        this.coordinateX2TextField.getText().toString());
+                        x2.getText().toString());
                 Double y1Coordinate = Double.parseDouble(
-                        this.coordinateY1TextField.getText().toString());
+                        y1.getText().toString());
                 Double y2Coordinate = Double.parseDouble(
-                        this.coordinateY2TextField.getText().toString());
+                        y2.getText().toString());
                 Envelope env = new ReferencedEnvelope(
                         x1Coordinate,
                         x2Coordinate,
@@ -1000,15 +1017,6 @@ public class WMSMapSwing extends Parent {
             }
         }
         return null;
-        /*
-        Component[] components = this.mapNode.getContent().getComponents();
-        for (Component c : components) {
-            if (c.getClass().equals(ExtJMapPane.class)) {
-                return ((ExtJMapPane) c).getSelectedEnvelope();
-            }
-        }
-        return null;
-        */
     }
 
     //TODO - Destructor for Swing Item with Maplayer Dispose

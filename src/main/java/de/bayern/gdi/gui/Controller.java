@@ -524,12 +524,22 @@ public class Controller {
     private void extractBoundingBox() {
         String bbox = "";
         Envelope2D envelope = null;
-        if (this.dataBean.getServiceType().equals(ServiceType.Atom)
-                && mapAtom != null) {
-            envelope = this.mapAtom.getBounds();
-
-        } else {
+        if (this.dataBean.getServiceType().equals(ServiceType.Atom)) {
+            //in Atom the bboxes are given by the extend of every dataset
+            envelope = null;
+        } else if (!this.dataBean.getServiceType().equals(ServiceType.Atom)
+                && mapWFS != null) {
             envelope = this.mapWFS.getBounds(
+                    referenceSystemChooser.
+                            getSelectionModel().
+                            getSelectedItem().
+                            getCRS()
+            );
+        } else {
+            envelope = mapWFS.calculateBBox(basicX1,
+                    basicX2,
+                    basicY1,
+                    basicY2,
                     referenceSystemChooser.
                             getSelectionModel().
                             getSelectedItem().
