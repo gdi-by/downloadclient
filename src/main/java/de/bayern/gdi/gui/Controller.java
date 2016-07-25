@@ -364,10 +364,10 @@ public class Controller {
                     getValue().getOldName()
                 : "EPSG:4326",
                 "");
-        if (referenceSystemChooser.getValue() != null) {
+        if (mapWFS != null && referenceSystemChooser.getValue() != null) {
             this.mapWFS.setDisplayCRS(
                     referenceSystemChooser.getValue().getCRS());
-        } else {
+        } else if (mapWFS != null) {
             try {
                 this.mapWFS.setDisplayCRS(
                         this.dataBean.getAttributeValue("srsName"));
@@ -521,10 +521,11 @@ public class Controller {
 
     private void extractBoundingBox() {
         String bbox = "";
-        Envelope2D envelope;
-        if (this.dataBean.getServiceType().equals(ServiceType.Atom)) {
+        Envelope2D envelope = null;
+        if (this.dataBean.getServiceType().equals(ServiceType.Atom) &&
+                mapAtom != null) {
             envelope = this.mapAtom.getBounds();
-        } else {
+        } else if (mapWFS != null) {
             envelope = this.mapWFS.getBounds();
         }
         if (envelope != null) {
@@ -1066,32 +1067,35 @@ public class Controller {
             EventHandler<Event> {
         @Override
         public void handle(Event event) {
-            String polygonName = mapAtom.getClickedPolygonName();
-            String polygonID = mapAtom.getClickedPolygonID();
+            if (mapAtom != null) {
+                String polygonName = mapAtom.getClickedPolygonName();
+                String polygonID = mapAtom.getClickedPolygonID();
 
-            if (polygonName != null && polygonID != null) {
-                if (polygonName.equals("#@#")) {
-                    statusBarText.setText(I18n.format(
-                            "status.polygon-intersect",
-                            polygonID));
-                    return;
-                }
-
-                ObservableList<ItemModel> items = serviceTypeChooser.getItems();
-                int i = 0;
-                for (i = 0; i < items.size(); i++) {
-                    AtomItemModel item = (AtomItemModel) items.get(i);
-                    Atom.Item aitem = (Atom.Item) item.getItem();
-                    if (aitem.id.equals(polygonID)) {
-                        break;
+                if (polygonName != null && polygonID != null) {
+                    if (polygonName.equals("#@#")) {
+                        statusBarText.setText(I18n.format(
+                                "status.polygon-intersect",
+                                polygonID));
+                        return;
                     }
-                }
-                Atom.Item oldItem = (Atom.Item) serviceTypeChooser
-                        .getSelectionModel()
-                        .getSelectedItem().getItem();
-                if (i < items.size() && !oldItem.id.equals(polygonID)) {
-                    serviceTypeChooser.setValue(items.get(i));
-                    chooseType(serviceTypeChooser.getValue());
+
+                    ObservableList<ItemModel> items =
+                            serviceTypeChooser.getItems();
+                    int i = 0;
+                    for (i = 0; i < items.size(); i++) {
+                        AtomItemModel item = (AtomItemModel) items.get(i);
+                        Atom.Item aitem = (Atom.Item) item.getItem();
+                        if (aitem.id.equals(polygonID)) {
+                            break;
+                        }
+                    }
+                    Atom.Item oldItem = (Atom.Item) serviceTypeChooser
+                            .getSelectionModel()
+                            .getSelectedItem().getItem();
+                    if (i < items.size() && !oldItem.id.equals(polygonID)) {
+                        serviceTypeChooser.setValue(items.get(i));
+                        chooseType(serviceTypeChooser.getValue());
+                    }
                 }
             }
         }
