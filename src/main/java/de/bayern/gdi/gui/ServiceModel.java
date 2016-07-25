@@ -96,7 +96,7 @@ public class ServiceModel {
     @Override
     public String toString() {
         if (this.restricted) {
-            return this.name + " - " + I18n.format("gui.restricted");
+            return  I18n.format("gui.restricted", this.name);
         }
         return this.name;
     }
