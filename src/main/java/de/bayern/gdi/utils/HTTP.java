@@ -28,6 +28,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
@@ -126,5 +127,15 @@ public final class HTTP {
      */
     public static HttpPost getPostRequest(URL url)  throws URISyntaxException {
         return new HttpPost(url.toURI());
+    }
+
+    /**
+     * Ret urns a configured Post request.
+     * @param url the URL to post to
+     * @return the POST Request Object
+     * @throws URISyntaxException if the url is not valid
+     */
+    public static HttpHead getHeadRequest(URL url)  throws URISyntaxException {
+        return new HttpHead(url.toURI());
     }
 }
