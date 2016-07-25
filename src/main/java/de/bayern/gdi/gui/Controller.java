@@ -231,10 +231,10 @@ public class Controller {
                                 .getServicesByFilter(currentText);
                         for (ServiceModel entry : catalog) {
                             dataBean.addCatalogServiceToList(entry);
-                            Platform.runLater(() -> {
-                                subentries.add(entry);
-                            });
                         }
+                        Platform.runLater(() -> {
+                            subentries.addAll(catalog);
+                        });
                     }
                     Platform.runLater(() -> {
                         progressSearch.setVisible(false);
