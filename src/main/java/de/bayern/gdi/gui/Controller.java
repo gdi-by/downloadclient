@@ -243,7 +243,9 @@ public class Controller {
                 }
             };
             Thread th = new Thread(task);
-            statusBarText.setText(I18n.getMsg("status.calling-service"));
+            if (catalogReachable) {
+                statusBarText.setText(I18n.getMsg("status.calling-service"));
+            }
             th.setDaemon(true);
             th.start();
         }
