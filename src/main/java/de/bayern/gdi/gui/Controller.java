@@ -758,6 +758,7 @@ public class Controller {
                     } else {
                         switch (st) {
                             case Atom:
+                                //TODO: Check deep if user/pw was correct
                                 Platform.runLater(() -> {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.atom"));
