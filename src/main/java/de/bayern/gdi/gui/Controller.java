@@ -848,7 +848,6 @@ public class Controller {
                         ReferencedEnvelope extendATOM = null;
                         atomCRS = CRS.decode(ATOM_CRS_STRING);
                         Geometry all = null;
-                        if (mapAtom != null) {
                             for (Atom.Item i : items) {
                                 opts.add(new AtomItemModel(i));
                                 WMSMapSwing.FeaturePolygon polygon =
@@ -866,13 +865,14 @@ public class Controller {
                                     }
                                 }
                             }
-                            if (all != null) {
-                                extendATOM = new ReferencedEnvelope(
-                                        all.getEnvelopeInternal(), atomCRS);
-                                mapAtom.setExtend(extendATOM);
+                            if (mapAtom != null) {
+                                if (all != null) {
+                                    extendATOM = new ReferencedEnvelope(
+                                            all.getEnvelopeInternal(), atomCRS);
+                                    mapAtom.setExtend(extendATOM);
+                                }
+                                mapAtom.drawPolygons(polygonList);
                             }
-                            mapAtom.drawPolygons(polygonList);
-                        }
                     } catch (FactoryException e) {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
