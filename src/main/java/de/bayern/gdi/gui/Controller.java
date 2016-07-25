@@ -39,6 +39,7 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 import java.io.File;
@@ -151,6 +152,7 @@ public class Controller {
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
+    @FXML private HBox processStepContainter;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
 
@@ -596,6 +598,19 @@ public class Controller {
     }
 
     /**
+     * Handle events on the process Chain Checkbox.
+     * @param event the event
+     */
+    @FXML
+    protected void handleChainCheckbox(ActionEvent event) {
+        if (chkChain.isSelected()) {
+            processStepContainter.setVisible(true);
+        } else {
+            factory.removeAllChainAttributes(this.dataBean, chainContainer);
+            processStepContainter.setVisible(false);
+        }
+    }
+    /**
      * Handle config saving.
      * @param event The event.
      */
@@ -612,8 +627,20 @@ public class Controller {
             }
 
             FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(downloadDir);
+            FileChooser.ExtensionFilter xmlFilter =
+                    new FileChooser.ExtensionFilter("xml files (*.xml)",
+                            "xml");
+            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml" ,
+                    null);
+            fileChooser.setInitialFileName(uniqueName.getName());
+            fileChooser.getExtensionFilters().add(xmlFilter);
+            fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
+            }
             if (configFile == null) {
                 return;
             }
@@ -1028,6 +1055,7 @@ public class Controller {
         }
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
+        this.processStepContainter.setVisible(false);
     }
 
     /**
