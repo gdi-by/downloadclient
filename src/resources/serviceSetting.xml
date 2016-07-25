@@ -8,7 +8,7 @@
     <wms>
         <service>
             <name>WMS WebAtlasDE.light Graustufen</name>
-            <url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
+            <url>htp://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
             <layer>webatlasde.light_grau</layer>
             <source>© GeoBasis-DE / BKG </source>
         </service>

@@ -823,7 +823,7 @@ public class Controller {
                             }
                         }
                     }
-                    if (extendWFS != null) {
+                    if (mapWFS != null && extendWFS != null) {
                         mapWFS.setExtend(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
@@ -847,29 +847,31 @@ public class Controller {
                         ReferencedEnvelope extendATOM = null;
                         atomCRS = CRS.decode(ATOM_CRS_STRING);
                         Geometry all = null;
-                        for (Atom.Item i : items) {
-                            opts.add(new AtomItemModel(i));
-                            WMSMapSwing.FeaturePolygon polygon =
-                                    new WMSMapSwing.FeaturePolygon(
-                                            i.polygon,
-                                            i.title,
-                                            i.id,
-                                            this.atomCRS);
-                            polygonList.add(polygon);
-                            if (i.polygon != null) {
-                                if (all == null) {
-                                    all = i.polygon;
-                                } else {
-                                    all = all.union(i.polygon);
+                        if (mapAtom != null) {
+                            for (Atom.Item i : items) {
+                                opts.add(new AtomItemModel(i));
+                                WMSMapSwing.FeaturePolygon polygon =
+                                        new WMSMapSwing.FeaturePolygon(
+                                                i.polygon,
+                                                i.title,
+                                                i.id,
+                                                this.atomCRS);
+                                polygonList.add(polygon);
+                                if (i.polygon != null) {
+                                    if (all == null) {
+                                        all = i.polygon;
+                                    } else {
+                                        all = all.union(i.polygon);
+                                    }
                                 }
                             }
+                            if (all != null) {
+                                extendATOM = new ReferencedEnvelope(
+                                        all.getEnvelopeInternal(), atomCRS);
+                                mapAtom.setExtend(extendATOM);
+                            }
+                            mapAtom.drawPolygons(polygonList);
                         }
-                        if (all != null) {
-                            extendATOM = new ReferencedEnvelope(
-                                    all.getEnvelopeInternal(), atomCRS);
-                            mapAtom.setExtend(extendATOM);
-                        }
-                        mapAtom.drawPolygons(polygonList);
                     } catch (FactoryException e) {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
@@ -890,7 +892,9 @@ public class Controller {
             statusBarText.setText(I18n.format("status.ready"));
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
-            mapAtom.highlightSelectedPolygon(item.id);
+            if (mapAtom != null) {
+                mapAtom.highlightSelectedPolygon(item.id);
+            }
             List<Atom.Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
@@ -952,7 +956,7 @@ public class Controller {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
-                if (!crsList.isEmpty()) {
+                if (mapWFS != null && !crsList.isEmpty()) {
                     this.referenceSystemChooser.setItems(crsList);
                     CRSModel crsm = crsList.get(0);
                     try {
@@ -1018,7 +1022,7 @@ public class Controller {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        if (ServiceChecker.isReachable(url)) {
+        if (url != null && ServiceChecker.isReachable(url)) {
             mapWFS = new WMSMapSwing(url,
                     MAP_WIDTH,
                     MAP_HEIGHT,
@@ -1029,8 +1033,7 @@ public class Controller {
                     basicX2,
                     basicY2);
             this.mapNodeWFS.getChildren().add(mapWFS);
-            this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(false);
+
             mapAtom = new WMSMapSwing(url,
                     MAP_WIDTH,
                     MAP_HEIGHT,
@@ -1044,15 +1047,13 @@ public class Controller {
                     atomY2);
 
             this.mapNodeAtom.getChildren().add(mapAtom);
-            this.atomContainer.setVisible(false);
-            this.progressSearch.setVisible(false);
         } else {
-            this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(false);
-            this.atomContainer.setVisible(false);
-            this.progressSearch.setVisible(false);
             statusBarText.setText(I18n.format("status.wms-not-available"));
         }
+        this.atomContainer.setVisible(false);
+        this.progressSearch.setVisible(false);
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
         this.processStepContainter.setVisible(false);
