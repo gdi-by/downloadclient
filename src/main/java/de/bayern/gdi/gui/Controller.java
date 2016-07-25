@@ -524,27 +524,32 @@ public class Controller {
     private void extractBoundingBox() {
         String bbox = "";
         Envelope2D envelope = null;
-        if (this.dataBean.getServiceType().equals(ServiceType.Atom)) {
-            //in Atom the bboxes are given by the extend of every dataset
-            envelope = null;
-        } else if (!this.dataBean.getServiceType().equals(ServiceType.Atom)
-                && mapWFS != null) {
-            envelope = this.mapWFS.getBounds(
-                    referenceSystemChooser.
-                            getSelectionModel().
-                            getSelectedItem().
-                            getCRS()
-            );
-        } else {
-            envelope = mapWFS.calculateBBox(basicX1,
-                    basicX2,
-                    basicY1,
-                    basicY2,
-                    referenceSystemChooser.
-                            getSelectionModel().
-                            getSelectedItem().
-                            getCRS()
-            );
+        switch this.dataBean.getServiceType() {
+            ServiceType.Atom:
+                //in Atom the bboxes are given by the extend of every dataset
+                break;
+            ServiceType.WFSOne:
+            ServiceType.WFSTwo:
+                if (mapWFS != null) {
+                    envelope = this.mapWFS.getBounds(
+                            referenceSystemChooser.
+                                    getSelectionModel().
+                                    getSelectedItem().
+                                    getCRS());
+                } else {
+                    envelope = mapWFS.calculateBBox(basicX1,
+                            basicX2,
+                            basicY1,
+                            basicY2,
+                            referenceSystemChooser.
+                                    getSelectionModel().
+                                    getSelectedItem().
+                                    getCRS()
+                }
+                break;
+            default:
+                break;
+
         }
         if (envelope != null) {
             bbox += envelope.getX() + ",";
