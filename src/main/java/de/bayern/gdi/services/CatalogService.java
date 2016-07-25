@@ -133,7 +133,7 @@ public class CatalogService {
                     context);
             this.providerName = providerNameNode.getTextContent();
             String getRecordsURLExpr = "//ows:OperationsMetadata"
-                    + "/ows:Operation[@name='DescribeRecord']"
+                    + "/ows:Operation[@name='GetRecords']"
                     + "/ows:DCP"
                     + "/ows:HTTP"
                     + "/ows:Post"
@@ -239,8 +239,6 @@ public class CatalogService {
                 String serviceType = (String) XML.xpath(serviceN,
                         typeExpr,
                         XPathConstants.STRING, context);
-
-
                 String serviceTypeVersionExpr =
                         "gmd:identificationInfo"
                                 + "/srv:SV_ServiceIdentification"
