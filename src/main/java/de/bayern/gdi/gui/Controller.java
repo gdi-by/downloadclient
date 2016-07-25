@@ -527,8 +527,14 @@ public class Controller {
         if (this.dataBean.getServiceType().equals(ServiceType.Atom)
                 && mapAtom != null) {
             envelope = this.mapAtom.getBounds();
-        } else if (mapWFS != null) {
-            envelope = this.mapWFS.getBounds();
+
+        } else {
+            envelope = this.mapWFS.getBounds(
+                    referenceSystemChooser.
+                            getSelectionModel().
+                            getSelectedItem().
+                            getCRS()
+            );
         }
         if (envelope != null) {
             bbox += envelope.getX() + ",";

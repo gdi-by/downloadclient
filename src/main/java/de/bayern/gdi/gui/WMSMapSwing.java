@@ -959,6 +959,15 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
+        return getBounds(this.displayCRS);
+    }
+
+    /**
+     * return the Bounds of the Map.
+     * @param crs the CRS of the Bounding Box
+     * @return the Bounds of the Map
+     */
+    public Envelope2D getBounds(CoordinateReferenceSystem crs) {
         if (this.coordinateX1TextField != null
                 && this.coordinateX2TextField != null
                 && this.coordinateY1TextField != null
@@ -985,7 +994,7 @@ public class WMSMapSwing extends Parent {
                         x2Coordinate,
                         y1Coordinate,
                         y2Coordinate,
-                        this.displayCRS);
+                        crs);
                 Envelope2D env2D = new Envelope2D(env);
                 return env2D;
             }
