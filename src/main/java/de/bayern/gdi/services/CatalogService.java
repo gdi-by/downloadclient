@@ -71,6 +71,7 @@ public class CatalogService {
     private String password;
     private String providerName;
     private NamespaceContext context;
+    private URL getRecordsURL;
 
     /**
      * Constructor.
@@ -131,6 +132,22 @@ public class CatalogService {
                     XPathConstants.NODE,
                     context);
             this.providerName = providerNameNode.getTextContent();
+            String getRecordsURLExpr = "//ows:OperationsMetadata"
+                    + "/ows:Operation[@name='DescribeRecord']"
+                    + "/ows:DCP"
+                    + "/ows:HTTP"
+                    + "/ows:Post"
+                    + "/@*[name()='xlink:href']";
+            String getRecordsURLStr = (String) XML.xpath(xml,
+                    getRecordsURLExpr,
+                    XPathConstants.STRING,
+                    context);
+            this.getRecordsURL = null;
+            try {
+                this.getRecordsURL = new URL(getRecordsURLStr);
+            } catch (MalformedURLException e) {
+                log.log(Level.SEVERE, e.toString(), xml);
+            }
         }
     }
 
@@ -151,9 +168,9 @@ public class CatalogService {
      */
     public List<ServiceModel> getServicesByFilter(String filter) {
         List<ServiceModel> services = new ArrayList<ServiceModel>();
-        if (filter.length() > MIN_SEARCHLENGTH) {
+        if (filter.length() > MIN_SEARCHLENGTH && this.getRecordsURL != null) {
             String search = loadXMLFilter(filter);
-            Document xml = XML.getDocument(this.catalogURL,
+            Document xml = XML.getDocument(this.getRecordsURL,
                     this.userName,
                     this.password,
                     search,
