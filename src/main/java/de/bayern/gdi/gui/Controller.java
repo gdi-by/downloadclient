@@ -524,12 +524,12 @@ public class Controller {
     private void extractBoundingBox() {
         String bbox = "";
         Envelope2D envelope = null;
-        switch this.dataBean.getServiceType() {
-            ServiceType.Atom:
+        switch (this.dataBean.getServiceType()) {
+            case Atom:
                 //in Atom the bboxes are given by the extend of every dataset
                 break;
-            ServiceType.WFSOne:
-            ServiceType.WFSTwo:
+            case WFSOne:
+            case WFSTwo:
                 if (mapWFS != null) {
                     envelope = this.mapWFS.getBounds(
                             referenceSystemChooser.
@@ -544,7 +544,7 @@ public class Controller {
                             referenceSystemChooser.
                                     getSelectionModel().
                                     getSelectedItem().
-                                    getCRS()
+                                    getCRS());
                 }
                 break;
             default:
@@ -880,13 +880,8 @@ public class Controller {
                                                 i.id,
                                                 this.atomCRS);
                                 polygonList.add(polygon);
-                                if (i.polygon != null) {
-                                    if (all == null) {
-                                        all = i.polygon;
-                                    } else {
-                                        all = all.union(i.polygon);
-                                    }
-                                }
+                                all = all == null
+                                        ? i.polygon : all.union(i.polygon);
                             }
                             if (mapAtom != null) {
                                 if (all != null) {
@@ -1033,13 +1028,9 @@ public class Controller {
         this.serviceList.setItems(this.dataBean.getServicesAsList());
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
-        if (dataBean.getCatalogService() != null) {
-            catalogReachable = ServiceChecker.isReachable(
-                    dataBean.getCatalogService().getUrl()
-            );
-        } else {
-            catalogReachable = false;
-        }
+        catalogReachable = dataBean.getCatalogService() != null
+                && ServiceChecker.isReachable(
+                dataBean.getCatalogService().getUrl());
         URL url = null;
         try {
             url = new URL(serviceSetting.getWMSUrl());
