@@ -120,18 +120,6 @@ public class WFSMetaExtractor {
         this.password = password;
     }
 
-    private static double[] toDouble(String s) {
-        try {
-            String[] parts = s.split("[ \\t]+");
-            double[] x = new double[parts.length];
-            for (int i = 0; i < parts.length; i++) {
-                x[i] = Double.parseDouble(parts[i]);
-            }
-            return x;
-        } catch (NumberFormatException nfe) {
-            return new double[0];
-        }
-    }
 
     private static ReferencedEnvelope getBounds(
             Element feature, NamespaceContext nc) {
@@ -150,7 +138,8 @@ public class WFSMetaExtractor {
         double maxY = -Double.MAX_VALUE;
 
         for (int i = 0; i < n; i++) {
-            double[] x = toDouble(corners.item(i).getTextContent());
+            double[] x = StringUtils.toDouble(
+                corners.item(i).getTextContent());
             if (x == null) {
                 return null;
             }
