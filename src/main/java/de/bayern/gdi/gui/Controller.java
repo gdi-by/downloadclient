@@ -796,7 +796,8 @@ public class Controller {
                         }
                     }
                     if (extendWFS != null) {
-                        mapWFS.setExtend(extendWFS);
+                        //Somehow broken?!
+                        //mapWFS.setExtend(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
                         types.add(new StoredQueryModel(s));
