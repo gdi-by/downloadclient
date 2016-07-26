@@ -31,6 +31,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -430,6 +431,34 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * sets the viewport of the map to the given extend.
+     *
+     * @param envelope the extend
+     */
+    public void setViewport(ReferencedEnvelope envelope) {
+        try {
+            envelope.transform(this.mapCRS, false);
+            mapContent.getViewport().setBounds(envelope);
+            AffineTransform worldToScreen
+                    = mapContent.getViewport().getWorldToScreen();
+            Point2D p1 =
+                    new Point2D.Double(envelope.getMinX(), envelope.getMinY());
+            Point2D p1New = null;
+            Point2D p2 =
+                    new Point2D.Double(envelope.getMaxX(), envelope.getMaxY());
+            Point2D p2New = null;
+            p1New = worldToScreen.transform(p1, p1New);
+            p2New = worldToScreen.transform(p2, p2New);
+            Rectangle rectangle = new Rectangle();
+            rectangle.setFrameFromDiagonal(p1New, p2New);
+            mapContent.getViewport().setScreenArea(rectangle);
+        } catch (FactoryException | TransformException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
      * sets text fields for coordinates.
      * @param x1 x1
      * @param y1 y1
@@ -490,6 +519,10 @@ public class WMSMapSwing extends Parent {
         Double rectY;
         Double rectHeigth;
         Double rectWidth;
+        //Better Function?!
+        //I Tried putting it into a evelope first and shaping into a
+        //Triangle Object. Nothing works, because you can select a BBox over
+        //the 0 medan and the equator
         if (p2.getX() < p1.getX()) {
             rectX = p2.getX();
             rectHeigth = p1.getX() - rectX;
