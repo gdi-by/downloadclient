@@ -224,17 +224,6 @@ public class DownloadStepConverter {
             sb.append('&').append(parameters);
         }
 
-        /*
-        String bbox = dls.findParameter("bbox");
-        if (bbox != null) {
-            sb.append("&bbox=").append(StringUtils.urlEncode(bbox));
-        }
-
-        String srsName = dls.findParameter("srsName");
-        if (srsName != null) {
-            sb.append("&srsName=").append(StringUtils.urlEncode(srsName));
-        }
-        */
         return sb.toString();
     }
 
