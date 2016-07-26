@@ -115,13 +115,20 @@ public class App {
         if (config != null) {
             try {
                 Config.load(config);
-            } catch (IOException ioe) {
+            } catch (NullPointerException | IOException ioe) {
                 System.err.println(
                     "Loading config failed: " + ioe.getMessage());
                 System.exit(1);
             }
         } else {
             Config.uninitialized();
+        }
+        if (Config.getInstance().getServices() == null
+                || Config.getInstance().getMimeTypes() == null
+                || Config.getInstance().getProcessingConfig() == null) {
+            System.err.println(
+                    "Initialiazation of config Failed");
+            System.exit(1);
         }
 
         if (runHeadless(args)) {
