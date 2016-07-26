@@ -335,6 +335,9 @@ public class DownloadStepConverter {
         }
 
         Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
+        if (fpp == null) { // Fall back to global default.
+            fpp = meta.featuresPerPage();
+        }
 
         if (fpp == null) {
             unpagedWFSDownload(jl, workingDir, usedVars, meta);
