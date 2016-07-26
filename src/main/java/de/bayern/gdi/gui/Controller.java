@@ -582,8 +582,7 @@ public class Controller {
         }
         if (!failed.equals("")) {
             statusBarText.setText(
-                    I18n.format("status.validation-fail", failed)
-            );
+                I18n.format("status.validation-fail", failed));
             return false;
         }
         return true;
@@ -615,7 +614,7 @@ public class Controller {
                 JobList jl = dsc.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
-            } catch (final ConverterException ce) {
+            } catch (ConverterException ce) {
                 statusBarText.setText(ce.getMessage());
             }
         }
@@ -687,11 +686,8 @@ public class Controller {
     private void chooseService() {
         Task task = new Task() {
             private void setAuth() {
-                Platform.runLater(() -> {
-                    statusBarText.setText(
-                            I18n.format("status.service-needs-auth")
-                    );
-                });
+                setStatusTextUI(
+                    I18n.format("status.service-needs-auth"));
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
                 serviceAuthenticationCbx.setSelected(true);
                 serviceUser.setDisable(false);
@@ -699,11 +695,8 @@ public class Controller {
             }
 
             private void setUnreachable() {
-                Platform.runLater(() -> {
-                    statusBarText.setText(
-                            I18n.format("status.service-not-available")
-                    );
-                });
+                setStatusTextUI(
+                    I18n.format("status.service-not-available"));
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
             }
 
@@ -751,28 +744,22 @@ public class Controller {
                     if (st == null) {
                         log.log(Level.WARNING, "Could not determine "
                                 + "Service Type" , st);
-                        Platform.runLater(() -> {
-                            statusBarText.setText(
-                                I18n.getMsg("status.no-service-type"));
-                        });
+                        setStatusTextUI(
+                            I18n.getMsg("status.no-service-type"));
                     } else {
                         switch (st) {
                             case Atom:
                                 //TODO: Check deep if user/pw was correct
-                                Platform.runLater(() -> {
-                                    statusBarText.setText(
-                                        I18n.getMsg("status.type.atom"));
-                                });
+                                setStatusTextUI(
+                                    I18n.getMsg("status.type.atom"));
                                 Atom atom = new Atom(url,
                                         dataBean.getUserName(),
                                         dataBean.getPassword());
                                 dataBean.setAtomService(atom);
                                 break;
                             case WFSOne:
-                                Platform.runLater(() -> {
-                                    statusBarText.setText(
-                                        I18n.getMsg("status.type.wfsone"));
-                                });
+                                setStatusTextUI(
+                                    I18n.getMsg("status.type.wfsone"));
                                 WFSMetaExtractor wfsOne =
                                     new WFSMetaExtractor(url,
                                         dataBean.getUserName(),
@@ -781,10 +768,8 @@ public class Controller {
                                 dataBean.setWFSService(metaOne);
                                 break;
                             case WFSTwo:
-                                Platform.runLater(() -> {
-                                    statusBarText.setText(
-                                        I18n.getMsg("status.type.wfstwo"));
-                                });
+                                setStatusTextUI(
+                                    I18n.getMsg("status.type.wfstwo"));
                                 WFSMetaExtractor extractor =
                                     new WFSMetaExtractor(url,
                                         dataBean.getUserName(),
@@ -795,10 +780,7 @@ public class Controller {
                             default:
                                 log.log(Level.WARNING,
                                     "Could not determine URL" , st);
-                                Platform.runLater(() -> {
-                                    statusBarText.setText(
-                                            I18n.getMsg("status.no-url"));
-                                });
+                                setStatusTextUI(I18n.getMsg("status.no-url"));
                                 break;
                         }
                     }
@@ -809,9 +791,7 @@ public class Controller {
                         statusBarText.setText(I18n.getMsg("status.ready"));
                     });
                 } else {
-                    Platform.runLater(() -> {
-                        statusBarText.setText(I18n.getMsg("status.no-url"));
-                    });
+                    setStatusTextUI(I18n.getMsg("status.no-url"));
                 }
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
                 return 0;
@@ -1140,6 +1120,15 @@ public class Controller {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
 
+    }
+
+    /** Set the text of the status bar in UI thread.
+     * @param msg the text to set.
+     */
+    public void setStatusTextUI(String msg) {
+        Platform.runLater(() -> {
+            statusBarText.setText(msg);
+        });
     }
 
     /** Keeps track of download progression and errors. */
