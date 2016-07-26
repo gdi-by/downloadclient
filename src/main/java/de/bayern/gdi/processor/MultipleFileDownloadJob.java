@@ -164,7 +164,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         // TODO: i18n
         String msg = "Bytes downloaded: " + this.totalCount;
-        logger.log(msg);
+        log(msg);
         log.log(Level.INFO, msg);
 
         if (failed > 0) {

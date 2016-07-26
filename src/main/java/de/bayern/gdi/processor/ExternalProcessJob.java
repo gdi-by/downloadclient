@@ -162,15 +162,21 @@ public class ExternalProcessJob implements Job {
         return list;
     }
 
+    private void log(String msg) {
+        if (this.logger != null) {
+            this.logger.log(msg);
+        }
+    }
+
     private void broadcastMessage(Processor p, String msg) {
-        logger.log(msg);
+        log(msg);
         if (p != null) {
             p.broadcastMessage(msg);
         }
     }
 
     private void broadcastException(Processor p, JobExecutionException jee) {
-        logger.log(jee.getMessage());
+        log(jee.getMessage());
         if (p != null) {
             p.broadcastException(jee);
         }
@@ -219,10 +225,10 @@ public class ExternalProcessJob implements Job {
                     try {
                         String line;
                         while ((line = in.readLine()) != null) {
-                            logger.log(line);
+                            log(line);
                         }
                     } catch (IOException ioe) {
-                        logger.log(ioe.getMessage());
+                        log(ioe.getMessage());
                     } finally {
                         try {
                             in.close();
