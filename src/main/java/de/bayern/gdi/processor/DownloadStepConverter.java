@@ -176,7 +176,8 @@ public class DownloadStepConverter {
     }
 
     private static String capURL(String base) {
-        return base + "?service=WFS&request=GetCapabilities&version=2.0.0";
+        return base
+            + "?service=WFS&request=GetCapabilities&acceptversions=2.0.0";
     }
 
     private static String wfsURL(
