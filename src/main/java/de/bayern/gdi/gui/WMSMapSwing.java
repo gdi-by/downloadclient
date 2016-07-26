@@ -439,23 +439,32 @@ public class WMSMapSwing extends Parent {
         try {
             envelope.transform(this.mapCRS, false);
             mapContent.getViewport().setBounds(envelope);
-            AffineTransform worldToScreen
-                    = mapContent.getViewport().getWorldToScreen();
-            Point2D p1 =
-                    new Point2D.Double(envelope.getMinX(), envelope.getMinY());
-            Point2D p1New = null;
-            Point2D p2 =
-                    new Point2D.Double(envelope.getMaxX(), envelope.getMaxY());
-            Point2D p2New = null;
-            p1New = worldToScreen.transform(p1, p1New);
-            p2New = worldToScreen.transform(p2, p2New);
-            Rectangle rectangle = new Rectangle();
-            rectangle.setFrameFromDiagonal(p1New, p2New);
+            Rectangle rectangle =
+                    getScreenTransformedRectangle(envelope.getMinX(),
+                            envelope.getMinY(),
+                            envelope.getMaxX(),
+                            envelope.getMaxY());
             mapContent.getViewport().setScreenArea(rectangle);
         } catch (FactoryException | TransformException e) {
             e.printStackTrace();
         }
+    }
 
+    private Rectangle getScreenTransformedRectangle(Double x1, Double y1,
+                                                    Double x2, Double y2) {
+        AffineTransform worldToScreen
+                = mapContent.getViewport().getWorldToScreen();
+        Point2D p1 =
+                new Point2D.Double(x1, y1);
+        Point2D p1New = null;
+        Point2D p2 =
+                new Point2D.Double(x2, y2);
+        Point2D p2New = null;
+        p1New = worldToScreen.transform(p1, p1New);
+        p2New = worldToScreen.transform(p2, p2New);
+        Rectangle rectangle = new Rectangle();
+        rectangle.setFrameFromDiagonal(p1New, p2New);
+        return rectangle;
     }
 
     /**
@@ -519,7 +528,7 @@ public class WMSMapSwing extends Parent {
         Double rectY;
         Double rectHeigth;
         Double rectWidth;
-        //Better Function?!
+        //TODO: Better Function?!
         //I Tried putting it into a evelope first and shaping into a
         //Triangle Object. Nothing works, because you can select a BBox over
         //the 0 medan and the equator
