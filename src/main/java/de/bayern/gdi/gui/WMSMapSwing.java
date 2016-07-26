@@ -22,7 +22,6 @@ package de.bayern.gdi.gui;
 import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -50,6 +49,7 @@ import javafx.scene.layout.VBox;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -64,6 +64,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
@@ -101,6 +102,7 @@ import org.opengis.filter.identity.FeatureId;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
@@ -119,16 +121,19 @@ public class WMSMapSwing extends Parent {
     private int mapWidth;
     private int mapHeight;
     private SwingNode mapNode;
-    private TextField coordinateX1;
-    private TextField coordinateY1;
-    private TextField coordinateX2;
-    private TextField coordinateY2;
+    private TextField coordinateX1TextField;
+    private TextField coordinateY1TextField;
+    private TextField coordinateX2TextField;
+    private TextField coordinateY2TextField;
     private ExtJMapPane mapPane;
     private Layer baseLayer;
     private StyleBuilder sb;
     private StyleFactory sf;
     private FilterFactory2 ff;
     DefaultFeatureCollection polygonFeatureCollection;
+    private CoordinateReferenceSystem displayCRS;
+    private CoordinateReferenceSystem oldDisplayCRS;
+    private CoordinateReferenceSystem mapCRS;
 
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
@@ -158,6 +163,7 @@ public class WMSMapSwing extends Parent {
     private String selectedPolygonID;
     private GeometryDescriptor geomDesc;
     private String geometryAttributeName;
+    private String source;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -177,14 +183,21 @@ public class WMSMapSwing extends Parent {
         public String id;
 
         /**
+         * crs of the polygon.
+         */
+        public CoordinateReferenceSystem crs;
+
+        /**
          * Constructor.
          **/
         public FeaturePolygon(Polygon polygon,
                               String name,
-                              String id) {
+                              String id,
+                              CoordinateReferenceSystem crs) {
             this.polygon = polygon;
             this.name = name;
             this.id = id;
+            this.crs = crs;
         }
     }
 
@@ -227,7 +240,10 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Constructor.
-     *
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
      * @param mapURL The URL of the WMS Service
      * @throws MalformedURLException
      */
@@ -239,12 +255,47 @@ public class WMSMapSwing extends Parent {
 
     /**
      * Constructor.
-     *
-     * @param mapURL The URL of the WMS Service
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
      */
     public WMSMapSwing(URL mapURL, int width, int heigth, String layer) {
+        this(mapURL, width, heigth, layer, null, null);
+    }
+
+    /**
+     * Constructor.
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
+     * @param source source
+     */
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
+                       String source) {
+        this(mapURL, width, heigth, layer, null, source);
+    }
+
+    /**
+     * Constructor.
+     * @param mapURL mapURL
+     * @param width width
+     * @param heigth heigth
+     * @param layer layer
+     * @param source source
+     * @param displayCRS crs of display
+     */
+    public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
+                       CoordinateReferenceSystem displayCRS, String source) {
         initGeotoolsLocale();
         try {
+            if (displayCRS == null) {
+                setDisplayCRS(INITIAL_CRS);
+            } else {
+                setDisplayCRS(displayCRS);
+            }
+            this.source = source;
             this.sb = new StyleBuilder();
             this.sf = CommonFactoryFinder.getStyleFactory(null);
             this.ff = CommonFactoryFinder.getFilterFactory2(null);
@@ -254,16 +305,34 @@ public class WMSMapSwing extends Parent {
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
             baseLayer = null;
-            for (Layer wmsLayer : layers) {
-                if (wmsLayer.getTitle().toLowerCase().equals(
-                        layer.toLowerCase())) {
-                    baseLayer = wmsLayer;
-                    baseLayer.setTitle(layer);
+            boolean layerFound = false;
+            for (Layer outerLayer : layers) {
+                if (outerLayer.getName() != null) {
+                    if (outerLayer.getName().toLowerCase().equals(layer
+                            .toLowerCase())) {
+                        baseLayer = outerLayer;
+                        // we actually need to set both by hand, else the
+                        // request will fail
+                        baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
+                        layerFound = true;
+                    }
+                }
+                for (Layer wmsLayer : outerLayer.getChildren()) {
+                    if (wmsLayer.getName().toLowerCase().equals(
+                            layer.toLowerCase())) {
+                        baseLayer = wmsLayer.getParent();
+                        baseLayer.setTitle(layer);
+                        baseLayer.setName(layer);
+                        layerFound = true;
+                        break;
+                    }
+                }
+                if (layerFound) {
                     break;
                 }
             }
             this.mapContent = new MapContent();
-            this.title = this.wms.getCapabilities().getService().getTitle();
             this.mapContent.setTitle(this.title);
             this.mapNode = new SwingNode();
             //this.add(this.layerLabel);
@@ -272,45 +341,190 @@ public class WMSMapSwing extends Parent {
             this.getChildren().add(vBox);
             displayMap(baseLayer);
 
-        } catch (IOException | ServiceException e) {
+        } catch (IOException | ServiceException | FactoryException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * sets the CRS the coords under the map should be displayed in.
+     * @param crs Coordinate Reference System
+     * @throws FactoryException when the CRS can't be found
+     */
+    public void setDisplayCRS(String crs) throws FactoryException {
+        CoordinateReferenceSystem coordinateReferenceSystem = null;
+        coordinateReferenceSystem = CRS.decode(crs);
+        setDisplayCRS(coordinateReferenceSystem);
+    }
+
+
+    private void setMapCRS(CoordinateReferenceSystem crs) {
+        this.mapCRS = crs;
+    }
+
+    /**
+     * Sets the CRS to Display the coordinates under the map.
+     * @param crs CoordinateReferenceSystem
+     */
+    public void setDisplayCRS(CoordinateReferenceSystem crs) {
+        if (this.displayCRS == null) {
+            this.oldDisplayCRS = crs;
+        }
+        this.oldDisplayCRS = this.displayCRS;
+        this.displayCRS = crs;
+        if (this.coordinateX1TextField != null
+                && this.coordinateY1TextField != null
+                && this.coordinateX2TextField != null
+                && this.coordinateY2TextField != null) {
+            //System.out.println("TextFields not null");
+            if (!this.coordinateX1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateX2TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY2TextField.getText().
+                    toString().equals("")) {
+                //System.out.println("TextFields not empty");
+                Double x1Coordinate = Double.parseDouble(
+                        this.coordinateX1TextField.getText().toString());
+                Double x2Coordinate = Double.parseDouble(
+                        this.coordinateX2TextField.getText().toString());
+                Double y1Coordinate = Double.parseDouble(
+                        this.coordinateY1TextField.getText().toString());
+                Double y2Coordinate = Double.parseDouble(
+                        this.coordinateY2TextField.getText().toString());
+                if (x1Coordinate != null
+                        && x2Coordinate != null
+                        && y1Coordinate != null
+                        && y2Coordinate != null) {
+                    try {
+                        convertAndDisplayBoundingBox(x1Coordinate,
+                                x2Coordinate,
+                                y1Coordinate,
+                                y2Coordinate,
+                                this.oldDisplayCRS,
+                                this.displayCRS);
+                    } catch (FactoryException | TransformException e) {
+                        clearCoordinateDisplay();
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                } else {
+                    clearCoordinateDisplay();
+                }
+            } else {
+                clearCoordinateDisplay();
+            }
         }
     }
 
     private void displayMap(Layer wmsLayer) {
         WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
         this.mapContent.addLayer(displayLayer);
+        setMapCRS(this
+                .mapContent
+                .getViewport()
+                .getCoordinateReferenceSystem());
         createSwingContent(this.mapNode);
-        //JMapPane mapPane = new JMapPane(this.mapContent);
-
     }
 
-
     /**
-     * Set TextFields to display the selected coordinates.
-     *
-     * @param x1 X1
-     * @param y1 Y1
-     * @param x2 X2
-     * @param y2 Y2
+     * sets text fields for coordinates.
+     * @param x1 x1
+     * @param y1 y1
+     * @param x2 x2
+     * @param y2 y2
      */
     public void setCoordinateDisplay(
             TextField x1,
             TextField y1,
             TextField x2,
-            TextField y2
+            TextField y2) {
+        this.coordinateX1TextField = x1;
+        this.coordinateY1TextField = y1;
+        this.coordinateX2TextField = x2;
+        this.coordinateY2TextField = y2;
+    }
+
+    private void setDisplayCoordinates(
+            Double x1,
+            Double y1,
+            Double x2,
+            Double y2
     ) {
-        this.coordinateX1 = x1;
-        this.coordinateY1 = y1;
-        this.coordinateX2 = x2;
-        this.coordinateY2 = y2;
+        try {
+            convertAndDisplayBoundingBox(x1,
+                    x2,
+                    y1,
+                    y2,
+                    this.mapCRS,
+                    this.displayCRS);
+        } catch (FactoryException | TransformException e) {
+            clearCoordinateDisplay();
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void convertAndDisplayBoundingBox(
+            Double x1,
+            Double x2,
+            Double y1,
+            Double y2,
+            CoordinateReferenceSystem sourceCRS,
+            CoordinateReferenceSystem targetCRS
+    ) throws TransformException, FactoryException {
+        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+                x1,
+                y1,
+                sourceCRS,
+                targetCRS);
+        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+                x2,
+                y2,
+                sourceCRS,
+                targetCRS);
+        this.coordinateX1TextField.setText(
+                String.valueOf(p1.getX()));
+        this.coordinateY1TextField.setText(
+                String.valueOf(p1.getY()));
+        this.coordinateX2TextField.setText(
+                String.valueOf(p2.getX()));
+        this.coordinateY2TextField.setText(
+                String.valueOf(p2.getY()));
+    }
+
+    private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
+            Double x,
+            Double y,
+            CoordinateReferenceSystem sourceCRS,
+            CoordinateReferenceSystem targetCRS)
+    throws TransformException, FactoryException {
+        com.vividsolutions.jts.geom.GeometryFactory gf = new
+                com.vividsolutions.jts.geom.GeometryFactory();
+        com.vividsolutions.jts.geom.Coordinate coo = new com
+                .vividsolutions.jts.geom.Coordinate(x, y);
+        com.vividsolutions.jts.geom.Point p = gf.createPoint(coo);
+        MathTransform transform = CRS.findMathTransform(
+                sourceCRS, targetCRS);
+        return (com.vividsolutions.jts.geom.Point) JTS.transform(p, transform);
+    }
+
+    private void clearCoordinateDisplay() {
+        this.coordinateX1TextField.setText("");
+        this.coordinateY1TextField.setText("");
+        this.coordinateX2TextField.setText("");
+        this.coordinateY2TextField.setText("");
     }
 
     /**
-<<<<<<< HEAD
      * represents the actions for the cursor.
      **/
     private class CursorAction extends NoToolAction {
+
+        private Double x1Coordinate;
+        private Double x2Coordinate;
+        private Double y1Coordinate;
+        private Double y2Coordinate;
 
         public CursorAction(MapPane mapPane) {
             super(mapPane);
@@ -338,20 +552,19 @@ public class WMSMapSwing extends Parent {
                             mapPane.setSelectedEnvelope(null);
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
-                            coordinateX1.setText(
-                                    String.valueOf(mapStartPos.getX()));
-                            coordinateY1.setText(
-                                    String.valueOf(mapStartPos.getY()));
-                            coordinateX2.setText("");
-                            coordinateY2.setText("");
+                            clearCoordinateDisplay();
+                            x1Coordinate = mapStartPos.getX();
+                            y1Coordinate = mapStartPos.getY();
+                            x2Coordinate = null;
+                            y2Coordinate = null;
                             clickCount++;
                         } else if (clickCount == 1) {
                             end = ev.getPoint();
                             mapEndPos = ev.getWorldPos();
-                            coordinateX2.setText(
-                                    String.valueOf(mapEndPos.getX()));
-                            coordinateY2.setText(
-                                    String.valueOf(mapEndPos.getY()));
+                            x2Coordinate = mapEndPos.getX();
+                            y2Coordinate = mapEndPos.getY();
+                            setDisplayCoordinates(x1Coordinate, y1Coordinate,
+                                    x2Coordinate, y2Coordinate);
                             Rectangle rect = new Rectangle();
                             rect.setFrameFromDiagonal(start, end);
                             mapPane.setDrawRect(rect);
@@ -608,6 +821,10 @@ public class WMSMapSwing extends Parent {
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
                 panel.add(mapPane, "grow");
+                if (source != null) {
+                    JLabel sourceLabel = new JLabel(source);
+                    panel.add(sourceLabel, "grow");
+                }
                 panel.add(
                         JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
@@ -626,9 +843,19 @@ public class WMSMapSwing extends Parent {
         try {
 
             SimpleFeatureType polygonFeatureType;
+
+            String epsgCode = this
+                    .mapCRS
+                    .getIdentifiers()
+                    .toArray()[0]
+                    .toString();
+            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(":") + 1,
+                    epsgCode.length());
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
-                    "geometry:Geometry:srid=4326,"
+                    "geometry:Geometry:srid="
+                            + epsgCode
+                            + ","
                             + "name:String,"
                             + "id:String"
             );
@@ -642,11 +869,18 @@ public class WMSMapSwing extends Parent {
             for (FeaturePolygon fp : featurePolygons) {
                 SimpleFeatureBuilder featureBuilder =
                         new SimpleFeatureBuilder(polygonFeatureType);
-                featureBuilder.add(fp.polygon);
-                featureBuilder.add(fp.name);
-                featureBuilder.add(fp.id);
-                SimpleFeature feature = featureBuilder.buildFeature(null);
-                polygonFeatureCollection.add(feature);
+                try {
+                    MathTransform transform = CRS.findMathTransform(
+                            fp.crs, this.mapCRS);
+                    featureBuilder.add((Polygon) JTS.transform(fp.polygon,
+                            transform));
+                    featureBuilder.add(fp.name);
+                    featureBuilder.add(fp.id);
+                    SimpleFeature feature = featureBuilder.buildFeature(null);
+                    polygonFeatureCollection.add(feature);
+                } catch (FactoryException | TransformException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
             }
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
                     polygonFeatureCollection, createPolygonStyle());
@@ -659,7 +893,9 @@ public class WMSMapSwing extends Parent {
                     }
                 }
             }
+            //polygonLayer.setVisible(false);
             mapContent.addLayer(polygonLayer);
+            mapPane.repaint();
         } catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -723,6 +959,39 @@ public class WMSMapSwing extends Parent {
      * @return the Bounds of the Map
      */
     public Envelope2D getBounds() {
+        if (this.coordinateX1TextField != null
+                && this.coordinateX2TextField != null
+                && this.coordinateY1TextField != null
+                && this.coordinateY2TextField != null) {
+            if (!this.coordinateX1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY1TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateX2TextField.getText()
+                    .toString().equals("")
+                    && !this.coordinateY2TextField.getText().
+                    toString().equals("")) {
+                //System.out.println("TextFields not empty");
+                Double x1Coordinate = Double.parseDouble(
+                        this.coordinateX1TextField.getText().toString());
+                Double x2Coordinate = Double.parseDouble(
+                        this.coordinateX2TextField.getText().toString());
+                Double y1Coordinate = Double.parseDouble(
+                        this.coordinateY1TextField.getText().toString());
+                Double y2Coordinate = Double.parseDouble(
+                        this.coordinateY2TextField.getText().toString());
+                Envelope env = new ReferencedEnvelope(
+                        x1Coordinate,
+                        x2Coordinate,
+                        y1Coordinate,
+                        y2Coordinate,
+                        this.displayCRS);
+                Envelope2D env2D = new Envelope2D(env);
+                return env2D;
+            }
+        }
+        return null;
+        /*
         Component[] components = this.mapNode.getContent().getComponents();
         for (Component c : components) {
             if (c.getClass().equals(ExtJMapPane.class)) {
@@ -730,6 +999,7 @@ public class WMSMapSwing extends Parent {
             }
         }
         return null;
+        */
     }
 
     //TODO - Destructor for Swing Item with Maplayer Dispose

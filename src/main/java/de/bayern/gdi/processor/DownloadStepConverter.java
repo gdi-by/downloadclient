@@ -37,6 +37,8 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
@@ -57,6 +59,10 @@ public class DownloadStepConverter {
     private String user;
     private String password;
 
+    private DownloadStep dls;
+
+    private Log logger;
+
     public DownloadStepConverter() {
     }
 
@@ -72,11 +78,14 @@ public class DownloadStepConverter {
 
     /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
-     * @param dls DownloadStep the configuration to be converted.
+     * @param downloadSteps DownloadStep the configuration to be converted.
      * @return A job list for the download processor.
      * @throws ConverterException If the conversion went wrong.
      */
-    public JobList convert(DownloadStep dls) throws ConverterException {
+    public JobList convert(DownloadStep downloadSteps)
+        throws ConverterException {
+
+        this.dls = downloadSteps;
 
         ProcessingStepConverter psc = new ProcessingStepConverter();
 
@@ -92,6 +101,18 @@ public class DownloadStepConverter {
                 I18n.format("dls.converter.not.dir", path));
         }
 
+        File dlLog = Misc.uniqueFile(path, "download-", "log", null);
+        if (dlLog == null) {
+            // TODO: i18n
+            throw new ConverterException(
+                "Cannot create unique download filename");
+        }
+
+        this.logger = new Log(dlLog);
+
+        OpenLogJob olj = new OpenLogJob(this.logger);
+        CloseLogJob clj = new CloseLogJob(this.logger);
+
         FileTracker fileTracker = new FileTracker(path);
         if (!fileTracker.scan()) {
             // TODO: i18n
@@ -99,18 +120,21 @@ public class DownloadStepConverter {
                 "Inital scan of download file failed.");
         }
 
-        psc.convert(dls, fileTracker);
+        psc.convert(dls, fileTracker, logger);
 
         JobList jl = new JobList();
 
+        jl.addJob(olj);
 
         if (dls.getServiceType().equals("ATOM")) {
-            createAtomDownload(jl, path, dls);
+            createAtomDownload(jl, path);
         } else {
-            createWFSDownload(jl, path, psc.getUsedVars(), dls);
+            createWFSDownload(jl, path, psc.getUsedVars());
         }
 
         jl.addJobs(psc.getJobs());
+
+        jl.addJob(clj);
 
         return jl;
     }
@@ -217,25 +241,25 @@ public class DownloadStepConverter {
         JobList      jl,
         File         workingDir,
         Set<String>  usedVars,
-        DownloadStep dls,
         WFSMeta      meta
     ) throws ConverterException {
 
         String url = wfsURL(dls, usedVars, meta);
         log.log(Level.INFO, "url: " + url);
 
-        String ext = extension(dls);
+        String ext = extension();
 
         File gml = new File(workingDir, "download." + ext);
         log.info("Download to file \"" + gml + "\"");
 
         FileDownloadJob fdj = new FileDownloadJob(
             url, gml,
-            this.user, this.password);
+            this.user, this.password,
+            this.logger);
 
         jl.addJob(fdj);
         if (ext.equals("gml")) {
-            jl.addJob(new GMLCheckJob(gml));
+            jl.addJob(new GMLCheckJob(gml, logger));
         }
     }
 
@@ -282,7 +306,7 @@ public class DownloadStepConverter {
         return newURL(sb.toString());
     }
 
-    private static String extension(DownloadStep dls) {
+    private String extension() {
         String mimeType = dls.findParameter("outputformat");
         return  Config.getInstance().getMimeTypes()
             .findExtension(mimeType, "gml");
@@ -291,8 +315,7 @@ public class DownloadStepConverter {
     private void createWFSDownload(
         JobList      jl,
         File         workingDir,
-        Set<String>  usedVars,
-        DownloadStep dls
+        Set<String>  usedVars
     ) throws ConverterException {
 
         String url = dls.getServiceURL();
@@ -313,7 +336,7 @@ public class DownloadStepConverter {
         Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
 
         if (fpp == null) {
-            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            unpagedWFSDownload(jl, workingDir, usedVars, meta);
             return;
         }
 
@@ -322,17 +345,17 @@ public class DownloadStepConverter {
 
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
-            unpagedWFSDownload(jl, workingDir, usedVars, dls, meta);
+            unpagedWFSDownload(jl, workingDir, usedVars, meta);
             return;
         }
 
         log.info("total number of features: " + numFeatures);
 
-        FilesDownloadJob fdj =
-            new FilesDownloadJob(this.user, this.password);
-        GMLCheckJob gcj = new GMLCheckJob();
+        FilesDownloadJob fdj = new FilesDownloadJob(
+            this.user, this.password, this.logger);
+        GMLCheckJob gcj = new GMLCheckJob(logger);
 
-        String ext = extension(dls);
+        String ext = extension();
 
         boolean isGML = ext.equals("gml");
 
@@ -368,8 +391,7 @@ public class DownloadStepConverter {
 
     private void createAtomDownload(
         JobList jl,
-        File workingDir,
-        DownloadStep dls
+        File workingDir
     ) throws ConverterException {
 
         String dataset = dls.getDataset();
@@ -385,7 +407,8 @@ public class DownloadStepConverter {
             dataset,
             variation,
             workingDir,
-            this.user, this.password);
+            this.user, this.password,
+            this.logger);
         jl.addJob(job);
     }
 }

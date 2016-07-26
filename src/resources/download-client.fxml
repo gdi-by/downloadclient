@@ -234,7 +234,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomFormat" text="format" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomFormat" text="" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>
@@ -248,7 +248,7 @@
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="refsys" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>
@@ -265,7 +265,7 @@
                                  <content>
                                     <VBox fx:id="chainContainer" minWidth="-Infinity" prefHeight="63.0" prefWidth="570.0">
                                        <children>
-                                          <CheckBox fx:id="chkChain" mnemonicParsing="false" text="%gui.post_process">
+                                          <CheckBox fx:id="chkChain" onAction="#handleChainCheckbox" mnemonicParsing="false" text="%gui.post_process">
                                              <VBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </VBox.margin>
@@ -275,7 +275,7 @@
                                           </CheckBox>
                                           <VBox fx:id="containerChain" prefHeight="103.0" prefWidth="574.0">
                                              <children>
-                                                <HBox prefHeight="26.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <HBox fx:id="processStepContainter" prefHeight="26.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label fx:id="labelPostProcess" text="%gui.process_chain">
                                                          <font>

@@ -18,21 +18,10 @@
 
 package de.bayern.gdi.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.geotools.geometry.Envelope2D;
-
+import com.vividsolutions.jts.geom.Geometry;
 import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.MIMEType;
+import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
@@ -44,16 +33,25 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.services.WebService;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
-
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -79,6 +77,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -86,6 +85,11 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -95,7 +99,9 @@ public class Controller {
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
-
+    private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
+    private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
 
@@ -116,7 +122,7 @@ public class Controller {
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
     @FXML private ComboBox atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
-    @FXML private ComboBox referenceSystemChooser;
+    @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
     @FXML private VBox basicWFSContainer;
     @FXML private VBox atomContainer;
@@ -144,6 +150,7 @@ public class Controller {
     @FXML private Button buttonSaveConfig;
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
+    @FXML private HBox processStepContainter;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
 
@@ -215,7 +222,6 @@ public class Controller {
                     });
                     List<ServiceModel> catalog = dataBean.getCatalogService()
                             .getServicesByFilter(currentText);
-            //System.out.println(catalog.size());
                     for (ServiceModel entry: catalog) {
                         dataBean.addCatalogServiceToList(entry);
                         Platform.runLater(() -> {
@@ -257,8 +263,17 @@ public class Controller {
                     (ServiceModel)this.serviceList.getSelectionModel()
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
+                try {
+                    URL servUrl = new URL(url);
+                    service.setRestricted(ServiceChecker.isRestricted(servUrl));
+                } catch (MalformedURLException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
                 this.serviceURL.setText(url);
                 if (service.isRestricted()) {
+                    statusBarText.setText(
+                            I18n.format("status.service-needs-auth")
+                    );
                     this.serviceAuthenticationCbx.setSelected(true);
                     this.serviceUser.setDisable(false);
                     this.servicePW.setDisable(false);
@@ -296,7 +311,7 @@ public class Controller {
                 getSelectionModel().getSelectedItem();
         if (item != null) {
             dataBean.setDataType(item);
-            dataBean.setAttributes(new HashMap<String, String>());
+            dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
             chooseType(item);
         }
     }
@@ -310,7 +325,8 @@ public class Controller {
         this.dataBean.addAttribute("outputformat",
             this.dataFormatChooser.getValue() != null
                 ? this.dataFormatChooser.getValue().toString()
-                : "");
+                : "",
+                "");
     }
 
     /**
@@ -330,8 +346,21 @@ public class Controller {
     @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
         this.dataBean.addAttribute("srsName",
             referenceSystemChooser.getValue() != null
-                ? referenceSystemChooser.getValue().toString()
-                : "EPSG:38468");
+                ? referenceSystemChooser.
+                    getValue().getOldName()
+                : "EPSG:4326",
+                "");
+        if (referenceSystemChooser.getValue() != null) {
+            this.mapWFS.setDisplayCRS(
+                    referenceSystemChooser.getValue().getCRS());
+        } else {
+            try {
+                this.mapWFS.setDisplayCRS(
+                        this.dataBean.getAttributeValue("srsName"));
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
     }
 
     /**
@@ -343,7 +372,20 @@ public class Controller {
         this.dataBean.addAttribute("VARIATION",
             this.atomVariationChooser.getValue() != null
                 ? this.atomVariationChooser.getValue().toString()
-                : "");
+                : "",
+                "");
+        ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
+                .getSelectedItem();
+        Atom.Item item = (Atom.Item) im.getItem();
+        List <Atom.Field> fields = item.fields;
+        for (Atom.Field field: fields) {
+            if (field.type.equals(this.atomVariationChooser.getValue())) {
+                this.valueAtomFormat.setText(field.format);
+                this.valueAtomRefsys.setText(field.crs);
+                this.dataBean.addAttribute("outputformat", field.format, "");
+                break;
+            }
+        }
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
@@ -356,14 +398,37 @@ public class Controller {
         Set<Node> parameter =
             this.chainContainer.lookupAll("#process_parameter");
 
+        if (parameter.isEmpty()) {
+            return steps;
+        }
+
+        String format = this.dataBean.getAttributeValue("outputformat");
+        if (format == null || format.isEmpty()) {
+            statusBarText.setText(I18n.getMsg("gui.process.no.format"));
+            return steps;
+        }
+
+        MIMETypes mtypes = Config.getInstance().getMimeTypes();
+        MIMEType mtype = mtypes.findByName(format);
+        if (mtype == null) {
+            statusBarText.setText(I18n.getMsg("gui.process.format.not.found"));
+            return steps;
+        }
+
         for (Node n: parameter) {
             Set<Node> vars = n.lookupAll("#process_var");
             Node nameNode = n.lookup("#process_name");
             ComboBox namebox = (ComboBox)nameNode;
-            String name =
-                ((ProcessingStepConfiguration)namebox.getValue())
-                    .getName();
-            //System.out.println(name);
+            ProcessingStepConfiguration psc =
+                (ProcessingStepConfiguration)namebox.getValue();
+
+            String name = psc.getName();
+
+            if (!psc.isCompatibleWithFormat(mtype.getType())) {
+                statusBarText.setText(
+                        I18n.format("gui.process.not.compatible", name));
+                continue;
+            }
 
             ProcessingStep step = new ProcessingStep();
             steps.add(step);
@@ -385,7 +450,6 @@ public class Controller {
                         ? ((Option)input.getValue()).getValue()
                         : null;
                 }
-                //System.out.println(varName + ": " + varValue);
                 if (varName != null && varValue != null) {
                     Parameter p = new Parameter(varName, varValue);
                     parameters.add(p);
@@ -398,14 +462,45 @@ public class Controller {
     private void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
         if (data instanceof StoredQueryModel) {
-            this.dataBean.setAttributes(new HashMap<String, String>());
-            Set<Node> textfields =
-                this.simpleWFSContainer.lookupAll("#parameter");
-            for (Node n: textfields) {
-                TextField f = (TextField)n;
-                this.dataBean.addAttribute(
-                    f.getUserData().toString(),
-                    f.getText());
+            this.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
+
+            ObservableList<Node> children
+                    = this.simpleWFSContainer.getChildren();
+            for (Node n: children) {
+                if (n.getClass() == HBox.class) {
+                    HBox hbox = (HBox) n;
+                    ObservableList<Node> hboxChildren = hbox.getChildren();
+                    String value = "";
+                    String name = "";
+                    String type = "";
+                    Label l1 = null;
+                    Label l2 = null;
+                    TextField tf = null;
+                    for (Node hn: hboxChildren) {
+                        if (hn.getClass() == TextField.class) {
+                            tf = (TextField) hn;
+                        }
+                        if (hn.getClass() == Label.class) {
+                            if (l1 == null) {
+                                l1 = (Label) hn;
+                            }
+                            if (l1 != (Label) hn) {
+                                l2 = (Label) hn;
+                            }
+                        }
+                    }
+                    name = tf.getUserData().toString();
+                    value = tf.getText();
+                    if (l1.getText().equals(name)) {
+                        type = l2.getText();
+                    } else {
+                        type = l1.getText();
+                    }
+                    this.dataBean.addAttribute(
+                            name,
+                            value,
+                            type);
+                }
             }
         }
     }
@@ -423,10 +518,37 @@ public class Controller {
             bbox += envelope.getY() + ",";
             bbox += (envelope.getX() + envelope.getWidth()) + ",";
             bbox += (envelope.getY() + envelope.getHeight());
-            this.dataBean.addAttribute("bbox", bbox);
+            this.dataBean.addAttribute("bbox", bbox, "");
         } else {
             // Raise an error?
         }
+    }
+
+
+    private boolean validateInput() {
+        String failed = "";
+        ArrayList<DataBean.Attribute> attributes
+                                = this.dataBean.getAttributes();
+
+        Validator validator = Validator.getInstance();
+        for (DataBean.Attribute attribute: attributes) {
+            if (!attribute.type.equals("")) {
+                if (!validator.isValid(attribute.type, attribute.value)) {
+                    if (failed.equals("")) {
+                        failed = attribute.name;
+                    } else {
+                        failed = failed + ", " + attribute.name;
+                    }
+                }
+            }
+        }
+        if (!failed.equals("")) {
+            statusBarText.setText(
+                    I18n.format("status.validation-fail", failed)
+            );
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -435,75 +557,89 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDownload(ActionEvent event) {
-
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        //fileChooser.getExtensionFilters().addAll();
-        File selectedDir = dirChooser.showDialog(getPrimaryStage());
-        if (selectedDir == null) {
-            return;
-        }
-
         extractStoredQuery();
         extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
+        if (validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File selectedDir = dirChooser.showDialog(getPrimaryStage());
+            if (selectedDir == null) {
+                return;
+            }
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
 
-        Task task = new Task() {
-            @Override
-            protected Integer call() {
-                String savePath = selectedDir.getPath();
-                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                try {
-                    DownloadStepConverter dsc = new DownloadStepConverter(
+            String savePath = selectedDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                DownloadStepConverter dsc = new DownloadStepConverter(
                         dataBean.getUserName(),
                         dataBean.getPassword());
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (final ConverterException ce) {
-                    Platform.runLater(() -> {
-                        statusBarText.setText(ce.getMessage());
-                    });
-                }
-                return 0;
+                JobList jl = dsc.convert(ds);
+                Processor p = Processor.getInstance();
+                p.addJob(jl);
+            } catch (final ConverterException ce) {
+                statusBarText.setText(ce.getMessage());
             }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+        }
     }
 
+    /**
+     * Handle events on the process Chain Checkbox.
+     * @param event the event
+     */
+    @FXML
+    protected void handleChainCheckbox(ActionEvent event) {
+        if (chkChain.isSelected()) {
+            processStepContainter.setVisible(true);
+        } else {
+            factory.removeAllChainAttributes(this.dataBean, chainContainer);
+            processStepContainter.setVisible(false);
+        }
+    }
     /**
      * Handle config saving.
      * @param event The event.
      */
     @FXML
     protected void handleSaveConfig(ActionEvent event) {
-
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-        File downloadDir = dirChooser.showDialog(getPrimaryStage());
-        if (downloadDir == null) {
-            return;
-        }
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-        if (configFile == null) {
-            return;
-        }
-
         extractStoredQuery();
         extractBoundingBox();
-        this.dataBean.setProcessingSteps(extractProcessingSteps());
+        if (validateInput()) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            File downloadDir = dirChooser.showDialog(getPrimaryStage());
+            if (downloadDir == null) {
+                return;
+            }
 
-        String savePath = downloadDir.getPath();
-        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-        try {
-            ds.write(configFile);
-        } catch (IOException ex) {
-            log.log(Level.WARNING, ex.getMessage() , ex);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(downloadDir);
+            FileChooser.ExtensionFilter xmlFilter =
+                    new FileChooser.ExtensionFilter("xml files (*.xml)",
+                            "xml");
+            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml" ,
+                    null);
+            fileChooser.setInitialFileName(uniqueName.getName());
+            fileChooser.getExtensionFilters().add(xmlFilter);
+            fileChooser.setSelectedExtensionFilter(xmlFilter);
+            fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+            File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
+            }
+            if (configFile == null) {
+                return;
+            }
+
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+            String savePath = downloadDir.getPath();
+            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+            try {
+                ds.write(configFile);
+            } catch (IOException ex) {
+                log.log(Level.WARNING, ex.getMessage(), ex);
+            }
         }
     }
 
@@ -512,6 +648,17 @@ public class Controller {
      */
     private void chooseService() {
         Task task = new Task() {
+            private void setAuth() {
+                Platform.runLater(() -> {
+                    statusBarText.setText(
+                            I18n.format("status.service-needs-auth")
+                    );
+                });
+                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                serviceAuthenticationCbx.setSelected(true);
+                serviceUser.setDisable(false);
+                servicePW.setDisable(false);
+            }
             @Override
             protected Integer call() throws Exception {
                 serviceURL.getScene().setCursor(Cursor.WAIT);
@@ -525,8 +672,24 @@ public class Controller {
                     password = servicePW.getText();
                     dataBean.setPassword(password);
                 }
+                if ((username == null && password == null)
+                        || (username.equals("") && password.equals(""))) {
+                    if (ServiceChecker.isRestricted(new URL(url))) {
+                        String pw = dataBean.getPassword();
+                        String un = dataBean.getUserName();
+
+                        if ((pw == null && un == null)
+                                || (pw.isEmpty() && un.isEmpty())) {
+                            setAuth();
+                            return 0;
+                        }
+                    } else {
+                        serviceAuthenticationCbx.setSelected(false);
+                        serviceUser.setDisable(true);
+                        servicePW.setDisable(true);
+                    }
+                }
                 if (url != null && !"".equals(url)) {
-                    //view.setStatusBarText("Check for Servicetype");
                     ServiceType st = ServiceChecker.checkService(
                         url,
                         dataBean.getUserName(),
@@ -547,7 +710,9 @@ public class Controller {
                                     statusBarText.setText(
                                         I18n.getMsg("status.type.atom"));
                                 });
-                                Atom atom = new Atom(url);
+                                Atom atom = new Atom(url,
+                                        dataBean.getUserName(),
+                                        dataBean.getPassword());
                                 dataBean.setAtomService(atom);
                                 break;
                             case WFSOne:
@@ -584,14 +749,10 @@ public class Controller {
                                 break;
                         }
                     }
-//                    dataBean.setWebService(ws);
                     Platform.runLater(() -> {
                         setServiceTypes();
                         serviceTypeChooser.
                                 getSelectionModel().select(0);
-                        /*ChooseTypeEventHandler chooseType
-                                = new ChooseTypeEventHandler();
-                        chooseType.handle(e);*/
                         statusBarText.setText(I18n.getMsg("status.ready"));
                     });
                 } else {
@@ -616,10 +777,8 @@ public class Controller {
         if (dataBean.isWebServiceSet()) {
             switch (dataBean.getServiceType()) {
                 case WFSOne:
-//                    dataBean.setServiceTypes(
-//                            dataBean.getWFSService());
-//                    break;
                 case WFSTwo:
+                    ReferencedEnvelope extendWFS = null;
                     List<WFSMeta.Feature> features =
                         dataBean.getWFSService().features;
                     List<WFSMeta.StoredQuery> queries =
@@ -628,6 +787,16 @@ public class Controller {
                         FXCollections.observableArrayList();
                     for (WFSMeta.Feature f : features) {
                         types.add(new FeatureModel(f));
+                        if (f.bbox != null) {
+                            if (extendWFS == null) {
+                                extendWFS = f.bbox;
+                            } else {
+                                extendWFS.expandToInclude(f.bbox);
+                            }
+                        }
+                    }
+                    if (extendWFS != null) {
+                        mapWFS.setExtend(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
                         types.add(new StoredQueryModel(s));
@@ -644,20 +813,44 @@ public class Controller {
                             FXCollections.observableArrayList();
                     List<WMSMapSwing.FeaturePolygon> polygonList = new
                             ArrayList<WMSMapSwing.FeaturePolygon>();
-                    for (Atom.Item i : items) {
-                        opts.add(new AtomItemModel(i));
-                        WMSMapSwing.FeaturePolygon polygon =
-                                new WMSMapSwing.FeaturePolygon(
-                                        i.polygon,
-                                        i.title,
-                                        i.id);
-                        polygonList.add(polygon);
+                    //Polygons are always epsg:4326
+                    // (http://www.georss.org/gml.html)
+                    try {
+                        ReferencedEnvelope extendATOM = null;
+                        atomCRS = CRS.decode(ATOM_CRS_STRING);
+                        Geometry all = null;
+                        for (Atom.Item i : items) {
+                            opts.add(new AtomItemModel(i));
+                            WMSMapSwing.FeaturePolygon polygon =
+                                    new WMSMapSwing.FeaturePolygon(
+                                            i.polygon,
+                                            i.title,
+                                            i.id,
+                                            this.atomCRS);
+                            polygonList.add(polygon);
+                            if (i.polygon != null) {
+                                if (all == null) {
+                                    all = i.polygon;
+                                } else {
+                                    all = all.union(i.polygon);
+                                }
+                            }
+                        }
+                        if (all != null) {
+                            extendATOM = new ReferencedEnvelope(
+                                    all.getEnvelopeInternal(), atomCRS);
+                            mapAtom.setExtend(extendATOM);
+                        }
+                        mapAtom.drawPolygons(polygonList);
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
                     }
-                    mapAtom.drawPolygons(polygonList);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
-                    serviceTypeChooser.setValue(opts.get(0));
-                    chooseType(serviceTypeChooser.getValue());
+                    if (!opts.isEmpty()) {
+                        serviceTypeChooser.setValue(opts.get(0));
+                        chooseType(serviceTypeChooser.getValue());
+                    }
                 default:
             }
         }
@@ -670,10 +863,10 @@ public class Controller {
             Atom.Item item = (Atom.Item)data.getItem();
             item.load();
             mapAtom.highlightSelectedPolygon(item.id);
-            List<Field> fields = item.fields;
+            List<Atom.Field> fields = item.fields;
             ObservableList<String> list =
                 FXCollections.observableArrayList();
-            for (Field f : fields) {
+            for (Atom.Field f : fields) {
                 list.add(f.type);
             }
             this.atomVariationChooser.setItems(list);
@@ -693,8 +886,6 @@ public class Controller {
                 // Displays the webview with white background...
             }
             engine.loadContent(item.description);
-            this.valueAtomFormat.setText(item.format);
-            this.valueAtomRefsys.setText(item.defaultCRS);
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
@@ -704,12 +895,53 @@ public class Controller {
                 this.basicWFSContainer.setVisible(true);
                 this.atomContainer.setVisible(false);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
-                ObservableList<String> list =
-                    FXCollections.observableArrayList();
+                ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);
-                this.referenceSystemChooser.setItems(list);
-                this.referenceSystemChooser.setValue(feature.defaultCRS);
+                ObservableList<CRSModel> crsList =
+                        FXCollections.observableArrayList();
+                for (String crsStr: list) {
+                    try {
+                        String newcrsStr = crsStr;
+                        String seperator = null;
+                        if (newcrsStr.contains("::")) {
+                            seperator = "::";
+                        } else if (newcrsStr.contains("/")) {
+                            seperator = "/";
+                        }
+                        if (seperator != null) {
+                            newcrsStr = "EPSG:"
+                                    + newcrsStr.substring(
+                                    newcrsStr.lastIndexOf(seperator)
+                                    + seperator.length(),
+                                    newcrsStr.length());
+                        }
+                        CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                        CRSModel crsm = new CRSModel(crs);
+                        crsm.setOldName(crsStr);
+                        crsList.add(crsm);
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                }
+                if (!crsList.isEmpty()) {
+                    this.referenceSystemChooser.setItems(crsList);
+                    CRSModel crsm = crsList.get(0);
+                    try {
+                        CoordinateReferenceSystem initCRS = CRS.decode(
+                                INITIAL_CRS_DISPLAY);
+                        CRSModel initCRSM = new CRSModel(initCRS);
+                        for (int i = 0; i < crsList.size(); i++) {
+                            if (crsList.get(i).equals(initCRSM)) {
+                                crsm = crsList.get(i);
+                                break;
+                            }
+                        }
+                    } catch (FactoryException e) {
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                    this.referenceSystemChooser.setValue(crsm);
+                }
                 List<String> outputFormats = feature.outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
@@ -753,10 +985,10 @@ public class Controller {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         mapWFS = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer());
+                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
         mapWFS.setCoordinateDisplay(basicX1, basicY1, basicX2, basicY2);
         mapAtom = new WMSMapSwing(url, MAP_WIDTH, MAP_HEIGHT,
-                serviceSetting.getWMSLayer());
+                serviceSetting.getWMSLayer(), serviceSetting.getWMSSource());
         mapAtom.addEventHandler(PolygonClickedEvent.ANY,
                 new SelectedAtomPolygon());
         mapAtom.setCoordinateDisplay(atomX1, atomY1, atomX2, atomY2);
@@ -770,6 +1002,7 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
+        this.processStepContainter.setVisible(false);
     }
 
     /**
@@ -832,521 +1065,10 @@ public class Controller {
      */
     public Controller() {
         this.factory = new UIFactory();
-/*
-        //this.dataBean = dataBean;
-        //this.view = new View();
-        //this.view.setServiceListEntries(this.dataBean.getServicesAsList());
-        //this.view.setCatalogueServiceNameLabelText(
-        //        I18n.getMsg("gui.catalogue") + ": "
-        //        + this.dataBean.getCatalogService().getProviderName());
-
-        // Register Event Handler
-        /*view.getQuitMenuItem().
-                setOnAction(new QuitMenuItemEventHandler());
-        view.getResetMenuItem().
-                setOnAction(new ResetMenuItemEventHandler());
-        view.getServiceChooseButton().
-                setOnAction(new ServiceChooseButtonEventHandler());
-        view.getTypeComboBox().
-                setOnAction(new ChooseTypeEventHandler());
-        view.getAttributesFilledButton().
-                setOnAction(new AttributesFilledEventHandler());
-        //FIXME - Not only on Click, but everytime
-        view.getServiceList().
-                setOnMouseClicked(new MouseClickedOnServiceList());
-        view.getDownloadButton().
-                setOnAction(new DownloadButtonEventHandler());
-        view.getSaveMenuItem().
-                setOnAction(new SaveMenuItemEventHandler());
-        //TODO - Implement Loading Function
-        /*
-        view.getLoadMenuItem().
-                setOnAction(new LoadMenuItemEventHandler());
-
-        // Register Listener
-        view.getServiceSearch().textProperty().
-                addListener(new SearchServiceListChangeListener());
-*/
         Processor.getInstance().addListener(new DownloadListener());
 
-        // stage overrides
-//        getPrimaryStage().
-//                setOnCloseRequest(new ConfirmCloseEventHandler());
-
     }
 
-    /**
-     * shows the view.
-     *
-    public void show() {
-    //    view.show(getPrimaryStage());
-    }
-
-    /**
-     * sets the Service Types.
-     *
-    public void setServiceTypes() {
-        if (dataBean.isWebServiceSet()) {
-            switch (dataBean.getWebService().getServiceType()) {
-                case WFSOne:
-                    dataBean.setServiceTypes(
-                            dataBean.getWebService().getTypes());
-                    break;
-                case WFSTwo:
-                    WFSTwo wfstwo = (WFSTwo) dataBean.getWebService();
-                    ArrayList<String> wfstwoServices = new ArrayList<>();
-                    ArrayList<String> storedQuieres = dataBean
-                        .getWebService().getStoredQueries();
-                    for (String str: storedQuieres) {
-                        str = wfstwo.getSimplePrefix() + " " + str;
-                        wfstwoServices.add(str);
-                    }
-                    ArrayList<String> types = dataBean
-                            .getWebService().getTypes();
-                    for (String str: types) {
-                        str = wfstwo.getBasicPrefix() + " " + str;
-                        wfstwoServices.add(str);
-                    }
-                    dataBean.setServiceTypes(wfstwoServices);
-                    break;
-                case Atom:
-                default:
-            }
-//            view.setTypes(dataBean.getServiceTypes());
-        }
-    }
-
-    /**
-     * sets the Service Types Attributes.
-     * @param map the Map of Attributes
-     *
-    public void setServiceAttributes(Map<String, String> map) {
-        if (dataBean.isWebServiceSet()) {
-  //          view.setAttributes(map);
-            setWMSMap(this.dataBean.getWmsUrl(), this.dataBean.getWmsName());
-        }
-    }
-
-    private void setWMSMap(String wmsUrl, String wmsName) {
-  //      view.setWMSMap(wmsUrl, wmsName);
-    }
-
-    //+++++++++++++++++++++++++++++++++++++++++++++
-    // Listener
-    //+++++++++++++++++++++++++++++++++++++++++++++
-
-    /**
-     * listener for changes in search field, so the list can be searched.
-     *
-    @FXML
-    protected void searchServiceList(String oldVal, String newVal) {
-        if (oldVal != null && (newVal.length() < oldVal.length())) {
-//            view.getServiceList().setItems(view.getServiceListEntries());
-        }
-        String value = newVal.toUpperCase();
-        ObservableList<String> subentries
-                = FXCollections.observableArrayList();
-        Map<String, String> catalog = dataBean.getCatalogService()
-                .getServicesByFilter(newVal);
-        for (Map.Entry<String, String> entry: catalog.entrySet()) {
-//            view.addServiceToList(entry.getKey());
-            dataBean.addServiceToList(entry.getKey(), entry.getValue());
-        }
-//        for (Object entry : view.getServiceList().getItems()) {
-            boolean match = true;
-            String entryText = (String) entry;
-            if (!entryText.toUpperCase().contains(value)) {
-                match = false;
-                break;
-            }
-            if (match) {
-                subentries.add(entryText);
-            }
-        }
-//        view.getServiceList().setItems(subentries);
-    }
-
-    //+++++++++++++++++++++++++++++++++++++++++++++
-    // Events
-    //+++++++++++++++++++++++++++++++++++++++++++++
-
-    /**
-     * Event Handler for choosing a type.
-     *
-    private class ChooseTypeEventHandler
-        implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            Map<String, String> map = new HashMap<String, String>();
-//            if (view.getTypeComboBox().getSelectionModel().getSelectedItem()
-//                    != null) {
-//                String choosenType =
-//                        view.getTypeComboBox().getSelectionModel()
-//                        .getSelectedItem()
-//                        .toString();
-                ArrayList <AttributeType> attributes = null;
-                switch (dataBean.getWebService().getServiceType()) {
-                    case WFSOne:
-                        map = dataBean.getWebService()
-                                        .getAttributes(choosenType);
-                        break;
-                    case WFSTwo:
-                        if (choosenType.startsWith(WFSTwo.getSimplePrefix())) {
-                            choosenType = choosenType.substring(WFSTwo
-                                    .getSimplePrefix().length() + 1);
-                            map.putAll(dataBean.getWebService()
-                                    .getParameters(choosenType));
-                        } else {
-                            choosenType = choosenType.substring(WFSTwo
-                                    .getBasicPrefix().length() + 1);
-                            map.putAll(dataBean.getWebService()
-                                    .getAttributes(choosenType));
-                        }
-                        break;
-                    case Atom:
-                    default:
-                }
-                dataBean.setAttributes(map);
-                setServiceAttributes(dataBean.getAttributes());
-            }
-        }
-    }
-
-    /**
-     * Class for handling stuff if Attributes are filled.
-     *
-    private class AttributesFilledEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            Map map = dataBean.getAttributes();
-            for (Node n:view.getAttributeGridPane().getChildren()) {
-                System.out.println(n.toString());
-            }
-        }
-    }
-
-    /**
-     * Event handler for clicking "Save".
-     *
-    private class LoadMenuItemEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            /* TODO: Implent this function in a way so the configuration File
-             * fills the Frontend with the Informtaion. So all fields in the
-             * frontend should be filled with the Information from the config
-             * file, so you can check and verify your settings before clicking
-             * "download"
-             *
-            FileChooser configFileChooser = new FileChooser();
-            configFileChooser.setTitle(I18n.getMsg("gui.load-conf"));
-
-            File configFile = configFileChooser.showOpenDialog(
-                    getPrimaryStage());
-            if (configFile == null) {
-                return;
-            }
-            try {
-                DownloadStep ds = DownloadStep.read(configFile);
-                FileChooser downloadFileChooser = new FileChooser();
-                downloadFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-                downloadFileChooser.setInitialDirectory(new File(ds.getPath()));
-                File downloadFile = downloadFileChooser.showSaveDialog(
-                        getPrimaryStage());
-                if (downloadFile == null) {
-                    return;
-                }
-                ds.setPath(downloadFile.toString());
-                JobList jl = DownloadStepConverter.convert(ds);
-                Processor p = Processor.getInstance();
-                p.addJob(jl);
-            } catch (IOException | ConverterException ex) {
-                log.log(Level.WARNING, ex.getMessage() , ex);
-            }
-        }
-    }
-
-    /**
-     * Event handler for clicking "Save".
-     *
-    private class SaveMenuItemEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            FileChooser downloadFileChooser = new FileChooser();
-            downloadFileChooser.setTitle(I18n.getMsg("gui.save-file"));
-            File downloadFile = downloadFileChooser.showSaveDialog(
-                    getPrimaryStage());
-            if (downloadFile == null) {
-                return;
-            }
-            FileChooser configFileChooser = new FileChooser();
-            configFileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-            File configFile = configFileChooser.showSaveDialog(
-                    getPrimaryStage());
-            if (configFile == null) {
-                return;
-            }
-            String savePath = downloadFile.getPath();
-            DownloadStepFactory dsf = new DownloadstepFactory();
-            DownloadStep ds = dsf.getStep(view, dataBean, savePath);
-            try {
-                ds.write(configFile);
-
-            } catch (IOException ex) {
-                log.log(Level.WARNING, ex.getMessage() , ex);
-            }
-        }
-    }
-
-    /**
-     * Event Handler for the Quit Programm Menu Entry.
-     *
-    private class QuitMenuItemEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            getPrimaryStage().fireEvent(
-                            new WindowEvent(
-                                    getPrimaryStage(),
-                                    WindowEvent.WINDOW_CLOSE_REQUEST
-                            )
-            );
-        }
-    }
-
-    /**
-     * Event Handler for resetting the programm.
-     *
-    private class ResetMenuItemEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            view.reset();
-        }
-    }
-
-    /**
-     * Event Handler for Downloading.
-     *
-    private class DownloadButtonEventHandler
-            implements EventHandler<ActionEvent> {
-        @Override
-        public void handle(ActionEvent e) {
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-            //fileChooser.getExtensionFilters().addAll();
-            File selectedDir = dirChooser.showDialog(
-                    getPrimaryStage());
-            if (selectedDir == null) {
-                return;
-            }
-            Task task = new Task() {
-                @Override
-                protected Integer call() throws Exception {
-                    String savePath = selectedDir.getPath();
-                    DownloadStepFactory dsf = DownloadStepFactory.getInstance();
-                    DownloadStep ds = dsf.getStep(view, dataBean, savePath);
-                    JobList jl = DownloadStepConverter.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                    return 0;
-                }
-            };
-            Thread th = new Thread(task);
-            th.setDaemon(true);
-            th.start();
-        }
-    }
-
-    /**
-     * Event Handler for the choose Service Button.
-     *
-    private class ServiceChooseButtonEventHandler implements
-            EventHandler<ActionEvent> {
-
-        public void handle(MouseEvent e) {
-            ActionEvent ev = new ActionEvent();
-            handle(ev);
-        }
-
-        @Override
-        public void handle(ActionEvent e) {
-            Task task = new Task() {
-                @Override
-                protected Integer call() throws Exception {
-                    view.getScene().setCursor(Cursor.WAIT);
-                    String serviceURL = null;
-                    String username = null;
-                    String password = null;
-                    if (view.getServiceUseAuthenticationCBX().
-                            isSelected()) {
-                        username =
-                                view.getServiceUser().
-                                        textProperty().getValue();
-                        dataBean.setUsername(username);
-                        password =
-                                view.getServicePW().
-                                        textProperty().getValue();
-                        dataBean.setPassword(password);
-                    }
-                    if (view.getServiceList().
-                            getSelectionModel().getSelectedItems().get(0)
-                            != null) {
-                        String serviceName =
-                                view.getServiceList().
-                                        getSelectionModel().
-                                        getSelectedItems().get(0);
-                        serviceURL = dataBean.getServiceURL(serviceName);
-                    } else {
-                        serviceURL =
-                                view.getServiceURLfield().
-                                        textProperty().getValue();
-                    }
-                    if (view.getServiceUseAuthenticationCBX().
-                            isSelected()) {
-                        username = view.getServiceUser().
-                                        textProperty().getValue();
-                        dataBean.setUsername(username);
-                        password = view.getServicePW().
-                                        textProperty().getValue();
-                        dataBean.setPassword(password);
-                    }
-                    if (serviceURL != null) {
-                        //view.setStatusBarText("Check for Servicetype");
-                        ServiceType st =
-                                ServiceChecker.checkService(serviceURL,
-                                        dataBean.getBase64EncAuth());
-                        WebService ws = null;
-                        //Check for null, since switch breaks on a null value
-                        if (st == null) {
-                            log.log(Level.WARNING, "Could not determine "
-                                    + "Service Type" , st);
-                            Platform.runLater(() -> {
-                                view.setStatusBarText(
-                                    I18n.getMsg("status.no-service-type"));
-                            });
-                        } else {
-                            switch (st) {
-                                case Atom:
-                                    Platform.runLater(() -> {
-                                        view.setStatusBarText(
-                                            I18n.getMsg("status.type.atom"));
-                                    });
-                                    ws = new Atom(serviceURL);
-                                    break;
-                                case WFSOne:
-                                    Platform.runLater(() -> {
-                                        view.setStatusBarText(
-                                            I18n.getMsg("status.type.wfsone"));
-                                    });
-                                    ws = new WFSOne(serviceURL, dataBean
-                                            .getUserName(), dataBean
-                                            .getPassword());
-                                    break;
-                                case WFSTwo:
-                                    Platform.runLater(() -> {
-                                        view.setStatusBarText(
-                                            I18n.getMsg("status.type.wfstwo"));
-                                    });
-                                    ws = new WFSTwo(serviceURL, dataBean
-                                            .getUserName(), dataBean
-                                            .getPassword());
-                                    break;
-                                default:
-                                    log.log(Level.WARNING,
-                                        "Could not determine URL" , st);
-                                    Platform.runLater(() -> {
-                                        view.setStatusBarText(
-                                                I18n.getMsg("status.no-url"));
-                                    });
-                                    break;
-                            }
-                        }
-                        dataBean.setWebService(ws);
-                        Platform.runLater(() -> {
-                            setServiceTypes();
-                            view.getTypeComboBox().
-                                    getSelectionModel().select(0);
-                            ChooseTypeEventHandler chooseType
-                                    = new ChooseTypeEventHandler();
-                            chooseType.handle(e);
-                            view.setStatusBarText(I18n.getMsg("status.ready"));
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            view.setStatusBarText(I18n.getMsg("status.no-url"));
-                        });
-                    }
-                    view.getScene().setCursor(Cursor.DEFAULT);
-                    return 0;
-                }
-            };
-            Thread th = new Thread(task);
-            view.setStatusBarText(I18n.getMsg("status.calling-service"));
-            th.setDaemon(true);
-            th.start();
-        }
-    }
-
-    /**
-     * Event Handler for closing the Application.
-     *
-    private class ConfirmCloseEventHandler implements
-            EventHandler<WindowEvent> {
-        @Override
-        public void handle(WindowEvent e) {
-            Alert closeConfirmation = new Alert(
-                    Alert.AlertType.CONFIRMATION,
-                    I18n.getMsg("gui.want-to-quit")
-            );
-            Button exitButton
-                    = (Button) closeConfirmation.getDialogPane().lookupButton(
-                        ButtonType.OK
-                    );
-            exitButton.setText(I18n.getMsg("gui.exit"));
-            closeConfirmation.setHeaderText(I18n.getMsg("gui.confirm-exit"));
-            closeConfirmation.initModality(Modality.APPLICATION_MODAL);
-            closeConfirmation.initOwner(getPrimaryStage());
-
-            Optional<ButtonType> closeResponse =
-                    closeConfirmation.showAndWait();
-            if (!ButtonType.OK.equals(closeResponse.get())) {
-                e.consume();
-            }
-        }
-    }
-
-    /**
-     *  Eventhandler for mouse events on map.
-     *
-    private class MouseClickedOnServiceList
-            implements EventHandler<MouseEvent> {
-        @Override
-        public void handle(MouseEvent e) {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                if (e.getClickCount() > 1) {
-                    ServiceChooseButtonEventHandler se =
-                            new ServiceChooseButtonEventHandler();
-                    se.handle(e);
-                }
-                if (e.getClickCount() == 1) {
-                    if (view.getServiceList().
-                            getSelectionModel().getSelectedItems().get(0)
-                            != null) {
-                        String serviceName =
-                                view.getServiceList().
-                                        getSelectionModel().
-                                        getSelectedItems().get(0);
-                        String serviceURL = dataBean.getServiceURL(serviceName);
-                        view.setServiceURLText(serviceURL);
-                    }
-                }
-            }
-        }
-    }
-*/
     /** Keeps track of download progression and errors. */
     private class DownloadListener implements ProcessorListener, Runnable {
 

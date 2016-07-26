@@ -36,6 +36,7 @@ import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
@@ -60,9 +61,10 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         String variation,
         File workingDir,
         String user,
-        String password
+        String password,
+        Log logger
     ) {
-        super(user, password);
+        super(user, password, logger);
         this.url = url;
         this.dataset = dataset;
         this.variation = variation;
