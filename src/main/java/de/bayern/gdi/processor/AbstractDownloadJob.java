@@ -71,12 +71,21 @@ public abstract class AbstractDownloadJob
         }
     }
 
+    /** Log message to download log.
+     * @param msg The message to log.
+     */
+    protected void log(String msg) {
+        if (logger != null) {
+            logger.log(msg);
+        }
+    }
+
     /**
      * Broadcasts a message to a processor if set.
      * @param message The message to broadcast.
      */
     protected void broadcastMessage(String message) {
-        logger.log(message);
+        log(message);
         if (this.processor != null) {
             this.processor.broadcastMessage(message);
         }
@@ -87,7 +96,7 @@ public abstract class AbstractDownloadJob
      * @param e The exception to broadcast.
      */
     protected void broadcastException(JobExecutionException e) {
-        logger.log(e.getMessage());
+        log(e.getMessage());
         if (this.processor != null) {
             this.processor.broadcastException(e);
         }
@@ -111,7 +120,7 @@ public abstract class AbstractDownloadJob
             return new URL(urlString);
         } catch (MalformedURLException mue) {
             String msg = I18n.format("file.download.bad.url", urlString);
-            logger.log(msg);
+            log(msg);
             throw new JobExecutionException(msg);
         }
     }
@@ -128,7 +137,7 @@ public abstract class AbstractDownloadJob
             return HTTP.getGetRequest(url);
         } catch (URISyntaxException use) {
             String msg = I18n.format("file.download.bad.url", url);
-            logger.log(msg);
+            log(msg);
             throw new JobExecutionException(msg);
         }
     }

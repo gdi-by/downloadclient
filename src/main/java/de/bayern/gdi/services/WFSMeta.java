@@ -40,7 +40,7 @@ public class WFSMeta {
         /** get. */
         public String get;
         /** output formats. */
-        public ArrayList<String> outputFormats;
+        public List<String> outputFormats;
         /** constraints. */
         public List<Constraint> constraints;
 
@@ -61,7 +61,7 @@ public class WFSMeta {
         public String toString() {
             return "operation: { name: " + name + " "
                 + " get: " + get + " "
-                + " constraints: " +  constraints() + " "
+                + " constraints: " + constraints() + " "
                 + " output formats: " + outputFormats() + " }";
         }
 
@@ -71,19 +71,7 @@ public class WFSMeta {
          *         null if paging is not supported.
          */
         public Integer featuresPerPage() {
-            for (Constraint constraint: this.constraints) {
-                if (constraint.name != null
-                && constraint.value != null
-                && constraint.name.equals("CountDefault")) {
-                    try {
-                        return Integer.valueOf(constraint.value);
-                    } catch (NumberFormatException nfe) {
-                        // Ignore me.
-                    }
-                    return null;
-                }
-            }
-            return null;
+            return WFSMeta.featuresPerPage(this.constraints);
         }
     }
 
@@ -302,6 +290,31 @@ public class WFSMeta {
             : def;
     }
 
+    private static Integer featuresPerPage(List<Constraint> constraints) {
+        for (Constraint constraint: constraints) {
+            if (constraint.name != null
+            && constraint.value != null
+            && constraint.name.equals("CountDefault")) {
+                try {
+                    return Integer.valueOf(constraint.value);
+                } catch (NumberFormatException nfe) {
+                    // Ignore me.
+                }
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Figure out if this service implements paging.
+     * @return number of features per page.
+     *         null if paging is not supported.
+     */
+    public Integer featuresPerPage() {
+        return featuresPerPage(this.constraints);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("WFSMeta {\n");
@@ -336,6 +349,11 @@ public class WFSMeta {
         sb.append("\toutput formats: {\n");
         for (String outputFormat: outputFormats) {
             sb.append("\t\t").append(outputFormat).append("\n");
+        }
+        sb.append("\t}\n");
+        sb.append("\tconstraints: {\n");
+        for (Constraint constraint: constraints) {
+            sb.append("\t\t").append(constraint).append("\n");
         }
         sb.append("\t}\n");
         sb.append("}");

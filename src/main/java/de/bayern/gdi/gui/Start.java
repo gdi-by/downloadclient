@@ -18,10 +18,13 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Unauthorized;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -30,8 +33,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import de.bayern.gdi.utils.I18n;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -90,7 +91,9 @@ public class Start extends Application {
             Controller controller = fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);
-
+            Unauthorized unauthorized = new WarningPopup();
+            FileResponseHandler.setUnauthorized(unauthorized);
+            DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
             primaryStage.setScene(scene);
             primaryStage.show();
