@@ -153,6 +153,9 @@ public class Controller {
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
     @FXML private HBox processStepContainter;
+    @FXML private HBox basicWFSX1Y1;
+    @FXML private HBox basicWFSX2Y2;
+    @FXML private Label referenceSystemChooserLabel;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
 
@@ -925,7 +928,12 @@ public class Controller {
             if (data instanceof FeatureModel) {
                 this.simpleWFSContainer.setVisible(false);
                 this.basicWFSContainer.setVisible(true);
+                this.mapNodeWFS.setVisible(true);
                 this.atomContainer.setVisible(false);
+                this.basicWFSX1Y1.setVisible(true);
+                this.basicWFSX2Y2.setVisible(true);
+                this.referenceSystemChooser.setVisible(true);
+                this.referenceSystemChooserLabel.setVisible(true);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
@@ -975,14 +983,12 @@ public class Controller {
                     this.referenceSystemChooser.setValue(crsm);
                 }
                 List<String> outputFormats = feature.outputFormats;
+
+                outputFormats = this.dataBean.getWFSService()
+                        .findOperation("GetFeature").outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
-                        this.dataBean.getWFSService()
-                            .findOperation("GetFeature").outputFormats;
-                    if (outputFormats.isEmpty()) {
-                        outputFormats =
                             this.dataBean.getWFSService().outputFormats;
-                    }
                 }
                 ObservableList<String> formats =
                     FXCollections.observableArrayList(outputFormats);
@@ -992,9 +998,25 @@ public class Controller {
                     dataBean,
                     this.simpleWFSContainer,
                     (WFSMeta.StoredQuery)data.getItem());
+                List<String> outputFormats =
+                        this.dataBean.getWFSService()
+                                .findOperation("GetFeature").outputFormats;
+                if (outputFormats.isEmpty()) {
+                    outputFormats =
+                            this.dataBean.getWFSService().outputFormats;
+                }
+                ObservableList<String> formats =
+                        FXCollections.observableArrayList(outputFormats);
+                this.dataFormatChooser.setItems(formats);
                 this.simpleWFSContainer.setVisible(true);
-                this.basicWFSContainer.setVisible(false);
+                this.basicWFSContainer.setVisible(true);
+                this.mapNodeWFS.setVisible(false);
+                this.basicWFSX1Y1.setVisible(false);
+                this.basicWFSX2Y2.setVisible(false);
+                this.referenceSystemChooser.setVisible(false);
+                this.referenceSystemChooserLabel.setVisible(false);
                 this.atomContainer.setVisible(false);
+
             }
         }
     }
