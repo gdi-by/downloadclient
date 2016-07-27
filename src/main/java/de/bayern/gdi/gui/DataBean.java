@@ -32,6 +32,7 @@ import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import javafx.collections.FXCollections;
@@ -94,8 +95,10 @@ public class DataBean extends Observable {
         this.staticServices = serviceSetting.getServices();
 
         this.catalogServices = new ArrayList<ServiceModel>();
-        this.catalogService =
-            new CatalogService(serviceSetting.getCatalogueURL());
+        if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
+            this.catalogService =
+                    new CatalogService(serviceSetting.getCatalogueURL());
+        }
         this.processingSteps = new ArrayList<>();
     }
 
