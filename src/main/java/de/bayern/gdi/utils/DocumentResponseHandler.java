@@ -17,11 +17,9 @@
  */
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.gui.WarningPopup;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javafx.application.Platform;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -36,12 +34,38 @@ import org.w3c.dom.Document;
  */
 public class DocumentResponseHandler implements ResponseHandler<Document> {
 
+
     private WrapInputStreamFactory wrapFactory;
     private Boolean namespaceAware;
 
+    private static Unauthorized unauthorized;
+
+
+    /** Set the Unauthorized handler.
+     * @param setUnauthorized The handler to set.
+     */
+    public static synchronized void setUnauthorized(
+        Unauthorized setUnauthorized) {
+        unauthorized = setUnauthorized;
+
+    }
+
+    private static synchronized void callUnauthorized() {
+        if (unauthorized != null) {
+            unauthorized.unauthorized();
+        }
+    }
+
+    /**
+     * Constructor.
+     */
     public DocumentResponseHandler() {
     }
 
+    /**
+     * Constructor.
+     * @param wrapFactory the factory
+     */
     public DocumentResponseHandler(WrapInputStreamFactory wrapFactory) {
         this.wrapFactory = wrapFactory;
     }
@@ -67,10 +91,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
             if (status == HttpStatus.SC_UNAUTHORIZED) {
-                Platform.runLater(() -> {
-                    WarningPopup wp = new WarningPopup();
-                    wp.popup(I18n.format("gui.wrong.user.and.pw"));
-                });
+                callUnauthorized();
             }
             throw new ClientProtocolException("Unexpected response status: "
                     + status);

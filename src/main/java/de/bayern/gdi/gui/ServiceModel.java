@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.utils.I18n;
+
 /**
  * UI model for services.
  */
@@ -94,7 +96,7 @@ public class ServiceModel {
     @Override
     public String toString() {
         if (this.restricted) {
-            return this.name + " - restricted";
+            return  I18n.format("gui.restricted", this.name);
         }
         return this.name;
     }
