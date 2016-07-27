@@ -119,9 +119,12 @@ public class WfsTest extends TestCase {
         sb.append("FeaturesPerPage parsing failed.");
 
 
-        WFSMeta.Operation getFeature = wfsMeta.findOperation("GetFeature");
-        if (getFeature.featuresPerPage() == null
-                || getFeature.featuresPerPage() != FEATURES_PER_PAGE) {
+        Integer fpp = wfsMeta.findOperation("GetFeature").featuresPerPage();
+        if (fpp == null) { // Fall back to global default.
+            fpp = wfsMeta.featuresPerPage();
+        }
+
+        if (fpp == null || !fpp.equals(FEATURES_PER_PAGE)) {
             assertFalse(sb.toString(), true);
         }
     }
