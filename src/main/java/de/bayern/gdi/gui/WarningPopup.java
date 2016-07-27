@@ -19,7 +19,9 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Unauthorized;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -28,13 +30,13 @@ import javafx.scene.control.ButtonType;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class WarningPopup extends Alert {
+public class WarningPopup extends Alert implements Unauthorized {
 
     /**
      * Constructor.
      */
     public WarningPopup() {
-        this(Alert.AlertType.CONFIRMATION);
+        this(AlertType.ERROR);
     }
 
     private WarningPopup(@NamedArg("alertType") AlertType alertType) {
@@ -42,11 +44,19 @@ public class WarningPopup extends Alert {
     }
 
     /**
+     * Displays Poput Windows when the creds are wrong.
+     */
+    public void unauthorized() {
+        Platform.runLater(() -> {
+            popup(I18n.getMsg("gui.wrong.user.and.pw"));
+        });
+    }
+    /**
      * Opens the Popup-Window with the given text.
      * @param text the text
      */
     public void popup(String text) {
-        setTitle(I18n.getMsg("gui.confirm-exit"));
+        setTitle(I18n.getMsg("gui.failure"));
         setContentText(text);
         ButtonType confirm = new ButtonType(I18n.getMsg("gui.ok"),
                 ButtonBar.ButtonData.CANCEL_CLOSE);

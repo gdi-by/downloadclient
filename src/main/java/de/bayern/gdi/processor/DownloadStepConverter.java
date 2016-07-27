@@ -176,7 +176,8 @@ public class DownloadStepConverter {
     }
 
     private static String capURL(String base) {
-        return base + "?service=WFS&request=GetCapabilities&version=2.0.0";
+        return base
+            + "?service=WFS&request=GetCapabilities&acceptversions=2.0.0";
     }
 
     private static String wfsURL(
@@ -223,17 +224,6 @@ public class DownloadStepConverter {
             sb.append('&').append(parameters);
         }
 
-        /*
-        String bbox = dls.findParameter("bbox");
-        if (bbox != null) {
-            sb.append("&bbox=").append(StringUtils.urlEncode(bbox));
-        }
-
-        String srsName = dls.findParameter("srsName");
-        if (srsName != null) {
-            sb.append("&srsName=").append(StringUtils.urlEncode(srsName));
-        }
-        */
         return sb.toString();
     }
 
@@ -334,6 +324,9 @@ public class DownloadStepConverter {
         }
 
         Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
+        if (fpp == null) { // Fall back to global default.
+            fpp = meta.featuresPerPage();
+        }
 
         if (fpp == null) {
             unpagedWFSDownload(jl, workingDir, usedVars, meta);

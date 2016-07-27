@@ -244,4 +244,23 @@ public class StringUtils {
         }
         return places;
     }
+
+    /** Convert a whitespace separated list of double strings
+     * to a double array.
+     * @param s the string with the double values.
+     * @return the converted array. Returns an empty array
+     *         if the conversion fails.
+     */
+    public static double[] toDouble(String s) {
+        try {
+            String[] parts = s.split("[ \\t]+");
+            double[] x = new double[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                x[i] = Double.parseDouble(parts[i]);
+            }
+            return x;
+        } catch (NumberFormatException nfe) {
+            return new double[0];
+        }
+    }
 }
