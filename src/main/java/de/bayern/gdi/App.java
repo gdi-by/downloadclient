@@ -130,7 +130,7 @@ public class App {
                 || Config.getInstance().getMimeTypes() == null
                 || Config.getInstance().getProcessingConfig() == null) {
             System.err.println(
-                    "Initialiazation of config Failed");
+                    "Initialization of config failed");
             System.exit(1);
         }
 
