@@ -73,18 +73,24 @@ public class GMLCheckJob implements Job {
         this.files.add(file);
     }
 
+    private void log(String msg) {
+        if (this.logger != null) {
+            this.logger.log(msg);
+        }
+    }
+
     private void checkForProblems(File file)
     throws JobExecutionException {
         Document doc = XML.getDocument(file);
         if (doc == null) {
             String msg = I18n.format("gml.check.parsing.failed", file);
-            logger.log(msg);
+            log(msg);
             throw new JobExecutionException(msg);
         }
         String message = XML.xpathString(doc, ERROR_MESSAGE, null);
         if (message != null && !message.isEmpty()) {
             String msg = I18n.format("gml.check.wfs.problem", message);
-            logger.log(msg);
+            log(msg);
             throw new JobExecutionException(msg);
         }
     }
@@ -97,7 +103,7 @@ public class GMLCheckJob implements Job {
 
             if (!file.isFile() || !file.canRead()) {
                 String msg = I18n.format("gml.check.not.accessible", file);
-                logger.log(msg);
+                log(msg);
                 throw new JobExecutionException(msg);
             }
 
@@ -109,20 +115,20 @@ public class GMLCheckJob implements Job {
                     if (XML.containsTags(file, EXCEPTION_INDICATORS) == null) {
                         // No indicators no cry ...
                         String msg = I18n.getMsg("gml.check.passed");
-                        logger.log(msg);
+                        log(msg);
                         p.broadcastMessage(msg);
                         return;
                     }
                 } catch (XMLStreamException | IOException e) {
                     String msg =
                         I18n.format("gml.check.processing.failed", file);
-                    logger.log(msg);
+                    log(msg);
                     throw new JobExecutionException(msg);
                 }
             }
             checkForProblems(file);
             String msg = I18n.getMsg("gml.check.passed");
-            logger.log(msg);
+            log(msg);
             p.broadcastMessage(msg);
         }
     }
