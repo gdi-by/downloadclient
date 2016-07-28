@@ -79,6 +79,9 @@ public class UIFactory {
      * @param dataBean The data
      * @param type The selected service type
      * @param container The container node
+     * @param outputFormats the Outputformats of the selected service
+     * @param outputFormatSelectionHandler the handler for the outputformat
+     *                                     combobox
      *
      */
     public void fillSimpleWFS(

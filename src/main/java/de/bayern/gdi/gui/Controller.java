@@ -341,11 +341,12 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        EventHandler handle = new dataFormatHandler();
+        EventHandler handle = new DataFormatHandler();
         handle.handle(event);
     }
 
-    private class dataFormatHandler implements EventHandler {
+    /** handles the dataformat choosing .*/
+    private class DataFormatHandler implements EventHandler {
         @Override
         public void handle(Event event) {
             ComboBox source = (ComboBox) event.getSource();
@@ -1018,7 +1019,7 @@ public class Controller {
                     (WFSMeta.StoredQuery)data.getItem(),
                     this.dataBean.getWFSService()
                                 .findOperation("GetFeature").outputFormats,
-                    new dataFormatHandler());
+                    new DataFormatHandler());
                 /*
                 List<String> outputFormats =
                         this.dataBean.getWFSService()
