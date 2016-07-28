@@ -522,7 +522,7 @@ public class WMSMapSwing extends Parent {
                 y2,
                 sourceCRS,
                 targetCRS);
-
+        /*
         //http://math.stackexchange.com/a/170664
         Double rectX;
         Double rectY;
@@ -550,14 +550,15 @@ public class WMSMapSwing extends Parent {
                 rectX + rectHeigth);
         Point2D p22DN = new Point2D.Double(rectY + rectWidth,
                 rectX + rectWidth);
+                */
         this.coordinateX1TextField.setText(
-                String.valueOf(p12DN.getX()));
+                String.valueOf(p1.getX()));
         this.coordinateY1TextField.setText(
-                String.valueOf(p12DN.getY()));
+                String.valueOf(p1.getY()));
         this.coordinateX2TextField.setText(
-                String.valueOf(p22DN.getX()));
+                String.valueOf(p2.getX()));
         this.coordinateY2TextField.setText(
-                String.valueOf(p22DN.getY()));
+                String.valueOf(p2.getY()));
     }
 
     private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
@@ -617,6 +618,7 @@ public class WMSMapSwing extends Parent {
                             end = null;
                             mapEndPos = null;
                             mapPane.setSelectedEnvelope(null);
+                            //Evaluate here if the selection?
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
                             clearCoordinateDisplay();

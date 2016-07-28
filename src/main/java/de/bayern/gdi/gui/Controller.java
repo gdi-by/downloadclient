@@ -828,7 +828,6 @@ public class Controller {
                             }
                         }
                     }
-
                     if (extendWFS != null) {
                         mapWFS.setViewport(extendWFS);
                     }
