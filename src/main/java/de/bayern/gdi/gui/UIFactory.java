@@ -145,7 +145,7 @@ public class UIFactory {
         Separator sep = new Separator();
         HBox outputFormatBox = new HBox();
         Label outputFormatLabel = new Label();
-        outputFormatLabel.setText(I18n.format("gui.choose_type"));
+        outputFormatLabel.setText(I18n.format("gui.data-format"));
         ComboBox outputFormat = new ComboBox();
         outputFormat.setId(DATAFORMAT_ID);
         ObservableList<String> out =
