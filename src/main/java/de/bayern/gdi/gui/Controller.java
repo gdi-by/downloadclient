@@ -252,7 +252,6 @@ public class Controller {
             th.setDaemon(true);
             th.start();
         }
-
         this.serviceList.setItems(subentries);
     }
 
@@ -341,22 +340,14 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        EventHandler handle = new DataFormatHandler();
-        handle.handle(event);
+        ComboBox source = (ComboBox) event.getSource();
+        dataBean.addAttribute("outputformat",
+                source.getValue() != null
+                        ? source.getValue().toString()
+                        : "",
+                "");
     }
 
-    /** handles the dataformat choosing .*/
-    private class DataFormatHandler implements EventHandler {
-        @Override
-        public void handle(Event event) {
-            ComboBox source = (ComboBox) event.getSource();
-            dataBean.addAttribute("outputformat",
-                    source.getValue() != null
-                            ? source.getValue().toString()
-                            : "",
-                    "");
-        }
-    }
     /**
      * Handle the dataformat selection.
      *
@@ -504,40 +495,53 @@ public class Controller {
                     Label l1 = null;
                     Label l2 = null;
                     TextField tf = null;
+                    ComboBox cb = null;
                     for (Node hn: hboxChildren) {
-                        if (hn.getId() != UIFactory.getDataFormatID()) {
-                            if (hn.getClass() == TextField.class) {
-                                tf = (TextField) hn;
+                        if (hn.getClass() == ComboBox.class) {
+                            cb = (ComboBox) hn;
+                        }
+                        if (hn.getClass() == TextField.class) {
+                            tf = (TextField) hn;
+                        }
+                        if (hn.getClass() == Label.class) {
+                            if (l1 == null) {
+                                l1 = (Label) hn;
                             }
-                            if (hn.getClass() == Label.class) {
-                                if (l1 == null) {
-                                    l1 = (Label) hn;
-                                }
-                                if (l1 != (Label) hn) {
-                                    l2 = (Label) hn;
-                                }
+                            if (l1 != (Label) hn) {
+                                l2 = (Label) hn;
                             }
-                        } else {
-                            tf = null;
-                            l1 = null;
-                            l2 = null;
+                        }
+                        if  (tf != null
+                            && (l1 != null
+                                || l2 != null)) {
+                            name = tf.getUserData().toString();
+                            value = tf.getText();
+                            if (l2 != null && l1.getText().equals(name)) {
+                                type = l2.getText();
+                            } else {
+                                type = l1.getText();
+                            }
+                        }
+                        if (cb != null
+                                && (l1 != null
+                                || l2 != null)) {
+                            if (cb.getId().equals(
+                                    UIFactory.getDataFormatID())
+                                    ) {
+                                name = "outputformat";
+                                value = cb.getSelectionModel()
+                                        .getSelectedItem().toString();
+                                type = "";
+                            }
+                        }
+                        if (!name.isEmpty() && !value.isEmpty()) {
+                            this.dataBean.addAttribute(
+                                    name,
+                                    value,
+                                    type);
                         }
                     }
-                    if  (tf != null
-                            && l1 != null
-                            && l2 != null) {
-                        name = tf.getUserData().toString();
-                        value = tf.getText();
-                        if (l1.getText().equals(name)) {
-                            type = l2.getText();
-                        } else {
-                            type = l1.getText();
-                        }
-                        this.dataBean.addAttribute(
-                                name,
-                                value,
-                                type);
-                    }
+
                 }
             }
         }
@@ -1018,33 +1022,10 @@ public class Controller {
                     this.simpleWFSContainer,
                     (WFSMeta.StoredQuery)data.getItem(),
                     this.dataBean.getWFSService()
-                                .findOperation("GetFeature").outputFormats,
-                    new DataFormatHandler());
-                /*
-                List<String> outputFormats =
-                        this.dataBean.getWFSService()
-                                .findOperation("GetFeature").outputFormats;
-                if (outputFormats.isEmpty()) {
-                    outputFormats =
-                            this.dataBean.getWFSService().outputFormats;
-                }
-                ObservableList<String> formats =
-                        FXCollections.observableArrayList(outputFormats);
-                this.dataFormatChooser.setItems(formats);
-                */
+                                .findOperation("GetFeature").outputFormats);
                 this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
                 this.basicWFSContainer.setVisible(false);
-                /*
-                this.basicWFSContainer.setVisible(true);
-                this.mapNodeWFS.setVisible(false);
-                this.basicWFSX1Y1.setVisible(false);
-                this.basicWFSX2Y2.setVisible(false);
-                this.referenceSystemChooser.setVisible(false);
-                this.referenceSystemChooserLabel.setVisible(false);
-                */
-
-
             }
         }
     }

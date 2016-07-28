@@ -80,30 +80,25 @@ public class UIFactory {
      * @param type The selected service type
      * @param container The container node
      * @param outputFormats the Outputformats of the selected service
-     * @param outputFormatSelectionHandler the handler for the outputformat
-     *                                     combobox
      *
      */
     public void fillSimpleWFS(
         DataBean dataBean,
         VBox container,
         WFSMeta.StoredQuery type,
-        List <String> outputFormats,
-        EventHandler outputFormatSelectionHandler
+        List <String> outputFormats
     ) {
         createSimpleWFS(dataBean,
                 type,
                 container,
-                outputFormats,
-                outputFormatSelectionHandler);
+                outputFormats);
     }
 
     private void createSimpleWFS(
         DataBean dataBean,
         WFSMeta.StoredQuery type,
         VBox container,
-        List <String> outputFormats,
-        EventHandler outputFormatSelectionHandler
+        List <String> outputFormats
     ) {
         container.getChildren().clear();
         Label descriptionHead = new Label();
@@ -153,7 +148,6 @@ public class UIFactory {
         outputFormatLabel.setText(I18n.format("gui.choose_type"));
         ComboBox outputFormat = new ComboBox();
         outputFormat.setId(DATAFORMAT_ID);
-        outputFormat.setOnAction(outputFormatSelectionHandler);
         ObservableList<String> out =
                 FXCollections.observableArrayList();
         out.addAll(outputFormats);
