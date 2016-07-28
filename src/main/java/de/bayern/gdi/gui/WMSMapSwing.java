@@ -56,6 +56,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.ows.HTTPClient;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.factory.CommonFactoryFinder;
@@ -275,6 +276,31 @@ public class WMSMapSwing extends Parent {
     public WMSMapSwing(URL mapURL, int width, int heigth, String layer,
                        String source) {
         this(mapURL, width, heigth, layer, null, source);
+    }
+
+    /**
+     * gets the getCapabilities URL.
+     * @param mapURL the URL of the Map
+     * @return getCapabilties URL
+     */
+    public static URL getCapabiltiesURL(URL mapURL) {
+        URL url = mapURL;
+        try {
+            WebMapServer wms = new WebMapServer(mapURL);
+            HTTPClient httpClient = wms.getHTTPClient();
+            URL get = wms.
+                    getCapabilities().
+                    getRequest().
+                    getGetCapabilities().
+                    getGet();
+            if (get != null) {
+                url = new URL(get.toString() + "request=GetCapabilities");
+            }
+            httpClient.getConnectTimeout();
+        } catch (IOException | ServiceException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return url;
     }
 
     /**

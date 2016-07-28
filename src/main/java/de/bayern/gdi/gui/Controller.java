@@ -1040,7 +1040,10 @@ public class Controller {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        if (url != null && ServiceChecker.isReachable(url)) {
+        if (url != null
+                && ServiceChecker.isReachable(
+                WMSMapSwing.getCapabiltiesURL(url))
+                ) {
             mapWFS = new WMSMapSwing(url,
                     MAP_WIDTH,
                     MAP_HEIGHT,
