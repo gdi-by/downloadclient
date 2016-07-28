@@ -153,6 +153,9 @@ public class Controller {
     @FXML private Button addChainItem;
     @FXML private ProgressIndicator progressSearch;
     @FXML private HBox processStepContainter;
+    @FXML private HBox basicWFSX1Y1;
+    @FXML private HBox basicWFSX2Y2;
+    @FXML private Label referenceSystemChooserLabel;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
 
@@ -249,7 +252,6 @@ public class Controller {
             th.setDaemon(true);
             th.start();
         }
-
         this.serviceList.setItems(subentries);
     }
 
@@ -338,10 +340,11 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        this.dataBean.addAttribute("outputformat",
-            this.dataFormatChooser.getValue() != null
-                ? this.dataFormatChooser.getValue().toString()
-                : "",
+        ComboBox source = (ComboBox) event.getSource();
+        dataBean.addAttribute("outputformat",
+                source.getValue() != null
+                        ? source.getValue().toString()
+                        : "",
                 "");
     }
 
@@ -492,7 +495,11 @@ public class Controller {
                     Label l1 = null;
                     Label l2 = null;
                     TextField tf = null;
+                    ComboBox cb = null;
                     for (Node hn: hboxChildren) {
+                        if (hn.getClass() == ComboBox.class) {
+                            cb = (ComboBox) hn;
+                        }
                         if (hn.getClass() == TextField.class) {
                             tf = (TextField) hn;
                         }
@@ -504,18 +511,37 @@ public class Controller {
                                 l2 = (Label) hn;
                             }
                         }
+                        if  (tf != null
+                            && (l1 != null
+                                || l2 != null)) {
+                            name = tf.getUserData().toString();
+                            value = tf.getText();
+                            if (l2 != null && l1.getText().equals(name)) {
+                                type = l2.getText();
+                            } else {
+                                type = l1.getText();
+                            }
+                        }
+                        if (cb != null
+                                && (l1 != null
+                                || l2 != null)) {
+                            if (cb.getId().equals(
+                                    UIFactory.getDataFormatID())
+                                    ) {
+                                name = "outputformat";
+                                value = cb.getSelectionModel()
+                                        .getSelectedItem().toString();
+                                type = "";
+                            }
+                        }
+                        if (!name.isEmpty() && !value.isEmpty()) {
+                            this.dataBean.addAttribute(
+                                    name,
+                                    value,
+                                    type);
+                        }
                     }
-                    name = tf.getUserData().toString();
-                    value = tf.getText();
-                    if (l1.getText().equals(name)) {
-                        type = l2.getText();
-                    } else {
-                        type = l1.getText();
-                    }
-                    this.dataBean.addAttribute(
-                            name,
-                            value,
-                            type);
+
                 }
             }
         }
@@ -925,7 +951,12 @@ public class Controller {
             if (data instanceof FeatureModel) {
                 this.simpleWFSContainer.setVisible(false);
                 this.basicWFSContainer.setVisible(true);
+                this.mapNodeWFS.setVisible(true);
                 this.atomContainer.setVisible(false);
+                this.basicWFSX1Y1.setVisible(true);
+                this.basicWFSX2Y2.setVisible(true);
+                this.referenceSystemChooser.setVisible(true);
+                this.referenceSystemChooserLabel.setVisible(true);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
@@ -975,14 +1006,12 @@ public class Controller {
                     this.referenceSystemChooser.setValue(crsm);
                 }
                 List<String> outputFormats = feature.outputFormats;
+
+                outputFormats = this.dataBean.getWFSService()
+                        .findOperation("GetFeature").outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
-                        this.dataBean.getWFSService()
-                            .findOperation("GetFeature").outputFormats;
-                    if (outputFormats.isEmpty()) {
-                        outputFormats =
                             this.dataBean.getWFSService().outputFormats;
-                    }
                 }
                 ObservableList<String> formats =
                     FXCollections.observableArrayList(outputFormats);
@@ -991,10 +1020,12 @@ public class Controller {
                 factory.fillSimpleWFS(
                     dataBean,
                     this.simpleWFSContainer,
-                    (WFSMeta.StoredQuery)data.getItem());
+                    (WFSMeta.StoredQuery)data.getItem(),
+                    this.dataBean.getWFSService()
+                                .findOperation("GetFeature").outputFormats);
+                this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
                 this.basicWFSContainer.setVisible(false);
-                this.atomContainer.setVisible(false);
             }
         }
     }
