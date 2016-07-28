@@ -1017,12 +1017,18 @@ public class Controller {
                     FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
             } else if (data instanceof StoredQueryModel) {
+
+                List<String> outputFormats = this.dataBean.getWFSService()
+                        .findOperation("GetFeature").outputFormats;
+                if (outputFormats.isEmpty()) {
+                    outputFormats =
+                            this.dataBean.getWFSService().outputFormats;
+                }
                 factory.fillSimpleWFS(
                     dataBean,
                     this.simpleWFSContainer,
                     (WFSMeta.StoredQuery)data.getItem(),
-                    this.dataBean.getWFSService()
-                                .findOperation("GetFeature").outputFormats);
+                    outputFormats);
                 this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
                 this.basicWFSContainer.setVisible(false);

@@ -96,9 +96,7 @@ public class WFSMetaExtractor {
 
     private static final String XPATH_OUT_FORMATS
         = "/wfs:WFS_Capabilities"
-        + "/ows:OperationsMetadata/"
-        + "/ows:Operation[@name='GetFeature']"
-        + "/ows:Parameter[@name='outputFormat']"
+        + "/ows:OperationsMetadata/ows:Parameter[@name='outputFormat']"
         + "/ows:AllowedValues/ows:Value/text()";
 
     private static final String XPATH_FEATURE_OUT_FORMATS
