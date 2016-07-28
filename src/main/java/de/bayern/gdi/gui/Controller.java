@@ -341,13 +341,21 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleDataformatSelect(ActionEvent event) {
-        this.dataBean.addAttribute("outputformat",
-            this.dataFormatChooser.getValue() != null
-                ? this.dataFormatChooser.getValue().toString()
-                : "",
-                "");
+        EventHandler handle = new dataFormatHandler();
+        handle.handle(event);
     }
 
+    private class dataFormatHandler implements EventHandler {
+        @Override
+        public void handle(Event event) {
+            ComboBox source = (ComboBox) event.getSource();
+            dataBean.addAttribute("outputformat",
+                    source.getValue() != null
+                            ? source.getValue().toString()
+                            : "",
+                    "");
+        }
+    }
     /**
      * Handle the dataformat selection.
      *
@@ -496,29 +504,39 @@ public class Controller {
                     Label l2 = null;
                     TextField tf = null;
                     for (Node hn: hboxChildren) {
-                        if (hn.getClass() == TextField.class) {
-                            tf = (TextField) hn;
-                        }
-                        if (hn.getClass() == Label.class) {
-                            if (l1 == null) {
-                                l1 = (Label) hn;
+                        if (hn.getId() != UIFactory.getDataFormatID()) {
+                            if (hn.getClass() == TextField.class) {
+                                tf = (TextField) hn;
                             }
-                            if (l1 != (Label) hn) {
-                                l2 = (Label) hn;
+                            if (hn.getClass() == Label.class) {
+                                if (l1 == null) {
+                                    l1 = (Label) hn;
+                                }
+                                if (l1 != (Label) hn) {
+                                    l2 = (Label) hn;
+                                }
                             }
+                        } else {
+                            tf = null;
+                            l1 = null;
+                            l2 = null;
                         }
                     }
-                    name = tf.getUserData().toString();
-                    value = tf.getText();
-                    if (l1.getText().equals(name)) {
-                        type = l2.getText();
-                    } else {
-                        type = l1.getText();
+                    if  (tf != null
+                            && l1 != null
+                            && l2 != null) {
+                        name = tf.getUserData().toString();
+                        value = tf.getText();
+                        if (l1.getText().equals(name)) {
+                            type = l2.getText();
+                        } else {
+                            type = l1.getText();
+                        }
+                        this.dataBean.addAttribute(
+                                name,
+                                value,
+                                type);
                     }
-                    this.dataBean.addAttribute(
-                            name,
-                            value,
-                            type);
                 }
             }
         }
@@ -997,7 +1015,11 @@ public class Controller {
                 factory.fillSimpleWFS(
                     dataBean,
                     this.simpleWFSContainer,
-                    (WFSMeta.StoredQuery)data.getItem());
+                    (WFSMeta.StoredQuery)data.getItem(),
+                    this.dataBean.getWFSService()
+                                .findOperation("GetFeature").outputFormats,
+                    new dataFormatHandler());
+                /*
                 List<String> outputFormats =
                         this.dataBean.getWFSService()
                                 .findOperation("GetFeature").outputFormats;
@@ -1008,14 +1030,19 @@ public class Controller {
                 ObservableList<String> formats =
                         FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
+                */
+                this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
+                this.basicWFSContainer.setVisible(false);
+                /*
                 this.basicWFSContainer.setVisible(true);
                 this.mapNodeWFS.setVisible(false);
                 this.basicWFSX1Y1.setVisible(false);
                 this.basicWFSX2Y2.setVisible(false);
                 this.referenceSystemChooser.setVisible(false);
                 this.referenceSystemChooserLabel.setVisible(false);
-                this.atomContainer.setVisible(false);
+                */
+
 
             }
         }
