@@ -29,7 +29,6 @@ import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.Config;
-//import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.utils.I18n;
 
 import javafx.collections.FXCollections;
@@ -68,6 +67,11 @@ public class UIFactory {
     private static final int WEBVIEW_MIN_WIDTH = 200;
     private static final int WEBVIEW_PREF_HEIGHT = 50;
     private static final int WEBVIEW_MIN_HEIGHT = 50;
+    private static final String DATAFORMAT_ID = "simpleDataformat";
+
+    public static String getDataFormatID() {
+        return DATAFORMAT_ID;
+    }
 
     /**
      * Creates a stack pane with content based on the selected service.
@@ -75,20 +79,26 @@ public class UIFactory {
      * @param dataBean The data
      * @param type The selected service type
      * @param container The container node
+     * @param outputFormats the Outputformats of the selected service
      *
      */
     public void fillSimpleWFS(
         DataBean dataBean,
         VBox container,
-        WFSMeta.StoredQuery type
+        WFSMeta.StoredQuery type,
+        List <String> outputFormats
     ) {
-        createSimpleWFS(dataBean, type, container);
+        createSimpleWFS(dataBean,
+                type,
+                container,
+                outputFormats);
     }
 
     private void createSimpleWFS(
         DataBean dataBean,
         WFSMeta.StoredQuery type,
-        VBox container
+        VBox container,
+        List <String> outputFormats
     ) {
         container.getChildren().clear();
         Label descriptionHead = new Label();
@@ -132,6 +142,25 @@ public class UIFactory {
             HBox attributeItem = createAttributeItem(entry);
             container.getChildren().add(attributeItem);
         }
+        Separator sep = new Separator();
+        HBox outputFormatBox = new HBox();
+        Label outputFormatLabel = new Label();
+        outputFormatLabel.setText(I18n.format("gui.data-format"));
+        ComboBox outputFormat = new ComboBox();
+        outputFormat.setId(DATAFORMAT_ID);
+        ObservableList<String> out =
+                FXCollections.observableArrayList();
+        out.addAll(outputFormats);
+        outputFormat.setItems(out);
+        outputFormatLabel.setLabelFor(outputFormat);
+        outputFormatBox.getChildren().add(outputFormatLabel);
+        outputFormatBox.getChildren().add(outputFormat);
+        outputFormatBox.setMargin(outputFormatLabel,
+                new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
+        outputFormatBox.setMargin(outputFormatLabel,
+                new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
+        container.getChildren().add(sep);
+        container.getChildren().add(outputFormatBox);
     }
 
     private HBox createAttributeItem(Field field) {

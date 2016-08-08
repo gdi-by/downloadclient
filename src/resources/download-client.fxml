@@ -137,7 +137,7 @@
                                                 </Group>
                                                 <VBox VBox.vgrow="SOMETIMES">
                                                    <children>
-                                                      <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                      <HBox fx:id="basicWFSX1Y1" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                          <children>
                                                             <Label text="x1">
                                                                <HBox.margin>
@@ -153,7 +153,7 @@
                                                             <TextField fx:id="basicY1" minWidth="-Infinity" prefWidth="140.0" />
                                                          </children>
                                                       </HBox>
-                                                      <HBox prefHeight="31.0" prefWidth="200.0">
+                                                      <HBox fx:id="basicWFSX2Y2" prefHeight="31.0" prefWidth="200.0">
                                                          <children>
                                                             <Label text="x2">
                                                                <HBox.margin>
@@ -182,7 +182,7 @@
                                                                   <Insets left="3.0" />
                                                                </HBox.margin>
                                                             </ComboBox>
-                                                            <Label minWidth="-Infinity" prefWidth="120.0" text="%gui.reference-system">
+                                                            <Label fx:id="referenceSystemChooserLabel" minWidth="-Infinity" prefWidth="120.0" text="%gui.reference-system">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -265,7 +265,7 @@
                                  <content>
                                     <VBox fx:id="chainContainer" minWidth="-Infinity" prefHeight="63.0" prefWidth="570.0">
                                        <children>
-                                          <CheckBox fx:id="chkChain" onAction="#handleChainCheckbox" mnemonicParsing="false" text="%gui.post_process">
+                                          <CheckBox fx:id="chkChain" mnemonicParsing="false" onAction="#handleChainCheckbox" text="%gui.post_process">
                                              <VBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </VBox.margin>
