@@ -510,35 +510,6 @@ public class WMSMapSwing extends Parent {
                 y2,
                 sourceCRS,
                 targetCRS);
-        /*
-        //http://math.stackexchange.com/a/170664
-        Double rectX;
-        Double rectY;
-        Double rectHeigth;
-        Double rectWidth;
-        //TODO: Better Function?!
-        //I Tried putting it into a evelope first and shaping into a
-        //Triangle Object. Nothing works, because you can select a BBox over
-        //the 0 medan and the equator
-        if (p2.getX() < p1.getX()) {
-            rectX = p2.getX();
-            rectHeigth = p1.getX() - rectX;
-        } else {
-            rectX = p1.getX();
-            rectHeigth = p2.getX() - rectX;
-        }
-        if (p2.getY() < p1.getY()) {
-            rectY = p1.getY();
-            rectWidth = rectY - p2.getY();
-        } else {
-            rectY = p2.getY();
-            rectWidth = rectY - p1.getY();
-        }
-        Point2D p12DN = new Point2D.Double(rectY - rectHeigth,
-                rectX + rectHeigth);
-        Point2D p22DN = new Point2D.Double(rectY + rectWidth,
-                rectX + rectWidth);
-                */
         this.coordinateX1TextField.setText(
                 String.valueOf(p1.getX()));
         this.coordinateY1TextField.setText(
