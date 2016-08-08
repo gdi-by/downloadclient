@@ -850,13 +850,12 @@ public class Controller {
                             if (extendWFS == null) {
                                 extendWFS = f.bbox;
                             } else {
-                                //extendWFS.expandToInclude(f.bbox);
+                                extendWFS.expandToInclude(f.bbox);
                             }
                         }
                     }
                     if (extendWFS != null) {
                         mapWFS.setExtend(extendWFS);
-                        //mapWFS.setViewport(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
                         types.add(new StoredQueryModel(s));
@@ -959,6 +958,7 @@ public class Controller {
                 this.referenceSystemChooser.setVisible(true);
                 this.referenceSystemChooserLabel.setVisible(true);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
+                mapWFS.setExtend(feature.bbox);
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);

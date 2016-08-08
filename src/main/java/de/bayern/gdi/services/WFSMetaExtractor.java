@@ -17,13 +17,14 @@
  */
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -31,10 +32,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.StringUtils;
-import de.bayern.gdi.utils.XML;
 
 /** Extract meta data from a WFS. */
 public class WFSMetaExtractor {
@@ -82,6 +79,12 @@ public class WFSMetaExtractor {
         + "string-length(local-name()) - string-length('Corner') +1)"
         + "= 'Corner']/text()";
 
+    private static final String XPATH_CONER_UPPER
+            = "ows:WGS84BoundingBox/ows:UpperCorner";
+
+    private static final String XPATH_CONER_LOWER
+            = "ows:WGS84BoundingBox/ows:LowerCorner";
+
     private static final String XPATH_OPERATION_GET
         = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
 
@@ -124,11 +127,15 @@ public class WFSMetaExtractor {
     private static ReferencedEnvelope getBounds(
             Element feature, NamespaceContext nc) {
 
-        NodeList corners = (NodeList)
-            XML.xpath(feature, XPATH_CORNERS, XPathConstants.NODESET, nc);
+        String upperCorner = (String)
+                XML.xpath(feature, XPATH_CONER_UPPER, XPathConstants.STRING,
+                        nc);
 
-        int n = corners.getLength();
-        if (n == 0) {
+        String lowerCorner = (String)
+                XML.xpath(feature, XPATH_CONER_LOWER, XPathConstants.STRING,
+                        nc);
+
+        if (lowerCorner == null || upperCorner == null) {
             return null;
         }
 
@@ -137,25 +144,17 @@ public class WFSMetaExtractor {
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
 
-        for (int i = 0; i < n; i++) {
-            double[] x = StringUtils.toDouble(
-                corners.item(i).getTextContent());
-            if (x == null) {
-                return null;
-            }
-            if (x[0] < minX) {
-                minX = x[0];
-            }
-            if (x[0] > maxX) {
-                maxX = x[0];
-            }
-            if (x[1] < minY) {
-                minY = x[1];
-            }
-            if (x[1] > maxY) {
-                maxY = x[1];
-            }
+        String[] upperCornerSplit = upperCorner.split("\\s+");
+        String[] lowerCornerSplit = lowerCorner.split("\\s+");
+        if (upperCornerSplit.length != lowerCornerSplit.length) {
+            return null;
         }
+
+        minY = StringUtils.toDouble(lowerCornerSplit[0])[0];
+        minX = StringUtils.toDouble(lowerCornerSplit[1])[0];
+        maxY = StringUtils.toDouble(upperCornerSplit[0])[0];
+        maxX = StringUtils.toDouble(upperCornerSplit[1])[0];
+
         return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
 

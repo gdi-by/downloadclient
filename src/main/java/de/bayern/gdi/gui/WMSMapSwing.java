@@ -31,8 +31,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -456,42 +454,6 @@ public class WMSMapSwing extends Parent {
         createSwingContent(this.mapNode);
     }
 
-    /**
-     * sets the viewport of the map to the given extend.
-     *
-     * @param envelope the extend
-     */
-    public void setViewport(ReferencedEnvelope envelope) {
-        try {
-            envelope.transform(this.mapCRS, false);
-            mapContent.getViewport().setBounds(envelope);
-            Rectangle rectangle =
-                    getScreenTransformedRectangle(envelope.getMinX(),
-                            envelope.getMinY(),
-                            envelope.getMaxX(),
-                            envelope.getMaxY());
-            mapContent.getViewport().setScreenArea(rectangle);
-        } catch (FactoryException | TransformException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Rectangle getScreenTransformedRectangle(Double x1, Double y1,
-                                                    Double x2, Double y2) {
-        AffineTransform worldToScreen
-                = mapContent.getViewport().getWorldToScreen();
-        Point2D p1 =
-                new Point2D.Double(x1, y1);
-        Point2D p1New = null;
-        Point2D p2 =
-                new Point2D.Double(x2, y2);
-        Point2D p2New = null;
-        p1New = worldToScreen.transform(p1, p1New);
-        p2New = worldToScreen.transform(p2, p2New);
-        Rectangle rectangle = new Rectangle();
-        rectangle.setFrameFromDiagonal(p1New, p2New);
-        return rectangle;
-    }
 
     /**
      * sets text fields for coordinates.
