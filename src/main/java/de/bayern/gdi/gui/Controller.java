@@ -824,12 +824,13 @@ public class Controller {
                             if (extendWFS == null) {
                                 extendWFS = f.bbox;
                             } else {
-                                extendWFS.expandToInclude(f.bbox);
+                                //extendWFS.expandToInclude(f.bbox);
                             }
                         }
                     }
                     if (extendWFS != null) {
-                        mapWFS.setViewport(extendWFS);
+                        mapWFS.setExtend(extendWFS);
+                        //mapWFS.setViewport(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
                         types.add(new StoredQueryModel(s));
