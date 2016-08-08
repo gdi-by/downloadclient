@@ -402,7 +402,6 @@ public class WMSMapSwing extends Parent {
                 && this.coordinateY1TextField != null
                 && this.coordinateX2TextField != null
                 && this.coordinateY2TextField != null) {
-            //System.out.println("TextFields not null");
             if (!this.coordinateX1TextField.getText()
                     .toString().equals("")
                     && !this.coordinateY1TextField.getText()
@@ -411,7 +410,6 @@ public class WMSMapSwing extends Parent {
                     .toString().equals("")
                     && !this.coordinateY2TextField.getText().
                     toString().equals("")) {
-                //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
                         this.coordinateX1TextField.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
@@ -453,7 +451,6 @@ public class WMSMapSwing extends Parent {
                 .getCoordinateReferenceSystem());
         createSwingContent(this.mapNode);
     }
-
 
     /**
      * sets text fields for coordinates.
@@ -577,7 +574,6 @@ public class WMSMapSwing extends Parent {
                             end = null;
                             mapEndPos = null;
                             mapPane.setSelectedEnvelope(null);
-                            //Evaluate here if the selection?
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
                             clearCoordinateDisplay();
@@ -591,7 +587,6 @@ public class WMSMapSwing extends Parent {
                             mapEndPos = ev.getWorldPos();
                             x2Coordinate = mapEndPos.getX();
                             y2Coordinate = mapEndPos.getY();
-                            //TODO: Calculate here?
                             setDisplayCoordinates(x1Coordinate, y1Coordinate,
                                     x2Coordinate, y2Coordinate);
                             Rectangle rect = new Rectangle();
