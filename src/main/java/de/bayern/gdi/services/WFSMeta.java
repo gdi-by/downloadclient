@@ -175,7 +175,7 @@ public class WFSMeta {
         public Version() {
         }
 
-        /** @param version. The version. */
+        /** @param version The version. */
         public Version(String version) {
             this.version = version;
             parse();

@@ -56,6 +56,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.ows.HTTPClient;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.factory.CommonFactoryFinder;
@@ -278,6 +279,31 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * gets the getCapabilities URL.
+     * @param mapURL the URL of the Map
+     * @return getCapabilties URL
+     */
+    public static URL getCapabiltiesURL(URL mapURL) {
+        URL url = mapURL;
+        try {
+            WebMapServer wms = new WebMapServer(mapURL);
+            HTTPClient httpClient = wms.getHTTPClient();
+            URL get = wms.
+                    getCapabilities().
+                    getRequest().
+                    getGetCapabilities().
+                    getGet();
+            if (get != null) {
+                url = new URL(get.toString() + "request=GetCapabilities");
+            }
+            httpClient.getConnectTimeout();
+        } catch (IOException | ServiceException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return url;
+    }
+
+    /**
      * Constructor.
      * @param mapURL mapURL
      * @param width width
@@ -376,7 +402,6 @@ public class WMSMapSwing extends Parent {
                 && this.coordinateY1TextField != null
                 && this.coordinateX2TextField != null
                 && this.coordinateY2TextField != null) {
-            //System.out.println("TextFields not null");
             if (!this.coordinateX1TextField.getText()
                     .toString().equals("")
                     && !this.coordinateY1TextField.getText()
@@ -385,7 +410,6 @@ public class WMSMapSwing extends Parent {
                     .toString().equals("")
                     && !this.coordinateY2TextField.getText().
                     toString().equals("")) {
-                //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
                         this.coordinateX1TextField.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
@@ -549,7 +573,6 @@ public class WMSMapSwing extends Parent {
                         if (clickCount == 0) {
                             end = null;
                             mapEndPos = null;
-                            mapPane.setSelectedEnvelope(null);
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
                             clearCoordinateDisplay();
@@ -568,11 +591,6 @@ public class WMSMapSwing extends Parent {
                             Rectangle rect = new Rectangle();
                             rect.setFrameFromDiagonal(start, end);
                             mapPane.setDrawRect(rect);
-                            Envelope2D env = new Envelope2D();
-                            env.setFrameFromDiagonal(
-                                    mapStartPos,
-                                    ev.getWorldPos());
-                            mapPane.setSelectedEnvelope(env);
                             clickCount = 0;
                         } else {
                             clickCount = 0;
@@ -1026,7 +1044,6 @@ public class WMSMapSwing extends Parent {
      */
     private class ExtJMapPane extends JMapPane {
         private Rectangle rect;
-        private Envelope2D selectedEnv;
 
         public ExtJMapPane(MapContent content) {
             super(content);
@@ -1034,14 +1051,6 @@ public class WMSMapSwing extends Parent {
 
         public void setDrawRect(Rectangle rectangle) {
             this.rect = rectangle;
-        }
-
-        public void setSelectedEnvelope(Envelope2D env) {
-            this.selectedEnv = env;
-        }
-
-        public Envelope2D getSelectedEnvelope() {
-            return this.selectedEnv;
         }
 
         @Override
