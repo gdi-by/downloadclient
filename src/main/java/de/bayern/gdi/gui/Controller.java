@@ -255,6 +255,20 @@ public class Controller {
         this.serviceList.setItems(subentries);
     }
 
+    private void clearUserNamePassword() {
+        Task task = new Task() {
+            @Override
+            protected Integer call() throws Exception {
+                serviceUser.setText("");
+                servicePW.setText("");
+                return 0;
+            }
+        };
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
+
     /**
      * Handle the service selection.
      *
@@ -264,6 +278,7 @@ public class Controller {
         if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() > 1
         ) {
+            clearUserNamePassword();
             chooseService();
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
@@ -275,6 +290,9 @@ public class Controller {
                     (ServiceModel)this.serviceList.getSelectionModel()
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
+                if (!url.equals(this.serviceURL.getText())) {
+                    clearUserNamePassword();
+                }
                 if (!ServiceChecker.isReachable(url)) {
                     statusBarText.setText(
                             I18n.format("status.service-not-available")
