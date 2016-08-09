@@ -256,17 +256,8 @@ public class Controller {
     }
 
     private void clearUserNamePassword() {
-        Task task = new Task() {
-            @Override
-            protected Integer call() throws Exception {
-                serviceUser.setText("");
-                servicePW.setText("");
-                return 0;
-            }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+        this.serviceUser.setText("");
+        this.servicePW.setText("");
     }
 
     /**
