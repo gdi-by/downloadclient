@@ -573,7 +573,6 @@ public class WMSMapSwing extends Parent {
                         if (clickCount == 0) {
                             end = null;
                             mapEndPos = null;
-                            mapPane.setSelectedEnvelope(null);
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
                             clearCoordinateDisplay();
@@ -592,11 +591,6 @@ public class WMSMapSwing extends Parent {
                             Rectangle rect = new Rectangle();
                             rect.setFrameFromDiagonal(start, end);
                             mapPane.setDrawRect(rect);
-                            Envelope2D env = new Envelope2D();
-                            env.setFrameFromDiagonal(
-                                    mapStartPos,
-                                    ev.getWorldPos());
-                            mapPane.setSelectedEnvelope(env);
                             clickCount = 0;
                         } else {
                             clickCount = 0;
@@ -1050,7 +1044,6 @@ public class WMSMapSwing extends Parent {
      */
     private class ExtJMapPane extends JMapPane {
         private Rectangle rect;
-        private Envelope2D selectedEnv;
 
         public ExtJMapPane(MapContent content) {
             super(content);
@@ -1058,14 +1051,6 @@ public class WMSMapSwing extends Parent {
 
         public void setDrawRect(Rectangle rectangle) {
             this.rect = rectangle;
-        }
-
-        public void setSelectedEnvelope(Envelope2D env) {
-            this.selectedEnv = env;
-        }
-
-        public Envelope2D getSelectedEnvelope() {
-            return this.selectedEnv;
         }
 
         @Override
