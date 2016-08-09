@@ -402,7 +402,6 @@ public class WMSMapSwing extends Parent {
                 && this.coordinateY1TextField != null
                 && this.coordinateX2TextField != null
                 && this.coordinateY2TextField != null) {
-            //System.out.println("TextFields not null");
             if (!this.coordinateX1TextField.getText()
                     .toString().equals("")
                     && !this.coordinateY1TextField.getText()
@@ -411,7 +410,6 @@ public class WMSMapSwing extends Parent {
                     .toString().equals("")
                     && !this.coordinateY2TextField.getText().
                     toString().equals("")) {
-                //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
                         this.coordinateX1TextField.getText().toString());
                 Double x2Coordinate = Double.parseDouble(

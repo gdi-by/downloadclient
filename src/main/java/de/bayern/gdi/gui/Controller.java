@@ -854,7 +854,7 @@ public class Controller {
                             }
                         }
                     }
-                    if (mapWFS != null && extendWFS != null) {
+                    if (extendWFS != null) {
                         mapWFS.setExtend(extendWFS);
                     }
                     for (WFSMeta.StoredQuery s : queries) {
@@ -958,6 +958,7 @@ public class Controller {
                 this.referenceSystemChooser.setVisible(true);
                 this.referenceSystemChooserLabel.setVisible(true);
                 WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
+                mapWFS.setExtend(feature.bbox);
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);
