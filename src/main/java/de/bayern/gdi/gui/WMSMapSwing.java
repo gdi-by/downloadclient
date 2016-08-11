@@ -27,6 +27,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -835,31 +837,42 @@ public class WMSMapSwing extends Parent {
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
+                ActionListener deleteGraphics = new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mapPane.deleteGraphics();
+                    }
+                };
                 CursorAction cursorAction = new CursorAction(mapPane);
                 tbtn = new JToggleButton(cursorAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                tbtn.addActionListener(deleteGraphics);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new PanAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new InfoAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 btn = new JButton(new ResetAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
@@ -961,6 +974,7 @@ public class WMSMapSwing extends Parent {
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
+        mapPane.deleteGraphics();
         mapPane.setDisplayArea(envelope);
     }
 
@@ -1092,6 +1106,12 @@ public class WMSMapSwing extends Parent {
                         rect.width,
                         rect.height);
             }
+        }
+
+        public void deleteGraphics() {
+            clearCoordinateDisplay();
+            setDrawRect(null);
+            repaint();
         }
 
         @Override
