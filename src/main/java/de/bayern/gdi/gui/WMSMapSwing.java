@@ -685,7 +685,7 @@ public class WMSMapSwing extends Parent {
     /**
      * Information about the Polygon.
      */
-    public class PolygonInfos {
+    public static class PolygonInfos {
         private String name;
         private String id;
 
