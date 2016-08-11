@@ -27,6 +27,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -46,14 +48,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.event.EventListenerList;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.HTTPClient;
@@ -765,6 +770,52 @@ public class WMSMapSwing extends Parent {
         return this.selectedPolygonID;
     }
 
+
+    /** Button Group with Action Listener. */
+    @SuppressWarnings("serial")
+    private class ActionButtonGroup extends ButtonGroup {
+        private ActionListener btnGrpListener = new BtnGrpListener();
+        private EventListenerList listenerList = new EventListenerList();
+
+        @Override
+        public void add(AbstractButton b) {
+            b.addActionListener(btnGrpListener);
+            super.add(b);
+        }
+
+        public void addActionListener(ActionListener listener) {
+            listenerList.add(ActionListener.class, listener);
+        }
+
+        public void removeActionListener(ActionListener listener) {
+            listenerList.remove(ActionListener.class, listener);
+        }
+
+        protected void fireActionListeners() {
+            Object[] listeners = listenerList.getListenerList();
+            String actionCommand = "";
+            ButtonModel model = getSelection();
+            if (model != null) {
+                actionCommand = model.getActionCommand();
+            }
+            ActionEvent ae = new ActionEvent(this,
+                    ActionEvent.ACTION_PERFORMED,
+                    actionCommand);
+            for (int i = listeners.length - 2; i >= 0; i -= 2) {
+                if (listeners[i] == ActionListener.class) {
+                    ((ActionListener)listeners[i + 1]).actionPerformed(ae);
+                }
+            }
+        }
+
+        /** The Action Listener for the Button group. */
+        private class BtnGrpListener implements ActionListener {
+            public void actionPerformed(ActionEvent ae) {
+                fireActionListeners();
+            }
+        }
+    }
+
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -809,7 +860,12 @@ public class WMSMapSwing extends Parent {
                 toolBar.setFloatable(false);
                 JButton btn;
                 JToggleButton tbtn;
-                ButtonGroup cursorToolGrp = new ButtonGroup();
+                ActionButtonGroup cursorToolGrp = new ActionButtonGroup();
+                cursorToolGrp.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mapPane.deleteGraphics();
+                    }
+                });
                 CursorAction cursorAction = new CursorAction(mapPane);
                 tbtn = new JToggleButton(cursorAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
@@ -936,6 +992,7 @@ public class WMSMapSwing extends Parent {
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
+        mapPane.deleteGraphics();
         mapPane.setDisplayArea(envelope);
     }
 
@@ -1067,6 +1124,11 @@ public class WMSMapSwing extends Parent {
                         rect.width,
                         rect.height);
             }
+        }
+
+        public void deleteGraphics() {
+            setDrawRect(null);
+            repaint();
         }
 
         @Override
