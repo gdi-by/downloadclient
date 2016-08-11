@@ -1127,6 +1127,7 @@ public class WMSMapSwing extends Parent {
         }
 
         public void deleteGraphics() {
+            clearCoordinateDisplay();
             setDrawRect(null);
             repaint();
         }
