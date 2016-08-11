@@ -683,17 +683,50 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * Information about the Polygon.
+     */
+    public class PolygonInfos {
+        private String name;
+        private String id;
+
+        /**
+         * Constructor.
+         * @param name the name
+         * @param id the id
+         */
+        public PolygonInfos(String name, String id) {
+            this.name = name;
+            this.id = id;
+        }
+
+        /**
+         * returns the name.
+         * @return the name
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * returns the ID.
+         * @return the ID
+         */
+        public String getID() {
+            return this.id;
+        }
+    }
+
+    /**
      * sets name and id of the selected polygon.
      * @param name name
      * @param id id
      */
     private void setNameAndId(String name, String id) {
-        this.selectedPolygonName = name;
-        this.selectedPolygonID = id;
+        PolygonInfos polyInf = new PolygonInfos(name, id);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                fireEvent(new PolygonClickedEvent());
+                fireEvent(new PolygonClickedEvent(polyInf));
             }
         });
     }
@@ -755,14 +788,6 @@ public class WMSMapSwing extends Parent {
         Rule rule = sf.createRule();
         rule.symbolizers().add(symbolizer);
         return rule;
-    }
-
-    public String getClickedPolygonName() {
-        return this.selectedPolygonName;
-    }
-
-    public String getClickedPolygonID() {
-        return this.selectedPolygonID;
     }
 
     private void createSwingContent(final SwingNode swingNode) {
