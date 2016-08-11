@@ -48,17 +48,14 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-import javax.swing.event.EventListenerList;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.HTTPClient;
@@ -770,52 +767,6 @@ public class WMSMapSwing extends Parent {
         return this.selectedPolygonID;
     }
 
-
-    /** Button Group with Action Listener. */
-    @SuppressWarnings("serial")
-    private class ActionButtonGroup extends ButtonGroup {
-        private ActionListener btnGrpListener = new BtnGrpListener();
-        private EventListenerList listenerList = new EventListenerList();
-
-        @Override
-        public void add(AbstractButton b) {
-            b.addActionListener(btnGrpListener);
-            super.add(b);
-        }
-
-        public void addActionListener(ActionListener listener) {
-            listenerList.add(ActionListener.class, listener);
-        }
-
-        public void removeActionListener(ActionListener listener) {
-            listenerList.remove(ActionListener.class, listener);
-        }
-
-        protected void fireActionListeners() {
-            Object[] listeners = listenerList.getListenerList();
-            String actionCommand = "";
-            ButtonModel model = getSelection();
-            if (model != null) {
-                actionCommand = model.getActionCommand();
-            }
-            ActionEvent ae = new ActionEvent(this,
-                    ActionEvent.ACTION_PERFORMED,
-                    actionCommand);
-            for (int i = listeners.length - 2; i >= 0; i -= 2) {
-                if (listeners[i] instanceof ActionListener) {
-                    ((ActionListener)listeners[i + 1]).actionPerformed(ae);
-                }
-            }
-        }
-
-        /** The Action Listener for the Button group. */
-        private class BtnGrpListener implements ActionListener {
-            public void actionPerformed(ActionEvent ae) {
-                fireActionListeners();
-            }
-        }
-    }
-
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -860,37 +811,43 @@ public class WMSMapSwing extends Parent {
                 toolBar.setFloatable(false);
                 JButton btn;
                 JToggleButton tbtn;
-                ActionButtonGroup cursorToolGrp = new ActionButtonGroup();
-                cursorToolGrp.addActionListener(new ActionListener() {
+                ButtonGroup cursorToolGrp = new ButtonGroup();
+                ActionListener deleteGraphics = new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         mapPane.deleteGraphics();
                     }
-                });
+                };
                 CursorAction cursorAction = new CursorAction(mapPane);
                 tbtn = new JToggleButton(cursorAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                tbtn.addActionListener(deleteGraphics);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new PanAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new InfoAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 btn = new JButton(new ResetAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
