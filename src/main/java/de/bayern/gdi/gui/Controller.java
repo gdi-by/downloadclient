@@ -1113,7 +1113,7 @@ public class Controller {
         @Override
         public void handle(Event event) {
             if (mapAtom != null) {
-                if (event.getClass() == PolygonClickedEvent.class) {
+                if (event instanceof PolygonClickedEvent) {
                     PolygonClickedEvent pce = (PolygonClickedEvent) event;
                     WMSMapSwing.PolygonInfos polygonInfos =
                             pce.getPolygonInfos();
