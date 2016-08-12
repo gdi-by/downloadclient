@@ -536,10 +536,18 @@ public class WMSMapSwing extends Parent {
     }
 
     private void clearCoordinateDisplay() {
-        this.coordinateX1TextField.setText("");
-        this.coordinateY1TextField.setText("");
-        this.coordinateX2TextField.setText("");
-        this.coordinateY2TextField.setText("");
+        if (this.coordinateX1TextField != null) {
+            this.coordinateX1TextField.setText("");
+        }
+        if (this.coordinateY1TextField != null) {
+            this.coordinateY1TextField.setText("");
+        }
+        if (this.coordinateX2TextField != null) {
+            this.coordinateX2TextField.setText("");
+        }
+        if (this.coordinateY2TextField != null) {
+            this.coordinateY2TextField.setText("");
+        }
     }
 
     /**
