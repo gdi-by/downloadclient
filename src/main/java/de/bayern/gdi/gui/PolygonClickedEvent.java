@@ -29,6 +29,8 @@ import javafx.event.EventType;
 
 public class PolygonClickedEvent extends Event {
 
+    private WMSMapSwing.PolygonInfos polyInf;
+
     /**
      * the event type.
      */
@@ -37,17 +39,27 @@ public class PolygonClickedEvent extends Event {
 
     /**
      * Constructor.
+     * @param polygonInfos about the clicked polygon
+     */
+    public PolygonClickedEvent(WMSMapSwing.PolygonInfos polygonInfos) {
+        this(NOTIFY, polygonInfos);
+    }
+    /**
+     * Constructor.
      */
     public PolygonClickedEvent() {
-        this(NOTIFY);
+        this(NOTIFY, null);
     }
 
     /**
      * Constructor.
      * @param arg0 the event source
+     * @param polygonInfos the infos about the clicked polygon
      */
-    public PolygonClickedEvent(EventType<? extends Event> arg0) {
+    public PolygonClickedEvent(EventType<? extends Event> arg0,
+                               WMSMapSwing.PolygonInfos polygonInfos) {
         super(arg0);
+        this.polyInf = polygonInfos;
     }
 
     /**
@@ -59,5 +71,13 @@ public class PolygonClickedEvent extends Event {
     public PolygonClickedEvent(Object arg0, EventTarget arg1,
                                EventType<? extends Event> arg2) {
         super(arg0, arg1, arg2);
+    }
+
+    /**
+     * gets the polygon Infos.
+     * @return Polygon Infos
+     */
+    public WMSMapSwing.PolygonInfos getPolygonInfos() {
+        return this.polyInf;
     }
 }

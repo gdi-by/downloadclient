@@ -27,6 +27,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -534,10 +536,18 @@ public class WMSMapSwing extends Parent {
     }
 
     private void clearCoordinateDisplay() {
-        this.coordinateX1TextField.setText("");
-        this.coordinateY1TextField.setText("");
-        this.coordinateX2TextField.setText("");
-        this.coordinateY2TextField.setText("");
+        if (this.coordinateX1TextField != null) {
+            this.coordinateX1TextField.setText("");
+        }
+        if (this.coordinateY1TextField != null) {
+            this.coordinateY1TextField.setText("");
+        }
+        if (this.coordinateX2TextField != null) {
+            this.coordinateX2TextField.setText("");
+        }
+        if (this.coordinateY2TextField != null) {
+            this.coordinateY2TextField.setText("");
+        }
     }
 
     /**
@@ -683,17 +693,50 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * Information about the Polygon.
+     */
+    public static class PolygonInfos {
+        private String name;
+        private String id;
+
+        /**
+         * Constructor.
+         * @param name the name
+         * @param id the id
+         */
+        public PolygonInfos(String name, String id) {
+            this.name = name;
+            this.id = id;
+        }
+
+        /**
+         * returns the name.
+         * @return the name
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * returns the ID.
+         * @return the ID
+         */
+        public String getID() {
+            return this.id;
+        }
+    }
+
+    /**
      * sets name and id of the selected polygon.
      * @param name name
      * @param id id
      */
     private void setNameAndId(String name, String id) {
-        this.selectedPolygonName = name;
-        this.selectedPolygonID = id;
+        PolygonInfos polyInf = new PolygonInfos(name, id);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                fireEvent(new PolygonClickedEvent());
+                fireEvent(new PolygonClickedEvent(polyInf));
             }
         });
     }
@@ -757,14 +800,6 @@ public class WMSMapSwing extends Parent {
         return rule;
     }
 
-    public String getClickedPolygonName() {
-        return this.selectedPolygonName;
-    }
-
-    public String getClickedPolygonID() {
-        return this.selectedPolygonID;
-    }
-
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -810,31 +845,42 @@ public class WMSMapSwing extends Parent {
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
+                ActionListener deleteGraphics = new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mapPane.deleteGraphics();
+                    }
+                };
                 CursorAction cursorAction = new CursorAction(mapPane);
                 tbtn = new JToggleButton(cursorAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                tbtn.addActionListener(deleteGraphics);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new PanAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new InfoAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 btn = new JButton(new ResetAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
@@ -936,6 +982,7 @@ public class WMSMapSwing extends Parent {
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
+        mapPane.deleteGraphics();
         mapPane.setDisplayArea(envelope);
     }
 
@@ -1067,6 +1114,12 @@ public class WMSMapSwing extends Parent {
                         rect.width,
                         rect.height);
             }
+        }
+
+        public void deleteGraphics() {
+            clearCoordinateDisplay();
+            setDrawRect(null);
+            repaint();
         }
 
         @Override
