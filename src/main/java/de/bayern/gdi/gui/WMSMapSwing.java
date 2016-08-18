@@ -167,6 +167,7 @@ public class WMSMapSwing extends Parent {
     private GeometryDescriptor geomDesc;
     private String geometryAttributeName;
     private String source;
+    private CursorAction bboxAction;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -559,6 +560,18 @@ public class WMSMapSwing extends Parent {
         private Double x2Coordinate;
         private Double y1Coordinate;
         private Double y2Coordinate;
+        private int clickCount = 0;
+
+        /**
+         * resets the coordinate Infos.
+         */
+        public void resetCoordinates() {
+            x1Coordinate = null;
+            x2Coordinate = null;
+            y1Coordinate = null;
+            y2Coordinate = null;
+            clickCount = 0;
+        }
 
         public CursorAction(MapPane mapPane) {
             super(mapPane);
@@ -571,8 +584,8 @@ public class WMSMapSwing extends Parent {
                 private Point end;
                 private DirectPosition2D mapStartPos;
                 private DirectPosition2D mapEndPos;
-                private int clickCount = 0;
                 private WeakHashMap<Layer, InfoToolHelper> helperTable;
+
 
                 @Override
                 public void onMouseClicked(MapMouseEvent ev) {
@@ -850,8 +863,8 @@ public class WMSMapSwing extends Parent {
                         mapPane.deleteGraphics();
                     }
                 };
-                CursorAction cursorAction = new CursorAction(mapPane);
-                tbtn = new JToggleButton(cursorAction);
+                bboxAction = new CursorAction(mapPane);
+                tbtn = new JToggleButton(bboxAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
                 tbtn.addActionListener(deleteGraphics);
                 toolBar.add(tbtn);
@@ -982,6 +995,7 @@ public class WMSMapSwing extends Parent {
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
+        bboxAction.resetCoordinates();
         mapPane.deleteGraphics();
         mapPane.setDisplayArea(envelope);
     }
