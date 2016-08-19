@@ -893,7 +893,7 @@ public class WMSMapSwing extends Parent {
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 btn = new JButton(new ResetAction(mapPane));
-                tbtn.addActionListener(deleteGraphics);
+                btn.addActionListener(deleteGraphics);
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
