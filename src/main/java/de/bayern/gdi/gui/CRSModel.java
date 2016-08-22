@@ -60,10 +60,7 @@ public class CRSModel {
      * @return true if equal; false if not
      */
     public boolean equals(CRSModel crsModel) {
-        if (this.hashCode() == crsModel.hashCode()) {
-            return true;
-        }
-        return false;
+        return this.hashCode() == crsModel.hashCode();
     }
 
     /**

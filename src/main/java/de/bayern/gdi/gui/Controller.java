@@ -591,6 +591,11 @@ public class Controller {
             bbox += envelope.getY() + ",";
             bbox += (envelope.getX() + envelope.getWidth()) + ",";
             bbox += (envelope.getY() + envelope.getHeight());
+
+            CRSModel model = referenceSystemChooser.getValue();
+            if (model != null) {
+                bbox += "," + model.getOldName();
+            }
             this.dataBean.addAttribute("bbox", bbox, "");
         } else {
             // Raise an error?
