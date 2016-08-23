@@ -611,9 +611,11 @@ public class WMSMapSwing extends Parent {
                             y2Coordinate = mapEndPos.getY();
                             setDisplayCoordinates(x1Coordinate, y1Coordinate,
                                     x2Coordinate, y2Coordinate);
-                            Rectangle rect = new Rectangle();
-                            rect.setFrameFromDiagonal(start, end);
-                            mapPane.setDrawRect(rect);
+                            if (start != null && end != null) {
+                                Rectangle rect = new Rectangle();
+                                rect.setFrameFromDiagonal(start, end);
+                                mapPane.setDrawRect(rect);
+                            }
                             clickCount = 0;
                         } else {
                             clickCount = 0;
