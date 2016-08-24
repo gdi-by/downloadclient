@@ -50,16 +50,23 @@ oder im *headless mode*:
 
 Um passwortgeschützte Dienste zugänglich zu machen, können die Benutzerdaten über  --user=<user> and --password=<password> dem Download-Client übergeben werden.
 
-Über --config=<directory> kann ein Ordner spezifiziert werden mit Konfigurationsdateien, um die default-Einstellungen zu überschreiben (wichtig für Proxy-Einstellungen!) 
+     `--config=<directory>`
 
-    proxy.xml To configure alternative HTTP(S) proxy settings.
+Hier kann ein Ordner spezifiziert werden mit Konfigurationsdateien, um die default-Einstellungen zu überschreiben (wichtig für Proxy-Einstellungen!):  
 
-    <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|...
+     `proxy.xml` 
 
-    All fields are optional. To avoid application of the settings set overrideSystemSetting="false". enableSNIExtension enables/disables Server Name Indication. This might be needed in case of some problematic SSL-Hosts.
+Um alternative HTTP(S) Proxy-Einstellungen zu konfigurieren.
 
-    serviceSetting.xml A pre-selected set of services.
-    verarbeitungsschritte.xml A list of post-processing steps after successful downloads.
+<!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|...
+
+All fields are optional. To avoid application of the settings set overrideSystemSetting="false". enableSNIExtension enables/disables Server Name Indication. This might be needed in case of some problematic SSL-Hosts.
+
+     `serviceSetting.xml`
+Ein vorselektiertes Dienste-Set. 
+
+     `verarbeitungsschritte.xml`
+Eine Liste von Verarbeitungsschritten nach einem erfolgreichen Download.
 
 
 Funktionalität
