@@ -119,7 +119,8 @@ Handelt es sich beim Eintrag um eine vordefinierte Abfrage, passt sich die Oberf
 
 **Beispiel:**
 
-#### Bild #### 
+.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_storedquery_WFS.PNG
+
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Die vordefinierte Abfrage lautet *"Abfrage einer Gemeinde über den Gemeindeschlüssel"*. 
 Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format *KML* abgefragt.
@@ -133,7 +134,8 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 **Beispiel:**
 
-##### Bild #########
+.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_featuretype_WFS.PNG
+
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen (=Begrenzungsfläche definiert). Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
 
@@ -148,7 +150,8 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 **Beispiel Variante a):**
 
-###### Bild #########
+.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_Kartenauswahl_Atom.PNG
+
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
 Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungen zum Download zur Auswahl. Somit ist eine Auswahl über die Kartenkomponente möglich. Es wird der Datensatz *"Digitales Orthophoto 112013-0"* in der Variante *"Gauß-Krueger Zone 4"* gewählt. 
@@ -157,7 +160,8 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungen 
 
 **Beispiel Variante b):**
 
-###### Bild #########
+.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_Listenauswahl_Atom.PNG
+
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
 Der Dienst bietet die Datensätze Naturparke, Nationalparke, Naturschutzgebiete, Biosphärenreservate und Landschaftsschutzgebiete zum Download zur Auswahl. 
