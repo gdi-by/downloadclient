@@ -122,7 +122,7 @@ public class Controller {
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
-    @FXML private ComboBox atomVariationChooser;
+    @FXML private ComboBox<ItemModel> atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
     @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
@@ -402,18 +402,13 @@ public class Controller {
                 ? this.atomVariationChooser.getValue().toString()
                 : "",
                 "");
-        ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
+        AtomFieldModel afm = (AtomFieldModel) this.atomVariationChooser
+                .getSelectionModel()
                 .getSelectedItem();
-        Atom.Item item = (Atom.Item) im.getItem();
-        List <Atom.Field> fields = item.fields;
-        for (Atom.Field field: fields) {
-            if (field.type.equals(this.atomVariationChooser.getValue())) {
-                this.valueAtomFormat.setText(field.format);
-                this.valueAtomRefsys.setText(field.crs);
-                this.dataBean.addAttribute("outputformat", field.format, "");
-                break;
-            }
-        }
+        Atom.Field af = (Atom.Field) afm.getItem();
+        this.valueAtomFormat.setText(af.format);
+        this.valueAtomRefsys.setText(af.crs);
+        this.dataBean.addAttribute("outputformat", af.format, "");
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
@@ -936,10 +931,11 @@ public class Controller {
                 mapAtom.highlightSelectedPolygon(item.id);
             }
             List<Atom.Field> fields = item.fields;
-            ObservableList<String> list =
+            ObservableList<ItemModel> list =
                 FXCollections.observableArrayList();
             for (Atom.Field f : fields) {
-                list.add(f.type);
+                AtomFieldModel afm = new AtomFieldModel(f);
+                list.add(afm);
             }
             this.atomVariationChooser.setItems(list);
             WebEngine engine = this.valueAtomDescr.getEngine();
