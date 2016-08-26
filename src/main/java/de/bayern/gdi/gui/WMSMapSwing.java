@@ -91,7 +91,6 @@ import org.geotools.swing.action.PanAction;
 import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
-import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.InfoToolHelper;
