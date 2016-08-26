@@ -734,24 +734,24 @@ public class Controller {
                 servicePW.setDisable(false);
             }
 
-            private void unsetAuth() {
-                setStatusTextUI(
-                        I18n.format("status.calling-service"));
-                serviceAuthenticationCbx.setSelected(false);
-                serviceUser.setDisable(true);
-                servicePW.setDisable(true);
-            }
-
             private void setUnreachable() {
                 setStatusTextUI(
                     I18n.format("status.service-not-available"));
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
             }
 
+            private void resetUI() {
+                setStatusTextUI(
+                        I18n.format("status.ready"));
+                serviceAuthenticationCbx.setSelected(false);
+                serviceUser.setDisable(true);
+                servicePW.setDisable(true);
+            }
+
             @Override
             protected Integer call() throws Exception {
                 serviceURL.getScene().setCursor(Cursor.WAIT);
-                unsetAuth();
+                resetUI();
                 String url = null;
                 String username = null;
                 String password = null;
