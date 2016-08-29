@@ -274,6 +274,7 @@ public class Controller {
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
         ) {
+            resetGui();
             if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
                     != null
             ) {
@@ -654,6 +655,18 @@ public class Controller {
         }
     }
 
+    private void resetGui() {
+        this.dataBean.reset();
+        this.serviceTypeChooser.getItems().retainAll();
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(false);
+        this.mapNodeWFS.setVisible(false);
+        this.atomContainer.setVisible(false);
+        this.basicWFSX1Y1.setVisible(false);
+        this.basicWFSX2Y2.setVisible(false);
+        this.referenceSystemChooser.setVisible(false);
+        this.referenceSystemChooserLabel.setVisible(false);
+    }
     /**
      * Handle events on the process Chain Checkbox.
      * @param event the event
@@ -734,7 +747,7 @@ public class Controller {
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
             }
 
-            private void resetUI() {
+            private void unsetAuth() {
                 setStatusTextUI(
                         I18n.format("status.ready"));
                 serviceAuthenticationCbx.setSelected(false);
@@ -744,8 +757,9 @@ public class Controller {
 
             @Override
             protected Integer call() throws Exception {
+                resetGui();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
-                resetUI();
+                unsetAuth();
                 String url = null;
                 String username = null;
                 String password = null;
