@@ -122,7 +122,7 @@ public class Controller {
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
-    @FXML private ComboBox atomVariationChooser;
+    @FXML private ComboBox<ItemModel> atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
     @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
@@ -397,22 +397,16 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleVariationSelect(ActionEvent event) {
-        this.dataBean.addAttribute("VARIATION",
-            this.atomVariationChooser.getValue() != null
-                ? this.atomVariationChooser.getValue().toString()
-                : "",
-                "");
-        ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
-                .getSelectedItem();
-        Atom.Item item = (Atom.Item) im.getItem();
-        List <Atom.Field> fields = item.fields;
-        for (Atom.Field field: fields) {
-            if (field.type.equals(this.atomVariationChooser.getValue())) {
-                this.valueAtomFormat.setText(field.format);
-                this.valueAtomRefsys.setText(field.crs);
-                this.dataBean.addAttribute("outputformat", field.format, "");
-                break;
-            }
+        ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
+        if (selim != null) {
+            Atom.Field selaf = (Atom.Field) selim.getItem();
+            this.dataBean.addAttribute("VARIATION", selaf.type, "");
+            this.valueAtomFormat.setText(selaf.format);
+            this.valueAtomRefsys.setText(selaf.crs);
+            this.dataBean.addAttribute("outputformat", selaf.format, "");
+        } else {
+            this.dataBean.addAttribute("VARIATION", "", "");
+            this.dataBean.addAttribute("outputformat", "", "");
         }
     }
 
@@ -945,10 +939,11 @@ public class Controller {
                 mapAtom.highlightSelectedPolygon(item.id);
             }
             List<Atom.Field> fields = item.fields;
-            ObservableList<String> list =
+            ObservableList<ItemModel> list =
                 FXCollections.observableArrayList();
             for (Atom.Field f : fields) {
-                list.add(f.type);
+                AtomFieldModel afm = new AtomFieldModel(f);
+                list.add(afm);
             }
             this.atomVariationChooser.setItems(list);
             WebEngine engine = this.valueAtomDescr.getEngine();

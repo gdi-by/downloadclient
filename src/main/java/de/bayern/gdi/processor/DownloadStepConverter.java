@@ -156,7 +156,8 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (usedVars.contains(p.getKey())) {
+            if (p.getValue().isEmpty()
+            || usedVars.contains(p.getKey())) {
                 continue;
             }
             if (sb.length() > 0) {

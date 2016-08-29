@@ -91,7 +91,6 @@ import org.geotools.swing.action.PanAction;
 import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
-import org.geotools.swing.control.JMapStatusBar;
 import org.geotools.swing.event.MapMouseEvent;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.InfoToolHelper;
@@ -904,8 +903,6 @@ public class WMSMapSwing extends Parent {
                     JLabel sourceLabel = new JLabel(source);
                     panel.add(sourceLabel, "grow");
                 }
-                panel.add(
-                        JMapStatusBar.createDefaultStatusBar(mapPane), "grow");
                 swingNode.setContent(panel);
                 setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
                         INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
