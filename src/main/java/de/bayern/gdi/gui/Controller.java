@@ -397,18 +397,17 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleVariationSelect(ActionEvent event) {
-        this.dataBean.addAttribute("VARIATION",
-            this.atomVariationChooser.getValue() != null
-                ? this.atomVariationChooser.getValue().toString()
-                : "",
-                "");
-        AtomFieldModel afm = (AtomFieldModel) this.atomVariationChooser
-                .getSelectionModel()
-                .getSelectedItem();
-        Atom.Field af = (Atom.Field) afm.getItem();
-        this.valueAtomFormat.setText(af.format);
-        this.valueAtomRefsys.setText(af.crs);
-        this.dataBean.addAttribute("outputformat", af.format, "");
+        ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
+        if (selim != null) {
+            Atom.Field selaf = (Atom.Field) selim.getItem();
+            this.dataBean.addAttribute("VARIATION", selaf.type, "");
+            this.valueAtomFormat.setText(selaf.format);
+            this.valueAtomRefsys.setText(selaf.crs);
+            this.dataBean.addAttribute("outputformat", selaf.format, "");
+        } else {
+            this.dataBean.addAttribute("VARIATION", "", "");
+            this.dataBean.addAttribute("outputformat", "", "");
+        }
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
