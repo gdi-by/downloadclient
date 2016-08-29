@@ -154,7 +154,7 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 **Beispiel:**
 
-.. image:: /img/DLC_featuretype_WFS.PNG
+.. image:: img/DLC_featuretype_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen (=Begrenzungsfläche definiert). Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
@@ -170,7 +170,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 **Beispiel Variante a):**
 
-.. image:: /img/DLC_Kartenauswahl_Atom.PNG
+.. image:: img/DLC_Kartenauswahl_Atom.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
@@ -180,7 +180,7 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungen 
 
 **Beispiel Variante b):**
 
-.. image:: /img/DLC_Listenauswahl_Atom.PNG
+.. image:: img/DLC_Listenauswahl_Atom.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
