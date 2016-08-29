@@ -114,7 +114,7 @@
                               <Insets bottom="5.0" left="10.0" top="10.0" />
                            </VBox.margin>
                         </Label>
-                        <ComboBox fx:id="serviceTypeChooser" minHeight="-Infinity" onAction="#handleServiceTypeSelect" prefHeight="26.0" prefWidth="322.0">
+                        <ComboBox fx:id="serviceTypeChooser" minWidth="200.0" onAction="#handleServiceTypeSelect">
                            <VBox.margin>
                               <Insets bottom="5.0" left="15.0" right="15.0" />
                            </VBox.margin>
@@ -170,7 +170,7 @@
                                                          </children>
                                                       </HBox>
                                                       <Separator prefWidth="200.0" />
-                                                      <VBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                      <VBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
                                                          <children>
                                                            <HBox VBox.vgrow="NEVER">
                                                             <children>
