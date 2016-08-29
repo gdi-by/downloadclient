@@ -126,7 +126,7 @@ Handelt es sich beim Eintrag um eine vordefinierte Abfrage, passt sich die Oberf
 
 **Beispiel:**
 
-.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_storedquery_WFS.PNG
+.. image:: img/DLC_storedquery_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Die vordefinierte Abfrage lautet *"Abfrage einer Gemeinde über den Gemeindeschlüssel"*. 
