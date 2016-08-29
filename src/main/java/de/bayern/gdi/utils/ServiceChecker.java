@@ -20,7 +20,6 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -255,11 +254,17 @@ public class ServiceChecker {
      */
     public static boolean isReachable(URL url) {
         try {
-            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-            huc.setRequestMethod("HEAD");
-            int responseCode = huc.getResponseCode();
-            return responseCode != HttpStatus.SC_NOT_FOUND;
-        } catch (IOException e) {
+            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
+            HttpHead getRequest = HTTP.getHeadRequest(url);
+            CloseableHttpResponse execute = httpCl.execute(getRequest);
+            StatusLine statusLine = execute.getStatusLine();
+            if (statusLine.getStatusCode() == HttpStatus.SC_OK
+                    || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED
+                    || statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN) {
+                return true;
+            }
+            return false;
+        } catch (IOException | URISyntaxException e) {
             //log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }

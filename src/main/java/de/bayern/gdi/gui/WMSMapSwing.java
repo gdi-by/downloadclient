@@ -27,6 +27,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -56,6 +58,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.ows.HTTPClient;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.factory.CommonFactoryFinder;
@@ -164,6 +167,7 @@ public class WMSMapSwing extends Parent {
     private GeometryDescriptor geomDesc;
     private String geometryAttributeName;
     private String source;
+    private CursorAction bboxAction;
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -278,6 +282,31 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * gets the getCapabilities URL.
+     * @param mapURL the URL of the Map
+     * @return getCapabilties URL
+     */
+    public static URL getCapabiltiesURL(URL mapURL) {
+        URL url = mapURL;
+        try {
+            WebMapServer wms = new WebMapServer(mapURL);
+            HTTPClient httpClient = wms.getHTTPClient();
+            URL get = wms.
+                    getCapabilities().
+                    getRequest().
+                    getGetCapabilities().
+                    getGet();
+            if (get != null) {
+                url = new URL(get.toString() + "request=GetCapabilities");
+            }
+            httpClient.getConnectTimeout();
+        } catch (IOException | ServiceException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return url;
+    }
+
+    /**
      * Constructor.
      * @param mapURL mapURL
      * @param width width
@@ -376,7 +405,6 @@ public class WMSMapSwing extends Parent {
                 && this.coordinateY1TextField != null
                 && this.coordinateX2TextField != null
                 && this.coordinateY2TextField != null) {
-            //System.out.println("TextFields not null");
             if (!this.coordinateX1TextField.getText()
                     .toString().equals("")
                     && !this.coordinateY1TextField.getText()
@@ -385,7 +413,6 @@ public class WMSMapSwing extends Parent {
                     .toString().equals("")
                     && !this.coordinateY2TextField.getText().
                     toString().equals("")) {
-                //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
                         this.coordinateX1TextField.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
@@ -510,10 +537,18 @@ public class WMSMapSwing extends Parent {
     }
 
     private void clearCoordinateDisplay() {
-        this.coordinateX1TextField.setText("");
-        this.coordinateY1TextField.setText("");
-        this.coordinateX2TextField.setText("");
-        this.coordinateY2TextField.setText("");
+        if (this.coordinateX1TextField != null) {
+            this.coordinateX1TextField.setText("");
+        }
+        if (this.coordinateY1TextField != null) {
+            this.coordinateY1TextField.setText("");
+        }
+        if (this.coordinateX2TextField != null) {
+            this.coordinateX2TextField.setText("");
+        }
+        if (this.coordinateY2TextField != null) {
+            this.coordinateY2TextField.setText("");
+        }
     }
 
     /**
@@ -525,6 +560,18 @@ public class WMSMapSwing extends Parent {
         private Double x2Coordinate;
         private Double y1Coordinate;
         private Double y2Coordinate;
+        private int clickCount = 0;
+
+        /**
+         * resets the coordinate Infos.
+         */
+        public void resetCoordinates() {
+            x1Coordinate = null;
+            x2Coordinate = null;
+            y1Coordinate = null;
+            y2Coordinate = null;
+            clickCount = 0;
+        }
 
         public CursorAction(MapPane mapPane) {
             super(mapPane);
@@ -537,8 +584,8 @@ public class WMSMapSwing extends Parent {
                 private Point end;
                 private DirectPosition2D mapStartPos;
                 private DirectPosition2D mapEndPos;
-                private int clickCount = 0;
                 private WeakHashMap<Layer, InfoToolHelper> helperTable;
+
 
                 @Override
                 public void onMouseClicked(MapMouseEvent ev) {
@@ -549,7 +596,6 @@ public class WMSMapSwing extends Parent {
                         if (clickCount == 0) {
                             end = null;
                             mapEndPos = null;
-                            mapPane.setSelectedEnvelope(null);
                             start = ev.getPoint();
                             mapStartPos = ev.getWorldPos();
                             clearCoordinateDisplay();
@@ -568,11 +614,6 @@ public class WMSMapSwing extends Parent {
                             Rectangle rect = new Rectangle();
                             rect.setFrameFromDiagonal(start, end);
                             mapPane.setDrawRect(rect);
-                            Envelope2D env = new Envelope2D();
-                            env.setFrameFromDiagonal(
-                                    mapStartPos,
-                                    ev.getWorldPos());
-                            mapPane.setSelectedEnvelope(env);
                             clickCount = 0;
                         } else {
                             clickCount = 0;
@@ -665,17 +706,50 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * Information about the Polygon.
+     */
+    public static class PolygonInfos {
+        private String name;
+        private String id;
+
+        /**
+         * Constructor.
+         * @param name the name
+         * @param id the id
+         */
+        public PolygonInfos(String name, String id) {
+            this.name = name;
+            this.id = id;
+        }
+
+        /**
+         * returns the name.
+         * @return the name
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * returns the ID.
+         * @return the ID
+         */
+        public String getID() {
+            return this.id;
+        }
+    }
+
+    /**
      * sets name and id of the selected polygon.
      * @param name name
      * @param id id
      */
     private void setNameAndId(String name, String id) {
-        this.selectedPolygonName = name;
-        this.selectedPolygonID = id;
+        PolygonInfos polyInf = new PolygonInfos(name, id);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                fireEvent(new PolygonClickedEvent());
+                fireEvent(new PolygonClickedEvent(polyInf));
             }
         });
     }
@@ -739,14 +813,6 @@ public class WMSMapSwing extends Parent {
         return rule;
     }
 
-    public String getClickedPolygonName() {
-        return this.selectedPolygonName;
-    }
-
-    public String getClickedPolygonID() {
-        return this.selectedPolygonID;
-    }
-
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -792,31 +858,42 @@ public class WMSMapSwing extends Parent {
                 JButton btn;
                 JToggleButton tbtn;
                 ButtonGroup cursorToolGrp = new ButtonGroup();
-                CursorAction cursorAction = new CursorAction(mapPane);
-                tbtn = new JToggleButton(cursorAction);
+                ActionListener deleteGraphics = new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mapPane.deleteGraphics();
+                    }
+                };
+                bboxAction = new CursorAction(mapPane);
+                tbtn = new JToggleButton(bboxAction);
                 tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+                tbtn.addActionListener(deleteGraphics);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomInAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new PanAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 tbtn = new JToggleButton(new InfoAction(mapPane));
+                tbtn.addActionListener(deleteGraphics);
                 tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
                 toolBar.add(tbtn);
                 cursorToolGrp.add(tbtn);
                 toolBar.addSeparator();
                 btn = new JButton(new ResetAction(mapPane));
+                btn.addActionListener(deleteGraphics);
                 btn.setName(TOOLBAR_RESET_BUTTON_NAME);
                 toolBar.add(btn);
                 panel.add(toolBar, "grow");
@@ -918,6 +995,8 @@ public class WMSMapSwing extends Parent {
      * @param envelope the extend
      */
     public void setExtend(Envelope envelope) {
+        bboxAction.resetCoordinates();
+        mapPane.deleteGraphics();
         mapPane.setDisplayArea(envelope);
     }
 
@@ -1026,7 +1105,6 @@ public class WMSMapSwing extends Parent {
      */
     private class ExtJMapPane extends JMapPane {
         private Rectangle rect;
-        private Envelope2D selectedEnv;
 
         public ExtJMapPane(MapContent content) {
             super(content);
@@ -1034,14 +1112,6 @@ public class WMSMapSwing extends Parent {
 
         public void setDrawRect(Rectangle rectangle) {
             this.rect = rectangle;
-        }
-
-        public void setSelectedEnvelope(Envelope2D env) {
-            this.selectedEnv = env;
-        }
-
-        public Envelope2D getSelectedEnvelope() {
-            return this.selectedEnv;
         }
 
         @Override
@@ -1058,6 +1128,12 @@ public class WMSMapSwing extends Parent {
                         rect.width,
                         rect.height);
             }
+        }
+
+        public void deleteGraphics() {
+            clearCoordinateDisplay();
+            setDrawRect(null);
+            repaint();
         }
 
         @Override

@@ -304,12 +304,14 @@ public class CatalogService {
 
     private String makeCapabiltiesURL(String url, String type) {
         if (url.endsWith("?") && type.toUpperCase().contains("WFS")) {
-            return url + "service=wfs&version=" + getVersionOfType(type)
+            return url + "service=wfs"
+                    + "&acceptversions=" + getVersionOfType(type)
                     + "&request=GetCapabilities";
         }
         if (!url.toUpperCase().contains("GETCAPABILITIES") && type
                 .toUpperCase().contains("WFS")) {
-            return url + "?service=wfs&version=" + getVersionOfType(type)
+            return url + "?service=wfs"
+                    + "&acceptversions=" + getVersionOfType(type)
                     + "&request=GetCapabilities";
         }
         return url;
