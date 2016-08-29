@@ -48,7 +48,7 @@ oder im *headless mode*:
 
      $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
 
-Um passwortgeschützte Dienste zugänglich zu machen, können die Benutzerdaten über  --user=<user> and --password=<password> dem Download-Client übergeben werden.
+Um passwortgeschützte Dienste zugänglich zu machen, können die Benutzerdaten über  ``--user=<user>`` and ``--password=<password>`` dem Download-Client übergeben werden.
 
      `--config=<directory>`
 
@@ -56,11 +56,24 @@ Hier kann ein Ordner spezifiziert werden mit Konfigurationsdateien, um die defau
 
      `proxy.xml` 
 
-Um alternative HTTP(S) Proxy-Einstellungen zu konfigurieren.
+Alternative HTTP(S) Proxy-Einstellungen können folgendermaßen konfiguriert werden: ::
 
-<!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|...
+      <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
+        <!-- HTTP settings: -->
+        <HTTPProxyHost>HOST</HTTPProxyHost>
+        <HTTPProxyPort>PORT</HTTPProxyPort>
+        <HTTPProxyUser>USER</HTTPProxyUser>
+        <HTTPProxyUser>PASSWORD</HTTPProxyPassword>
+        <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
+        <!-- HTTPS settings: -->
+        <HTTPSProxyHost>HOST</HTTPSProxyHost>
+        <HTTPSProxyPort>PORT</HTTPSProxyPort>
+        <HTTPSProxyUser>USER</HTTPSProxyUser>
+        <HTTPSProxyUser>PASSWORD</HTTPSProxyPassword>
+        <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
+      </ProxyConfiguration>
 
-All fields are optional. To avoid application of the settings set overrideSystemSetting="false". enableSNIExtension enables/disables Server Name Indication. This might be needed in case of some problematic SSL-Hosts.
+All fields are optional. To avoid application of the settings set ``overrideSystemSetting="false"``. enableSNIExtension enables/disables Server Name Indication. This might be needed in case of some problematic SSL-Hosts.
 
      `serviceSetting.xml`
 Ein vorselektiertes Dienste-Set. 
@@ -141,7 +154,7 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 **Beispiel:**
 
-.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_featuretype_WFS.PNG
+.. image:: /img/DLC_featuretype_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen (=Begrenzungsfläche definiert). Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
@@ -157,7 +170,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 **Beispiel Variante a):**
 
-.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_Kartenauswahl_Atom.PNG
+.. image:: /img/DLC_Kartenauswahl_Atom.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
@@ -167,7 +180,7 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungen 
 
 **Beispiel Variante b):**
 
-.. image:: https://github.com/gdi-by/downloadclient/blob/docs/docs/img/DLC_Listenauswahl_Atom.PNG
+.. image:: /img/DLC_Listenauswahl_Atom.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
@@ -183,12 +196,12 @@ Die heruntergeladenen Datensätze  können mit Hilfe des Clients zu einem indivi
 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (siehe xxxx)  bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
-Folgende Verarbeitungsschritte werden aktuell von der Geschäftsstelle GDI-BY zur Verfügung gestellt: 
+Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung: 
 
-- Konvertierung eines Vektordatenformates nach ESRI-Shape nach Eingabe folgendes Parameters: 
+- Konvertierung eines Vektordatenformates nach ESRI-Shape nach Eingabe des folgenden Parameters: 
    - Koordinatenreferenzsystem 
 
-- Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe folgendes Parameters:
+- Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
 - ??? Konvertierung eines Vektor- oder Rasterdatenformates nach GeoPackage nach Eingabe folgender Parameter: 
