@@ -766,6 +766,7 @@ public class Controller {
                 url = serviceURL.getText();
                 if (!ServiceChecker.isReachable(url)) {
                     setUnreachable();
+                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
                     return 0;
                 }
                 username = serviceUser.getText();
@@ -778,6 +779,7 @@ public class Controller {
                         if ((password == null && username == null)
                                 || (password.isEmpty() && username.isEmpty())) {
                             setAuth();
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
                             return 0;
                         }
                     } else {
@@ -798,6 +800,8 @@ public class Controller {
                                 + "Service Type" , st);
                         setStatusTextUI(
                             I18n.getMsg("status.no-service-type"));
+                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        return 0;
                     } else {
                         switch (st) {
                             case Atom:
