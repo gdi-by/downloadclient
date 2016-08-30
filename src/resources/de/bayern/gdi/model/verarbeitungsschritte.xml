@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Verarbeitungskonfiguration für den Downloadclient der GDI-BY
 
-    Stand: 25.11.2015
+    Stand: 10.06.2016
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
 
@@ -92,7 +92,7 @@
         <Verarbeitungsschritt formattyp="raster" name="toGeoTIFF">
             <Titel>Konvertierung nach GeoTIFF</Titel>
             <Beschreibung>Konvertiert die heruntergeladenen Dateien in ein GeoTIFF</Beschreibung>
-            <Befehl>gdal</Befehl>
+            <Befehl>gdalwarp</Befehl>
             <ParameterSet>
                 <Parameter verpflichtend="true">
                     -of GTiff
@@ -108,17 +108,6 @@
             </ParameterSet>
         </Verarbeitungsschritt>
 
-        <Verarbeitungsschritt formattyp="raster, vektor" name="sendmail">
-            <Titel>[MOCK] Per E-Mail verschicken</Titel>
-            <Beschreibung>[MOCK] Verschickt die heruntergeladenen Dateien per E-Mail</Beschreibung>
-            <Befehl>send_email.py</Befehl>
-            <ParameterSet>
-                <Parameter>-attachment</Parameter>
-                <Parameter glob="delta">*.*</Parameter>
-                <Parameter verpflichtend="true" eingabeelement="text">
-                    -to {TEXT}
-                </Parameter>
-            </ParameterSet>
-        </Verarbeitungsschritt>
     </Verarbeitungsschritte>
 </Verarbeitungskonfiguration>
+
