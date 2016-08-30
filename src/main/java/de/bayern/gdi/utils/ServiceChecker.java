@@ -265,9 +265,11 @@ public class ServiceChecker {
             HttpHead getRequest = HTTP.getHeadRequest(url);
             CloseableHttpResponse execute = httpCl.execute(getRequest);
             StatusLine statusLine = execute.getStatusLine();
+            // Removing statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN
+            // because special MS "Standards"
+            // (https://en.wikipedia.org/wiki/HTTP_403)
             if (statusLine.getStatusCode() == HttpStatus.SC_OK
-                    || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED
-                    || statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN) {
+                || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 return true;
             }
             return false;

@@ -126,13 +126,6 @@ public class App {
         } else {
             Config.uninitialized();
         }
-        if (Config.getInstance().getServices() == null
-                || Config.getInstance().getMimeTypes() == null
-                || Config.getInstance().getProcessingConfig() == null) {
-            System.err.println(
-                    "Initialization of config failed");
-            System.exit(1);
-        }
 
         if (runHeadless(args)) {
             Unauthorized unauthorized = new UnauthorizedLog();

@@ -766,23 +766,20 @@ public class Controller {
                 url = serviceURL.getText();
                 if (!ServiceChecker.isReachable(url)) {
                     setUnreachable();
+                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
                     return 0;
                 }
-                if (serviceAuthenticationCbx.isSelected()) {
-                    username = serviceUser.getText();
-                    dataBean.setUsername(username);
-                    password = servicePW.getText();
-                    dataBean.setPassword(password);
-                }
+                username = serviceUser.getText();
+                dataBean.setUsername(username);
+                password = servicePW.getText();
+                dataBean.setPassword(password);
                 if ((username == null && password == null)
                         || (username.equals("") && password.equals(""))) {
                     if (ServiceChecker.isRestricted(new URL(url))) {
-                        String pw = dataBean.getPassword();
-                        String un = dataBean.getUserName();
-
-                        if ((pw == null && un == null)
-                                || (pw.isEmpty() && un.isEmpty())) {
+                        if ((password == null && username == null)
+                                || (password.isEmpty() && username.isEmpty())) {
                             setAuth();
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
                             return 0;
                         }
                     } else {
@@ -803,6 +800,8 @@ public class Controller {
                                 + "Service Type" , st);
                         setStatusTextUI(
                             I18n.getMsg("status.no-service-type"));
+                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        return 0;
                     } else {
                         switch (st) {
                             case Atom:
