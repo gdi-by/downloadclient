@@ -140,16 +140,23 @@ public class ServiceChecker {
         if (nl.getLength() == 0) {
             nl = doc.getElementsByTagName("WFS:WFS_CAPABILITIES");
         }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
+        }
         if (nl.getLength() != 0) {
             NamedNodeMap nnm = nl.item(0).getAttributes();
-            switch (nnm.getNamedItem("version").getNodeValue()) {
-                case "1.0.0":
-                case "1.1.0":
-                    return ServiceType.WFSOne;
-                case "2.0.0":
-                    return ServiceType.WFSTwo;
-                default:
-                    return null;
+            if (nnm.getNamedItem("version") != null) {
+                switch (nnm.getNamedItem("version").getNodeValue()) {
+                    case "1.0.0":
+                    case "1.1.0":
+                        return ServiceType.WFSOne;
+                    case "2.0.0":
+                        return ServiceType.WFSTwo;
+                    default:
+                        return null;
+                }
+            } else {
+                return null;
             }
         }
         nl = doc.getElementsByTagName("feed");
