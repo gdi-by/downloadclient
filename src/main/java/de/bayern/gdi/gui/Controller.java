@@ -768,20 +768,15 @@ public class Controller {
                     setUnreachable();
                     return 0;
                 }
-                if (serviceAuthenticationCbx.isSelected()) {
-                    username = serviceUser.getText();
-                    dataBean.setUsername(username);
-                    password = servicePW.getText();
-                    dataBean.setPassword(password);
-                }
+                username = serviceUser.getText();
+                dataBean.setUsername(username);
+                password = servicePW.getText();
+                dataBean.setPassword(password);
                 if ((username == null && password == null)
                         || (username.equals("") && password.equals(""))) {
                     if (ServiceChecker.isRestricted(new URL(url))) {
-                        String pw = dataBean.getPassword();
-                        String un = dataBean.getUserName();
-
-                        if ((pw == null && un == null)
-                                || (pw.isEmpty() && un.isEmpty())) {
+                        if ((password == null && username == null)
+                                || (password.isEmpty() && username.isEmpty())) {
                             setAuth();
                             return 0;
                         }
