@@ -281,11 +281,24 @@ public class DownloadStepConverter {
         }
     }
 
+    private static String hitsURL(String wfsURL) {
+        // outputformat parameters irritates wfs servers
+        // when doing hits requests.
+        int idx = wfsURL.lastIndexOf('?');
+        if (idx >= 0) {
+            String prefix = wfsURL.substring(0, idx + 1);
+            String rest = wfsURL.substring(idx + 1);
+            wfsURL = prefix + StringUtils.ignorePartsWithPrefix(
+                rest, "&", "outputformat=");
+        }
+        return wfsURL + "&resultType=hits";
+    }
+
     private static final String XPATH_NUMBER_MATCHED
         = "/wfs:FeatureCollection/@numberMatched";
 
     private int numFeatures(String wfsURL) throws ConverterException {
-        URL url = newURL(wfsURL + "&resultType=hits");
+        URL url = newURL(hitsURL(wfsURL));
         Document hitsDoc = XML.getDocument(url, user, password);
         if (hitsDoc == null) {
             // TODO: I18n

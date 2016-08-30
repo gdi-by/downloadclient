@@ -263,4 +263,25 @@ public class StringUtils {
             return new double[0];
         }
     }
+
+    /**
+     * Splits a given string by a separator and ignores parts
+     * that starts with a given prefix (case insensitve).
+     * Afterwards the parts are re-joined with the separator.
+     * @param s The string.
+     * @param sep The separator.
+     * @param prefix The prefix.
+     * @return The treated string.
+     */
+    public static String ignorePartsWithPrefix(
+        String s, String sep, String prefix) {
+        prefix = prefix.toLowerCase();
+        List<String> use = new ArrayList<>();
+        for (String part: s.split(Pattern.quote(sep))) {
+            if (!part.toLowerCase().startsWith(prefix)) {
+                use.add(part);
+            }
+        }
+        return join(use, sep);
+    }
 }
