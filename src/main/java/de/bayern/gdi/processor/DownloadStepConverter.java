@@ -156,7 +156,8 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (usedVars.contains(p.getKey())) {
+            if (p.getValue().isEmpty()
+            || usedVars.contains(p.getKey())) {
                 continue;
             }
             if (sb.length() > 0) {
@@ -261,6 +262,25 @@ public class DownloadStepConverter {
         }
     }
 
+    private static final String XPATH_SERVICE_EXCEPTION
+        = "//ows:ExceptionReport/ows:Exception/ows:ExceptionText";
+
+    private static void checkServiceException(Document doc)
+        throws ConverterException {
+
+        String exceptionText = (String)XML.xpath(
+            doc, XPATH_SERVICE_EXCEPTION,
+            XPathConstants.STRING,
+            WFSMetaExtractor.NAMESPACES);
+
+        if (exceptionText != null && !exceptionText.isEmpty()) {
+            throw new ConverterException(
+                I18n.format(
+                    "dls.converter.wfs.exception",
+                    exceptionText));
+        }
+    }
+
     private static final String XPATH_NUMBER_MATCHED
         = "/wfs:FeatureCollection/@numberMatched";
 
@@ -271,6 +291,9 @@ public class DownloadStepConverter {
             // TODO: I18n
             throw new ConverterException("cannot load hits document");
         }
+
+        checkServiceException(hitsDoc);
+
         String numberMatchedString = (String)XML.xpath(
             hitsDoc, XPATH_NUMBER_MATCHED,
             XPathConstants.STRING,

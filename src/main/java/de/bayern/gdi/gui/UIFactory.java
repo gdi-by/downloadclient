@@ -54,7 +54,7 @@ import javafx.scene.web.WebView;
  */
 public class UIFactory {
 
-    private static final double LABEL_MIN_WIDTH = 150f;
+    private static final int LABEL_MIN_WIDTH = 150;
     private static final double TEXTFIELD_MIN_WIDTH = 170f;
     private static final double FONT_BIG = 14f;
     private static final int MARGIN_0 = 0;
@@ -66,7 +66,8 @@ public class UIFactory {
     private static final int WEBVIEW_PREF_WIDTH = 200;
     private static final int WEBVIEW_MIN_WIDTH = 200;
     private static final int WEBVIEW_PREF_HEIGHT = 50;
-    private static final int WEBVIEW_MIN_HEIGHT = 50;
+    private static final int WEBVIEW_MIN_HEIGHT = 0;
+    private static final int OUTPUTFORMAT_PREF_WIDTH = LABEL_MIN_WIDTH;
     private static final String DATAFORMAT_ID = "simpleDataformat";
 
     public static String getDataFormatID() {
@@ -153,6 +154,7 @@ public class UIFactory {
         out.addAll(outputFormats);
         outputFormat.setItems(out);
         outputFormatLabel.setLabelFor(outputFormat);
+        outputFormatLabel.setPrefWidth(OUTPUTFORMAT_PREF_WIDTH);
         outputFormatBox.getChildren().add(outputFormatLabel);
         outputFormatBox.getChildren().add(outputFormat);
         outputFormatBox.setMargin(outputFormatLabel,
