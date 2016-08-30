@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /** Model for proxy configuration. */
 @XmlRootElement(name = "ProxyConfiguration")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProxyConfiguration {
+public class ProxyConfiguration implements Configuration {
 
     /** Name of the config file. */
     public static final String PROXY_CONFIG_FILE = "proxy.xml";
@@ -74,6 +74,8 @@ public class ProxyConfiguration {
 
     @XmlElement(name = "HTTPSNonProxyHosts")
     private String httpsNonProxyHosts;
+
+    private static File sourceFile;
 
     public ProxyConfiguration() {
     }
@@ -285,6 +287,7 @@ public class ProxyConfiguration {
      * @throws IOException Something went wrong.
      */
     public static ProxyConfiguration read(File file) throws IOException {
+        sourceFile = file;
         try (FileInputStream fis = new FileInputStream(file)) {
             JAXBContext context =
                 JAXBContext.newInstance(ProxyConfiguration.class);
@@ -295,5 +298,13 @@ public class ProxyConfiguration {
             je.printStackTrace();
             throw new IOException(je.getMessage(), je);
         }
+    }
+
+    /**
+     * gets the file of the source.
+     * @return source file
+     */
+    public File getSourceFile() {
+        return this.sourceFile;
     }
 }

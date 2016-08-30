@@ -164,6 +164,78 @@ public class Config {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
         }
 
+        boolean configFailed = false;
+
+        String failedConfigs = "";
+        if (Holder.INSTANCE.getServices() == null) {
+            configFailed = true;
+            if (Holder.INSTANCE.getServices().getSourceFile()
+                    != null) {
+                if (failedConfigs.isEmpty()) {
+                    failedConfigs = Holder.
+                            INSTANCE.
+                            getServices().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            + Holder.
+                            INSTANCE.
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                }
+            }
+        }
+        if (Holder.INSTANCE.getMimeTypes() == null) {
+            configFailed = true;
+            if (Holder.INSTANCE.getMimeTypes().getSourceFile()
+                    != null) {
+                if (failedConfigs.isEmpty()) {
+                    failedConfigs = Holder.
+                            INSTANCE.
+                            getMimeTypes().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            + Holder.
+                            INSTANCE.
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                }
+            }
+        }
+        if (Holder.INSTANCE.getProcessingConfig() == null) {
+            configFailed = true;
+            if (Holder.INSTANCE.getProcessingConfig().getSourceFile()
+                    != null) {
+                if (failedConfigs.isEmpty()) {
+                    failedConfigs = Holder.
+                            INSTANCE.
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            + Holder.
+                            INSTANCE.
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                }
+            }
+        }
+
+        if (configFailed) {
+            System.err.println(
+                    "Initialization with config file(s) "
+                            + failedConfigs
+                            + " failed");
+            System.exit(1);
+        }
+
         // TODO: MIME types -> file extensions.
     }
 }
