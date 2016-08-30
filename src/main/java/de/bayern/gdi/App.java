@@ -126,11 +126,74 @@ public class App {
         } else {
             Config.uninitialized();
         }
-        if (Config.getInstance().getServices() == null
-                || Config.getInstance().getMimeTypes() == null
-                || Config.getInstance().getProcessingConfig() == null) {
+        boolean configFailed = false;
+        String failedConfigs = "";
+        if (Config.getInstance().getServices() == null) {
+            configFailed = true;
+            if (Config.getInstance().getServices().getSourceFile()
+                        != null) {
+                if (failedConfigs.isEmpty()) {
+                    failedConfigs = Config.
+                            getInstance().
+                            getServices().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            + Config.
+                                    getInstance().
+                                    getProcessingConfig().
+                                    getSourceFile().
+                                    getAbsolutePath();
+                }
+            }
+        }
+        if (Config.getInstance().getMimeTypes() == null) {
+            configFailed = true;
+            if (Config.getInstance().getMimeTypes().getSourceFile()
+                        != null) {
+                    if (failedConfigs.isEmpty()) {
+                    failedConfigs = Config.
+                            getInstance().
+                            getMimeTypes().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            + Config.
+                                    getInstance().
+                                    getProcessingConfig().
+                                    getSourceFile().
+                                    getAbsolutePath();
+                }
+            }
+        }
+        if (Config.getInstance().getProcessingConfig() == null) {
+            configFailed = true;
+            if (Config.getInstance().getProcessingConfig().getSourceFile()
+                    != null) {
+                if (failedConfigs.isEmpty()) {
+                    failedConfigs = Config.
+                            getInstance().
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                } else {
+                    failedConfigs += ", "
+                            +
+                            Config.
+                            getInstance().
+                            getProcessingConfig().
+                            getSourceFile().
+                            getAbsolutePath();
+                }
+            }
+        }
+        if (configFailed) {
             System.err.println(
-                    "Initialization of config failed");
+                    "Initialization with config file(s) "
+                            + failedConfigs
+                            + " failed");
             System.exit(1);
         }
 

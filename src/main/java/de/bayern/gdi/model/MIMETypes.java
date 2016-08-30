@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,7 +41,7 @@ import de.bayern.gdi.utils.StringUtils;
 /** Model for mapping MIME types to file name extensions. */
 @XmlRootElement(name = "MIMETypes")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class MIMETypes {
+public class MIMETypes implements Configuration {
 
     private static final Logger log
         = Logger.getLogger(MIMETypes.class.getName());
@@ -51,6 +52,8 @@ public class MIMETypes {
 
     @XmlElement(name = "Type")
     private List<MIMEType> types;
+
+    private static File source;
 
     public MIMETypes() {
         types = new ArrayList<>();
@@ -135,6 +138,7 @@ public class MIMETypes {
      * @throws IOException Something went wrong.
      */
     public static MIMETypes read(File file) throws IOException {
+        source = file;
         try (FileInputStream fis = new FileInputStream(file)) {
             return read(fis);
         }
@@ -146,7 +150,7 @@ public class MIMETypes {
      * @return The restored MIME.
      * @throws IOException Something went wrong.
      */
-    public static MIMETypes read(InputStream is) throws IOException {
+    private static MIMETypes read(InputStream is) throws IOException {
         try {
             JAXBContext context = JAXBContext.newInstance(MIMETypes.class);
             Unmarshaller um = context.createUnmarshaller();
@@ -165,13 +169,16 @@ public class MIMETypes {
         InputStream in = null;
         try {
             in = MIMETypes.class.getResourceAsStream(MIME_TYPES_FILE);
+            source = new File(MIMETypes.class.getResource(
+                    MIME_TYPES_FILE).toURI()
+            );
             if (in == null) {
                 log.log(Level.SEVERE,
                     MIME_TYPES_FILE + " not found");
                 return new MIMETypes();
             }
             return read(in);
-        } catch (IOException ioe) {
+        } catch (URISyntaxException | IOException ioe) {
             log.log(Level.SEVERE, "Failed to load mimetypes", ioe);
         } finally {
             if (in != null) {
@@ -182,5 +189,13 @@ public class MIMETypes {
             }
         }
         return new MIMETypes();
+    }
+
+    /**
+     * gets the file of the source.
+     * @return source file
+     */
+    public File getSourceFile() {
+        return source;
     }
 }
