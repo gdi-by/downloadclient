@@ -113,6 +113,8 @@ public class DownloadStepConverter {
         OpenLogJob olj = new OpenLogJob(this.logger);
         CloseLogJob clj = new CloseLogJob(this.logger);
 
+        LogMetaJob lmj = new LogMetaJob(this.logger, dls);
+
         FileTracker fileTracker = new FileTracker(path);
         if (!fileTracker.scan()) {
             // TODO: i18n
@@ -125,6 +127,7 @@ public class DownloadStepConverter {
         JobList jl = new JobList();
 
         jl.addJob(olj);
+        jl.addJob(lmj);
 
         if (dls.getServiceType().equals("ATOM")) {
             createAtomDownload(jl, path);
