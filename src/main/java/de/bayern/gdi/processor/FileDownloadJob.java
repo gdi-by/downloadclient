@@ -69,7 +69,6 @@ public class FileDownloadJob extends AbstractDownloadJob {
         CloseableHttpClient httpclient = getClient(url);
 
         String msg = I18n.format("download.file", url, this.file);
-        log(msg);
         broadcastMessage(msg);
 
         try {
