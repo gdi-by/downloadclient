@@ -31,6 +31,7 @@ import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.Misc;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * Starts an external process with optional arguments and
@@ -202,8 +203,9 @@ public class ExternalProcessJob implements Job {
                 throw jee;
             }
         }
+        List<String> cmd = commandList();
 
-        ProcessBuilder builder = new ProcessBuilder(commandList());
+        ProcessBuilder builder = new ProcessBuilder(cmd);
         if (this.fileTracker != null
         && this.fileTracker.getDirectory() != null) {
             builder.directory(this.fileTracker.getDirectory());
@@ -211,7 +213,8 @@ public class ExternalProcessJob implements Job {
 
         builder.redirectErrorStream(true);
 
-        broadcastMessage(p, I18n.format("external.process.start", command));
+        broadcastMessage(p, I18n.format("external.process.start",
+            StringUtils.join(cmd, " ")));
 
         try {
             Process process = builder.start();
