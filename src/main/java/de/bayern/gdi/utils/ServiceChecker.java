@@ -94,24 +94,29 @@ public class ServiceChecker {
             String password
     ) {
         Document doc = null;
-
-        if (isReachable(serviceURL)) {
-            if (simpleRestricted(serviceURL)) {
-                if (user != null && password != null) {
+        try {
+            if (isReachable(serviceURL)) {
+                if (simpleRestricted(serviceURL)) {
+                    if (user != null && password != null) {
+                        doc = XML.getDocument(
+                                serviceURL,
+                                user, password);
+                    } else {
+                        return null;
+                    }
+                } else {
                     doc = XML.getDocument(
                             serviceURL,
-                            user, password);
-                } else {
-                    return null;
+                            null, null);
                 }
-            } else {
-                doc = XML.getDocument(
-                        serviceURL,
-                        null, null);
             }
-        }
-        if (doc == null) {
-            return null;
+            if (doc == null) {
+                return null;
+            }
+        } catch (URISyntaxException
+                | IOException e) {
+            log.log(Level.SEVERE, "Could not get Document of URL: "
+                    + serviceURL.toString(), e);
         }
 
 
@@ -183,7 +188,15 @@ public class ServiceChecker {
             if (simpleRestricted(url)) {
                 return true;
             }
-            Document mainXML = XML.getDocument(url, false);
+            Document mainXML = null;
+            try {
+                mainXML = XML.getDocument(url, false);
+            } catch (URISyntaxException
+                    | IOException e) {
+                log.log(Level.SEVERE, "Could not get Document of URL: "
+                        + url.toString(), e);
+                return true;
+            }
             String describedByExpr =
                     "/feed/entry/link[@rel='alternate']/@href[1]";
             String describedBy = (String) XML.xpath(mainXML,
@@ -197,7 +210,15 @@ public class ServiceChecker {
                 if (simpleRestricted(url)) {
                     return true;
                 }
-                Document entryDoc = XML.getDocument(entryURL, false);
+                Document entryDoc = null;
+                try {
+                     entryDoc = XML.getDocument(entryURL, false);
+                } catch (URISyntaxException
+                    | IOException e) {
+                    log.log(Level.SEVERE, "Could not get Document of URL: "
+                        + entryURL.toString(), e);
+                    return true;
+                }
                 String downloadURLExpr =
                         "/feed/entry/link/@href[1]";
                 String downloadURLStr = (String) XML.xpath(entryDoc,

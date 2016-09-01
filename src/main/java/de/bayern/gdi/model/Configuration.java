@@ -29,8 +29,21 @@ import java.io.File;
  */
 public interface Configuration {
     /**
+     * Name of the Configuration.
+     */
+    String NAME = "Configuration";
+
+    /**
      * gets the file of the source.
      * @return source file
      */
     File getSourceFile();
+
+    /**
+     * gets the name of the configuration.
+     * @return name of the config
+     */
+    static String getName() {
+        return NAME;
+    }
 }

@@ -20,6 +20,7 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
@@ -302,7 +303,12 @@ public class DownloadStepConverter {
 
     private int numFeatures(String wfsURL) throws ConverterException {
         URL url = newURL(hitsURL(wfsURL));
-        Document hitsDoc = XML.getDocument(url, user, password);
+        Document hitsDoc = null;
+        try {
+            hitsDoc = XML.getDocument(url, user, password);
+        } catch (URISyntaxException | IOException e) {
+            throw new ConverterException(e.getMessage());
+        }
         if (hitsDoc == null) {
             // TODO: I18n
             throw new ConverterException("cannot load hits document");
@@ -357,7 +363,7 @@ public class DownloadStepConverter {
         WFSMeta meta;
         try {
             meta = extractor.parse();
-        } catch (IOException ioe) {
+        } catch (URISyntaxException | IOException ioe) {
             // TODO: I18n
             throw new ConverterException("Cannot load meta data", ioe);
         }

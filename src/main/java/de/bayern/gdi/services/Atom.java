@@ -27,7 +27,10 @@ import com.vividsolutions.jts.io.WKTReader;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.XML;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -44,6 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -197,15 +202,18 @@ public class Atom {
 
         /**
          * Loads the "costly" details.
+         * @throws URISyntaxException if the url is wrong
+         * @throws SAXException if the xml is wrong
+         * @throws ParserConfigurationException if the config is wrong
+         * @throws IOException if something in io is wrong
          */
-        public void load() {
+        public void load()
+            throws URISyntaxException, SAXException,
+                ParserConfigurationException, IOException {
             Document entryDoc = null;
-            try {
-                URL url = new URL(this.describedBy);
-                entryDoc = Atom.getDocument(url, this.username, this.password);
-            } catch (MalformedURLException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
+            URL url = new URL(this.describedBy);
+            entryDoc = Atom.getDocument(url, this.username, this.password);
+
             if (entryDoc == null) {
                 entryDoc = XML.getDocument(this.describedBy);
             }
@@ -262,15 +270,23 @@ public class Atom {
 
     /**
      * @inheritDoc
-     * @return the URL of the Service
+     * @param serviceURL the url of the service
+     * @throws URISyntaxException if the url is wrong
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
-    public Atom(String serviceURL) {
+    public Atom(String serviceURL)
+            throws URISyntaxException, SAXException,
+            ParserConfigurationException, IOException {
         this(serviceURL, null, null);
     }
 
     private static Document getDocument(URL url,
                                         String username,
-                                        String password) {
+                                        String password)
+            throws SAXException, ParserConfigurationException, IOException,
+                URISyntaxException {
         Document doc = null;
         if (ServiceChecker.simpleRestricted(url)) {
             if (username == null && password == null) {
@@ -295,13 +311,18 @@ public class Atom {
      * @param serviceURL the URL to the service
      * @param userName username
      * @param password password
+     * @throws URISyntaxException if the url is wrong
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
-    public Atom(String serviceURL, String userName, String password) {
+    public Atom(String serviceURL, String userName, String password)
+            throws URISyntaxException, SAXException,
+            ParserConfigurationException, IOException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
         URL url = null;
-
         try {
             url = new URL(this.serviceURL);
         } catch (MalformedURLException e) {

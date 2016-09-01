@@ -21,6 +21,7 @@ import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import javax.xml.namespace.NamespaceContext;
@@ -162,8 +163,10 @@ public class WFSMetaExtractor {
      * Extracts meta information from a given capabilities path.
      * @return The extracted meta data.
      * @throws IOException If something went wrong.
+     * @throws URISyntaxException if the URL is wrong
      */
-    public WFSMeta parse() throws IOException {
+    public WFSMeta parse()
+            throws IOException, URISyntaxException {
         WFSMeta meta = new WFSMeta();
         meta.url = capURLString;
         parseCapabilites(meta);
@@ -171,7 +174,8 @@ public class WFSMetaExtractor {
         return meta;
     }
 
-    private Document getDocument(String url) throws IOException {
+    private Document getDocument(String url)
+            throws IOException, URISyntaxException {
         Document doc = XML.getDocument(new URL(url), this.user, this.password);
         if (doc != null) {
             return doc;
@@ -202,7 +206,7 @@ public class WFSMetaExtractor {
     }
 
     private void parseDescribeStoredQueries(WFSMeta meta)
-        throws IOException {
+        throws IOException, URISyntaxException {
 
         WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
         if (op == null) {
@@ -246,7 +250,8 @@ public class WFSMetaExtractor {
         }
     }
 
-    private void parseCapabilites(WFSMeta meta) throws IOException {
+    private void parseCapabilites(WFSMeta meta)
+            throws IOException, URISyntaxException {
 
         Document capDoc = getDocument(this.capURLString);
         meta.namespaces.join(capDoc);
