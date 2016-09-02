@@ -77,6 +77,9 @@ public class ProxyConfiguration implements Configuration {
 
     private static File sourceFile;
 
+    private static final String NAME =
+            "ProxyConfig";
+
     public ProxyConfiguration() {
     }
 
@@ -306,5 +309,13 @@ public class ProxyConfiguration implements Configuration {
      */
     public File getSourceFile() {
         return this.sourceFile;
+    }
+
+    /**
+     * gets the name of the configuration.
+     * @return name of the config
+     */
+    public static String getName() {
+        return NAME;
     }
 }

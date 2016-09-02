@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
@@ -29,6 +30,7 @@ import org.w3c.dom.Document;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.XML;
+import org.xml.sax.SAXException;
 
 /**
  * Checks if a given set of GML files contain
@@ -80,7 +82,8 @@ public class GMLCheckJob implements Job {
     }
 
     private void checkForProblems(File file)
-    throws JobExecutionException {
+    throws JobExecutionException, SAXException,
+            ParserConfigurationException, IOException {
         Document doc = XML.getDocument(file);
         if (doc == null) {
             String msg = I18n.format("gml.check.parsing.failed", file);
@@ -126,7 +129,13 @@ public class GMLCheckJob implements Job {
                     throw new JobExecutionException(msg);
                 }
             }
-            checkForProblems(file);
+            try {
+                checkForProblems(file);
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException e) {
+                throw new JobExecutionException(e.getMessage());
+            }
             String msg = I18n.getMsg("gml.check.passed");
             log(msg);
             p.broadcastMessage(msg);

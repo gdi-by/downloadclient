@@ -55,6 +55,9 @@ public class MIMETypes implements Configuration {
 
     private static File source;
 
+    private static final String NAME =
+            "MimeTypeConfig";
+
     public MIMETypes() {
         types = new ArrayList<>();
     }
@@ -197,5 +200,13 @@ public class MIMETypes implements Configuration {
      */
     public File getSourceFile() {
         return source;
+    }
+
+    /**
+     * gets the name of the configuration.
+     * @return name of the config
+     */
+    public static String getName() {
+        return NAME;
     }
 }

@@ -87,7 +87,13 @@ public class Start extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = new DataBean();
+            DataBean dataBean = null;
+            try {
+                dataBean = new DataBean();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
             Controller controller = fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);

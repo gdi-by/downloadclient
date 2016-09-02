@@ -45,6 +45,7 @@ import de.bayern.gdi.utils.ServiceSetting;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +91,9 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -947,7 +951,16 @@ public class Controller {
         if (type == ServiceType.Atom) {
             statusBarText.setText(I18n.format("status.ready"));
             Atom.Item item = (Atom.Item)data.getItem();
-            item.load();
+            try {
+                item.load();
+            } catch (URISyntaxException
+                    | SAXException
+                    | ParserConfigurationException
+                    | IOException e) {
+                log.log(Level.SEVERE, "Could not Load Item\n"
+                        + e.getMessage(), item);
+                return;
+            }
             if (mapAtom != null) {
                 mapAtom.highlightSelectedPolygon(item.id);
             }

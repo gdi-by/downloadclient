@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -79,10 +80,11 @@ public class CatalogService {
      * @param url      String URL
      * @param userName Username
      * @param password Password
-     * @throws MalformedURLException
+     * @throws URISyntaxException if URL is wrong
+     * @throws IOException if something in IO is wrong
      */
-    public CatalogService(String url, String userName, String password) throws
-            MalformedURLException {
+    public CatalogService(String url, String userName, String password)
+            throws URISyntaxException, IOException {
         this(new URL(url), userName, password);
     }
 
@@ -90,9 +92,10 @@ public class CatalogService {
      * Constructor.
      *
      * @param url Stirng URL
-     * @throws MalformedURLException When URL has bad format
+     * @throws URISyntaxException if URL is wrong
+     * @throws IOException if something in IO is wrong
      */
-    public CatalogService(String url) throws MalformedURLException {
+    public CatalogService(String url) throws URISyntaxException, IOException {
         this(url, null, null);
     }
 
@@ -100,8 +103,11 @@ public class CatalogService {
      * Constructor.
      *
      * @param url URL
+     * @throws URISyntaxException if URL is wrong
+     * @throws IOException if something in IO is wrong
      */
-    public CatalogService(URL url) {
+    public CatalogService(URL url)
+            throws URISyntaxException, IOException {
         this(url, null, null);
     }
 
@@ -111,8 +117,11 @@ public class CatalogService {
      * @param url      URL
      * @param userName Username
      * @param password Password
+     * @throws URISyntaxException if URL is wrong
+     * @throws IOException if something in IO is wrong
      */
-    public CatalogService(URL url, String userName, String password) {
+    public CatalogService(URL url, String userName, String password)
+    throws URISyntaxException, IOException {
         this.catalogURL = url;
         this.userName = userName;
         this.password = password;
@@ -123,8 +132,8 @@ public class CatalogService {
                 "srv", SRV_NAMESPACE,
                 "gco", GCO_NAMESPACE);
         Document xml = XML.getDocument(this.catalogURL,
-                this.userName,
-                this.password);
+                    this.userName,
+                    this.password);
         if (xml != null) {
             String getProviderExpr = "//ows:ServiceIdentification/ows:Title";
             Node providerNameNode = (Node) XML.xpath(xml,
@@ -143,11 +152,7 @@ public class CatalogService {
                     XPathConstants.STRING,
                     context);
             this.getRecordsURL = null;
-            try {
-                this.getRecordsURL = new URL(getRecordsURLStr);
-            } catch (MalformedURLException e) {
-                log.log(Level.SEVERE, e.toString(), xml);
-            }
+            this.getRecordsURL = new URL(getRecordsURLStr);
         }
     }
 
@@ -165,16 +170,19 @@ public class CatalogService {
      *
      * @param filter the Word to filter to
      * @return Map of Service Names and URLs
+     * @throws URISyntaxException if URL is wrong
+     * @throws IOException if something in IO is wrong
      */
-    public List<ServiceModel> getServicesByFilter(String filter) {
+    public List<ServiceModel> getServicesByFilter(String filter)
+        throws URISyntaxException, IOException {
         List<ServiceModel> services = new ArrayList<ServiceModel>();
         if (filter.length() > MIN_SEARCHLENGTH && this.getRecordsURL != null) {
             String search = loadXMLFilter(filter);
             Document xml = XML.getDocument(this.getRecordsURL,
-                    this.userName,
-                    this.password,
-                    search,
-                    true);
+                        this.userName,
+                        this.password,
+                        search,
+                        true);
             Node exceptionNode = (Node) XML.xpath(xml,
                     "//ows:ExceptionReport",
                     XPathConstants.NODE, this.context);

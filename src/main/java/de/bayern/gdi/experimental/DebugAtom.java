@@ -19,6 +19,11 @@
 package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.services.Atom;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /**
@@ -53,15 +58,22 @@ public class DebugAtom {
     }
 
     private void go() {
-        atom = new Atom(this.urlString, this.userName, this.password);
-        System.out.println("Title: " + atom.getTitle());
-        System.out.println("Subtitle: " + atom.getSubTitle());
-        System.out.println("ID: " + atom.getID());
-        ArrayList<Atom.Item> items = atom.getItems();
-        for (int i = 0; i < items.size(); i++) {
-            Atom.Item item = items.get(i);
-            item.load();
+        try {
+            atom = new Atom(this.urlString, this.userName, this.password);
+            System.out.println("Title: " + atom.getTitle());
+            System.out.println("Subtitle: " + atom.getSubTitle());
+            System.out.println("ID: " + atom.getID());
+            ArrayList<Atom.Item> items = atom.getItems();
+            for (int i = 0; i < items.size(); i++) {
+                Atom.Item item = items.get(i);
+                item.load();
+            }
+            System.out.println(items.toString());
+        } catch (URISyntaxException
+                | SAXException
+                | ParserConfigurationException
+                | IOException e) {
+            System.out.println(e.getMessage());
         }
-        System.out.println(items.toString());
     }
 }

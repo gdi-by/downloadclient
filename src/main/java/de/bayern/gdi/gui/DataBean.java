@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +89,7 @@ public class DataBean extends Observable {
     /**
      * Constructor.
      */
-    public DataBean() {
+    public DataBean() throws IOException {
         this.namePwMap = new HashMap<>();
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
@@ -96,8 +98,15 @@ public class DataBean extends Observable {
 
         this.catalogServices = new ArrayList<ServiceModel>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
-            this.catalogService =
-                    new CatalogService(serviceSetting.getCatalogueURL());
+            try {
+                this.catalogService =
+                        new CatalogService(serviceSetting.getCatalogueURL());
+            } catch (URISyntaxException | IOException e) {
+                throw new IOException(
+                        "Failed to Initialize Calatalog Service: '"
+                                + serviceSetting.getCatalogueURL()
+                                + "'");
+            }
         }
         this.processingSteps = new ArrayList<>();
     }

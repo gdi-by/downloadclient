@@ -124,7 +124,13 @@ public class App {
                 System.exit(1);
             }
         } else {
-            Config.uninitialized();
+            try {
+                Config.uninitialized();
+            } catch (IOException e) {
+                System.err.println(
+                        "Loading config failed: " + e.getMessage());
+                System.exit(1);
+            }
         }
 
         if (runHeadless(args)) {

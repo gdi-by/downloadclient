@@ -59,6 +59,9 @@ public class ProcessingConfiguration implements Configuration {
 
     private static File sourceFile;
 
+    private static final String NAME =
+            "ProcessingConfig";
+
     public ProcessingConfiguration() {
         this.inputElements = new ArrayList<>();
         this.processingSteps = new ArrayList<>();
@@ -202,5 +205,13 @@ public class ProcessingConfiguration implements Configuration {
      */
     public File getSourceFile() {
         return sourceFile;
+    }
+
+    /**
+     * gets the name of the configuration.
+     * @return name of the config
+     */
+    public static String getName() {
+        return NAME;
     }
 }

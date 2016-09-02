@@ -19,6 +19,8 @@ package de.bayern.gdi.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -28,6 +30,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 
 import org.w3c.dom.Document;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * ResponseHandler for HttpClient.
@@ -39,6 +43,9 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
     private Boolean namespaceAware;
 
     private static Unauthorized unauthorized;
+
+    private static final Logger log
+            = Logger.getLogger(DocumentResponseHandler.class.getName());
 
 
     /** Set the Unauthorized handler.
@@ -97,8 +104,15 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
                     + status);
         }
         HttpEntity entity = response.getEntity();
-        return entity == null
-            ? null
-            : XML.getDocument(wrap(entity.getContent()), namespaceAware);
+        try {
+            return entity == null
+                    ? null
+                    : XML.getDocument(wrap(entity.getContent())
+                        , namespaceAware);
+        } catch (org.xml.sax.SAXException
+                | ParserConfigurationException e) {
+            log.log(Level.SEVERE, e.toString(), entity);
+            return null;
+        }
     }
 }
