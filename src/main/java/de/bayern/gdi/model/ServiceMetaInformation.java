@@ -187,4 +187,20 @@ public class ServiceMetaInformation {
     public String getAdditionalMessage() {
         return this.additionalMessage;
     }
+
+    /**
+     * gets the Username.
+     * @return username
+     */
+    public String getUsername() {
+        return this.username;
+    }
+
+    /**
+     * gets the Password.
+     * @return password
+     */
+    public String getPassword() {
+        return this.password;
+    }
 }
