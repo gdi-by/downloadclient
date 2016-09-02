@@ -34,6 +34,11 @@ public class ServiceMetaInformation extends Object {
     private String password;
     private boolean restricted;
 
+    /**
+     * Constructor.
+     */
+    public ServiceMetaInformation() {
+    }
 
     /**
      * Constructor.
@@ -80,9 +85,22 @@ public class ServiceMetaInformation extends Object {
         this.password = password;
         this.serviceURL = url;
         this.restricted = ServiceChecker.isRestricted(this.serviceURL);
-        this.serviceType = ServiceChecker.checkService(this.serviceURL,
-                this.username,
-                this.password);
+        this.serviceType = null;
+        if (this.isRestricted()) {
+            if (this.getUsername() != null && this.getPassword() != null) {
+                if (!this.getUsername().isEmpty()
+                        && !this.getPassword().isEmpty()) {
+                    this.serviceType = ServiceChecker.checkService(
+                            this.serviceURL,
+                            this.username,
+                            this.password);
+                }
+            }
+        } else {
+            this.serviceType = ServiceChecker.checkService(this.serviceURL,
+                    null,
+                    null);
+        }
         this.additionalMessage = new String();
     }
 
@@ -168,10 +186,12 @@ public class ServiceMetaInformation extends Object {
      * @return true if equal; false if not
      */
     public boolean equals(ServiceMetaInformation smi) {
-        if (smi.getUsername().equals(this.getUsername())
-                && smi.getPassword().equals(this.getPassword())
-                && smi.getServiceURL().equals(this.getServiceURL())) {
-            return true;
+        if (smi.serviceURL != null) {
+            if (smi.getUsername().equals(this.getUsername())
+                    && smi.getPassword().equals(this.getPassword())
+                    && smi.getServiceURL().equals(this.getServiceURL())) {
+                return true;
+            }
         }
         return false;
     }
@@ -222,5 +242,14 @@ public class ServiceMetaInformation extends Object {
      */
     public String getPassword() {
         return this.password;
+    }
+
+    public void setUsernamePassword(String userName, String password) {
+        ServiceMetaInformation smi = new ServiceMetaInformation(this
+                .serviceURL, userName, password);
+        this.username = smi.getUsername();
+        this.password = smi.getPassword();
+        this.additionalMessage = smi.getAdditionalMessage();
+        this.serviceType = smi.getServiceType();
     }
 }

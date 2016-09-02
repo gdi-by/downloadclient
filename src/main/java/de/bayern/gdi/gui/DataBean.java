@@ -29,6 +29,7 @@ import java.util.Observable;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.ServiceMetaInformation;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
@@ -39,6 +40,8 @@ import de.bayern.gdi.utils.ServiceSetting;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import javax.xml.ws.Service;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -57,6 +60,7 @@ public class DataBean extends Observable {
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
+    private ServiceMetaInformation selectedService;
 
     private CatalogService catalogService;
 
@@ -109,8 +113,24 @@ public class DataBean extends Observable {
             }
         }
         this.processingSteps = new ArrayList<>();
+        this.selectedService = new ServiceMetaInformation();
     }
 
+    /**
+     * sets the selected service.
+     * @param smi the selected service
+     */
+    public void setSelectedService(ServiceMetaInformation smi) {
+        this.selectedService = smi;
+    }
+
+    /**
+     * gets the selected service.
+     * @return the selected service
+     */
+    public ServiceMetaInformation getSelectedService(){
+        return this.selectedService;
+    }
     /**
      * returns the Name Map.
      * @return the Name Map
