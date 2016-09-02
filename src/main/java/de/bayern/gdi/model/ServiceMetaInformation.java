@@ -18,6 +18,7 @@
 package de.bayern.gdi.model;
 
 import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.utils.ServiceChecker;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,13 +26,13 @@ import java.net.URL;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class ServiceMetaInformation {
+public class ServiceMetaInformation extends Object {
     private URL serviceURL;
     private ServiceType serviceType;
     private String additionalMessage;
     private String username;
     private String password;
-    private Boolean restricted;
+    private boolean restricted;
 
 
     /**
@@ -78,6 +79,11 @@ public class ServiceMetaInformation {
         this.username = username;
         this.password = password;
         this.serviceURL = url;
+        this.restricted = ServiceChecker.isRestricted(this.serviceURL);
+        this.serviceType = ServiceChecker.checkService(this.serviceURL,
+                this.username,
+                this.password);
+        this.additionalMessage = new String();
     }
 
     /**
@@ -147,13 +153,27 @@ public class ServiceMetaInformation {
                                   String additionalMessage,
                                   String username,
                                   String password,
-                                  Boolean restricted) {
+                                  boolean restricted) {
         this.username = username;
         this.password = password;
         this.serviceURL = url;
         this.restricted = restricted;
         this.serviceType = serviceType;
         this.additionalMessage = additionalMessage;
+    }
+
+    /**
+     * checks if two Objects are Equal.
+     * @param smi the other services
+     * @return true if equal; false if not
+     */
+    public boolean equals(ServiceMetaInformation smi) {
+        if (smi.getUsername().equals(this.getUsername())
+                && smi.getPassword().equals(this.getPassword())
+                && smi.getServiceURL().equals(this.getServiceURL())) {
+            return true;
+        }
+        return false;
     }
 
     /**

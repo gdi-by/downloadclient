@@ -60,17 +60,17 @@ public class DebugServiceMetaInformation {
                     this.urlString,
                     this.userName,
                     this.password);
-            System.out.println("ServiceType: "
+            System.out.println("ServiceType:\t"
                     + smi.getServiceType().toString());
-            System.out.println("ServiceURL: "
+            System.out.println("ServiceURL:\t\t"
                     + smi.getServiceURL());
-            System.out.println("Is Restricted: "
+            System.out.println("Is Restricted:\t"
                     + smi.isRestricted().toString());
-            System.out.println("Additional: "
+            System.out.println("Additional:\t\t"
                     + smi.getAdditionalMessage());
-            System.out.println("Password: "
+            System.out.println("Password:\t\t"
                     + smi.getPassword());
-            System.out.println("Username: "
+            System.out.println("Username:\t\t"
                     + smi.getUsername());
 
         } catch (MalformedURLException e) {
