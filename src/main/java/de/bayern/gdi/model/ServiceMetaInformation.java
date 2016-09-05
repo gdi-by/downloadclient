@@ -187,13 +187,26 @@ public class ServiceMetaInformation extends Object {
      */
     public boolean equals(ServiceMetaInformation smi) {
         if (smi.serviceURL != null) {
-            if (smi.getUsername().equals(this.getUsername())
-                    && smi.getPassword().equals(this.getPassword())
-                    && smi.getServiceURL().equals(this.getServiceURL())) {
+            if (this.hashCode() == smi.hashCode()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * hashcode function.
+     * @return returns hashcode.
+     */
+    public int hashCode() {
+        if (this.serviceURL != null) {
+            if (this.username != null && this.password != null) {
+                return this.serviceURL.hashCode() + this.password.hashCode()
+                        + this.username.hashCode();
+            }
+            return this.serviceURL.hashCode();
+        }
+        return 0;
     }
 
     /**
@@ -244,9 +257,14 @@ public class ServiceMetaInformation extends Object {
         return this.password;
     }
 
-    public void setUsernamePassword(String userName, String password) {
+    /**
+     * sets username and password.
+     * @param userName username
+     * @param pw password
+     */
+    public void setUsernamePassword(String userName, String pw) {
         ServiceMetaInformation smi = new ServiceMetaInformation(this
-                .serviceURL, userName, password);
+                .serviceURL, userName, pw);
         this.username = smi.getUsername();
         this.password = smi.getPassword();
         this.additionalMessage = smi.getAdditionalMessage();

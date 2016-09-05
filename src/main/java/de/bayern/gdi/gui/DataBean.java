@@ -41,8 +41,6 @@ import de.bayern.gdi.utils.ServiceSetting;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.xml.ws.Service;
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -128,9 +126,10 @@ public class DataBean extends Observable {
      * gets the selected service.
      * @return the selected service
      */
-    public ServiceMetaInformation getSelectedService(){
+    public ServiceMetaInformation getSelectedService() {
         return this.selectedService;
     }
+
     /**
      * returns the Name Map.
      * @return the Name Map

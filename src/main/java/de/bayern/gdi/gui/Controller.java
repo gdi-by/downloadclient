@@ -19,7 +19,14 @@
 package de.bayern.gdi.gui;
 
 import com.vividsolutions.jts.geom.Geometry;
-import de.bayern.gdi.model.*;
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.MIMEType;
+import de.bayern.gdi.model.MIMETypes;
+import de.bayern.gdi.model.Option;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.model.ServiceMetaInformation;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
@@ -293,7 +300,8 @@ public class Controller {
                         clearUserNamePassword();
                         if (!ServiceChecker
                                 .isReachable(dataBean
-                                        .getSelectedService().getServiceURL())) {
+                                        .getSelectedService()
+                                        .getServiceURL())) {
                             setStatusTextUI(
                                     I18n.format("status.service-not-available")
                             );
@@ -786,8 +794,8 @@ public class Controller {
                                     servicePW.getText());
                     if (!newSelectedService.equals(
                             dataBean.getSelectedService())) {
-                        if (newSelectedService.getServiceURL().toString().equals
-                                (dataBean.getSelectedService()
+                        if (newSelectedService.getServiceURL()
+                                .toString().equals(dataBean.getSelectedService()
                                         .getServiceURL().toString())) {
                             newSelectedService.setUsernamePassword(
                                     serviceUser.getText(),
@@ -801,7 +809,7 @@ public class Controller {
                 resetGui();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
                 if (dataBean.getSelectedService().isRestricted()) {
-                    if((dataBean.getSelectedService().getUsername()
+                    if ((dataBean.getSelectedService().getUsername()
                                 == null
                             && dataBean.getSelectedService().getPassword()
                                 == null)
@@ -835,7 +843,8 @@ public class Controller {
                         setStatusTextUI(
                                 I18n.getMsg("status.type.atom"));
                         Atom atom = new Atom(
-                                dataBean.getSelectedService().getServiceURL().toString(),
+                                dataBean.getSelectedService()
+                                        .getServiceURL().toString(),
                                 dataBean.getUserName(),
                                 dataBean.getPassword());
                         dataBean.setAtomService(atom);
