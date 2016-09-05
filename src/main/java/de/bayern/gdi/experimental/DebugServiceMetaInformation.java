@@ -21,7 +21,6 @@ package de.bayern.gdi.experimental;
 import de.bayern.gdi.model.ServiceMetaInformation;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)

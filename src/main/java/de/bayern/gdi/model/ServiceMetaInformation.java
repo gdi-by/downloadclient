@@ -29,9 +29,9 @@ import java.net.URL;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class ServiceMetaInformation extends Object {
-    private final static String WFS_URL_EXPR = "wfs";
-    private final static String GET_CAP_EXPR = "getcapabilities";
-    private final static String URL_TRY_APPENDIX =
+    private static final String WFS_URL_EXPR = "wfs";
+    private static final String GET_CAP_EXPR = "getcapabilities";
+    private static final String URL_TRY_APPENDIX =
             "?service=wfs&acceptversions=2.0.0&request=GetCapabilities";
     private URL serviceURL;
     private ServiceType serviceType;
@@ -52,7 +52,7 @@ public class ServiceMetaInformation extends Object {
      * @throws IOException if url is wrong
      */
     public ServiceMetaInformation(String url)
-        throws IOException{
+        throws IOException {
         this(new URL(url));
     }
 
@@ -305,6 +305,7 @@ public class ServiceMetaInformation extends Object {
      * sets username and password.
      * @param userName username
      * @param pw password
+     * @throws IOException when something goes wrong
      */
     public void setUsernamePassword(String userName, String pw)
     throws IOException {
