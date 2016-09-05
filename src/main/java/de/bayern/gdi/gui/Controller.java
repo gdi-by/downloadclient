@@ -324,7 +324,7 @@ public class Controller {
                             this.serviceUser.setDisable(true);
                             this.servicePW.setDisable(true);
                         }
-                    } catch (MalformedURLException e) {
+                    } catch (IOException e) {
                         log.log(Level.SEVERE, e.getMessage(), url);
                     } finally {
                         serviceURL.getScene().setCursor(Cursor.DEFAULT);

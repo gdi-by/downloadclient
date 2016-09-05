@@ -19,7 +19,9 @@ package de.bayern.gdi.model;
 
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.utils.ServiceChecker;
+import org.apache.http.HttpStatus;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -27,6 +29,10 @@ import java.net.URL;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class ServiceMetaInformation extends Object {
+    private final static String WFS_URL_EXPR = "wfs";
+    private final static String GET_CAP_EXPR = "getcapabilities";
+    private final static String URL_TRY_APPENDIX =
+            "?service=wfs&acceptversions=2.0.0&request=GetCapabilities";
     private URL serviceURL;
     private ServiceType serviceType;
     private String additionalMessage;
@@ -43,18 +49,19 @@ public class ServiceMetaInformation extends Object {
     /**
      * Constructor.
      * @param url the url
-     * @throws MalformedURLException if url is wrong
+     * @throws IOException if url is wrong
      */
     public ServiceMetaInformation(String url)
-        throws MalformedURLException {
+        throws IOException{
         this(new URL(url));
     }
 
     /**
      * Constructor.
      * @param url the url
+     * @throws IOException if url is wrong
      */
-    public ServiceMetaInformation(URL url) {
+    public ServiceMetaInformation(URL url) throws IOException {
         this(url, new String(), new String());
     }
 
@@ -63,12 +70,12 @@ public class ServiceMetaInformation extends Object {
      * @param url the url
      * @param username username
      * @param password password
-     * @throws MalformedURLException if url is wrong
+     * @throws IOException if url is wrong
      */
     public ServiceMetaInformation(String url,
                                   String username,
                                   String password)
-            throws MalformedURLException {
+            throws IOException {
         this(new URL(url), username, password);
     }
 
@@ -77,15 +84,53 @@ public class ServiceMetaInformation extends Object {
      * @param url the url
      * @param username username
      * @param password password
+     * @throws IOException if url is wrong
      */
     public ServiceMetaInformation(URL url,
                                   String username,
-                                  String password) {
+                                  String password)
+    throws IOException {
+        this.additionalMessage = new String();
         this.username = username;
         this.password = password;
         this.serviceURL = url;
-        this.restricted = ServiceChecker.isRestricted(this.serviceURL);
-        this.serviceType = null;
+        int headStatus = ServiceChecker.tryHead(serviceURL);
+        if (headStatus == HttpStatus.SC_OK) {
+            this.restricted = ServiceChecker.isRestricted(this.serviceURL);
+            this.serviceType = null;
+            checkServiceType();
+            return;
+        } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
+            this.restricted = true;
+            checkServiceType();
+            if (serviceType != null) {
+                return;
+            }
+        }
+        URL newURL = guessURL(this.serviceURL);
+        if (newURL.equals(this.serviceURL)) {
+            additionalMessage = "The URL is not reachable";
+        } else {
+            this.serviceURL = newURL;
+            checkServiceType();
+            if (serviceType != null) {
+                return;
+            }
+        }
+        additionalMessage = "The service could not be determined";
+    }
+
+    private static URL guessURL(URL url) throws MalformedURLException {
+        String urlStr = url.toString();
+        if (urlStr.toLowerCase().contains(WFS_URL_EXPR)
+                && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
+            return url;
+        } else {
+            return new URL(urlStr + URL_TRY_APPENDIX);
+        }
+    }
+
+    private void checkServiceType() {
         if (this.isRestricted()) {
             if (this.getUsername() != null && this.getPassword() != null) {
                 if (!this.getUsername().isEmpty()
@@ -101,7 +146,6 @@ public class ServiceMetaInformation extends Object {
                     null,
                     null);
         }
-        this.additionalMessage = new String();
     }
 
     /**
@@ -262,7 +306,8 @@ public class ServiceMetaInformation extends Object {
      * @param userName username
      * @param pw password
      */
-    public void setUsernamePassword(String userName, String pw) {
+    public void setUsernamePassword(String userName, String pw)
+    throws IOException {
         ServiceMetaInformation smi = new ServiceMetaInformation(this
                 .serviceURL, userName, pw);
         this.username = smi.getUsername();

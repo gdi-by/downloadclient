@@ -19,6 +19,8 @@
 package de.bayern.gdi.experimental;
 
 import de.bayern.gdi.model.ServiceMetaInformation;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
@@ -73,7 +75,7 @@ public class DebugServiceMetaInformation {
             System.out.println("Username:\t\t"
                     + smi.getUsername());
 
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }

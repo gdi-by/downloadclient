@@ -20,9 +20,12 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.xpath.XPathConstants;
@@ -246,17 +249,34 @@ public class ServiceChecker {
      */
     public static boolean simpleRestricted(URL url) {
         try {
+            int ret = tryHead(url);
+            if (ret != HttpStatus.SC_OK) {
+                return true;
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
+     * trys to make a head request against url.
+     * @param url the url
+     * @return HTTP Return code
+     * @throws IOException if something goes wrong
+     */
+    public static int tryHead(URL url)
+        throws IOException {
+        try {
             CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
             HttpHead getRequest = HTTP.getHeadRequest(url);
             CloseableHttpResponse execute = httpCl.execute(getRequest);
             StatusLine statusLine = execute.getStatusLine();
-            if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-                return true;
-            }
-        } catch (URISyntaxException | IOException e) {
+            return statusLine.getStatusCode();
+        } catch (URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return false;
+        return -1;
     }
 
     /**
