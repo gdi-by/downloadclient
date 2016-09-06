@@ -137,6 +137,7 @@ public class WMSMapSwing extends Parent {
     private CoordinateReferenceSystem oldDisplayCRS;
     private CoordinateReferenceSystem mapCRS;
 
+    private static final double TEN_PERCENT = 0.1D;
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
     private static final String TOOLBAR_INFO_BUTTON_NAME = "ToolbarInfoButton";
     private static final String TOOLBAR_PAN_BUTTON_NAME
@@ -993,22 +994,18 @@ public class WMSMapSwing extends Parent {
      *
      * @param envelope the extend
      */
-    public void setExtend(Envelope envelope) {
-        bboxAction.resetCoordinates();
-        mapPane.deleteGraphics();
-        mapPane.setDisplayArea(envelope);
-    }
-
-    /**
-     * sets the viewport of the map to the given extend.
-     *
-     * @param envelope the extend
-     */
     public void setExtend(ReferencedEnvelope envelope) {
         try {
             envelope = envelope.transform(this.mapContent.getViewport()
                     .getCoordinateReferenceSystem(), true);
-            setExtend((Envelope) envelope);
+            double xLength = envelope.getSpan(0);
+            xLength = xLength * TEN_PERCENT;
+            double yLength = envelope.getSpan(1);
+            yLength = yLength * TEN_PERCENT;
+            envelope.expandBy(xLength, yLength);
+            bboxAction.resetCoordinates();
+            mapPane.deleteGraphics();
+            mapPane.setDisplayArea(envelope);
         } catch (FactoryException | TransformException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
