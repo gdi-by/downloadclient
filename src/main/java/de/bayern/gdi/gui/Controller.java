@@ -336,7 +336,6 @@ public class Controller {
                         serviceSelection.setDisable(false);
                     }
                 };
-                //task.run();
                 Thread thread = new Thread(task);
                 thread.start();
             }
