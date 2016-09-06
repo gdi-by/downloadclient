@@ -274,7 +274,7 @@ public class Controller {
             && event.getClickCount() > 1
         ) {
             clearUserNamePassword();
-            chooseService();
+            //chooseService();
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
         ) {
@@ -283,17 +283,20 @@ public class Controller {
                     != null
             ) {
                 setStatusTextUI(
-                        I18n.format("status.ready"));
+                        I18n.format("status.checking-auth"));
+                serviceSelection.setDisable(true);
                 ServiceModel service =
                     (ServiceModel)this.serviceList.getSelectionModel()
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
-                Runnable task = () -> {
+                //Runnable task = () -> {
                     try {
                         ServiceMetaInformation smi =
                                 new ServiceMetaInformation(url);
                         if (dataBean.getSelectedService().equals(smi)) {
+                            setStatusTextUI(
+                                    I18n.format("status.ready"));
                             return;
                         }
                         dataBean.setSelectedService(smi);
@@ -323,16 +326,19 @@ public class Controller {
                             this.serviceAuthenticationCbx.setSelected(false);
                             this.serviceUser.setDisable(true);
                             this.servicePW.setDisable(true);
+                            setStatusTextUI(
+                                    I18n.format("status.ready"));
                         }
                     } catch (IOException e) {
                         log.log(Level.SEVERE, e.getMessage(), url);
                     } finally {
                         serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        serviceSelection.setDisable(false);
                     }
-                };
-                task.run();
-                Thread thread = new Thread(task);
-                thread.start();
+                //};
+                //task.run();
+                //Thread thread = new Thread(task);
+                //thread.start();
             }
         }
     }
