@@ -290,7 +290,7 @@ public class Controller {
                         .getSelectedItems().get(0);
                 String url = service.getUrl();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
-                //Runnable task = () -> {
+                Runnable task = () -> {
                     try {
                         ServiceMetaInformation smi =
                                 new ServiceMetaInformation(url);
@@ -335,10 +335,10 @@ public class Controller {
                         serviceURL.getScene().setCursor(Cursor.DEFAULT);
                         serviceSelection.setDisable(false);
                     }
-                //};
+                };
                 //task.run();
-                //Thread thread = new Thread(task);
-                //thread.start();
+                Thread thread = new Thread(task);
+                thread.start();
             }
         }
     }
