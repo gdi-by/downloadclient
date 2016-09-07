@@ -83,7 +83,10 @@ public class CswTest extends TestCase {
         List<ServiceModel> services = catalogService.
                 getServicesByFilter("not-required-because-mocked");
 
-        assertFalse(services.isEmpty());
+
+        System.out.println("Anzahl der ermittelten Dienste: " + services.size());
+
+        assertTrue(services.size() == 4);
     }
 
 
