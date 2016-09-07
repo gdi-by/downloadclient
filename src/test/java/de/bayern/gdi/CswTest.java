@@ -86,7 +86,7 @@ public class CswTest extends TestCase {
 
         System.out.println("Anzahl der ermittelten Dienste: " + services.size());
 
-        assertTrue(services.size() == 4);
+        assertTrue(services.size() == 3);
     }
 
 
