@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /** 'Verarbeitungskonfiguration' of processing step configuration. */
 @XmlRootElement(name = "Verarbeitungskonfiguration")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProcessingConfiguration {
+public class ProcessingConfiguration implements Configuration {
 
     private static final Logger log
         = Logger.getLogger(ProcessingStepConfiguration.class.getName());
@@ -55,6 +56,8 @@ public class ProcessingConfiguration {
     @XmlElementWrapper(name = "Verarbeitungsschritte")
     @XmlElement(name = "Verarbeitungsschritt")
     private List<ProcessingStepConfiguration> processingSteps;
+
+    private static File sourceFile;
 
     public ProcessingConfiguration() {
         this.inputElements = new ArrayList<>();
@@ -135,7 +138,8 @@ public class ProcessingConfiguration {
      * @return The restored ProcessingConfiguration.
      * @throws IOException Something went wrong.
      */
-    public static ProcessingConfiguration read(File file) throws IOException {
+     public static ProcessingConfiguration read(File file) throws IOException {
+        sourceFile = file;
         try (FileInputStream fis = new FileInputStream(file)) {
             return read(fis);
         }
@@ -147,9 +151,8 @@ public class ProcessingConfiguration {
      * @return The restored ProcessingConfiguration.
      * @throws IOException Something went wrong.
      */
-    public static ProcessingConfiguration read(InputStream fis)
+    private static ProcessingConfiguration read(InputStream fis)
         throws IOException {
-
         try {
             JAXBContext context =
                 JAXBContext.newInstance(ProcessingConfiguration.class);
@@ -170,13 +173,17 @@ public class ProcessingConfiguration {
         try {
             in = ProcessingStepConfiguration.class.getResourceAsStream(
                 PROCESSING_CONFIG_FILE);
+            sourceFile = new File(ProcessingStepConfiguration.class.
+                    getResource(
+                    PROCESSING_CONFIG_FILE).toURI()
+            );
             if (in == null) {
                 log.log(Level.SEVERE,
                     PROCESSING_CONFIG_FILE + " not found");
                 return new ProcessingConfiguration();
             }
             return read(in);
-        } catch (IOException ioe) {
+        } catch (URISyntaxException | IOException ioe) {
             log.log(Level.SEVERE, "Failed to load configuration", ioe);
         } finally {
             if (in != null) {
@@ -187,5 +194,13 @@ public class ProcessingConfiguration {
             }
         }
         return new ProcessingConfiguration();
+    }
+
+    /**
+     * gets the file of the source.
+     * @return source file
+     */
+    public File getSourceFile() {
+        return sourceFile;
     }
 }

@@ -122,7 +122,7 @@ public class Controller {
     @FXML private TextField servicePW;
     @FXML private Label statusBarText;
     @FXML private ComboBox<ItemModel> serviceTypeChooser;
-    @FXML private ComboBox atomVariationChooser;
+    @FXML private ComboBox<ItemModel> atomVariationChooser;
     @FXML private ComboBox dataFormatChooser;
     @FXML private ComboBox<CRSModel> referenceSystemChooser;
     @FXML private VBox simpleWFSContainer;
@@ -274,6 +274,7 @@ public class Controller {
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
         ) {
+            resetGui();
             if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
                     != null
             ) {
@@ -397,22 +398,16 @@ public class Controller {
      * @param event The event
      */
     @FXML protected void handleVariationSelect(ActionEvent event) {
-        this.dataBean.addAttribute("VARIATION",
-            this.atomVariationChooser.getValue() != null
-                ? this.atomVariationChooser.getValue().toString()
-                : "",
-                "");
-        ItemModel im = (ItemModel) serviceTypeChooser.getSelectionModel()
-                .getSelectedItem();
-        Atom.Item item = (Atom.Item) im.getItem();
-        List <Atom.Field> fields = item.fields;
-        for (Atom.Field field: fields) {
-            if (field.type.equals(this.atomVariationChooser.getValue())) {
-                this.valueAtomFormat.setText(field.format);
-                this.valueAtomRefsys.setText(field.crs);
-                this.dataBean.addAttribute("outputformat", field.format, "");
-                break;
-            }
+        ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
+        if (selim != null) {
+            Atom.Field selaf = (Atom.Field) selim.getItem();
+            this.dataBean.addAttribute("VARIATION", selaf.type, "");
+            this.valueAtomFormat.setText(selaf.format);
+            this.valueAtomRefsys.setText(selaf.crs);
+            this.dataBean.addAttribute("outputformat", selaf.format, "");
+        } else {
+            this.dataBean.addAttribute("VARIATION", "", "");
+            this.dataBean.addAttribute("outputformat", "", "");
         }
     }
 
@@ -660,6 +655,18 @@ public class Controller {
         }
     }
 
+    private void resetGui() {
+        this.dataBean.reset();
+        this.serviceTypeChooser.getItems().retainAll();
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(false);
+        this.mapNodeWFS.setVisible(false);
+        this.atomContainer.setVisible(false);
+        this.basicWFSX1Y1.setVisible(false);
+        this.basicWFSX2Y2.setVisible(false);
+        this.referenceSystemChooser.setVisible(false);
+        this.referenceSystemChooserLabel.setVisible(false);
+    }
     /**
      * Handle events on the process Chain Checkbox.
      * @param event the event
@@ -740,32 +747,39 @@ public class Controller {
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
             }
 
+            private void unsetAuth() {
+                setStatusTextUI(
+                        I18n.format("status.ready"));
+                serviceAuthenticationCbx.setSelected(false);
+                serviceUser.setDisable(true);
+                servicePW.setDisable(true);
+            }
+
             @Override
             protected Integer call() throws Exception {
+                resetGui();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
+                unsetAuth();
                 String url = null;
                 String username = null;
                 String password = null;
                 url = serviceURL.getText();
                 if (!ServiceChecker.isReachable(url)) {
                     setUnreachable();
+                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
                     return 0;
                 }
-                if (serviceAuthenticationCbx.isSelected()) {
-                    username = serviceUser.getText();
-                    dataBean.setUsername(username);
-                    password = servicePW.getText();
-                    dataBean.setPassword(password);
-                }
+                username = serviceUser.getText();
+                dataBean.setUsername(username);
+                password = servicePW.getText();
+                dataBean.setPassword(password);
                 if ((username == null && password == null)
                         || (username.equals("") && password.equals(""))) {
                     if (ServiceChecker.isRestricted(new URL(url))) {
-                        String pw = dataBean.getPassword();
-                        String un = dataBean.getUserName();
-
-                        if ((pw == null && un == null)
-                                || (pw.isEmpty() && un.isEmpty())) {
+                        if ((password == null && username == null)
+                                || (password.isEmpty() && username.isEmpty())) {
                             setAuth();
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
                             return 0;
                         }
                     } else {
@@ -786,6 +800,8 @@ public class Controller {
                                 + "Service Type" , st);
                         setStatusTextUI(
                             I18n.getMsg("status.no-service-type"));
+                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        return 0;
                     } else {
                         switch (st) {
                             case Atom:
@@ -936,10 +952,11 @@ public class Controller {
                 mapAtom.highlightSelectedPolygon(item.id);
             }
             List<Atom.Field> fields = item.fields;
-            ObservableList<String> list =
+            ObservableList<ItemModel> list =
                 FXCollections.observableArrayList();
             for (Atom.Field f : fields) {
-                list.add(f.type);
+                AtomFieldModel afm = new AtomFieldModel(f);
+                list.add(afm);
             }
             this.atomVariationChooser.setItems(list);
             WebEngine engine = this.valueAtomDescr.getEngine();

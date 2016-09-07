@@ -156,7 +156,8 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (usedVars.contains(p.getKey())) {
+            if (p.getValue().isEmpty()
+            || usedVars.contains(p.getKey())) {
                 continue;
             }
             if (sb.length() > 0) {
@@ -261,16 +262,51 @@ public class DownloadStepConverter {
         }
     }
 
+    private static final String XPATH_SERVICE_EXCEPTION
+        = "//ows:ExceptionReport/ows:Exception/ows:ExceptionText";
+
+    private static void checkServiceException(Document doc)
+        throws ConverterException {
+
+        String exceptionText = (String)XML.xpath(
+            doc, XPATH_SERVICE_EXCEPTION,
+            XPathConstants.STRING,
+            WFSMetaExtractor.NAMESPACES);
+
+        if (exceptionText != null && !exceptionText.isEmpty()) {
+            throw new ConverterException(
+                I18n.format(
+                    "dls.converter.wfs.exception",
+                    exceptionText));
+        }
+    }
+
+    private static String hitsURL(String wfsURL) {
+        // outputformat parameters irritates wfs servers
+        // when doing hits requests.
+        int idx = wfsURL.lastIndexOf('?');
+        if (idx >= 0) {
+            String prefix = wfsURL.substring(0, idx + 1);
+            String rest = wfsURL.substring(idx + 1);
+            wfsURL = prefix + StringUtils.ignorePartsWithPrefix(
+                rest, "&", "outputformat=");
+        }
+        return wfsURL + "&resultType=hits";
+    }
+
     private static final String XPATH_NUMBER_MATCHED
         = "/wfs:FeatureCollection/@numberMatched";
 
     private int numFeatures(String wfsURL) throws ConverterException {
-        URL url = newURL(wfsURL + "&resultType=hits");
+        URL url = newURL(hitsURL(wfsURL));
         Document hitsDoc = XML.getDocument(url, user, password);
         if (hitsDoc == null) {
             // TODO: I18n
             throw new ConverterException("cannot load hits document");
         }
+
+        checkServiceException(hitsDoc);
+
         String numberMatchedString = (String)XML.xpath(
             hitsDoc, XPATH_NUMBER_MATCHED,
             XPathConstants.STRING,

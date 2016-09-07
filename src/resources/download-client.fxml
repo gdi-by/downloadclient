@@ -114,7 +114,7 @@
                               <Insets bottom="5.0" left="10.0" top="10.0" />
                            </VBox.margin>
                         </Label>
-                        <ComboBox fx:id="serviceTypeChooser" minHeight="-Infinity" onAction="#handleServiceTypeSelect" prefHeight="26.0" prefWidth="322.0">
+                        <ComboBox fx:id="serviceTypeChooser" minWidth="200.0" onAction="#handleServiceTypeSelect">
                            <VBox.margin>
                               <Insets bottom="5.0" left="15.0" right="15.0" />
                            </VBox.margin>
@@ -124,7 +124,7 @@
                         </ComboBox>
                         <SplitPane dividerPositions="0.8" orientation="VERTICAL" VBox.vgrow="ALWAYS">
                            <items>
-                              <ScrollPane prefViewportHeight="314.0" prefViewportWidth="590.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="400.0">
                                  <content>
                                     <StackPane>
                                        <children>
@@ -170,26 +170,37 @@
                                                          </children>
                                                       </HBox>
                                                       <Separator prefWidth="200.0" />
-                                                      <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                      <VBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
                                                          <children>
-                                                            <Label minWidth="-Infinity" prefWidth="100.0" text="%gui.data-format">
-                                                               <HBox.margin>
-                                                                  <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                               </HBox.margin>
-                                                            </Label>
-                                                            <ComboBox fx:id="dataFormatChooser" minWidth="-Infinity" onAction="#handleDataformatSelect" prefWidth="150.0">
-                                                               <HBox.margin>
-                                                                  <Insets left="3.0" />
-                                                               </HBox.margin>
-                                                            </ComboBox>
-                                                            <Label fx:id="referenceSystemChooserLabel" minWidth="-Infinity" prefWidth="120.0" text="%gui.reference-system">
-                                                               <HBox.margin>
-                                                                  <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
-                                                               </HBox.margin>
-                                                            </Label>
-                                                            <ComboBox fx:id="referenceSystemChooser" minWidth="-Infinity" onAction="#handleReferenceSystemSelect" prefWidth="150.0" />
+                                                           <HBox VBox.vgrow="NEVER">
+                                                            <children>
+                                                                <Label minWidth="-Infinity" prefWidth="120.0" text="%gui.data-format">
+                                                                <HBox.margin>
+                                                                    <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+                                                                </HBox.margin>
+                                                                </Label>
+                                                                <ComboBox fx:id="dataFormatChooser" minWidth="-Infinity" onAction="#handleDataformatSelect" HBox.hgrow="ALWAYS">
+                                                                <HBox.margin>
+                                                                    <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
+                                                                </HBox.margin>
+                                                                </ComboBox>
+                                                            </children>
+                                                           </HBox>
+                                                           <HBox VBox.vgrow="NEVER">
+                                                            <children>
+                                                                <Label fx:id="referenceSystemChooserLabel" minWidth="-Infinity" prefWidth="120.0" text="%gui.reference-system">
+                                                                <HBox.margin>
+                                                                    <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
+                                                                </HBox.margin>
+                                                                </Label>
+                                                                <ComboBox fx:id="referenceSystemChooser" minWidth="-Infinity" onAction="#handleReferenceSystemSelect" HBox.hgrow="ALWAYS">
+                                                                     <HBox.margin>
+                                                                        <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
+                                                                     </HBox.margin></ComboBox>
+                                                            </children>
+                                                           </HBox>
                                                          </children>
-                                                      </HBox>
+                                                      </VBox>
                                                    </children>
                                                 </VBox>
                                              </children>
@@ -202,7 +213,7 @@
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Group>
-                                                <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
+                                                <Separator VBox.vgrow="NEVER" />
                                                 <Label text="%gui.description" VBox.vgrow="NEVER">
                                                    <font>
                                                       <Font name="System Bold" size="13.0" />
@@ -211,23 +222,26 @@
                                                       <Insets bottom="5.0" left="15.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Label>
-                                                <WebView fx:id="valueAtomDescr" fontScale="0.8" minHeight="10.0" minWidth="200.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                                                <WebView fx:id="valueAtomDescr" fontScale="0.8" minHeight="10.0" minWidth="200.0" prefHeight="100.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
                                                    <VBox.margin>
                                                       <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </WebView>
-                                                <Separator prefWidth="200.0" VBox.vgrow="NEVER" />
-                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <Separator VBox.vgrow="NEVER" />
+                                                <HBox minHeight="-Infinity" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label fx:id="labelAtomVariation" minWidth="-Infinity" prefWidth="200.0" text="%gui.variants">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <ComboBox fx:id="atomVariationChooser" onAction="#handleVariationSelect" prefWidth="150.0" />
+                                                      <ComboBox fx:id="atomVariationChooser" onAction="#handleVariationSelect" HBox.hgrow="ALWAYS">
+                                                         <HBox.margin>
+                                                            <Insets right="5.0" />
+                                                         </HBox.margin></ComboBox>
                                                    </children>
                                                 </HBox>
-                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <HBox minHeight="-Infinity" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label minWidth="-Infinity" prefWidth="200.0" text="%gui.data-format">
                                                          <HBox.margin>
@@ -241,14 +255,14 @@
                                                       </Label>
                                                    </children>
                                                 </HBox>
-                                                <HBox minHeight="-Infinity" prefHeight="31.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <HBox minHeight="-Infinity" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label prefWidth="200.0" text="%gui.coordinate-ref-system">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                          </HBox.margin>
                                                       </Label>
-                                                      <Label fx:id="valueAtomRefsys" maxWidth="400.0" prefHeight="15.0" prefWidth="292.0" text="" wrapText="true" HBox.hgrow="ALWAYS">
+                                                      <Label fx:id="valueAtomRefsys" text="" wrapText="true" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets bottom="5.0" left="5.0" right="15.0" top="5.0" />
                                                          </HBox.margin>
@@ -261,9 +275,9 @@
                                     </StackPane>
                                  </content>
                               </ScrollPane>
-                              <ScrollPane prefViewportHeight="159.0" prefViewportWidth="590.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true">
                                  <content>
-                                    <VBox fx:id="chainContainer" minWidth="-Infinity" prefHeight="63.0" prefWidth="570.0">
+                                    <VBox fx:id="chainContainer">
                                        <children>
                                           <CheckBox fx:id="chkChain" mnemonicParsing="false" onAction="#handleChainCheckbox" text="%gui.post_process">
                                              <VBox.margin>
@@ -273,7 +287,7 @@
                                                 <Tooltip text="%tooltip.post_process" />
                                              </tooltip>
                                           </CheckBox>
-                                          <VBox fx:id="containerChain" prefHeight="103.0" prefWidth="574.0">
+                                          <VBox fx:id="containerChain">
                                              <children>
                                                 <HBox fx:id="processStepContainter" prefHeight="26.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>

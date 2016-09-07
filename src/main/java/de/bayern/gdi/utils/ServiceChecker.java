@@ -140,16 +140,23 @@ public class ServiceChecker {
         if (nl.getLength() == 0) {
             nl = doc.getElementsByTagName("WFS:WFS_CAPABILITIES");
         }
+        if (nl.getLength() == 0) {
+            nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
+        }
         if (nl.getLength() != 0) {
             NamedNodeMap nnm = nl.item(0).getAttributes();
-            switch (nnm.getNamedItem("version").getNodeValue()) {
-                case "1.0.0":
-                case "1.1.0":
-                    return ServiceType.WFSOne;
-                case "2.0.0":
-                    return ServiceType.WFSTwo;
-                default:
-                    return null;
+            if (nnm.getNamedItem("version") != null) {
+                switch (nnm.getNamedItem("version").getNodeValue()) {
+                    case "1.0.0":
+                    case "1.1.0":
+                        return ServiceType.WFSOne;
+                    case "2.0.0":
+                        return ServiceType.WFSTwo;
+                    default:
+                        return null;
+                }
+            } else {
+                return null;
             }
         }
         nl = doc.getElementsByTagName("feed");
@@ -258,9 +265,11 @@ public class ServiceChecker {
             HttpHead getRequest = HTTP.getHeadRequest(url);
             CloseableHttpResponse execute = httpCl.execute(getRequest);
             StatusLine statusLine = execute.getStatusLine();
+            // Removing statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN
+            // because special MS "Standards"
+            // (https://en.wikipedia.org/wiki/HTTP_403)
             if (statusLine.getStatusCode() == HttpStatus.SC_OK
-                    || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED
-                    || statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN) {
+                || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 return true;
             }
             return false;
