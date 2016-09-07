@@ -99,7 +99,9 @@ public class ServiceMetaInformation extends Object {
             this.restricted = ServiceChecker.isRestricted(this.serviceURL);
             this.serviceType = null;
             checkServiceType();
-            return;
+            if (this.serviceType != null) {
+                return;
+            }
         } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
             this.restricted = true;
             checkServiceType();

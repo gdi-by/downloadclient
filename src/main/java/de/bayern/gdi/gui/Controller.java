@@ -193,7 +193,8 @@ public class Controller {
      */
     @FXML protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            chooseService();
+                selectService(serviceURL.getText());
+                chooseService();
         }
     }
 
@@ -278,68 +279,89 @@ public class Controller {
         } else if (event.getButton().equals(MouseButton.PRIMARY)
             && event.getClickCount() == 1
         ) {
-            resetGui();
             if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
                     != null
             ) {
-                setStatusTextUI(
-                        I18n.format("status.checking-auth"));
-                serviceSelection.setDisable(true);
                 ServiceModel service =
-                    (ServiceModel)this.serviceList.getSelectionModel()
-                        .getSelectedItems().get(0);
-                String url = service.getUrl();
-                serviceURL.getScene().setCursor(Cursor.WAIT);
-                Runnable task = () -> {
-                    try {
-                        ServiceMetaInformation smi =
-                                new ServiceMetaInformation(url);
-                        if (dataBean.getSelectedService().equals(smi)) {
-                            setStatusTextUI(
-                                    I18n.format("status.ready"));
-                            return;
-                        }
-                        dataBean.setSelectedService(smi);
-                        clearUserNamePassword();
-                        if (!ServiceChecker
-                                .isReachable(dataBean
-                                        .getSelectedService()
-                                        .getServiceURL())) {
-                            setStatusTextUI(
-                                    I18n.format("status.service-not-available")
-                            );
-                            return;
-                        }
-                        serviceURL.setText(
-                                dataBean.getSelectedService()
-                                        .getServiceURL().toString());
-                        service.setRestricted(dataBean.getSelectedService()
-                                .isRestricted());
-                        if (dataBean.getSelectedService().isRestricted()) {
-                            setStatusTextUI(
-                                    I18n.format("status.service-needs-auth")
-                            );
-                            this.serviceAuthenticationCbx.setSelected(true);
-                            this.serviceUser.setDisable(false);
-                            this.servicePW.setDisable(false);
-                        } else {
-                            this.serviceAuthenticationCbx.setSelected(false);
-                            this.serviceUser.setDisable(true);
-                            this.servicePW.setDisable(true);
-                            setStatusTextUI(
-                                    I18n.format("status.ready"));
-                        }
-                    } catch (IOException e) {
-                        log.log(Level.SEVERE, e.getMessage(), url);
-                    } finally {
-                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                        serviceSelection.setDisable(false);
-                    }
-                };
-                Thread thread = new Thread(task);
-                thread.start();
+                        (ServiceModel)this.serviceList.getSelectionModel()
+                                .getSelectedItems().get(0);
+                selectService(service.getUrl());
             }
         }
+    }
+
+    private void selectService(String url) {
+        setStatusTextUI(
+                I18n.format("status.checking-auth"));
+        serviceSelection.setDisable(true);
+
+        serviceURL.getScene().setCursor(Cursor.WAIT);
+        Runnable task = () -> {
+            try {
+                ServiceMetaInformation smi =
+                        new ServiceMetaInformation(url,
+                                    serviceUser.getText(),
+                                    servicePW.getText());
+                if (dataBean.getSelectedService().equals(smi)) {
+                    setStatusTextUI(
+                            I18n.format("status.ready"));
+                    return;
+                } else {
+                    if (dataBean.getSelectedService().getServiceURL() != null
+                            && smi.getServiceURL().toString().equals(
+                                    dataBean.getSelectedService()
+                                    .getServiceURL().toString())
+                            ) {
+                        smi.setUsernamePassword(
+                                serviceUser.getText(),
+                                servicePW.getText());
+                        dataBean.setSelectedService(smi);
+                    } else {
+                        dataBean.setSelectedService(smi);
+                    }
+                }
+                resetGui();
+                if (!ServiceChecker
+                        .isReachable(dataBean
+                                .getSelectedService()
+                                .getServiceURL())) {
+                    setStatusTextUI(
+                            I18n.format("status.service-not-available")
+                    );
+                    return;
+                }
+                serviceURL.setText(
+                        dataBean.getSelectedService()
+                                .getServiceURL().toString());
+                if (dataBean.getSelectedService().isRestricted()) {
+                    setStatusTextUI(
+                            I18n.format("status.service-needs-auth")
+                    );
+                    this.serviceAuthenticationCbx.setSelected(true);
+                    this.serviceUser.setDisable(false);
+                    this.servicePW.setDisable(false);
+                    return;
+                } else {
+                    this.serviceAuthenticationCbx.setSelected(false);
+                    this.serviceUser.setDisable(true);
+                    this.servicePW.setDisable(true);
+                    setStatusTextUI(
+                            I18n.format("status.ready"));
+                }
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), url);
+            } finally {
+                serviceURL.setText(dataBean.getSelectedService()
+                        .getServiceURL().toString());
+                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                serviceSelection.setDisable(false);
+            }
+        };
+        task.run();
+        /*
+        Thread thread = new Thread(task);
+        thread.start();
+        */
     }
 
     /**
@@ -785,31 +807,10 @@ public class Controller {
 
             @Override
             protected Integer call() throws Exception {
-                ServiceMetaInformation newSelectedService =
-                        new ServiceMetaInformation();
                 if (serviceURL.getText() == null
                         || serviceURL.getText().isEmpty()) {
                     setStatusTextUI(I18n.getMsg("status.no-url"));
                     return 0;
-                }
-                try {
-                    newSelectedService =
-                            new ServiceMetaInformation(serviceURL.getText(),
-                                    serviceUser.getText(),
-                                    servicePW.getText());
-                    if (!newSelectedService.equals(
-                            dataBean.getSelectedService())) {
-                        if (newSelectedService.getServiceURL()
-                                .toString().equals(dataBean.getSelectedService()
-                                        .getServiceURL().toString())) {
-                            newSelectedService.setUsernamePassword(
-                                    serviceUser.getText(),
-                                    servicePW.getText());
-                            dataBean.setSelectedService(newSelectedService);
-                        }
-                    }
-                } catch (MalformedURLException e) {
-                    log.log(Level.SEVERE, e.getMessage(), serviceURL.getText());
                 }
                 resetGui();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
