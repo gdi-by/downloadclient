@@ -317,6 +317,7 @@ public class Controller {
                                 servicePW.getText());
                         dataBean.setSelectedService(smi);
                     } else {
+                        clearUserNamePassword();
                         dataBean.setSelectedService(smi);
                     }
                 }
