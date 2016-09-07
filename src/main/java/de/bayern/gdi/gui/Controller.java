@@ -317,11 +317,15 @@ public class Controller {
                                 servicePW.getText());
                         dataBean.setSelectedService(smi);
                     } else {
-                        clearUserNamePassword();
+                        Platform.runLater(() -> {
+                            clearUserNamePassword();
+                        });
                         dataBean.setSelectedService(smi);
                     }
                 }
-                resetGui();
+                Platform.runLater(() -> {
+                    resetGui();
+                });
                 if (!ServiceChecker
                         .isReachable(dataBean
                                 .getSelectedService()
@@ -331,38 +335,40 @@ public class Controller {
                     );
                     return;
                 }
-                serviceURL.setText(
+                Platform.runLater(() -> {
+                    serviceURL.setText(
                         dataBean.getSelectedService()
                                 .getServiceURL().toString());
+                });
                 if (dataBean.getSelectedService().isRestricted()) {
                     setStatusTextUI(
                             I18n.format("status.service-needs-auth")
                     );
-                    this.serviceAuthenticationCbx.setSelected(true);
-                    this.serviceUser.setDisable(false);
-                    this.servicePW.setDisable(false);
+                    Platform.runLater(() -> {
+                        this.serviceAuthenticationCbx.setSelected(true);
+                        this.serviceUser.setDisable(false);
+                        this.servicePW.setDisable(false);
+                    });
                     return;
                 } else {
-                    this.serviceAuthenticationCbx.setSelected(false);
-                    this.serviceUser.setDisable(true);
-                    this.servicePW.setDisable(true);
-                    setStatusTextUI(
-                            I18n.format("status.ready"));
+                        Platform.runLater(() -> {
+                                    this.serviceAuthenticationCbx
+                                            .setSelected(false);
+                                    this.serviceUser.setDisable(true);
+                                    this.servicePW.setDisable(true);
+                        });
+                        setStatusTextUI(
+                        I18n.format("status.ready"));
                 }
             } catch (IOException e) {
                 log.log(Level.SEVERE, e.getMessage(), url);
             } finally {
-                serviceURL.setText(dataBean.getSelectedService()
-                        .getServiceURL().toString());
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
                 serviceSelection.setDisable(false);
             }
         };
-        task.run();
-        /*
         Thread thread = new Thread(task);
         thread.start();
-        */
     }
 
     /**
