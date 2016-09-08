@@ -246,17 +246,34 @@ public class ServiceChecker {
      */
     public static boolean simpleRestricted(URL url) {
         try {
+            int ret = tryHead(url);
+            if (ret != HttpStatus.SC_OK) {
+                return true;
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
+     * trys to make a head request against url.
+     * @param url the url
+     * @return HTTP Return code
+     * @throws IOException if something goes wrong
+     */
+    public static int tryHead(URL url)
+        throws IOException {
+        try {
             CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
             HttpHead getRequest = HTTP.getHeadRequest(url);
             CloseableHttpResponse execute = httpCl.execute(getRequest);
             StatusLine statusLine = execute.getStatusLine();
-            if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-                return true;
-            }
-        } catch (URISyntaxException | IOException e) {
+            return statusLine.getStatusCode();
+        } catch (URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        return false;
+        return -1;
     }
 
     /**
@@ -282,19 +299,16 @@ public class ServiceChecker {
      */
     public static boolean isReachable(URL url) {
         try {
-            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
-            HttpHead getRequest = HTTP.getHeadRequest(url);
-            CloseableHttpResponse execute = httpCl.execute(getRequest);
-            StatusLine statusLine = execute.getStatusLine();
+            int retcode = tryHead(url);
             // Removing statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN
             // because special MS "Standards"
             // (https://en.wikipedia.org/wiki/HTTP_403)
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK
-                || statusLine.getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+            if (retcode == HttpStatus.SC_OK
+                || retcode == HttpStatus.SC_UNAUTHORIZED) {
                 return true;
             }
             return false;
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             //log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
