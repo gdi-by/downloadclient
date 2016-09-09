@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Observable;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.ServiceMetaInformation;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.ServiceType;
@@ -55,6 +58,7 @@ public class DataBean extends Observable {
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
+    private ServiceMetaInformation selectedService;
 
     private CatalogService catalogService;
 
@@ -87,7 +91,7 @@ public class DataBean extends Observable {
     /**
      * Constructor.
      */
-    public DataBean() {
+    public DataBean() throws IOException {
         this.namePwMap = new HashMap<>();
 
         ServiceSetting serviceSetting = Config.getInstance().getServices();
@@ -96,10 +100,34 @@ public class DataBean extends Observable {
 
         this.catalogServices = new ArrayList<ServiceModel>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
-            this.catalogService =
-                    new CatalogService(serviceSetting.getCatalogueURL());
+            try {
+                this.catalogService =
+                        new CatalogService(serviceSetting.getCatalogueURL());
+            } catch (URISyntaxException | IOException e) {
+                throw new IOException(
+                        "Failed to Initialize Calatalog Service: '"
+                                + serviceSetting.getCatalogueURL()
+                                + "'");
+            }
         }
         this.processingSteps = new ArrayList<>();
+        this.selectedService = new ServiceMetaInformation();
+    }
+
+    /**
+     * sets the selected service.
+     * @param smi the selected service
+     */
+    public void setSelectedService(ServiceMetaInformation smi) {
+        this.selectedService = smi;
+    }
+
+    /**
+     * gets the selected service.
+     * @return the selected service
+     */
+    public ServiceMetaInformation getSelectedService() {
+        return this.selectedService;
     }
 
     /**

@@ -19,6 +19,7 @@ package de.bayern.gdi.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -26,6 +27,9 @@ import org.w3c.dom.Document;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 //import java.util.logging.Level;
 
@@ -91,10 +95,21 @@ public class Config {
         return processingConfig;
     }
 
-    /** Mark global config as unused. */
-    public static void uninitialized() {
+    /**
+     * Mark global config as unused.
+     * @throws IOException when anythong goes wrong
+     */
+    public static void uninitialized()
+        throws IOException {
         synchronized (Holder.INSTANCE) {
-            Holder.INSTANCE.services = new ServiceSetting();
+            try {
+                Holder.INSTANCE.services = new ServiceSetting();
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
+                throwConfigFailureException(ServiceSetting.getName());
+            }
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
@@ -120,7 +135,6 @@ public class Config {
     }
 
     private static void loadInternal(String dirname) throws IOException {
-
         log.info("config directory: " + dirname);
 
         File dir = new File(dirname);
@@ -137,12 +151,23 @@ public class Config {
 
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
         if (services.isFile() && services.canRead()) {
-            Document doc = XML.getDocument(services);
-            if (doc == null) {
-                throw new IOException(
-                    "Cannot parse XML file '" + services + "'");
+            try {
+                Document doc = XML.getDocument(services);
+                if (doc == null) {
+                    throw new IOException(
+                        "Cannot parse XML file for '"
+                                + ServiceSetting.getName()
+                                + "'");
+                }
+                Holder.INSTANCE.services = new ServiceSetting(doc);
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
+                throwConfigFailureException(ServiceSetting.getName());
             }
-            Holder.INSTANCE.services = new ServiceSetting(doc);
+        } else {
+            throwConfigFailureException(ServiceSetting.getName());
         }
 
         File procConfig = new File(
@@ -155,6 +180,10 @@ public class Config {
                 ProcessingConfiguration.loadDefault();
         }
 
+        if (Holder.INSTANCE.getProcessingConfig() == null) {
+            throwConfigFailureException(ProcessingConfiguration.getName());
+        }
+
         File mimeTypes = new File(
             dir, MIMETypes.MIME_TYPES_FILE);
         if (mimeTypes.isFile() && mimeTypes.canRead()) {
@@ -164,78 +193,17 @@ public class Config {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
         }
 
-        boolean configFailed = false;
-
-        String failedConfigs = "";
-        if (Holder.INSTANCE.getServices() == null) {
-            configFailed = true;
-            if (Holder.INSTANCE.getServices().getSourceFile()
-                    != null) {
-                if (failedConfigs.isEmpty()) {
-                    failedConfigs = Holder.
-                            INSTANCE.
-                            getServices().
-                            getSourceFile().
-                            getAbsolutePath();
-                } else {
-                    failedConfigs += ", "
-                            + Holder.
-                            INSTANCE.
-                            getProcessingConfig().
-                            getSourceFile().
-                            getAbsolutePath();
-                }
-            }
-        }
         if (Holder.INSTANCE.getMimeTypes() == null) {
-            configFailed = true;
-            if (Holder.INSTANCE.getMimeTypes().getSourceFile()
-                    != null) {
-                if (failedConfigs.isEmpty()) {
-                    failedConfigs = Holder.
-                            INSTANCE.
-                            getMimeTypes().
-                            getSourceFile().
-                            getAbsolutePath();
-                } else {
-                    failedConfigs += ", "
-                            + Holder.
-                            INSTANCE.
-                            getProcessingConfig().
-                            getSourceFile().
-                            getAbsolutePath();
-                }
-            }
+            throwConfigFailureException(MIMETypes.getName());
         }
-        if (Holder.INSTANCE.getProcessingConfig() == null) {
-            configFailed = true;
-            if (Holder.INSTANCE.getProcessingConfig().getSourceFile()
-                    != null) {
-                if (failedConfigs.isEmpty()) {
-                    failedConfigs = Holder.
-                            INSTANCE.
-                            getProcessingConfig().
-                            getSourceFile().
-                            getAbsolutePath();
-                } else {
-                    failedConfigs += ", "
-                            + Holder.
-                            INSTANCE.
-                            getProcessingConfig().
-                            getSourceFile().
-                            getAbsolutePath();
-                }
-            }
-        }
-
-        if (configFailed) {
-            System.err.println(
-                    "Initialization with config file(s) "
-                            + failedConfigs
-                            + " failed");
-            System.exit(1);
-        }
-
         // TODO: MIME types -> file extensions.
+    }
+
+    private static void throwConfigFailureException(String configName)
+        throws IOException {
+        throw new IOException(
+                "Failed on XML file for '"
+                        + configName
+                        + "'");
     }
 }

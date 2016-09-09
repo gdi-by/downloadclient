@@ -75,16 +75,15 @@ public class XML {
      *
      * @param fileName the name of the XML file.
      * @return the loaded XML document of null if there was an error.
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
-    public static Document getDocument(File fileName) {
+    public static Document getDocument(File fileName)
+            throws SAXException, ParserConfigurationException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            return builder.parse(fileName);
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(fileName);
     }
 
     /**
@@ -92,8 +91,12 @@ public class XML {
      *
      * @param input the input stream.
      * @return the loaded XML document of null if there was an error.
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
-    public static Document getDocument(InputStream input) {
+    public static Document getDocument(InputStream input)
+            throws SAXException, ParserConfigurationException, IOException {
         return getDocument(input, null);
     }
 
@@ -103,21 +106,19 @@ public class XML {
      * @param input          the input stream.
      * @param namespaceAware Load namespace aware?
      * @return the loaded XML document of null if there was an error.
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
     public static Document getDocument(
             InputStream input, Boolean namespaceAware
-    ) {
+    ) throws SAXException, ParserConfigurationException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         if (namespaceAware != null) {
             factory.setNamespaceAware(namespaceAware);
         }
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            return builder.parse(input);
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(input);
     }
 
     /**
@@ -125,8 +126,11 @@ public class XML {
      *
      * @param url the URL
      * @return and XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
      */
-    public static Document getDocument(URL url) {
+    public static Document getDocument(URL url)
+            throws URISyntaxException, IOException {
         return getDocument(url, null, null);
     }
 
@@ -136,8 +140,11 @@ public class XML {
      * @param url the URL
      * @param nameSpaceaware if namespace aware or not
      * @return and XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
      */
-    public static Document getDocument(URL url, boolean nameSpaceaware) {
+    public static Document getDocument(URL url, boolean nameSpaceaware)
+            throws URISyntaxException, IOException {
         return getDocument(url, null, null, nameSpaceaware);
     }
 
@@ -149,25 +156,24 @@ public class XML {
      * @param password       the Password {NULLL if none needed}
      * @param nameSpaceAware if namespace aware or not
      * @return an XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
      */
     public static Document getDocument(
             URL url,
             String userName,
             String password,
-            boolean nameSpaceAware) {
-
+            boolean nameSpaceAware)
+            throws URISyntaxException, IOException {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
             HttpGet request = HTTP.getGetRequest(url);
             DocumentResponseHandler handler = new DocumentResponseHandler();
             handler.setNamespaceAware(nameSpaceAware);
             return client.execute(request, handler);
-        } catch (IOException | URISyntaxException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
         } finally {
             HTTP.closeGraceful(client);
         }
-        return null;
     }
 
     /**
@@ -177,11 +183,14 @@ public class XML {
      * @param userName the Username {NULL if none needed}
      * @param password the Password {NULLL if none needed}
      * @return an XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
      */
     public static Document getDocument(
             URL url,
             String userName,
-            String password) {
+            String password)
+            throws URISyntaxException, IOException {
         return getDocument(url, userName, password, true);
     }
 
@@ -190,16 +199,15 @@ public class XML {
      *
      * @param xmlString The String
      * @return The build Document
+     * @throws SAXException if the xml is wrong
+     * @throws ParserConfigurationException if the config is wrong
+     * @throws IOException if something in io is wrong
      */
-    public static final Document getDocument(String xmlString) {
+    public static final Document getDocument(String xmlString)
+            throws SAXException, ParserConfigurationException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            return builder.parse(xmlString);
-        } catch (SAXException | ParserConfigurationException | IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(xmlString);
     }
 
     /**
@@ -210,13 +218,16 @@ public class XML {
      * @param postXML the xml to post
      * @param nameSpaceAware if namespace aware
      * @return the returned document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
      */
     public static final Document getDocument(
             URL url,
             String userName,
             String password,
             String postXML,
-            boolean nameSpaceAware) {
+            boolean nameSpaceAware)
+            throws URISyntaxException, IOException {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
             DocumentResponseHandler handler = new DocumentResponseHandler();
@@ -229,13 +240,9 @@ public class XML {
             request.setHeader("Content-type", "text/xml;charset=utf-8");
             request.setEntity(inputStreamEntity);
             return client.execute(request, handler);
-        } catch (IOException
-                | URISyntaxException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
         } finally {
             HTTP.closeGraceful(client);
         }
-        return null;
     }
 
     /**
@@ -246,20 +253,21 @@ public class XML {
      * @param postXML the XML that should be posted
      * @param nameSpaceAware if namespace aware or not
      * @return the build document
+     * @throws URISyntaxException if the url is wrong
+     * @throws TransformerException if the xml is wrong
+     * @throws IOException if something in io is wrong
      */
     public static final Document getDocument(
             URL url,
             String userName,
             String password,
             Document postXML,
-            boolean nameSpaceAware) {
+            boolean nameSpaceAware)
+            throws URISyntaxException, IOException, TransformerException {
+
         Document doc = null;
-        try {
-            doc = getDocument(url, userName, password, documentToString(
+        doc = getDocument(url, userName, password, documentToString(
                             postXML), nameSpaceAware);
-        } catch (TransformerException e) {
-            log.log(Level.SEVERE, e.getLocalizedMessage(), e);
-        }
         return doc;
     }
 

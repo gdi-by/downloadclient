@@ -18,7 +18,8 @@
 
 package de.bayern.gdi.experimental;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +73,7 @@ public class DebugCatalog {
             printService(catalog.getServicesByFilter(third));
             printService(catalog.getServicesByFilter(fourth));
 
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | IOException e) {
             System.out.println(e.getMessage());
         }
     }

@@ -36,6 +36,7 @@ public class Log {
     private File file;
     private PrintWriter out;
 
+
     /**
      * @param The writer to log to.
      */
@@ -61,7 +62,8 @@ public class Log {
     public synchronized void log(String msg) {
         if (this.out != null) {
             Date now = new Date();
-            out.format("%s: %s\n", DF_FORMAT.format(now), msg);
+            out.format("%s: %s", DF_FORMAT.format(now), msg);
+            out.println();
         }
     }
 

@@ -90,8 +90,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     protected RemoteFileState downloadFile(DLFile dlf) throws
             JobExecutionException {
 
-        // TODO: i18n
-        String msg = "Downloading '" + dlf.url + "' to '" + dlf.file + "'";
+        String msg = I18n.format("download.file", dlf.url, dlf.file);
+        log(msg);
         log.log(Level.INFO, msg);
         this.currentCount = 0;
 

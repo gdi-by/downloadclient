@@ -20,7 +20,7 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.gui.ServiceModel;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,17 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
-import de.bayern.gdi.model.Configuration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class ServiceSetting implements Configuration {
+public class ServiceSetting {
 
     private static final Logger log
         = Logger.getLogger(ServiceSetting.class.getName());
@@ -52,9 +53,11 @@ public class ServiceSetting implements Configuration {
     private List<ServiceModel> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
-    private File sourceFile;
+    private static final String NAME =
+            "ServiceSetting";
 
-    public ServiceSetting() {
+    public ServiceSetting()
+            throws SAXException, ParserConfigurationException, IOException {
         this(SERVICE_SETTING_FILE);
     }
 
@@ -62,9 +65,9 @@ public class ServiceSetting implements Configuration {
      * Constructor.
      * @param filePath Path the the serviceSettings.xml
      */
-    public ServiceSetting(String filePath) {
+    public ServiceSetting(String filePath)
+        throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(getFileStream(filePath)));
-        sourceFile = new File(filePath);
     }
 
     public ServiceSetting(Document doc) {
@@ -156,13 +159,12 @@ public class ServiceSetting implements Configuration {
     }
 
     /**
-     * gets the file of the source.
-     * @return source file
+     * gets the name of the configuration.
+     * @return name of the config
      */
-    public File getSourceFile() {
-        return sourceFile;
+    public static String getName() {
+        return NAME;
     }
-
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
