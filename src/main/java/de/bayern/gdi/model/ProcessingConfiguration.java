@@ -174,9 +174,9 @@ public class ProcessingConfiguration implements Configuration {
     public static ProcessingConfiguration loadDefault() {
         InputStream in = null;
         try {
-            in = ProcessingStepConfiguration.class.getResourceAsStream(
+            in = ProcessingConfiguration.class.getResourceAsStream(
                 PROCESSING_CONFIG_FILE);
-            sourceFile = new File(ProcessingStepConfiguration.class.
+            sourceFile = new File(ProcessingConfiguration.class.
                     getResource(
                     PROCESSING_CONFIG_FILE).toURI()
             );
