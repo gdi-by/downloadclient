@@ -152,14 +152,14 @@ public class Config {
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
         if (services.isFile() && services.canRead()) {
             try {
-            Document doc = XML.getDocument(services);
-            if (doc == null) {
-                throw new IOException(
-                    "Cannot parse XML file for '"
-                            + ServiceSetting.getName()
-                            + "'");
-            }
-            Holder.INSTANCE.services = new ServiceSetting(doc);
+                Document doc = XML.getDocument(services);
+                if (doc == null) {
+                    throw new IOException(
+                        "Cannot parse XML file for '"
+                                + ServiceSetting.getName()
+                                + "'");
+                }
+                Holder.INSTANCE.services = new ServiceSetting(doc);
             } catch (SAXException
                     | ParserConfigurationException
                     | IOException e) {

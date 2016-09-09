@@ -20,7 +20,6 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.gui.ServiceModel;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -34,7 +33,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
-import de.bayern.gdi.model.Configuration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,7 +41,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class ServiceSetting implements Configuration {
+public class ServiceSetting {
 
     private static final Logger log
         = Logger.getLogger(ServiceSetting.class.getName());
@@ -55,7 +53,6 @@ public class ServiceSetting implements Configuration {
     private List<ServiceModel> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
-    private File sourceFile;
     private static final String NAME =
             "ServiceSetting";
 
@@ -71,7 +68,6 @@ public class ServiceSetting implements Configuration {
     public ServiceSetting(String filePath)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(getFileStream(filePath)));
-        sourceFile = new File(filePath);
     }
 
     public ServiceSetting(Document doc) {
@@ -160,14 +156,6 @@ public class ServiceSetting implements Configuration {
                 "layer",
                 "name",
                 "source");
-    }
-
-    /**
-     * gets the file of the source.
-     * @return source file
-     */
-    public File getSourceFile() {
-        return sourceFile;
     }
 
     /**

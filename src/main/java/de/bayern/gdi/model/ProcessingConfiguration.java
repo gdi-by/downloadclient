@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,7 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /** 'Verarbeitungskonfiguration' of processing step configuration. */
 @XmlRootElement(name = "Verarbeitungskonfiguration")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProcessingConfiguration implements Configuration {
+public class ProcessingConfiguration {
 
     private static final Logger log
         = Logger.getLogger(ProcessingStepConfiguration.class.getName());
@@ -57,7 +56,6 @@ public class ProcessingConfiguration implements Configuration {
     @XmlElement(name = "Verarbeitungsschritt")
     private List<ProcessingStepConfiguration> processingSteps;
 
-    private static File sourceFile;
 
     private static final String NAME =
             "ProcessingConfig";
@@ -142,7 +140,6 @@ public class ProcessingConfiguration implements Configuration {
      * @throws IOException Something went wrong.
      */
      public static ProcessingConfiguration read(File file) throws IOException {
-        sourceFile = file;
         try (FileInputStream fis = new FileInputStream(file)) {
             return read(fis);
         }
@@ -176,17 +173,13 @@ public class ProcessingConfiguration implements Configuration {
         try {
             in = ProcessingConfiguration.class.getResourceAsStream(
                 PROCESSING_CONFIG_FILE);
-            sourceFile = new File(ProcessingConfiguration.class.
-                    getResource(
-                    PROCESSING_CONFIG_FILE).toURI()
-            );
             if (in == null) {
                 log.log(Level.SEVERE,
                     PROCESSING_CONFIG_FILE + " not found");
                 return new ProcessingConfiguration();
             }
             return read(in);
-        } catch (URISyntaxException | IOException ioe) {
+        } catch (IOException ioe) {
             log.log(Level.SEVERE, "Failed to load configuration", ioe);
         } finally {
             if (in != null) {
@@ -197,14 +190,6 @@ public class ProcessingConfiguration implements Configuration {
             }
         }
         return new ProcessingConfiguration();
-    }
-
-    /**
-     * gets the file of the source.
-     * @return source file
-     */
-    public File getSourceFile() {
-        return sourceFile;
     }
 
     /**
