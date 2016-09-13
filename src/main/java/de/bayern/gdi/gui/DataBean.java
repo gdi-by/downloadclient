@@ -297,6 +297,7 @@ public class DataBean extends Observable {
         for (Attribute attr: this.attributes) {
             if (attr.name.equals(key)) {
                 attr.value = value;
+                attr.type = type;
                 return;
             }
         }
