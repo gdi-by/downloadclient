@@ -225,13 +225,21 @@ public class Service extends Object {
 
     public int hashCode() {
         int code = 0;
-        code += this.name.hashCode();
-        code += this.serviceURL.hashCode();
-        code += this.username.hashCode();
-        code += this.password.hashCode();
-        code += this.serviceType.hashCode();
-        if (this.loaded)
-            code++;
+        if (this.name != null) {
+            code += this.name.hashCode();
+        }
+        if (this.serviceURL != null) {
+            code += this.serviceURL.hashCode();
+        }
+        if (this.username != null) {
+            code += this.username.hashCode();
+        }
+        if (this.password != null) {
+            code += this.password.hashCode();
+        }
+        if (this.serviceType != null) {
+            code += this.serviceType.hashCode();
+        }
         return code;
     }
 
