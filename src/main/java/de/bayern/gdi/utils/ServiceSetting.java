@@ -18,8 +18,7 @@
 
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.gui.ServiceModel;
-
+import de.bayern.gdi.services.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -32,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -50,7 +48,7 @@ public class ServiceSetting {
     public static final String SERVICE_SETTING_FILE =
             "serviceSetting.xml";
 
-    private List<ServiceModel> services;
+    private List<Service> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
     private static final String NAME =
@@ -102,7 +100,7 @@ public class ServiceSetting {
      * returns a map of Strings with service Names und URLS.
      * @return Map of Strings with <Name, URL> of Services
      */
-    public List<ServiceModel> getServices()  {
+    public List<Service> getServices()  {
         return this.services;
     }
 
@@ -186,8 +184,8 @@ public class ServiceSetting {
         return map;
     }
 
-    private List<ServiceModel> parseService(Document xmlDocument) {
-        List<ServiceModel> servicesList = new ArrayList<ServiceModel>();
+    private List<Service> parseService(Document xmlDocument) {
+        List<Service> servicesList = new ArrayList<Service>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
         Node servicesNode = servicesNL.item(0);
@@ -220,11 +218,14 @@ public class ServiceSetting {
                     }
                 }
                 if (serviceURL != null && serviceName != null) {
-                    ServiceModel service = new ServiceModel();
-                    service.setName(serviceName);
-                    service.setUrl(serviceURL);
-                    service.setRestricted(restricted);
-                    servicesList.add(service);
+                    try {
+                        Service service = new Service(new URL(serviceURL),
+                                serviceName,
+                                restricted);
+                        servicesList.add(service);
+                    } catch (MalformedURLException e){
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                    }
                 }
             }
         }

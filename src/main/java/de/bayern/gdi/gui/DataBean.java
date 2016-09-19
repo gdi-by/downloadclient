@@ -18,6 +18,17 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.CatalogService;
+import de.bayern.gdi.services.Service;
+import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.ServiceChecker;
+import de.bayern.gdi.utils.ServiceSetting;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -25,19 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.model.Parameter;
-import de.bayern.gdi.model.ProcessingStep;
-import de.bayern.gdi.model.ServiceMetaInformation;
-import de.bayern.gdi.services.Atom;
-import de.bayern.gdi.services.CatalogService;
-import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.utils.Config;
-import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.ServiceSetting;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -47,8 +45,8 @@ import javafx.collections.ObservableList;
 public class DataBean extends Observable {
 
     private Map<String, String> namePwMap;
-    private List<ServiceModel> staticServices;
-    private List<ServiceModel> catalogServices;
+    private List<Service> staticServices;
+    private List<Service> catalogServices;
     private ServiceType serviceType;
     private ItemModel dataType;
     private Atom atomService;
@@ -58,7 +56,7 @@ public class DataBean extends Observable {
     private String userName;
     private String password;
     private ArrayList<ProcessingStep> processingSteps;
-    private ServiceMetaInformation selectedService;
+    private Service selectedService;
 
     private CatalogService catalogService;
 
@@ -98,7 +96,7 @@ public class DataBean extends Observable {
 
         this.staticServices = serviceSetting.getServices();
 
-        this.catalogServices = new ArrayList<ServiceModel>();
+        this.catalogServices = new ArrayList<Service>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
             try {
                 this.catalogService =
@@ -111,14 +109,14 @@ public class DataBean extends Observable {
             }
         }
         this.processingSteps = new ArrayList<>();
-        this.selectedService = new ServiceMetaInformation();
     }
 
     /**
      * sets the selected service.
      * @param smi the selected service
      */
-    public void setSelectedService(ServiceMetaInformation smi) {
+    public void setSelectedService(Service smi) throws IOException {
+        smi.load();
         this.selectedService = smi;
     }
 
@@ -126,7 +124,7 @@ public class DataBean extends Observable {
      * gets the selected service.
      * @return the selected service
      */
-    public ServiceMetaInformation getSelectedService() {
+    public Service getSelectedService() {
         return this.selectedService;
     }
 
@@ -151,9 +149,16 @@ public class DataBean extends Observable {
      * @return List build from services Map
      */
     public ObservableList<ServiceModel> getServicesAsList() {
+        List<Service> all = new ArrayList<>();
+        all.addAll(this.staticServices);
+        all.addAll(this.catalogServices);
+        List<ServiceModel> allModels = new ArrayList<>();
+        for(Service entry: all) {
+            ServiceModel sm = new ServiceModel(entry);
+            allModels.add(sm);
+        }
         ObservableList<ServiceModel> serviceNames =
-                FXCollections.observableArrayList(this.staticServices);
-        serviceNames.addAll(this.catalogServices);
+                FXCollections.observableArrayList(allModels);
         return serviceNames;
     }
 
@@ -161,7 +166,7 @@ public class DataBean extends Observable {
      * Adds a Service to the list.
      * @param service the Service
      */
-    public void addCatalogServiceToList(ServiceModel service) {
+    public void addCatalogServiceToList(Service service) {
         this.catalogServices.add(service);
     }
 
@@ -169,7 +174,7 @@ public class DataBean extends Observable {
      * Adds a Service to the list.
      * @param service the Service
      */
-    public void addServiceToList(ServiceModel service) {
+    public void addServiceToList(Service service) {
         this.catalogServices.add(service);
     }
 

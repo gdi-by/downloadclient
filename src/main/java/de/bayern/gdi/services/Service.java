@@ -27,17 +27,20 @@ import org.apache.http.HttpStatus;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class Service {
+public class Service extends Object {
 
     private boolean loaded;
     private static final String WFS_URL_EXPR = "wfs";
     private static final String GET_CAP_EXPR = "getcapabilities";
     private static final String URL_TRY_APPENDIX =
             "?service=wfs&acceptversions=2.0.0&request=GetCapabilities";
+    private final static String ATOM = "atom";
+    private final static String WFSONE = "wfs 1";
+    private final static String WFSTWO = "wfs 2";
+
     private URL serviceURL;
     private ServiceType serviceType;
     private String additionalMessage;
-
     private String username;
     private String password;
     private String name;
@@ -57,10 +60,34 @@ public class Service {
     public Service (URL url,
                     String name,
                     boolean restricted) {
+        this(url, name, restricted, "", "");
+    }
+
+    public Service (URL url,
+                    String name,
+                    String username,
+                    String password) {
+        this (url, name, ServiceChecker.isRestricted(url), username, password);
+    }
+
+    public Service (URL url,
+                    String name,
+                    boolean restricted,
+                    String username,
+                    String password) {
         this.serviceURL = url;
         this.name = name;
         this.restricted = restricted;
         this.loaded = false;
+        this.username = username;
+        this.password = password;
+    }
+
+    public Service (URL url,
+                    String name,
+                    boolean restricted,
+                    String serviceType) {
+        this (url, name, restricted, guessServiceType(serviceType));
     }
 
     public Service (URL url,
@@ -84,10 +111,14 @@ public class Service {
         this.serviceURL = url;
         this.name = name;
         this.restricted = restricted;
-        this.serviceType = serviceType;
         this.username = username;
         this.password = password;
-        this.loaded = true;
+        if (serviceType != null) {
+            this.serviceType = serviceType;
+            this.loaded = true;
+        }  else {
+            this.loaded = false;
+        }
     }
 
     public void setUsername(String username) {
@@ -176,9 +207,9 @@ public class Service {
 
     private void checkServiceType() {
         if (this.isRestricted()) {
-            if (this.getUsername() != null && this.getPassword() != null) {
-                if (!this.getUsername().isEmpty()
-                        && !this.getPassword().isEmpty()) {
+            if (this.username!= null && this.password != null) {
+                if (!this.username.isEmpty()
+                        && !this.password.isEmpty()) {
                     this.serviceType = ServiceChecker.checkService(
                             this.serviceURL,
                             this.username,
@@ -192,4 +223,35 @@ public class Service {
         }
     }
 
+    public int hashCode() {
+        int code = 0;
+        code += this.name.hashCode();
+        code += this.serviceURL.hashCode();
+        code += this.username.hashCode();
+        code += this.password.hashCode();
+        code += this.serviceType.hashCode();
+        if (this.loaded)
+            code++;
+        return code;
+    }
+
+    public boolean equals(Service s) {
+        if (s.hashCode() == this.hashCode()) {
+            return true;
+        }
+        return false;
+    }
+    public static ServiceType guessServiceType(String typeString) {
+        System.out.println(typeString);
+        typeString = typeString.toLowerCase();
+        if (typeString.contains(ATOM)) {
+            return ServiceType.Atom;
+        } else if (typeString.contains(WFSONE)) {
+            return ServiceType.WFSOne;
+        } else if (typeString.contains(WFSTWO)) {
+            return ServiceType.WFSTwo;
+        } else {
+            return null;
+        }
+    }
 }

@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.utils.NamespaceContextMap;
+import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -30,18 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
-
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import de.bayern.gdi.gui.ServiceModel;
-import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.XML;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -173,9 +169,9 @@ public class CatalogService {
      * @throws URISyntaxException if URL is wrong
      * @throws IOException if something in IO is wrong
      */
-    public List<ServiceModel> getServicesByFilter(String filter)
+    public List<Service> getServicesByFilter(String filter)
         throws URISyntaxException, IOException {
-        List<ServiceModel> services = new ArrayList<ServiceModel>();
+        List<Service> services = new ArrayList<Service>();
         if (filter.length() > MIN_SEARCHLENGTH && this.getRecordsURL != null) {
             String search = loadXMLFilter(filter);
             Document xml = XML.getDocument(this.getRecordsURL,
@@ -297,11 +293,10 @@ public class CatalogService {
                     if (!serviceName.equals("") && serviceURL != null) {
                         serviceURL = makeCapabiltiesURL(serviceURL,
                                 serviceTypeVersion);
-                        ServiceModel service = new ServiceModel();
-                        service.setName(serviceName);
-                        service.setUrl(serviceURL);
-                        service.setVersion(serviceTypeVersion);
-                        service.setRestricted(restricted);
+                        Service service = new Service(new URL(serviceURL),
+                                serviceName,
+                                restricted,
+                                serviceTypeVersion);
                         services.add(service);
                     }
                 }

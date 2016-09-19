@@ -26,7 +26,6 @@ import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
-import de.bayern.gdi.model.ServiceMetaInformation;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
@@ -34,6 +33,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
@@ -86,14 +86,13 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -234,14 +233,16 @@ public class Controller {
                         progressSearch.setVisible(true);
                     });
                     if (catalogReachable) {
-                        List<ServiceModel> catalog =
+                        List<Service> catalog =
                                 dataBean.getCatalogService()
                                 .getServicesByFilter(currentText);
-                        for (ServiceModel entry : catalog) {
+                        for (Service entry : catalog) {
                             dataBean.addCatalogServiceToList(entry);
                         }
                         Platform.runLater(() -> {
-                            subentries.addAll(catalog);
+                            for (Service entry: catalog) {
+                                subentries.add(new ServiceModel(entry));
+                            }
                         });
                     }
                     Platform.runLater(() -> {
@@ -283,9 +284,9 @@ public class Controller {
                     != null
             ) {
                 ServiceModel service =
-                        (ServiceModel)this.serviceList.getSelectionModel()
+                        (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
-                selectService(service.getUrl());
+                selectService(service.getUrl().toString());
             }
         }
     }
@@ -298,29 +299,29 @@ public class Controller {
         serviceURL.getScene().setCursor(Cursor.WAIT);
         Runnable task = () -> {
             try {
-                ServiceMetaInformation smi =
-                        new ServiceMetaInformation(url,
+                Service service =
+                        new Service(new URL(url),
+                                    "",
                                     serviceUser.getText(),
                                     servicePW.getText());
-                if (dataBean.getSelectedService().equals(smi)) {
+                if (dataBean.getSelectedService().equals(service)) {
                     setStatusTextUI(
                             I18n.format("status.ready"));
                     return;
                 } else {
                     if (dataBean.getSelectedService().getServiceURL() != null
-                            && smi.getServiceURL().toString().equals(
+                            && service.getServiceURL().toString().equals(
                                     dataBean.getSelectedService()
                                     .getServiceURL().toString())
                             ) {
-                        smi.setUsernamePassword(
-                                serviceUser.getText(),
-                                servicePW.getText());
-                        dataBean.setSelectedService(smi);
+                        service.setUsername(serviceUser.getText()) ;
+                        service.setPassword(servicePW.getText());
+                        dataBean.setSelectedService(service);
                     } else {
                         Platform.runLater(() -> {
                             clearUserNamePassword();
                         });
-                        dataBean.setSelectedService(smi);
+                        dataBean.setSelectedService(service);
                     }
                 }
                 Platform.runLater(() -> {
