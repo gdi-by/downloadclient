@@ -141,7 +141,7 @@ Es wird der Datensatz *"Nationalparke"* in der Variante *"Gauß-Krueger Zone 4"*
 
 
 Weiterverarbeitung der heruntergeladenen Datensätze
--------------------
+------------------------------------------------------
 
 Die heruntergeladenen Datensätze  können mit Hilfe des Download-Clients zu einem individuellen Endergebnis weiterverarbeitet werden (=Verarbeitungskette). 
 
@@ -157,56 +157,70 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
+.. image:: img/DLC_Weiterverarbeitung_DOP.png
+
+Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112013-0" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
+
+Download-Logfiles
+-------------------
+
+Für jeden Download, der über den Button „Download start…“ angestoßen wurde, wird im Ordner, der als Speicherort für den Download angegeben wurde, automatisch ein Logfile (Dateiname download_<DatumUhrzeitNr>.log) gespeichert. 
+
 
 Ausführungswiederholung
 ---------------------------
 
-Eine Download-Konfiguration kann über den entsprechenden Button gespeichert werden und ist automatisiert über ein Konsolenprogramm erneut ausführbar. 
+Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert werden und ist automatisiert über ein Konsolenprogramm erneut ausführbar. 
  
-!!!!!!!! Beispiele für Konfigurations-Dateien der Download-Schritte stehen unter folgenden Links zur Verfügung: 
+**Windows:**
 
-- https://gist.github.com/gdi-by/b5ade5062477eae11391 (Atom)
-
-- https://gist.github.com/gdi-by/ebfa67fbda614fa30e59 (WFS2 Simple - Beispiel mit Weiterverarbeitung)
-
-- https://gist.github.com/gdi-by/d02e71e0bb1c1ac21cd7 (WFS2 Basic)
-
-- Das entsprechende Schema befindet sich unter https://gist.github.com/gdi-by/20b132cfd5d34abb147a
+In der Eingabeaufforderung muss das Batch-Skript startup-headless.bat sowie die o.g. XML-Konfigurationsdatei inkl. Pfad angeben werden.
+Alternativ kann über das Tool "Aufgabenplanung" die Ausführung als eine einmalige oder regelmäßig wiederkehrende Aktion definiert werden.
 
 
-Lizenz
-======
-
-Der Download-Client ist eine OpenSource-Software und steht unter der Lizenz "Apache License 2.0".
-Nähere Details befinden sich unter *LICENSE*.
+**Linux:** 
+###ToDo
 
 
+Benutzerdefinierte Erweiterungsmöglichkeiten 
+=============================================
+
+Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
+
+proxy.xml
+----------
+
+Alternative HTTP(S) Proxy-Einstellungen können folgendermaßen konfiguriert werden:
+
+ <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
+Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann overrideSystemSetting="false" gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
+
+serviceSetting.xml
+---------------------
+
+Hier können folgende Einstellungen angepasst werden:
+
+- im Element <catalogues>: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
+
+- im Element < wms>: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
+
+- im Element <services>: in die Dienstesuche fest eingebundene Downloaddienste
+
+verarbeitungsschritte.xml
+---------------------------
 
 
-Entwicklerhinweise
-==================
+Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
-Der GDI-BY Download-Client kann mit Maven kompiliert werden.
+-	im Element <Befehl>: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
 
+- im Element <ParameterSet>: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
 
-Build 
-
-      $ mvn clean compile 
-
-Bundle 
-
-      $ mvn clean package
+- im Element <Eingabeelement>: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (typ="TextField") oder Auswahllistenfeldern (typ="ComboBox")
 
 
-Ausführen mit Benutzeroberfläche
+mimetypes.xml
+--------------
 
-     '$ mvn exec:java'
-
-Ausführen im *headless mode*:
-
-     $ mvn exec:java -Dexec.args=-headless [download-steps.xml ...]
-
-
-
-
+Hier kann die Liste der angegebenen MIMETypes erweitert werden.
 
