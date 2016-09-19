@@ -242,7 +242,6 @@ public class Service extends Object {
         return false;
     }
     public static ServiceType guessServiceType(String typeString) {
-        System.out.println(typeString);
         typeString = typeString.toLowerCase();
         if (typeString.contains(ATOM)) {
             return ServiceType.Atom;
