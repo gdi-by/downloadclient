@@ -9,97 +9,47 @@ GDI-BY Download-Client Dokumentation
 Einleitung
 ============
 
-Zur einfacheren Nutzung der im Rahmen der Geodateninfrastruktur Bayern (GDI-BY) bereitgestellten Downloaddienste steht der Download-Client als zentrale Komponente zur Verfügung. Der Download-Client ist eine plattformunabhängige OpenSource-Desktopanwendung. 
+Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
-Nach dem reinen Download der Daten können Downloadschritte auch konfiguriert und abgespeichert werden. Die gespeicherten Downloadschritte können anschließend über ein Konsolenprogramm angestoßen und automatisiert ausgeführt werden. 
+Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-Source-Software unter der Apache License 2.0 zur Verfügung gestellt.
+
 
 
 Installation
 ============
+
+Installationspakete für Windows und Linux stehen vrstl. ab Oktober 2016 hier bereit: http://gdi.bayern/downloadclient
 
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
 **Für die Installation des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
 
-Windows
----------
-
-Die Software benötigt Java 8 mit JavaFX. Das aktuelle JRE kann über http://www.oracle.com/technetwork/java/javase/downloads/index.html heruntergeladen werden. 
-
-
-Werden nach dem Download die Daten weiterverarbeitet, so werden weitere Tools wie ogr2ogr benötigt. Dazu kann z.B. die gdal-Bibliothek installiert werden.  
-
-
-Linux
------
-Der Download-Client wurde mit OpenJDK auf Debian und Arch Linux entwickelt. Wird eine aktuelle OpenJDK-Version verwendet sind keine weiteren Voraussetzungen nötig. 
-
-Werden nach dem Download die Daten weiterverarbeitet, so werden weitere Tools wie ogr2ogr benötigt. Diese sollten über den Package Manager installiert werden. 
-
-Befehle 
---------
-
-Im XML *download-steps.xml* können ein oder mehrere Download-Schritt-Dateien enthalten sein. Nach der Erstellung des jar-files soll folgender Befehl ausgeführt werden: 
-
-     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar
-
-oder im *headless mode*:
-
-     $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
-
-Um passwortgeschützte Dienste zugänglich zu machen, können die Benutzerdaten über  ``--user=<user>`` and ``--password=<password>`` dem Download-Client übergeben werden.
-
-     `--config=<directory>`
-
-Hier kann ein Ordner spezifiziert werden mit Konfigurationsdateien, um die default-Einstellungen zu überschreiben (wichtig für Proxy-Einstellungen!):  
-
-     `proxy.xml` 
-
-Alternative HTTP(S) Proxy-Einstellungen können folgendermaßen konfiguriert werden: ::
-
-      <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
-        <!-- HTTP settings: -->
-        <HTTPProxyHost>HOST</HTTPProxyHost>
-        <HTTPProxyPort>PORT</HTTPProxyPort>
-        <HTTPProxyUser>USER</HTTPProxyUser>
-        <HTTPProxyUser>PASSWORD</HTTPProxyPassword>
-        <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
-        <!-- HTTPS settings: -->
-        <HTTPSProxyHost>HOST</HTTPSProxyHost>
-        <HTTPSProxyPort>PORT</HTTPSProxyPort>
-        <HTTPSProxyUser>USER</HTTPSProxyUser>
-        <HTTPSProxyUser>PASSWORD</HTTPSProxyPassword>
-        <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
-      </ProxyConfiguration>
-
-All fields are optional. To avoid application of the settings set ``overrideSystemSetting="false"``. enableSNIExtension enables/disables Server Name Indication. This might be needed in case of some problematic SSL-Hosts.
-
-     `serviceSetting.xml`
-Ein vorselektiertes Dienste-Set. 
-
-     `verarbeitungsschritte.xml`
-Eine Liste von Verarbeitungsschritten nach einem erfolgreichen Download.
+Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 
 Funktionalität
 ==============
 
-Unterstützte Implementierungsvarianten
+Unterstützte Downloaddienstvarianten
 ---------------------------------------
 
-Aktuell werden folgende Downloaddienste vom Download-Client der GDI-BY unterstützt:
+Aktuell werden folgende INSPIRE-Downloaddienstvarianten vom Download-Client unterstützt:
 
-+---------------+---------------------+----------------------------+
-| Modul         | Downloaddienst      | Konformitätsklasse         |
-+===============+=====================+============================+
-| 1             | WFS 2.0             |  simple WFS                |
-+---------------+---------------------+----------------------------+
-| 2             | WFS 2.0             |  basic WFS                 |
-+---------------+---------------------+----------------------------+
-| 3             | predefined ATOM     |                            |
-+---------------+---------------------+----------------------------+
++-------------------------------------+--------------------------------+----------------------------+
+| Variante                            | Standard                       | Konformitätsklasse         |
++=====================================+================================+============================+
+| Pre-defined Dataset Downlaod        | Web Featrue Service (WFS)  2.0 |  Simple WFS                |
++-------------------------------------+--------------------------------+----------------------------+
+| Direct Access Download              | WFS 2.0                        |  Basic WFS                 |
++-------------------------------------+--------------------------------+----------------------------+
+| Pre-defined Dataset Download        | predefined ATOM                |                            |
++-------------------------------------+--------------------------------+----------------------------+
 
+Benutzeroberfläche 
+-------------------
+
+.. image:: img/GUI.PNG
 
 Auswahl von Downloaddiensten
 ------------------------------
