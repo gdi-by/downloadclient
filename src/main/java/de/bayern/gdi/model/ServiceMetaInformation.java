@@ -109,14 +109,17 @@ public class ServiceMetaInformation extends Object {
                 return;
             }
         }
-        URL newURL = guessURL(this.serviceURL);
-        if (newURL.equals(this.serviceURL)) {
-            additionalMessage = "The URL is not reachable";
-        } else {
-            this.serviceURL = newURL;
-            checkServiceType();
-            if (serviceType != null) {
-                return;
+        // Only append to the URL if the Service is not restricted.
+        if (!this.restricted) {
+            URL newURL = guessURL(this.serviceURL);
+            if (newURL.equals(this.serviceURL)) {
+                additionalMessage = "The URL is not reachable";
+            } else {
+                this.serviceURL = newURL;
+                checkServiceType();
+                if (serviceType != null) {
+                    return;
+                }
             }
         }
         additionalMessage = "The service could not be determined";
