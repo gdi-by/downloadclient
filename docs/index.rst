@@ -175,7 +175,29 @@ Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (
 **Windows:**
 
 In der Eingabeaufforderung muss das Batch-Skript startup-headless.bat sowie die o.g. XML-Konfigurationsdatei inkl. Pfad angeben werden.
-Alternativ kann über das Tool "Aufgabenplanung" die Ausführung als eine einmalige oder regelmäßig wiederkehrende Aktion definiert werden.
+Alternativ kann die Ausführung als eine einmalige oder regelmäßig wiederkehrende Aktion definiert werden.
+
+Variante a) Ausführungswiederholung mit Windows Eingabeaufforderung (cmd)
+
+- Funktioniert ohne dass der Benutzer Administratoren-Rechte hat
+- In der Batch-Datei müssen die Parameter für user und password bei zugriffsgeschützten Diensten definiert sein
+- Aufruf: startup-headless.bat C:\<Pfad>\<Download-Konfiguration>.xml <user> <password>
+
+Variante b) Ausführungswiederholung mit Windows Aufgabenplanung 
+
+- Voraussetzung: Aufgabenplanung wird als Administrator ausgeführt
+- In der Batch-Datei müssen die Parameter für user und password bei zugriffsgeschützten Diensten definiert sein
+- Aufruf: startup-headless.bat C:\<Pfad>\<Download-Konfiguration>.xml <user> <password>
+
+
+Einstellungen im Reiter Aktionen: 
+
+- Programm/Skript: C:\Windows\SysWOW64\cmd.exe (da Batch-Dateien nicht direkt ausgeführt werden können)
+
+- Argumente: /c"startup-headless.bat <Pfad>\<Download-Konfigurationsdatei.xml>", Bsp.:  /c"startup-headless.bat C:\TEMP\DownloadClient_Downloads\config20160909150028.xml"
+
+- Starten in: <Pfad unter dem Batch-Datei liegt>\ Bsp: C:\TEMP\DownloadClient\downloadclient-160909\
+
 
 
 **Linux:** 
