@@ -34,7 +34,7 @@ Funktionalität
 Unterstützte Downloaddienstvarianten
 ---------------------------------------
 
-Aktuell werden folgende INSPIRE-Downloaddienstvarianten vom Download-Client unterstützt:
+Aktuell werden folgende INSPIRE-Downloaddienstvarianten* vom Download-Client unterstützt:
 
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
@@ -46,46 +46,47 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten vom Download-Client unte
 | Pre-defined Dataset Download        | predefined ATOM                |                            |
 +-------------------------------------+--------------------------------+----------------------------+
 
+*gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf 
+
 Benutzeroberfläche 
 -------------------
 
-.. image:: img/GUI.PNG
+.. image:: img/DLC_GUI.png
+
+
 
 Auswahl von Downloaddiensten
 ------------------------------
-Downloaddienste können über zwei Varianten eingebunden werden: 
+Downloaddienste können über verschiedene Wege eingebunden werden: 
 
-- Eingabe der URL eines Downloaddienstes (vollständige GetCapabilities-URL inkl. Paramater bei WFS oder URL des predefined ATOM Downloaddienstes) - weitere Einschränkungen siehe "unterstützte Implementierungsvarianten" 
+- Eingabe der URL eines Downloaddienstes (vollständige GetCapabilities-URL inkl. Paramater bei WFS oder URL des ATOM Downloaddienstes) 
 
-- Suche nach Downloaddiensten über das Suchfeld. Hier wird im Hintergrund ein CSW GetRecordbyID-Aufruf auf den CSW http://geoportal.bayern.de/csw/gdi? mit einem Filter *ServiceTypeVersion = OGC:WFS:2.0* oder *ATOM* durchgeführt.
+- Suche nach Downloaddiensten durch Eingabe eines Suchbegriffes in das Suchfeld. Hier wird im Hintergrund ein GetRecord-Aufruf an einen Metadatenkatalogdienst (CSW) mit einem Filter *ServiceTypeVersion = OGC:WFS:2.0* oder *ATOM* durchgeführt. Standardmäßig ist hier der Metadatenkatalog der GDI-BY (http://geoportal.bayern.de/csw/gdi?) eingebunden. Das Einbinden anderer Kataloge ist möglich (s. Abschnitt „Benutzerdefinierte Erweiterungsmöglichkeiten“)
 
 
 Beispiel-URLs sind:
 
 - http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&acceptversions=2.0.0&request=getCapabilities (WFS 2.0.0)
-- https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/4331d3ef-a12d-48be-a9b9-9597c2591448 (predefined Atom)
-- http://www.geodaten.bayern.de/inspire/dls/dop200.xml (predefined Atom)
+- https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/4331d3ef-a12d-48be-a9b9-9597c2591448 (Atom)
+- http://www.geodaten.bayern.de/inspire/dls/dop200.xml (Atom)
 
-Über den Button *Dienst wählen* kann ein Downloaddienst eingebunden werden. Bei passwortgeschützten Diensten müssen die Login-Daten entsprechend in den Feldern *Kennung* und *Passwort* eingetragen werden. 
+Über den Button *Dienst wählen* kann ein Downloaddienst eingebunden werden. Bei zugriffsgeschützten Diensten müssen die Zugangsdaten entsprechend in den Feldern *Kennung* und *Passwort* eingetragen werden. 
 
 Ist nicht bekannt, ob ein Dienst passwortgeschützt ist oder nicht, so kann einfach die URL in das entsprechende Feld eingetragen werden. Nach einer Überprüfung wird vom Client gegebenenfalls die Meldung *"Service ist zugangsbeschränkt. Geben Sie Nutzername und Passwort an."* angezeigt.
 
-Im Hintergrund wird dabei bei WFS-Downloaddiensten ein HTTP-GET Aufruf gestartet. 
-Bei predefined ATOM-Downloaddiensten wird eine HTTP-GET Capabilities Aufruf auf die entsprechende online Ressource sowie ein HTTP-HEAD Aufruf auf die dataset feed Einträge (Pfad: //feed/entry[1]/link[1]@href) durchgeführt.
-
-Die grafische Benutzeroberfläche passt sich je nach Art des gewählten Downloaddienstes und Konformitätsklasse entsprechend an: 
+Die grafische Benutzeroberfläche passt sich je nach der gewählten Downloaddienstvariante automatisch an: 
 
 Download von Datensätzen eines WFS 2.0 
 ---------------------------------------
 
-Beim Download von Datensätzen eines WFS 2.0 werden in der Dropdown-Liste sowohl alle FeatureTypes des WFS als auch alle vordefinierten Abfragen - stored queries (wenn vorhanden) zum Download angeboten. 
-Standardmäßig ist der erste Eintrag der Dropdown-Liste ausgewählt.
+Beim Download von Datensätzen eines WFS 2.0 werden in der Datensatz-Auswahlliste sowohl alle FeatureTypes des WFS als auch alle vordefinierten Abfragen ("Stored Queries" - wenn vorhanden) zum Download angeboten. 
+Standardmäßig ist der erste Eintrag der Liste ausgewählt.
  
 *********************
 Vordefinierte Abfrage
 *********************
 
-Handelt es sich beim Eintrag um eine vordefinierte Abfrage, passt sich die Oberfläche dahingehend an, dass als Eingabefelder die Abfrageparameter erscheinen. Zusätzlich kann ein Ausgabedatenformat gewählt werden.
+Bei Auswahl einer vordefinierten Abfrage passt sich der Datensatzvarianten-Auswahlbereich dahingehend an, dass die Abfrageparameter als Eingabefelder sowie (falls vorhanden) eine Beschreibung der vordefinierten Abfrage erscheinen. Zusätzlich kann eines der vom Dienst nativ angebotenen Ausgabedatenformate gewählt werden.
 
 **Beispiel:**
 
@@ -93,13 +94,13 @@ Handelt es sich beim Eintrag um eine vordefinierte Abfrage, passt sich die Oberf
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Die vordefinierte Abfrage lautet *"Abfrage einer Gemeinde über den Gemeindeschlüssel"*. 
-Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format *KML* abgefragt.
+Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format *KML* abgefragt. Mit Klick auf den Button „Download start...“ unter Angabe eines Zielordners wird der Download angestoßen.
 
 ************
 FeatureTypes
 ************
 
-Handelt es sich um ein FeatureType, so kann der Nutzer über die Kartenkomponente eine BoundingBox aufziehen und so den Bereich wählen, für welchen er Daten beziehen möchte. 
+Handelt es sich um ein FeatureType, so kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck aufziehen und so den Bereich wählen, für welchen er Daten beziehen möchte. 
 Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden. 
 
 **Beispiel:**
@@ -107,16 +108,16 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 .. image:: img/DLC_featuretype_WFS.PNG
 
 
-Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen (=Begrenzungsfläche definiert). Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
+Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
 
 Download von Datensätzen eines predefined ATOM Downloaddienstes
 ------------------------------------------------------------------
 
-Beim Download von Datensätzen eines predefined ATOM Downloaddienstes werden in der Dropdown-Liste alle verfügbaren ServiceFeed-Einträge (=Datensätze) zum Download angeboten. Standardmäßig ist der erste Eintrag der Drowpdown-Liste ausgewählt. 
+Beim Download von Datensätzen eines predefined ATOM Downloaddienstes werden in der Datensatz-Auswahlliste alle verfügbaren ServiceFeed-Einträge (=Datensätze) zum Download angeboten. Standardmäßig ist der erste Eintrag der Liste ausgewählt. 
 
 Der Nutzer hat die Möglichkeit, die Auswahl durch Wahl eines anderen Eintrags der Liste oder durch Wahl eines Bereiches in der Kartenkomponente zu ändern. 
 
-Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur dann möglich, wenn die geographische Begrenzung der einzelnen Datensätze sich nicht überlagern. 
+Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur dann möglich, wenn die geographischen Begrenzungspolygone der einzelnen Datensätze sich nicht überlagern. 
 
 **Beispiel Variante a):**
 
@@ -124,7 +125,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
-Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungen zum Download zur Auswahl. Somit ist eine Auswahl über die Kartenkomponente möglich. Es wird der Datensatz *"Digitales Orthophoto 112013-0"* in der Variante *"Gauß-Krueger Zone 4"* gewählt. 
+Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspolygonen zum Download zur Auswahl. Somit ist eine Auswahl über die Kartenkomponente möglich. Es wird der Datensatz *"Digitales Orthophoto 112013-0"* in der Variante *"Gauß-Krueger Zone 4"* (EPSG:31468) gewählt. 
 
 
 
@@ -139,12 +140,12 @@ Da die Datensätze jeweils eine bayernweite Ausdehnung haben, ist nur eine Auswa
 Es wird der Datensatz *"Nationalparke"* in der Variante *"Gauß-Krueger Zone 4"* gewählt. 
 
 
-Verarbeitungskette
+Weiterverarbeitung der heruntergeladenen Datensätze
 -------------------
 
-Die heruntergeladenen Datensätze  können mit Hilfe des Clients zu einem individuellen Endergebnis weiterverarbeitet werden (=Verarbeitungskette). 
+Die heruntergeladenen Datensätze  können mit Hilfe des Download-Clients zu einem individuellen Endergebnis weiterverarbeitet werden (=Verarbeitungskette). 
 
-Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (siehe xxxx)  bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
+Nach Anhaken von "Weiterverarbeiten" können über den Button "Hinzufügen" ein oder mehrere Verarbeitungsschritte hinzugefügt werden.
 
 Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung: 
 
@@ -154,9 +155,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
-- ??? Konvertierung eines Vektor- oder Rasterdatenformates nach GeoPackage nach Eingabe folgender Parameter: 
-
-Es ist möglich, mehrere Verarbeitungsschritte nacheinander durchzuführen.
+Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
 
 Ausführungswiederholung
