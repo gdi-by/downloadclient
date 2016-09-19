@@ -170,38 +170,25 @@ Für jeden Download, der über den Button „Download start…“ angestoßen wu
 Ausführungswiederholung
 ---------------------------
 
-Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert werden und ist automatisiert über ein Konsolenprogramm erneut ausführbar. 
+Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert und über ein Konsolenprogramm erneut bzw. in regelmäßigen Intervallen ausgeführt werden. 
  
 **Windows:**
 
-In der Eingabeaufforderung muss das Batch-Skript startup-headless.bat sowie die o.g. XML-Konfigurationsdatei inkl. Pfad angeben werden.
-Alternativ kann die Ausführung als eine einmalige oder regelmäßig wiederkehrende Aktion definiert werden.
+Variante a) Ausführungswiederholung mit Windows Eingabeaufforderung (CMD)
 
-Variante a) Ausführungswiederholung mit Windows Eingabeaufforderung (cmd)
+- Angaben: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad sowie ggf. - bei zugriffsgeschützten Diensten - Username und Passwort.
+- Bsp.: `startup-headless.bat C:\TEMP\config20160909142610.xml foo bar`
 
-- Funktioniert ohne dass der Benutzer Administratoren-Rechte hat
-- In der Batch-Datei müssen die Parameter für user und password bei zugriffsgeschützten Diensten definiert sein
-- Aufruf: startup-headless.bat C:\<Pfad>\<Download-Konfiguration>.xml <user> <password>
+Variante b) Ausführungswiederholung mit Windows Aufgabenplanung (Voraussetzung: Ausführung als Administrator)
 
-Variante b) Ausführungswiederholung mit Windows Aufgabenplanung 
-
-- Voraussetzung: Aufgabenplanung wird als Administrator ausgeführt
-- In der Batch-Datei müssen die Parameter für user und password bei zugriffsgeschützten Diensten definiert sein
-- Aufruf: startup-headless.bat C:\<Pfad>\<Download-Konfiguration>.xml <user> <password>
-
-
-Einstellungen im Reiter Aktionen: 
-
-- Programm/Skript: C:\Windows\SysWOW64\cmd.exe (da Batch-Dateien nicht direkt ausgeführt werden können)
-
-- Argumente: /c"startup-headless.bat <Pfad>\<Download-Konfigurationsdatei.xml>", Bsp.:  /c"startup-headless.bat C:\TEMP\DownloadClient_Downloads\config20160909150028.xml"
-
-- Starten in: <Pfad unter dem Batch-Datei liegt>\ Bsp: C:\TEMP\DownloadClient\downloadclient-160909\
-
+- Programm/Skript: ausführbare Eingabeaufforderungsdatei inkl. Pfad (Bsp.: C:\Windows\SysWOW64\cmd.exe)
+- Argumente: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad sowie ggf. - bei zugriffsgeschützten Diensten - Username und Passwort (Bsp.:  `/c"startup-headless.bat C:\TEMP\config20160909142610.xml foo bar"`)
+- Starten in: Pfad, unter der Batch-Datei startup-headless.bat liegt
 
 
 **Linux:** 
-###ToDo
+
+Die Ausführungswiederholung ist über Cronjobs möglich.
 
 
 Benutzerdefinierte Erweiterungsmöglichkeiten 
@@ -222,11 +209,11 @@ serviceSetting.xml
 
 Hier können folgende Einstellungen angepasst werden:
 
-- im Element <catalogues>: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
+- im Element `<catalogues>`: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
 
-- im Element < wms>: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
+- im Element `<wms>`: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
 
-- im Element <services>: in die Dienstesuche fest eingebundene Downloaddienste
+- im Element `<services>`: in die Dienstesuche fest eingebundene Downloaddienste
 
 verarbeitungsschritte.xml
 ---------------------------
@@ -234,15 +221,15 @@ verarbeitungsschritte.xml
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
--	im Element <Befehl>: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
+-	im Element `<Befehl>`: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
 
-- im Element <ParameterSet>: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
+- im Element `<ParameterSet>`: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
 
-- im Element <Eingabeelement>: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (typ="TextField") oder Auswahllistenfeldern (typ="ComboBox")
+- im Element `<Eingabeelement>`: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
 
 
 mimetypes.xml
 --------------
 
-Hier kann die Liste der angegebenen MIMETypes erweitert werden.
+Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp ("raster"/"vektor") zugeordnet.
 
