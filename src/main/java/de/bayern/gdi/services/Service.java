@@ -87,7 +87,7 @@ public class Service extends Object {
                     String name,
                     boolean restricted,
                     String serviceType) {
-        this (url, name, restricted, guessServiceType(serviceType));
+        this (url, name, restricted, guessServiceType(serviceType), "", "");
     }
 
     public Service (URL url,
@@ -165,10 +165,11 @@ public class Service extends Object {
             int headStatus = ServiceChecker.tryHead(serviceURL);
             if (headStatus == HttpStatus.SC_OK) {
                 this.restricted = ServiceChecker.isRestricted(this.serviceURL);
-                this.serviceType = null;
-                checkServiceType();
                 if (this.serviceType != null) {
-                    return;
+                    checkServiceType();
+                    if (this.serviceType != null) {
+                        return;
+                    }
                 }
             } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
                 this.restricted = true;
