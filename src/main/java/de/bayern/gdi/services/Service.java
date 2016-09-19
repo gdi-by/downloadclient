@@ -244,8 +244,10 @@ public class Service extends Object {
     }
 
     public boolean equals(Service s) {
-        if (s.hashCode() == this.hashCode()) {
-            return true;
+        if (s != null) {
+            if (s.hashCode() == this.hashCode()) {
+                return true;
+            }
         }
         return false;
     }

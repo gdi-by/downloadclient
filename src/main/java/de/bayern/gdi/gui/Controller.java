@@ -304,12 +304,14 @@ public class Controller {
                                     "",
                                     serviceUser.getText(),
                                     servicePW.getText());
-                if (dataBean.getSelectedService().equals(service)) {
+                if (dataBean.getSelectedService() != null
+                && dataBean.getSelectedService().equals(service)) {
                     setStatusTextUI(
                             I18n.format("status.ready"));
                     return;
                 } else {
-                    if (dataBean.getSelectedService().getServiceURL() != null
+                    if (dataBean.getSelectedService() != null
+                        && dataBean.getSelectedService().getServiceURL() != null
                             && service.getServiceURL().toString().equals(
                                     dataBean.getSelectedService()
                                     .getServiceURL().toString())
