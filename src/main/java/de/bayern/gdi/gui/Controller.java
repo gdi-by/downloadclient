@@ -191,11 +191,13 @@ public class Controller {
      * @param event The mouse click event.
      */
     @FXML protected void handleServiceSelectButton(MouseEvent event) {
+        /*
         if (event.getButton().equals(MouseButton.PRIMARY)) {
             resetGui();
             selectService(serviceURL.getText());
             chooseService();
         }
+        */
     }
 
     /**
@@ -273,7 +275,7 @@ public class Controller {
      * @param event The mouse click event.
      */
     @FXML protected void handleServiceSelect(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY)
+        /*
             && event.getClickCount() > 1
         ) {
             clearUserNamePassword();
@@ -290,8 +292,10 @@ public class Controller {
                 selectService(service.getUrl().toString());
             }
         }
+        */
     }
 
+    /*
     private void selectService(String url) {
         setStatusTextUI(
                 I18n.format("status.checking-auth"));
@@ -371,6 +375,7 @@ public class Controller {
         Thread thread = new Thread(task);
         thread.start();
     }
+    */
 
     /**
      * Handle authentication required selection.
@@ -790,6 +795,7 @@ public class Controller {
     /**
      * Use selection to request the service data and fill th UI.
      */
+    /*
     private void chooseService() {
         Task task = new Task() {
             private void setAuth() {
@@ -834,6 +840,7 @@ public class Controller {
                 }
                 Service sel = dataBean.getSelectedService();
                 */
+    /*
                 System.out.println("Is Loaded");
                 if (dataBean.getSelectedService().isRestricted()) {
                     System.out.println("Is restricted");
@@ -938,6 +945,7 @@ public class Controller {
         th.setDaemon(true);
         th.start();
     }
+    */
 
     /**
      * Sets the Service Types.
