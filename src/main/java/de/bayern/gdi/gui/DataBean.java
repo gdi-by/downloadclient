@@ -114,6 +114,7 @@ public class DataBean extends Observable {
     /**
      * sets the selected service.
      * @param smi the selected service
+     * @throws IOException when something goes wrong
      */
     public void setSelectedService(Service smi) throws IOException {
         smi.load();
@@ -153,7 +154,7 @@ public class DataBean extends Observable {
         all.addAll(this.staticServices);
         all.addAll(this.catalogServices);
         List<ServiceModel> allModels = new ArrayList<>();
-        for(Service entry: all) {
+        for (Service entry: all) {
             ServiceModel sm = new ServiceModel(entry);
             allModels.add(sm);
         }

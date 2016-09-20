@@ -316,7 +316,7 @@ public class Controller {
                                     dataBean.getSelectedService()
                                     .getServiceURL().toString())
                             ) {
-                        service.setUsername(serviceUser.getText()) ;
+                        service.setUsername(serviceUser.getText());
                         service.setPassword(servicePW.getText());
                         dataBean.setSelectedService(service);
                     } else {

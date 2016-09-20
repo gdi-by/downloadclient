@@ -34,9 +34,9 @@ public class Service extends Object {
     private static final String GET_CAP_EXPR = "getcapabilities";
     private static final String URL_TRY_APPENDIX =
             "?service=wfs&acceptversions=2.0.0&request=GetCapabilities";
-    private final static String ATOM = "atom";
-    private final static String WFSONE = "wfs 1";
-    private final static String WFSTWO = "wfs 2";
+    private static final String ATOM = "atom";
+    private static final String WFSONE = "wfs 1";
+    private static final String WFSTWO = "wfs 2";
 
     private URL serviceURL;
     private ServiceType serviceType;
@@ -46,35 +46,37 @@ public class Service extends Object {
     private String name;
     private boolean restricted;
 
-    private Service() {}
+    private Service() {
 
-    public Service (URL url) {
+    }
+
+    public Service(URL url) {
         this(url, url.toString());
     }
 
-    public Service (URL url,
-                    String name) {
+    public Service(URL url,
+                   String name) {
         this(url, name, ServiceChecker.isRestricted(url));
     }
 
-    public Service (URL url,
-                    String name,
-                    boolean restricted) {
+    public Service(URL url,
+                   String name,
+                   boolean restricted) {
         this(url, name, restricted, "", "");
     }
 
-    public Service (URL url,
-                    String name,
-                    String username,
-                    String password) {
+    public Service(URL url,
+                   String name,
+                   String username,
+                   String password) {
         this (url, name, ServiceChecker.isRestricted(url), username, password);
     }
 
-    public Service (URL url,
-                    String name,
-                    boolean restricted,
-                    String username,
-                    String password) {
+    public Service(URL url,
+                   String name,
+                   boolean restricted,
+                   String username,
+                   String password) {
         this.serviceURL = url;
         this.name = name;
         this.restricted = restricted;
@@ -83,17 +85,17 @@ public class Service extends Object {
         this.password = password;
     }
 
-    public Service (URL url,
-                    String name,
-                    boolean restricted,
-                    String serviceType) {
+    public Service(URL url,
+                   String name,
+                   boolean restricted,
+                   String serviceType) {
         this (url, name, restricted, guessServiceType(serviceType), "", "");
     }
 
-    public Service (URL url,
-                    String name,
-                    boolean restricted,
-                    ServiceType serviceType) {
+    public Service(URL url,
+                   String name,
+                   boolean restricted,
+                   ServiceType serviceType) {
         this(url,
                 name,
                 restricted,
@@ -102,12 +104,12 @@ public class Service extends Object {
                 "");
     }
 
-    public Service (URL url,
-                    String name,
-                    boolean restricted,
-                    ServiceType serviceType,
-                    String username,
-                    String password) {
+    public Service(URL url,
+                   String name,
+                   boolean restricted,
+                   ServiceType serviceType,
+                   String username,
+                   String password) {
         this.serviceURL = url;
         this.name = name;
         this.restricted = restricted;
@@ -121,45 +123,85 @@ public class Service extends Object {
         }
     }
 
+    /**
+     * Sets the Username.
+     * @param username the username
+     */
     public void setUsername(String username) {
         this.username = username;
         this.loaded = false;
     }
 
+    /**
+     * Sets the Password.
+     * @param password the Pasword
+     */
     public void setPassword(String password) {
         this.password = password;
         this.loaded = false;
     }
 
+    /**
+     * gets the URL.
+     * @return the URL.
+     */
     public URL getServiceURL() {
         return serviceURL;
     }
 
+    /**
+     * gehts the service Type.
+     * @return the service Type.
+     */
     public ServiceType getServiceType() {
         return serviceType;
     }
 
+    /**
+     * returns an additional message.
+     * @return additional message
+     */
     public String getAdditionalMessage() {
         return additionalMessage;
     }
 
+    /**
+     * gets the username.
+     * @return the username.
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * gets the password.
+     * @return the password.
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * gets the name.
+     * @return the name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * returns restricition.
+     * @return true if restricted; false if not
+     */
     public boolean isRestricted() {
         return restricted;
     }
 
-    public void load() throws IOException{
+    /**
+     * loads all additional infos.
+     * @throws IOException when something goes worng
+     */
+    public void load() throws IOException {
         if (!this.loaded) {
             this.additionalMessage = new String();
             int headStatus = ServiceChecker.tryHead(serviceURL);
@@ -208,7 +250,7 @@ public class Service extends Object {
 
     private void checkServiceType() {
         if (this.isRestricted()) {
-            if (this.username!= null && this.password != null) {
+            if (this.username != null && this.password != null) {
                 if (!this.username.isEmpty()
                         && !this.password.isEmpty()) {
                     this.serviceType = ServiceChecker.checkService(
@@ -224,6 +266,10 @@ public class Service extends Object {
         }
     }
 
+    /**
+     * returns the hashcode.
+     * @return the hashcode
+     */
     public int hashCode() {
         int code = 0;
         if (this.name != null) {
@@ -244,6 +290,11 @@ public class Service extends Object {
         return code;
     }
 
+    /**
+     * checks if given object is equal.
+     * @param s given object
+     * @return true if equal; false if not
+     */
     public boolean equals(Service s) {
         if (s != null) {
             if (s.hashCode() == this.hashCode()) {
@@ -252,6 +303,12 @@ public class Service extends Object {
         }
         return false;
     }
+
+    /**
+     * guesses the service Type based on String.
+     * @param typeString the string
+     * @return service Type
+     */
     public static ServiceType guessServiceType(String typeString) {
         typeString = typeString.toLowerCase();
         if (typeString.contains(ATOM)) {

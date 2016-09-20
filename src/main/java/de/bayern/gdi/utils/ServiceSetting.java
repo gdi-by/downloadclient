@@ -223,7 +223,7 @@ public class ServiceSetting {
                                 serviceName,
                                 restricted);
                         servicesList.add(service);
-                    } catch (MalformedURLException e){
+                    } catch (MalformedURLException e) {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
