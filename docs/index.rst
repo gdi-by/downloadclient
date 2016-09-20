@@ -209,11 +209,11 @@ serviceSetting.xml
 
 Hier können folgende Einstellungen angepasst werden:
 
-- im Element `<catalogues>`: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
+- im Element ``<catalogues>``: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
 
-- im Element `<wms>`: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
+- im Element ``<wms>``: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
 
-- im Element `<services>`: in die Dienstesuche fest eingebundene Downloaddienste
+- im Element ``<services>``: in die Dienstesuche fest eingebundene Downloaddienste
 
 verarbeitungsschritte.xml
 ---------------------------
@@ -221,11 +221,11 @@ verarbeitungsschritte.xml
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
--	im Element `<Befehl>`: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
+-	im Element ``<Befehl>``: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
 
 - im Element `<ParameterSet>`: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
 
-- im Element `<Eingabeelement>`: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
+- im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
 
 
 mimetypes.xml
