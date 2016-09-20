@@ -851,12 +851,19 @@ public class Controller {
                         //TODO: Check deep if user/pw was correct
                         setStatusTextUI(
                                 I18n.getMsg("status.type.atom"));
-                        Atom atom = new Atom(
+                        Atom atom = null;
+                        try {
+                            atom = new Atom(
                                 dataBean.getSelectedService()
                                         .getServiceURL().toString(),
                                 dataBean.getUserName(),
                                 dataBean.getPassword());
-                        dataBean.setAtomService(atom);
+                            dataBean.setAtomService(atom);
+                        } catch (IllegalArgumentException e) {
+                            dataBean.setAtomService(atom);
+                            setStatusTextUI(I18n.getMsg("status.service.broken"));
+                            return 1;
+                        }
                         break;
                     case WFSOne:
                         setStatusTextUI(
