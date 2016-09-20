@@ -192,8 +192,9 @@ public class Controller {
      */
     @FXML protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-                selectService(serviceURL.getText());
-                chooseService();
+            resetGui();
+            selectService(serviceURL.getText());
+            chooseService();
         }
     }
 
@@ -326,9 +327,6 @@ public class Controller {
                         dataBean.setSelectedService(service);
                     }
                 }
-                Platform.runLater(() -> {
-                    resetGui();
-                });
                 if (!ServiceChecker
                         .isReachable(dataBean
                                 .getSelectedService()
@@ -818,7 +816,6 @@ public class Controller {
                     setStatusTextUI(I18n.getMsg("status.no-url"));
                     return 0;
                 }
-                resetGui();
                 serviceURL.getScene().setCursor(Cursor.WAIT);
                 if (dataBean.getSelectedService().isRestricted()) {
                     if ((dataBean.getSelectedService().getUsername()
