@@ -47,7 +47,6 @@ public class DataBean extends Observable {
     private Map<String, String> namePwMap;
     private List<Service> staticServices;
     private List<Service> catalogServices;
-    private ServiceType serviceType;
     private ItemModel dataType;
     private Atom atomService;
     private WFSMeta wfsService;
@@ -195,20 +194,13 @@ public class DataBean extends Observable {
         return dataType;
     }
 
-    /**
-     * Set the service type.
-     * @param type the service type
-     */
-    public void setServiceType(ServiceType type) {
-        this.serviceType = type;
-    }
 
     /**
      * Get the service type.
      * @return the service type
      */
     public ServiceType getServiceType() {
-        return this.serviceType;
+        return this.selectedService.getServiceType();
     }
 
     /**
@@ -232,7 +224,6 @@ public class DataBean extends Observable {
      * @param webService webservice
      */
     public void setAtomService(Atom webService) {
-        this.serviceType = ServiceType.Atom;
         this.atomService = webService;
     }
 
@@ -241,7 +232,6 @@ public class DataBean extends Observable {
      * @param webService webservice
      */
     public void setWFSService(WFSMeta webService) {
-        this.serviceType = ServiceType.WFSTwo;
         this.wfsService = webService;
     }
 
