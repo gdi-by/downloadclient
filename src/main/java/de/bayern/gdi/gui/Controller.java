@@ -803,12 +803,6 @@ public class Controller {
                 servicePW.setDisable(false);
             }
 
-            private void setUnreachable() {
-                setStatusTextUI(
-                    I18n.format("status.service-not-available"));
-                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-            }
-
             private void unsetAuth() {
                 setStatusTextUI(
                         I18n.format("status.ready"));
