@@ -207,7 +207,9 @@ public class Service extends Object {
                 this.additionalMessage = new String();
                 int headStatus = ServiceChecker.tryHead(serviceURL);
                 if (headStatus == HttpStatus.SC_OK) {
-                    this.restricted = ServiceChecker.isRestricted(this.serviceURL);
+                    this.restricted = ServiceChecker.isRestricted(
+                            this.serviceURL
+                    );
                     if (this.serviceType == null) {
                         checkServiceType();
                         if (this.serviceType != null) {

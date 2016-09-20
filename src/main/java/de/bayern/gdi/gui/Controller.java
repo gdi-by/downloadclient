@@ -870,7 +870,6 @@ public class Controller {
                 }
                 switch (dataBean.getSelectedService().getServiceType()) {
                     case Atom:
-                        //TODO: Check deep if user/pw was correct
                         setStatusTextUI(
                                 I18n.getMsg("status.type.atom"));
                         Atom atom = null;
@@ -883,7 +882,9 @@ public class Controller {
                             dataBean.setAtomService(atom);
                         } catch (IllegalArgumentException e) {
                             dataBean.setAtomService(atom);
-                            setStatusTextUI(I18n.getMsg("status.service.broken"));
+                            setStatusTextUI(
+                                    I18n.getMsg("status.service.broken")
+                            );
                             resetGui();
                             return 0;
                         }
