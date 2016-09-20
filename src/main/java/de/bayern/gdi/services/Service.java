@@ -203,38 +203,41 @@ public class Service extends Object {
      */
     public void load() throws IOException {
         if (!this.loaded) {
-            this.additionalMessage = new String();
-            int headStatus = ServiceChecker.tryHead(serviceURL);
-            if (headStatus == HttpStatus.SC_OK) {
-                this.restricted = ServiceChecker.isRestricted(this.serviceURL);
-                if (this.serviceType == null) {
-                    checkServiceType();
-                    if (this.serviceType != null) {
-                        return;
+            try {
+                this.additionalMessage = new String();
+                int headStatus = ServiceChecker.tryHead(serviceURL);
+                if (headStatus == HttpStatus.SC_OK) {
+                    this.restricted = ServiceChecker.isRestricted(this.serviceURL);
+                    if (this.serviceType == null) {
+                        checkServiceType();
+                        if (this.serviceType != null) {
+                            return;
+                        }
                     }
-                }
-            } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
-                this.restricted = true;
-                checkServiceType();
-                if (serviceType != null) {
-                    return;
-                }
-            }
-            // Only append to the URL if the Service is not restricted.
-            if (!this.restricted) {
-                URL newURL = guessURL(this.serviceURL);
-                if (newURL.equals(this.serviceURL)) {
-                    additionalMessage = "The URL is not reachable";
-                } else {
-                    this.serviceURL = newURL;
+                } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
+                    this.restricted = true;
                     checkServiceType();
                     if (serviceType != null) {
                         return;
                     }
                 }
+                // Only append to the URL if the Service is not restricted.
+                if (!this.restricted) {
+                    URL newURL = guessURL(this.serviceURL);
+                    if (newURL.equals(this.serviceURL)) {
+                        additionalMessage = "The URL is not reachable";
+                    } else {
+                        this.serviceURL = newURL;
+                        checkServiceType();
+                        if (serviceType != null) {
+                            return;
+                        }
+                    }
+                }
+                additionalMessage = "The service could not be determined";
+            } finally {
+                loaded = true;
             }
-            additionalMessage = "The service could not be determined";
-            loaded = true;
         }
     }
 
@@ -305,6 +308,14 @@ public class Service extends Object {
             }
         }
         return false;
+    }
+
+    /**
+     * checks if the object is loded.
+     * @return true if loaded; false if not
+     */
+    public boolean isLoaded() {
+        return this.loaded;
     }
 
     /**

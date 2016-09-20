@@ -802,8 +802,6 @@ public class Controller {
             }
 
             private void unsetAuth() {
-                setStatusTextUI(
-                        I18n.format("status.ready"));
                 serviceAuthenticationCbx.setSelected(false);
                 serviceUser.setDisable(true);
                 servicePW.setDisable(true);
@@ -811,13 +809,34 @@ public class Controller {
 
             @Override
             protected Integer call() throws Exception {
+                System.out.println("Call");
                 if (serviceURL.getText() == null
                         || serviceURL.getText().isEmpty()) {
                     setStatusTextUI(I18n.getMsg("status.no-url"));
+                    System.out.println("URL Field Empty");
                     return 0;
                 }
                 serviceURL.getScene().setCursor(Cursor.WAIT);
+                System.out.println("Waiting stuff");
+                Service sel = dataBean.getSelectedService();
+                while (true) {
+                    sel = dataBean.getSelectedService();
+                    if (sel != null) {
+                        if (sel.isLoaded()) {
+                            break;
+                        }
+                    }
+                }
+                /*
+                while (dataBean.getSelectedService() == null
+                        && dataBean.getSelectedService().isLoaded() != true) {
+                    System.out.println("Is not loaded");
+                }
+                Service sel = dataBean.getSelectedService();
+                */
+                System.out.println("Is Loaded");
                 if (dataBean.getSelectedService().isRestricted()) {
+                    System.out.println("Is restricted");
                     if ((dataBean.getSelectedService().getUsername()
                                 == null
                             && dataBean.getSelectedService().getPassword()
@@ -828,14 +847,17 @@ public class Controller {
                                 .equals(""))) {
                         setAuth();
                         serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        System.out.println("Auth stuff");
                         return 0;
                     } else {
+                        System.out.println("Has auth");
                         dataBean.setUsername(dataBean.getSelectedService()
                                 .getUsername());
                         dataBean.setPassword(dataBean.getSelectedService()
                                 .getPassword());
                     }
                 } else {
+                    System.out.println("unset Auth");
                     unsetAuth();
                 }
                 if (dataBean.getSelectedService().getServiceType() == null) {
@@ -863,7 +885,6 @@ public class Controller {
                             dataBean.setAtomService(atom);
                             setStatusTextUI(I18n.getMsg("status.service.broken"));
                             resetGui();
-                            Thread.sleep(3000);
                             return 0;
                         }
                         break;
@@ -906,6 +927,7 @@ public class Controller {
                             getSelectionModel().select(0);
                     statusBarText.setText(I18n.getMsg("status.ready"));
                 });
+                System.out.println("Back to default.");
                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
                 return 0;
             }
@@ -1002,7 +1024,6 @@ public class Controller {
     private void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
-            statusBarText.setText(I18n.format("status.ready"));
             Atom.Item item = (Atom.Item)data.getItem();
             try {
                 item.load();
