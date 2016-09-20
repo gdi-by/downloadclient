@@ -244,6 +244,9 @@ public class Service extends Object {
                 && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
             return url;
         } else {
+            if (urlStr.endsWith("?")) {
+                urlStr = urlStr.substring(0, urlStr.lastIndexOf("?"));
+            }
             return new URL(urlStr + URL_TRY_APPENDIX);
         }
     }
