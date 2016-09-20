@@ -202,7 +202,7 @@ proxy.xml
 Alternative HTTP(S) Proxy-Einstellungen können folgendermaßen konfiguriert werden:
 
  <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
-Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann overrideSystemSetting="false" gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
+Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
 
 serviceSetting.xml
 ---------------------
@@ -223,7 +223,7 @@ Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitung
 
 -	im Element ``<Befehl>``: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
 
-- im Element `<ParameterSet>`: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
+- im Element ``<ParameterSet>``: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
 
 - im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
 
