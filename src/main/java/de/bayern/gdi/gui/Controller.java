@@ -862,7 +862,9 @@ public class Controller {
                         } catch (IllegalArgumentException e) {
                             dataBean.setAtomService(atom);
                             setStatusTextUI(I18n.getMsg("status.service.broken"));
-                            return 1;
+                            resetGui();
+                            Thread.sleep(3000);
+                            return 0;
                         }
                         break;
                     case WFSOne:
