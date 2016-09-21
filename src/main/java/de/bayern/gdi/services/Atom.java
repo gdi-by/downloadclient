@@ -318,7 +318,8 @@ public class Atom {
      */
     public Atom(String serviceURL, String userName, String password)
             throws URISyntaxException, SAXException,
-            ParserConfigurationException, IOException {
+            ParserConfigurationException, IOException,
+            IllegalArgumentException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
@@ -417,9 +418,12 @@ public class Atom {
             Geometry polygon = null;
             try {
                 polygon = reader.read(bboxStr);
-            } catch (ParseException | IllegalArgumentException e) {
+            } catch (ParseException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
                 continue;
+            } catch (IllegalArgumentException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+                throw e;
             }
 
             Envelope env = polygon.getEnvelopeInternal();

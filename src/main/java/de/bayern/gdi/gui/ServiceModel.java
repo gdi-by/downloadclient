@@ -17,64 +17,52 @@
  */
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.services.Service;
 import de.bayern.gdi.utils.I18n;
+import java.net.URL;
 
 /**
  * UI model for services.
  */
-public class ServiceModel {
+public class ServiceModel implements ItemModel {
 
-    private String name;
-    private String url;
-    private String version;
-    private boolean restricted;
+    private Service service;
 
+    public ServiceModel(Service service) {
+        this.service = service;
+    }
+
+    public String getDataset() {
+        return getName();
+    }
+
+    public Service getItem() {
+        return this.service;
+    }
     /**
      * Get the service name.
      * @return the name
      */
     public String getName() {
-        return name;
+        return this.service.getName();
     }
 
-    /**
-     * Set the service name.
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
      * Get the service url.
      * @return the url
      */
-    public String getUrl() {
-        return url;
+    public URL getUrl() {
+        return this.service.getServiceURL();
     }
 
-    /**
-     * Set the service url.
-     * @param url the url to set
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     /**
      * Get the service version.
      * @return the version
      */
     public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Set the service version.
-     * @param version the version to set
-     */
-    public void setVersion(String version) {
-        this.version = version;
+        return this.service.getServiceType().toString();
     }
 
     /**
@@ -82,22 +70,15 @@ public class ServiceModel {
      * @return the restricted
      */
     public boolean isRestricted() {
-        return restricted;
+        return this.service.isRestricted();
     }
 
-    /**
-     * Set authentication required.
-     * @param restricted the restricted to set
-     */
-    public void setRestricted(boolean restricted) {
-        this.restricted = restricted;
-    }
 
     @Override
     public String toString() {
-        if (this.restricted) {
-            return  I18n.format("gui.restricted", this.name);
+        if (this.service.isRestricted()) {
+            return  I18n.format("gui.restricted", this.service.getName());
         }
-        return this.name;
+        return this.service.getName();
     }
 }
