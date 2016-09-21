@@ -928,12 +928,14 @@ public class Controller {
                 log.log(Level.WARNING,
                         "Could not determine URL",
                         dataBean.getSelectedService());
-                Platform.runLater(() -> {
                     setStatusTextUI(I18n.getMsg("status.no-url"));
-                });
                 break;
         }
-        setServiceTypes();
+        if (dataBean.isWebServiceSet()) {
+            setServiceTypes();
+        } else {
+            return;
+        }
         serviceTypeChooser.
                 getSelectionModel().select(0);
         statusBarText.setText(I18n.getMsg("status.ready"));
