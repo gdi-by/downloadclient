@@ -117,7 +117,6 @@ public class DataBean extends Observable {
      */
     public void setSelectedService(Service smi) throws IOException {
         this.selectedService = smi;
-        this.selectedService.load();
     }
 
     /**
