@@ -50,26 +50,10 @@ public class Service extends Object {
 
     }
 
-    public Service(URL url) {
-        this(url, url.toString());
-    }
-
-    public Service(URL url,
-                   String name) {
-        this(url, name, ServiceChecker.isRestricted(url));
-    }
-
     public Service(URL url,
                    String name,
                    boolean restricted) {
         this(url, name, restricted, "", "");
-    }
-
-    public Service(URL url,
-                   String name,
-                   String username,
-                   String password) {
-        this (url, name, ServiceChecker.isRestricted(url), username, password);
     }
 
     public Service(URL url,
@@ -83,13 +67,6 @@ public class Service extends Object {
         this.loaded = false;
         this.username = username;
         this.password = password;
-    }
-
-    public Service(URL url,
-                   String name,
-                   boolean restricted,
-                   String serviceType) {
-        this (url, name, restricted, guessServiceType(serviceType), "", "");
     }
 
     public Service(URL url,
@@ -119,6 +96,7 @@ public class Service extends Object {
             this.serviceType = serviceType;
             this.loaded = true;
         }  else {
+            this.serviceType = null;
             this.loaded = false;
         }
     }

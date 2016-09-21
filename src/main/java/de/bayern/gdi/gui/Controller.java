@@ -263,9 +263,11 @@ public class Controller {
                     service.setPassword(this.servicePW.getText());
                     service.setUsername(this.serviceUser.getText());
                 } else {
+                    URL sURL = new URL(this.serviceURL.getText());
                     service = new Service(
-                            new URL(this.serviceURL.getText()),
+                            sURL,
                             "",
+                            ServiceChecker.isRestricted(sURL),
                             this.serviceUser.getText(),
                             this.servicePW.getText());
                 }
@@ -369,61 +371,62 @@ public class Controller {
     }
 
     private boolean selectService(Service service) {
-        try {
-            if (ServiceChecker.isReachable(service.getServiceURL())) {
+        if (ServiceChecker.isReachable(service.getServiceURL())) {
+            try {
                 service.load();
-            } else {
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
                 Platform.runLater(() -> {
                     setStatusTextUI(
-                            I18n.format("status.service-not-available"));
+                            I18n.format("status.service.broken"));
                 });
                 return false;
             }
-            if (dataBean.getSelectedService() != null) {
-                if (dataBean.getSelectedService().equals(service)) {
-                    Platform.runLater(() -> {
-                        setStatusTextUI(
-                                I18n.format("status.ready"));
-                    });
-                    return true;
-                }
-            }
-            dataBean.setSelectedService(service);
-            Platform.runLater(() -> {
-                resetGui();
-                this.serviceURL.setText(
-                        dataBean.getSelectedService().getServiceURL().toString()
-                );
-            });
-            if (((dataBean.getSelectedService().getUsername() != null
-                    && dataBean.getSelectedService().getPassword() != null)
-                    || (dataBean.getSelectedService().getUsername().isEmpty()
-                    && dataBean.getSelectedService().getPassword().isEmpty()))
-                    && dataBean.getSelectedService().isRestricted()) {
-                Platform.runLater(() -> {
-                    setStatusTextUI(
-                            I18n.format("status.service-needs-auth"));
-                    this.serviceAuthenticationCbx.setSelected(true);
-                    this.serviceUser.setDisable(false);
-                    this.servicePW.setDisable(false);
-                });
-                return false;
-            } else {
-                Platform.runLater(() -> {
-                    this.serviceAuthenticationCbx.setSelected(false);
-                    this.serviceUser.setDisable(true);
-                    this.servicePW.setDisable(true);
-                    clearUserNamePassword();
-                });
-            }
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+        } else {
             Platform.runLater(() -> {
                 setStatusTextUI(
-                        I18n.format("status.service.broken"));
+                        I18n.format("status.service-not-available"));
             });
             return false;
         }
+        if (dataBean.getSelectedService() != null) {
+            if (dataBean.getSelectedService().equals(service)) {
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.format("status.ready"));
+                });
+                return true;
+            }
+        }
+        dataBean.setSelectedService(service);
+        Platform.runLater(() -> {
+            resetGui();
+            this.serviceURL.setText(
+                    dataBean.getSelectedService().getServiceURL().toString()
+            );
+        });
+        if (((dataBean.getSelectedService().getUsername() != null
+                && dataBean.getSelectedService().getPassword() != null)
+                || (dataBean.getSelectedService().getUsername().isEmpty()
+                && dataBean.getSelectedService().getPassword().isEmpty()))
+                && dataBean.getSelectedService().isRestricted()) {
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.service-needs-auth"));
+                this.serviceAuthenticationCbx.setSelected(true);
+                this.serviceUser.setDisable(false);
+                this.servicePW.setDisable(false);
+            });
+            return false;
+        } else {
+            Platform.runLater(() -> {
+                this.serviceAuthenticationCbx.setSelected(false);
+                this.serviceUser.setDisable(true);
+                this.servicePW.setDisable(true);
+                clearUserNamePassword();
+            });
+        }
+
         Platform.runLater(() -> {
             setStatusTextUI(
                     I18n.format("status.ready"));
@@ -904,8 +907,8 @@ public class Controller {
         switch (dataBean.getSelectedService().getServiceType()) {
             case Atom:
                 Platform.runLater(() -> {
-                            setStatusTextUI(
-                                    I18n.getMsg("status.type.atom"));
+                    setStatusTextUI(
+                            I18n.getMsg("status.type.atom"));
                 });
                 Atom atom = null;
                 try {
@@ -921,10 +924,10 @@ public class Controller {
                         | IOException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
                     Platform.runLater(() -> {
-                                setStatusTextUI(
-                                        I18n.getMsg("status.service.broken")
-                                );
-                            });
+                        setStatusTextUI(
+                                I18n.getMsg("status.service.broken")
+                        );
+                    });
                     resetGui();
                     return;
                 } finally {
@@ -933,9 +936,9 @@ public class Controller {
                 break;
             case WFSOne:
                 Platform.runLater(() -> {
-                            setStatusTextUI(
-                                    I18n.getMsg("status.type.wfsone"));
-                        });
+                    setStatusTextUI(
+                            I18n.getMsg("status.type.wfsone"));
+                });
                 WFSMetaExtractor wfsOne =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -959,9 +962,9 @@ public class Controller {
                 break;
             case WFSTwo:
                 Platform.runLater(() -> {
-                            setStatusTextUI(
-                                    I18n.getMsg("status.type.wfstwo"));
-                        });
+                    setStatusTextUI(
+                            I18n.getMsg("status.type.wfstwo"));
+                });
                 WFSMetaExtractor extractor =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -1000,9 +1003,9 @@ public class Controller {
             return;
         }
         Platform.runLater(() -> {
-                    serviceTypeChooser.
-                            getSelectionModel().select(0);
-                    statusBarText.setText(I18n.getMsg("status.ready"));
+            serviceTypeChooser.
+                    getSelectionModel().select(0);
+            statusBarText.setText(I18n.getMsg("status.ready"));
         });
         return;
 

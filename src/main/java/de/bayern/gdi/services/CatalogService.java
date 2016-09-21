@@ -296,7 +296,7 @@ public class CatalogService {
                         Service service = new Service(new URL(serviceURL),
                                 serviceName,
                                 restricted,
-                                serviceTypeVersion);
+                                Service.guessServiceType(serviceTypeVersion));
                         services.add(service);
                     }
                 }
