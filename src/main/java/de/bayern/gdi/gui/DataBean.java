@@ -52,8 +52,6 @@ public class DataBean extends Observable {
     private WFSMeta wfsService;
     private ArrayList<String> serviceTypes;
     private ArrayList<Attribute> attributes;
-    private String userName;
-    private String password;
     private ArrayList<ProcessingStep> processingSteps;
     private Service selectedService;
 
@@ -312,38 +310,6 @@ public class DataBean extends Observable {
             }
         }
         return null;
-    }
-
-    /**
-     * sets the Username.
-     * @param username the username
-     */
-    public void setUsername(String username) {
-        this.userName = username;
-    }
-
-    /**
-     * gets the username.
-     * @return the username
-     */
-    public String getUserName() {
-        return this.userName;
-    }
-
-    /**
-     * sets the password.
-     * @param password the password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * gets the password.
-     * @return the password
-     */
-    public String getPassword() {
-        return this.password;
     }
 
     /**

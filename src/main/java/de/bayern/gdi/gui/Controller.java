@@ -276,7 +276,8 @@ public class Controller {
                 Task task = new Task() {
                     protected Integer call() {
                         try {
-                            if (selectService(service)) {
+                            boolean serviceSelected = selectService(service);
+                            if (serviceSelected) {
                                 chooseSelectedService();
                             }
                             return 0;
@@ -384,7 +385,7 @@ public class Controller {
                         setStatusTextUI(
                                 I18n.format("status.ready"));
                     });
-                    return false;
+                    return true;
                 }
             }
             dataBean.setSelectedService(service);
@@ -807,8 +808,8 @@ public class Controller {
             DownloadStep ds = dataBean.convertToDownloadStep(savePath);
             try {
                 DownloadStepConverter dsc = new DownloadStepConverter(
-                        dataBean.getUserName(),
-                        dataBean.getPassword());
+                        dataBean.getSelectedService().getUsername(),
+                        dataBean.getSelectedService().getPassword());
                 JobList jl = dsc.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
@@ -911,8 +912,8 @@ public class Controller {
                     atom = new Atom(
                             dataBean.getSelectedService()
                                     .getServiceURL().toString(),
-                            dataBean.getUserName(),
-                            dataBean.getPassword());
+                            dataBean.getSelectedService().getUsername(),
+                            dataBean.getSelectedService().getPassword());
                 } catch (IllegalArgumentException
                         | URISyntaxException
                         | SAXException
@@ -939,8 +940,8 @@ public class Controller {
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
                                         .getServiceURL().toString(),
-                                dataBean.getUserName(),
-                                dataBean.getPassword());
+                                dataBean.getSelectedService().getUsername(),
+                                dataBean.getSelectedService().getPassword());
                 WFSMeta metaOne = null;
                 try {
                     metaOne = wfsOne.parse();
@@ -965,8 +966,8 @@ public class Controller {
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
                                         .getServiceURL().toString(),
-                                dataBean.getUserName(),
-                                dataBean.getPassword());
+                                dataBean.getSelectedService().getUsername(),
+                                dataBean.getSelectedService().getPassword());
                 WFSMeta meta = null;
                 try {
                     meta = extractor.parse();
