@@ -388,8 +388,16 @@ public class Controller {
                 }
             }
             dataBean.setSelectedService(service);
-            if (dataBean.getSelectedService().getUsername().isEmpty()
-                    && dataBean.getSelectedService().getPassword().isEmpty()
+            Platform.runLater(() -> {
+                resetGui();
+                this.serviceURL.setText(
+                        dataBean.getSelectedService().getServiceURL().toString()
+                );
+            });
+            if (((dataBean.getSelectedService().getUsername() != null
+                    && dataBean.getSelectedService().getPassword() != null)
+                    || (dataBean.getSelectedService().getUsername().isEmpty()
+                    && dataBean.getSelectedService().getPassword().isEmpty()))
                     && dataBean.getSelectedService().isRestricted()) {
                 Platform.runLater(() -> {
                     setStatusTextUI(
@@ -407,12 +415,6 @@ public class Controller {
                     clearUserNamePassword();
                 });
             }
-            Platform.runLater(() -> {
-                resetGui();
-                this.serviceURL.setText(
-                        dataBean.getSelectedService().getServiceURL().toString()
-                );
-            });
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             Platform.runLater(() -> {
