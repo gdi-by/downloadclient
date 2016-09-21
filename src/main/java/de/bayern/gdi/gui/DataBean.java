@@ -92,6 +92,8 @@ public class DataBean extends Observable {
 
         this.staticServices = serviceSetting.getServices();
 
+        this.attributes = new ArrayList<Attribute>();
+
         this.catalogServices = new ArrayList<Service>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
             try {
@@ -142,7 +144,6 @@ public class DataBean extends Observable {
         this.atomService = null;
         this.wfsService = null;
         this.namePwMap.clear();
-        this.attributes.clear();
     }
 
     /**
