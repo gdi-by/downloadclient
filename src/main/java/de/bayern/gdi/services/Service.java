@@ -212,28 +212,23 @@ public class Service extends Object {
                     );
                     if (this.serviceType == null) {
                         checkServiceType();
-                        if (this.serviceType != null) {
-                            return;
+                        if (this.serviceType == null) {
+                            if (!checkURLOptionsAndSetType()) {
+                                return;
+                            }
                         }
                     }
                 } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
                     this.restricted = true;
                     checkServiceType();
-                    if (serviceType != null) {
-                        return;
-                    }
-                }
-                // Only append to the URL if the Service is not restricted.
-                if (!this.restricted) {
-                    URL newURL = guessURL(this.serviceURL);
-                    if (newURL.equals(this.serviceURL)) {
-                        additionalMessage = "The URL is not reachable";
-                    } else {
-                        this.serviceURL = newURL;
-                        checkServiceType();
-                        if (serviceType != null) {
+                    if (serviceType == null) {
+                        if (!checkURLOptionsAndSetType()) {
                             return;
                         }
+                    }
+                } else {
+                    if (!checkURLOptionsAndSetType()) {
+                        return;
                     }
                 }
                 additionalMessage = "The service could not be determined";
@@ -241,6 +236,31 @@ public class Service extends Object {
                 loaded = true;
             }
         }
+    }
+
+    private boolean checkURLOptionsAndSetType() {
+        try {
+            URL newURL = guessURL(this.serviceURL);
+            if (!newURL.equals(this.serviceURL)) {
+                if (ServiceChecker.isReachable(newURL)) {
+                    ServiceType st;
+                    if (ServiceChecker.isRestricted(newURL)) {
+                        st = ServiceChecker.checkService(newURL, this
+                                .username, this.password);
+                    } else {
+                        st = ServiceChecker.checkService(newURL);
+                    }
+                    if (st != null) {
+                        this.serviceURL = newURL;
+                        this.serviceType = st;
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e ) {
+                return false;
+        }
+        return false;
     }
 
     private static URL guessURL(URL url) throws MalformedURLException {
