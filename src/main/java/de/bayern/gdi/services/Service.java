@@ -257,7 +257,7 @@ public class Service extends Object {
                     }
                 }
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
                 return false;
         }
         return false;
