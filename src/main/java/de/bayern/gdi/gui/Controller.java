@@ -26,7 +26,6 @@ import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
-import de.bayern.gdi.model.ServiceMetaInformation;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
@@ -34,6 +33,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
@@ -42,6 +42,7 @@ import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,6 +54,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -86,14 +88,15 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -105,83 +108,137 @@ public class Controller {
     private static final int BGCOLOR = 244;
     private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
     private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private static final Logger log
+            = Logger.getLogger(Controller.class.getName());
     private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
-
     private Stage primaryStage;
-
     private UIFactory factory;
-
     private boolean catalogReachable;
-
-    @FXML private Button buttonClose;
-    @FXML private MenuBar mainMenu;
-    @FXML private ListView serviceList;
-    @FXML private TextField searchField;
-    @FXML private TextField serviceURL;
-    @FXML private CheckBox serviceAuthenticationCbx;
-    @FXML private CheckBox chkChain;
-    @FXML private TextField serviceUser;
-    @FXML private TextField servicePW;
-    @FXML private Label statusBarText;
-    @FXML private ComboBox<ItemModel> serviceTypeChooser;
-    @FXML private ComboBox<ItemModel> atomVariationChooser;
-    @FXML private ComboBox dataFormatChooser;
-    @FXML private ComboBox<CRSModel> referenceSystemChooser;
-    @FXML private VBox simpleWFSContainer;
-    @FXML private VBox basicWFSContainer;
-    @FXML private VBox atomContainer;
-    @FXML private VBox chainContainer;
-    @FXML private Group mapNodeWFS;
-    @FXML private Group mapNodeAtom;
-    @FXML private TextField basicX1;
-    @FXML private TextField basicY1;
-    @FXML private TextField basicX2;
-    @FXML private TextField basicY2;
-    @FXML private TextField atomX1;
-    @FXML private TextField atomY1;
-    @FXML private TextField atomX2;
-    @FXML private TextField atomY2;
-    @FXML private Label labelURL;
-    @FXML private Label labelUser;
-    @FXML private Label labelPassword;
-    @FXML private Label labelSelectType;
-    @FXML private Label labelPostProcess;
-    @FXML private WebView valueAtomDescr;
-    @FXML private Label valueAtomFormat;
-    @FXML private Label valueAtomRefsys;
-    @FXML private Button serviceSelection;
-    @FXML private Button buttonDownload;
-    @FXML private Button buttonSaveConfig;
-    @FXML private Button addChainItem;
-    @FXML private ProgressIndicator progressSearch;
-    @FXML private HBox processStepContainter;
-    @FXML private HBox basicWFSX1Y1;
-    @FXML private HBox basicWFSX2Y2;
-    @FXML private Label referenceSystemChooserLabel;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
+
+    @FXML
+    private Button buttonClose;
+    @FXML
+    private MenuBar mainMenu;
+    @FXML
+    private ListView serviceList;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private TextField serviceURL;
+    @FXML
+    private CheckBox serviceAuthenticationCbx;
+    @FXML
+    private CheckBox chkChain;
+    @FXML
+    private TextField serviceUser;
+    @FXML
+    private TextField servicePW;
+    @FXML
+    private Label statusBarText;
+    @FXML
+    private ComboBox<ItemModel> serviceTypeChooser;
+    @FXML
+    private ComboBox<ItemModel> atomVariationChooser;
+    @FXML
+    private ComboBox dataFormatChooser;
+    @FXML
+    private ComboBox<CRSModel> referenceSystemChooser;
+    @FXML
+    private VBox simpleWFSContainer;
+    @FXML
+    private VBox basicWFSContainer;
+    @FXML
+    private VBox atomContainer;
+    @FXML
+    private VBox chainContainer;
+    @FXML
+    private Group mapNodeWFS;
+    @FXML
+    private Group mapNodeAtom;
+    @FXML
+    private TextField basicX1;
+    @FXML
+    private TextField basicY1;
+    @FXML
+    private TextField basicX2;
+    @FXML
+    private TextField basicY2;
+    @FXML
+    private TextField atomX1;
+    @FXML
+    private TextField atomY1;
+    @FXML
+    private TextField atomX2;
+    @FXML
+    private TextField atomY2;
+    @FXML
+    private Label labelURL;
+    @FXML
+    private Label labelUser;
+    @FXML
+    private Label labelPassword;
+    @FXML
+    private Label labelSelectType;
+    @FXML
+    private Label labelPostProcess;
+    @FXML
+    private WebView valueAtomDescr;
+    @FXML
+    private Label valueAtomFormat;
+    @FXML
+    private Label valueAtomRefsys;
+    @FXML
+    private Button serviceSelection;
+    @FXML
+    private Button buttonDownload;
+    @FXML
+    private Button buttonSaveConfig;
+    @FXML
+    private Button addChainItem;
+    @FXML
+    private ProgressIndicator progressSearch;
+    @FXML
+    private HBox processStepContainter;
+    @FXML
+    private HBox basicWFSX1Y1;
+    @FXML
+    private HBox basicWFSX2Y2;
+    @FXML
+    private Label referenceSystemChooserLabel;
+
+    /**
+     * Creates the Controller.
+     */
+    public Controller() {
+        this.factory = new UIFactory();
+        Processor.getInstance().addListener(new DownloadListener());
+
+    }
 
     /**
      * Handler to close the application.
      *
      * @param event The event.
      */
-    @FXML protected void handleCloseApp(ActionEvent event) {
+    @FXML
+    protected void handleCloseApp(ActionEvent event) {
         Alert closeDialog = new Alert(Alert.AlertType.CONFIRMATION);
         closeDialog.setTitle(I18n.getMsg("gui.confirm-exit"));
         closeDialog.setContentText(I18n.getMsg("gui.want-to-quit"));
         ButtonType confirm = new ButtonType(I18n.getMsg("gui.exit"));
         ButtonType cancel = new ButtonType(I18n.getMsg("gui.cancel"),
-            ButtonData.CANCEL_CLOSE);
+                ButtonData.CANCEL_CLOSE);
         closeDialog.getButtonTypes().setAll(confirm, cancel);
         Optional<ButtonType> res = closeDialog.showAndWait();
         if (res.get() == confirm) {
             Stage stage = (Stage) buttonClose.getScene().getWindow();
             stage.fireEvent(new WindowEvent(
-                stage,
-                WindowEvent.WINDOW_CLOSE_REQUEST
+                    stage,
+                    WindowEvent.WINDOW_CLOSE_REQUEST
             ));
         }
     }
@@ -191,10 +248,55 @@ public class Controller {
      *
      * @param event The mouse click event.
      */
-    @FXML protected void handleServiceSelectButton(MouseEvent event) {
+    @FXML
+    protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-                selectService(serviceURL.getText());
-                chooseService();
+            try {
+                ServiceModel serviceModel =
+                        (ServiceModel) this.serviceList.getSelectionModel()
+                                .getSelectedItems().get(0);
+                Service service;
+                if (serviceModel.getUrl().toString().equals(
+                        serviceURL.getText())
+                        ) {
+                    service = serviceModel.getItem();
+                    service.setPassword(this.servicePW.getText());
+                    service.setUsername(this.serviceUser.getText());
+                } else {
+                    URL sURL = new URL(this.serviceURL.getText());
+                    service = new Service(
+                            sURL,
+                            "",
+                            ServiceChecker.isRestricted(sURL),
+                            this.serviceUser.getText(),
+                            this.servicePW.getText());
+                }
+                serviceSelection.setDisable(true);
+                serviceURL.getScene().setCursor(Cursor.WAIT);
+                setStatusTextUI(
+                        I18n.format("status.checking-auth"));
+                Task task = new Task() {
+                    protected Integer call() {
+                        try {
+                            boolean serviceSelected = selectService(service);
+                            if (serviceSelected) {
+                                chooseSelectedService();
+                            }
+                            return 0;
+                        } finally {
+                            serviceSelection.setDisable(false);
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        }
+                    }
+                };
+                Thread th = new Thread(task);
+                th.setDaemon(true);
+                th.start();
+            } catch (MalformedURLException e) {
+                setStatusTextUI(
+                        I18n.format("status.no-url"));
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
         }
     }
 
@@ -203,7 +305,8 @@ public class Controller {
      *
      * @param event the event
      */
-    @FXML protected void handleSearch(KeyEvent event) {
+    @FXML
+    protected void handleSearch(KeyEvent event) {
         if (!catalogReachable) {
             statusBarText.setText(I18n.getMsg("status.catalog-not-available"));
         }
@@ -234,14 +337,16 @@ public class Controller {
                         progressSearch.setVisible(true);
                     });
                     if (catalogReachable) {
-                        List<ServiceModel> catalog =
+                        List<Service> catalog =
                                 dataBean.getCatalogService()
-                                .getServicesByFilter(currentText);
-                        for (ServiceModel entry : catalog) {
+                                        .getServicesByFilter(currentText);
+                        for (Service entry : catalog) {
                             dataBean.addCatalogServiceToList(entry);
                         }
                         Platform.runLater(() -> {
-                            subentries.addAll(catalog);
+                            for (Service entry : catalog) {
+                                subentries.add(new ServiceModel(entry));
+                            }
                         });
                     }
                     Platform.runLater(() -> {
@@ -265,117 +370,117 @@ public class Controller {
         this.servicePW.setText("");
     }
 
+    private boolean selectService(Service service) {
+        if (ServiceChecker.isReachable(service.getServiceURL())) {
+            try {
+                service.load();
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.format("status.service.broken"));
+                });
+                return false;
+            }
+        } else {
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.service-not-available"));
+            });
+            return false;
+        }
+        if (dataBean.getSelectedService() != null) {
+            if (dataBean.getSelectedService().equals(service)) {
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.format("status.ready"));
+                });
+                return true;
+            }
+        }
+        dataBean.setSelectedService(service);
+        Platform.runLater(() -> {
+            resetGui();
+            this.serviceURL.setText(
+                    dataBean.getSelectedService().getServiceURL().toString()
+            );
+        });
+        if (((dataBean.getSelectedService().getUsername() != null
+                && dataBean.getSelectedService().getPassword() != null)
+                || (dataBean.getSelectedService().getUsername().isEmpty()
+                && dataBean.getSelectedService().getPassword().isEmpty()))
+                && dataBean.getSelectedService().isRestricted()) {
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.service-needs-auth"));
+                this.serviceAuthenticationCbx.setSelected(true);
+                this.serviceUser.setDisable(false);
+                this.servicePW.setDisable(false);
+            });
+            return false;
+        } else {
+            Platform.runLater(() -> {
+                this.serviceAuthenticationCbx.setSelected(false);
+                this.serviceUser.setDisable(true);
+                this.servicePW.setDisable(true);
+                clearUserNamePassword();
+            });
+        }
+
+        Platform.runLater(() -> {
+            setStatusTextUI(
+                    I18n.format("status.ready"));
+        });
+        return true;
+    }
+
     /**
      * Handle the service selection.
      *
      * @param event The mouse click event.
      */
-    @FXML protected void handleServiceSelect(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY)
-            && event.getClickCount() > 1
-        ) {
-            clearUserNamePassword();
-            //chooseService();
-        } else if (event.getButton().equals(MouseButton.PRIMARY)
-            && event.getClickCount() == 1
-        ) {
-            if (this.serviceList.getSelectionModel().getSelectedItems().get(0)
-                    != null
-            ) {
-                ServiceModel service =
-                        (ServiceModel)this.serviceList.getSelectionModel()
+    @FXML
+    protected void handleServiceSelect(MouseEvent event) {
+        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+            if (event.getClickCount() == 1) {
+                clearUserNamePassword();
+                ServiceModel serviceModel =
+                        (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
-                selectService(service.getUrl());
+                if (serviceModel != null) {
+                    serviceSelection.setDisable(true);
+                    serviceURL.getScene().setCursor(Cursor.WAIT);
+                    setStatusTextUI(
+                            I18n.format("status.checking-auth"));
+                    Task task = new Task() {
+                        protected Integer call() {
+                            try {
+                                selectService(serviceModel.getItem());
+                                return 0;
+                            } finally {
+                                serviceSelection.setDisable(false);
+                                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                            }
+                        }
+                    };
+                    Thread th = new Thread(task);
+                    th.setDaemon(true);
+                    th.start();
+                }
+            } else if (event.getClickCount() > 1) {
+                clearUserNamePassword();
+                resetGui();
             }
         }
     }
 
-    private void selectService(String url) {
-        setStatusTextUI(
-                I18n.format("status.checking-auth"));
-        serviceSelection.setDisable(true);
-
-        serviceURL.getScene().setCursor(Cursor.WAIT);
-        Runnable task = () -> {
-            try {
-                ServiceMetaInformation smi =
-                        new ServiceMetaInformation(url,
-                                    serviceUser.getText(),
-                                    servicePW.getText());
-                if (dataBean.getSelectedService().equals(smi)) {
-                    setStatusTextUI(
-                            I18n.format("status.ready"));
-                    return;
-                } else {
-                    if (dataBean.getSelectedService().getServiceURL() != null
-                            && smi.getServiceURL().toString().equals(
-                                    dataBean.getSelectedService()
-                                    .getServiceURL().toString())
-                            ) {
-                        smi.setUsernamePassword(
-                                serviceUser.getText(),
-                                servicePW.getText());
-                        dataBean.setSelectedService(smi);
-                    } else {
-                        Platform.runLater(() -> {
-                            clearUserNamePassword();
-                        });
-                        dataBean.setSelectedService(smi);
-                    }
-                }
-                Platform.runLater(() -> {
-                    resetGui();
-                });
-                if (!ServiceChecker
-                        .isReachable(dataBean
-                                .getSelectedService()
-                                .getServiceURL())) {
-                    setStatusTextUI(
-                            I18n.format("status.service-not-available")
-                    );
-                    return;
-                }
-                Platform.runLater(() -> {
-                    serviceURL.setText(
-                        dataBean.getSelectedService()
-                                .getServiceURL().toString());
-                });
-                if (dataBean.getSelectedService().isRestricted()) {
-                    setStatusTextUI(
-                            I18n.format("status.service-needs-auth")
-                    );
-                    Platform.runLater(() -> {
-                        this.serviceAuthenticationCbx.setSelected(true);
-                        this.serviceUser.setDisable(false);
-                        this.servicePW.setDisable(false);
-                    });
-                    return;
-                } else {
-                        Platform.runLater(() -> {
-                                    this.serviceAuthenticationCbx
-                                            .setSelected(false);
-                                    this.serviceUser.setDisable(true);
-                                    this.servicePW.setDisable(true);
-                        });
-                        setStatusTextUI(
-                        I18n.format("status.ready"));
-                }
-            } catch (IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), url);
-            } finally {
-                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                serviceSelection.setDisable(false);
-            }
-        };
-        Thread thread = new Thread(task);
-        thread.start();
-    }
-
     /**
      * Handle authentication required selection.
+     *
      * @param event the event
      */
-    @FXML protected void handleAuthenticationRequired(ActionEvent event) {
+    @FXML
+    protected void handleAuthenticationRequired(ActionEvent event) {
         if (this.serviceAuthenticationCbx.isSelected()) {
             this.serviceUser.setDisable(false);
             this.servicePW.setDisable(false);
@@ -390,10 +495,11 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleServiceTypeSelect(ActionEvent event) {
+    @FXML
+    protected void handleServiceTypeSelect(ActionEvent event) {
         ItemModel item =
-            this.serviceTypeChooser.
-                getSelectionModel().getSelectedItem();
+                this.serviceTypeChooser.
+                        getSelectionModel().getSelectedItem();
         if (item != null) {
             dataBean.setDataType(item);
             dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
@@ -406,7 +512,8 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleDataformatSelect(ActionEvent event) {
+    @FXML
+    protected void handleDataformatSelect(ActionEvent event) {
         ComboBox source = (ComboBox) event.getSource();
         dataBean.addAttribute("outputformat",
                 source.getValue() != null
@@ -420,7 +527,8 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleAddChainItem(ActionEvent event) {
+    @FXML
+    protected void handleAddChainItem(ActionEvent event) {
         factory.addChainAttribute(this.dataBean, chainContainer);
     }
 
@@ -429,12 +537,13 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleReferenceSystemSelect(ActionEvent event) {
+    @FXML
+    protected void handleReferenceSystemSelect(ActionEvent event) {
         this.dataBean.addAttribute("srsName",
-            referenceSystemChooser.getValue() != null
-                ? referenceSystemChooser.
-                    getValue().getOldName()
-                : "EPSG:4326",
+                referenceSystemChooser.getValue() != null
+                        ? referenceSystemChooser.
+                        getValue().getOldName()
+                        : "EPSG:4326",
                 "");
         if (mapWFS != null && referenceSystemChooser.getValue() != null) {
             this.mapWFS.setDisplayCRS(
@@ -454,7 +563,8 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleVariationSelect(ActionEvent event) {
+    @FXML
+    protected void handleVariationSelect(ActionEvent event) {
         ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
         if (selim != null) {
             Atom.Field selaf = (Atom.Field) selim.getItem();
@@ -476,7 +586,7 @@ public class Controller {
         }
 
         Set<Node> parameter =
-            this.chainContainer.lookupAll("#process_parameter");
+                this.chainContainer.lookupAll("#process_parameter");
 
         if (parameter.isEmpty()) {
             return steps;
@@ -495,12 +605,12 @@ public class Controller {
             return steps;
         }
 
-        for (Node n: parameter) {
+        for (Node n : parameter) {
             Set<Node> vars = n.lookupAll("#process_var");
             Node nameNode = n.lookup("#process_name");
-            ComboBox namebox = (ComboBox)nameNode;
+            ComboBox namebox = (ComboBox) nameNode;
             ProcessingStepConfiguration psc =
-                (ProcessingStepConfiguration)namebox.getValue();
+                    (ProcessingStepConfiguration) namebox.getValue();
 
             String name = psc.getName();
 
@@ -516,19 +626,19 @@ public class Controller {
             ArrayList<Parameter> parameters = new ArrayList<>();
             step.setParameters(parameters);
 
-            for (Node v: vars) {
+            for (Node v : vars) {
                 String varName = null;
                 String varValue = null;
                 if (v instanceof TextField) {
-                    TextField input = (TextField)v;
+                    TextField input = (TextField) v;
                     varName = input.getUserData().toString();
                     varValue = input.getText();
                 } else if (v instanceof ComboBox) {
-                    ComboBox input = (ComboBox)v;
+                    ComboBox input = (ComboBox) v;
                     varName = input.getUserData().toString();
                     varValue = input.getValue() != null
-                        ? ((Option)input.getValue()).getValue()
-                        : null;
+                            ? ((Option) input.getValue()).getValue()
+                            : null;
                 }
                 if (varName != null && varValue != null) {
                     Parameter p = new Parameter(varName, varValue);
@@ -546,7 +656,7 @@ public class Controller {
 
             ObservableList<Node> children
                     = this.simpleWFSContainer.getChildren();
-            for (Node n: children) {
+            for (Node n : children) {
                 if (n.getClass() == HBox.class) {
                     HBox hbox = (HBox) n;
                     ObservableList<Node> hboxChildren = hbox.getChildren();
@@ -557,7 +667,7 @@ public class Controller {
                     Label l2 = null;
                     TextField tf = null;
                     ComboBox cb = null;
-                    for (Node hn: hboxChildren) {
+                    for (Node hn : hboxChildren) {
                         if (hn.getClass() == ComboBox.class) {
                             cb = (ComboBox) hn;
                         }
@@ -572,8 +682,8 @@ public class Controller {
                                 l2 = (Label) hn;
                             }
                         }
-                        if  (tf != null
-                            && (l1 != null
+                        if (tf != null
+                                && (l1 != null
                                 || l2 != null)) {
                             name = tf.getUserData().toString();
                             value = tf.getText();
@@ -654,14 +764,13 @@ public class Controller {
         }
     }
 
-
     private boolean validateInput() {
         String failed = "";
         ArrayList<DataBean.Attribute> attributes
-                                = this.dataBean.getAttributes();
+                = this.dataBean.getAttributes();
 
         Validator validator = Validator.getInstance();
-        for (DataBean.Attribute attribute: attributes) {
+        for (DataBean.Attribute attribute : attributes) {
             if (!attribute.type.equals("")) {
                 if (!validator.isValid(attribute.type, attribute.value)) {
                     if (failed.equals("")) {
@@ -674,7 +783,7 @@ public class Controller {
         }
         if (!failed.equals("")) {
             statusBarText.setText(
-                I18n.format("status.validation-fail", failed));
+                    I18n.format("status.validation-fail", failed));
             return false;
         }
         return true;
@@ -685,7 +794,8 @@ public class Controller {
      *
      * @param event The event
      */
-    @FXML protected void handleDownload(ActionEvent event) {
+    @FXML
+    protected void handleDownload(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
         if (validateInput()) {
@@ -701,8 +811,8 @@ public class Controller {
             DownloadStep ds = dataBean.convertToDownloadStep(savePath);
             try {
                 DownloadStepConverter dsc = new DownloadStepConverter(
-                        dataBean.getUserName(),
-                        dataBean.getPassword());
+                        dataBean.getSelectedService().getUsername(),
+                        dataBean.getSelectedService().getPassword());
                 JobList jl = dsc.convert(ds);
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
@@ -713,8 +823,10 @@ public class Controller {
     }
 
     private void resetGui() {
+        Platform.runLater(() -> {
+            this.serviceTypeChooser.getItems().retainAll();
+        });
         this.dataBean.reset();
-        this.serviceTypeChooser.getItems().retainAll();
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
@@ -724,8 +836,10 @@ public class Controller {
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
     }
+
     /**
      * Handle events on the process Chain Checkbox.
+     *
      * @param event the event
      */
     @FXML
@@ -737,8 +851,10 @@ public class Controller {
             processStepContainter.setVisible(false);
         }
     }
+
     /**
      * Handle config saving.
+     *
      * @param event The event.
      */
     @FXML
@@ -758,7 +874,7 @@ public class Controller {
             FileChooser.ExtensionFilter xmlFilter =
                     new FileChooser.ExtensionFilter("xml files (*.xml)",
                             "xml");
-            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml" ,
+            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
                     null);
             fileChooser.setInitialFileName(uniqueName.getName());
             fileChooser.getExtensionFilters().add(xmlFilter);
@@ -787,128 +903,112 @@ public class Controller {
     /**
      * Use selection to request the service data and fill th UI.
      */
-    private void chooseService() {
-        Task task = new Task() {
-            private void setAuth() {
-                setStatusTextUI(
-                    I18n.format("status.service-needs-auth"));
-                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                serviceAuthenticationCbx.setSelected(true);
-                serviceUser.setDisable(false);
-                servicePW.setDisable(false);
-            }
-
-            private void setUnreachable() {
-                setStatusTextUI(
-                    I18n.format("status.service-not-available"));
-                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-            }
-
-            private void unsetAuth() {
-                setStatusTextUI(
-                        I18n.format("status.ready"));
-                serviceAuthenticationCbx.setSelected(false);
-                serviceUser.setDisable(true);
-                servicePW.setDisable(true);
-            }
-
-            @Override
-            protected Integer call() throws Exception {
-                if (serviceURL.getText() == null
-                        || serviceURL.getText().isEmpty()) {
-                    setStatusTextUI(I18n.getMsg("status.no-url"));
-                    return 0;
-                }
-                resetGui();
-                serviceURL.getScene().setCursor(Cursor.WAIT);
-                if (dataBean.getSelectedService().isRestricted()) {
-                    if ((dataBean.getSelectedService().getUsername()
-                                == null
-                            && dataBean.getSelectedService().getPassword()
-                                == null)
-                            || (dataBean.getSelectedService().getUsername()
-                                .equals("")
-                            && dataBean.getSelectedService().getPassword()
-                                .equals(""))) {
-                        setAuth();
-                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                        return 0;
-                    } else {
-                        dataBean.setUsername(dataBean.getSelectedService()
-                                .getUsername());
-                        dataBean.setPassword(dataBean.getSelectedService()
-                                .getPassword());
-                    }
-                } else {
-                    unsetAuth();
-                }
-                if (dataBean.getSelectedService().getServiceType() == null) {
-                    log.log(Level.WARNING, "Could not determine "
-                            + "Service Type", dataBean.getSelectedService());
+    private void chooseSelectedService() {
+        switch (dataBean.getSelectedService().getServiceType()) {
+            case Atom:
+                Platform.runLater(() -> {
                     setStatusTextUI(
-                            I18n.getMsg("status.no-service-type"));
-                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                    return 0;
-                }
-                switch (dataBean.getSelectedService().getServiceType()) {
-                    case Atom:
-                        //TODO: Check deep if user/pw was correct
+                            I18n.getMsg("status.type.atom"));
+                });
+                Atom atom = null;
+                try {
+                    atom = new Atom(
+                            dataBean.getSelectedService()
+                                    .getServiceURL().toString(),
+                            dataBean.getSelectedService().getUsername(),
+                            dataBean.getSelectedService().getPassword());
+                } catch (IllegalArgumentException
+                        | URISyntaxException
+                        | SAXException
+                        | ParserConfigurationException
+                        | IOException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    Platform.runLater(() -> {
                         setStatusTextUI(
-                                I18n.getMsg("status.type.atom"));
-                        Atom atom = new Atom(
+                                I18n.getMsg("status.service.broken")
+                        );
+                    });
+                    resetGui();
+                    return;
+                } finally {
+                    dataBean.setAtomService(atom);
+                }
+                break;
+            case WFSOne:
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.getMsg("status.type.wfsone"));
+                });
+                WFSMetaExtractor wfsOne =
+                        new WFSMetaExtractor(
                                 dataBean.getSelectedService()
                                         .getServiceURL().toString(),
-                                dataBean.getUserName(),
-                                dataBean.getPassword());
-                        dataBean.setAtomService(atom);
-                        break;
-                    case WFSOne:
+                                dataBean.getSelectedService().getUsername(),
+                                dataBean.getSelectedService().getPassword());
+                WFSMeta metaOne = null;
+                try {
+                    metaOne = wfsOne.parse();
+                } catch (IOException
+                        | URISyntaxException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    Platform.runLater(() -> {
                         setStatusTextUI(
-                                I18n.getMsg("status.type.wfsone"));
-                        WFSMetaExtractor wfsOne =
-                                new WFSMetaExtractor(
-                                        dataBean.getSelectedService()
-                                                .getServiceURL().toString(),
-                                        dataBean.getUserName(),
-                                        dataBean.getPassword());
-                        WFSMeta metaOne = wfsOne.parse();
-                        dataBean.setWFSService(metaOne);
-                        break;
-                    case WFSTwo:
-                        setStatusTextUI(
-                                I18n.getMsg("status.type.wfstwo"));
-                        WFSMetaExtractor extractor =
-                                new WFSMetaExtractor(
-                                        dataBean.getSelectedService()
-                                            .getServiceURL().toString(),
-                                        dataBean.getUserName(),
-                                        dataBean.getPassword());
-                        WFSMeta meta = extractor.parse();
-                        dataBean.setWFSService(meta);
-                        break;
-                    default:
-                        log.log(Level.WARNING,
-                                "Could not determine URL" ,
-                                dataBean.getSelectedService());
-                        Platform.runLater(() -> {
-                            setStatusTextUI(I18n.getMsg("status.no-url"));
-                        });
-                        break;
+                                I18n.getMsg("status.service.broken")
+                        );
+                    });
+                } finally {
+                    dataBean.setWFSService(metaOne);
                 }
+                break;
+            case WFSTwo:
                 Platform.runLater(() -> {
-                    setServiceTypes();
-                    serviceTypeChooser.
-                            getSelectionModel().select(0);
-                    statusBarText.setText(I18n.getMsg("status.ready"));
+                    setStatusTextUI(
+                            I18n.getMsg("status.type.wfstwo"));
                 });
-                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                return 0;
-            }
-        };
-        Thread th = new Thread(task);
-        statusBarText.setText(I18n.getMsg("status.calling-service"));
-        th.setDaemon(true);
-        th.start();
+                WFSMetaExtractor extractor =
+                        new WFSMetaExtractor(
+                                dataBean.getSelectedService()
+                                        .getServiceURL().toString(),
+                                dataBean.getSelectedService().getUsername(),
+                                dataBean.getSelectedService().getPassword());
+                WFSMeta meta = null;
+                try {
+                    meta = extractor.parse();
+                } catch (IOException
+                        | URISyntaxException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    Platform.runLater(() -> {
+                        setStatusTextUI(
+                                I18n.getMsg("status.service.broken"));
+                    });
+
+                } finally {
+                    dataBean.setWFSService(meta);
+                }
+                break;
+            default:
+                log.log(Level.WARNING,
+                        "Could not determine URL",
+                        dataBean.getSelectedService());
+                Platform.runLater(() -> {
+                    setStatusTextUI(I18n.getMsg("status.no-url"));
+                });
+                break;
+        }
+        if (dataBean.isWebServiceSet()) {
+            Platform.runLater(() -> {
+                setServiceTypes();
+            });
+        } else {
+            return;
+        }
+        Platform.runLater(() -> {
+            serviceTypeChooser.
+                    getSelectionModel().select(0);
+            statusBarText.setText(I18n.getMsg("status.ready"));
+        });
+        return;
+
     }
 
     /**
@@ -921,11 +1021,11 @@ public class Controller {
                 case WFSTwo:
                     ReferencedEnvelope extendWFS = null;
                     List<WFSMeta.Feature> features =
-                        dataBean.getWFSService().features;
+                            dataBean.getWFSService().features;
                     List<WFSMeta.StoredQuery> queries =
-                        dataBean.getWFSService().storedQueries;
+                            dataBean.getWFSService().storedQueries;
                     ObservableList<ItemModel> types =
-                        FXCollections.observableArrayList();
+                            FXCollections.observableArrayList();
                     for (WFSMeta.Feature f : features) {
                         types.add(new FeatureModel(f));
                         if (f.bbox != null) {
@@ -960,26 +1060,26 @@ public class Controller {
                         ReferencedEnvelope extendATOM = null;
                         atomCRS = CRS.decode(ATOM_CRS_STRING);
                         Geometry all = null;
-                            for (Atom.Item i : items) {
-                                opts.add(new AtomItemModel(i));
-                                WMSMapSwing.FeaturePolygon polygon =
-                                        new WMSMapSwing.FeaturePolygon(
-                                                i.polygon,
-                                                i.title,
-                                                i.id,
-                                                this.atomCRS);
-                                polygonList.add(polygon);
-                                all = all == null
-                                        ? i.polygon : all.union(i.polygon);
+                        for (Atom.Item i : items) {
+                            opts.add(new AtomItemModel(i));
+                            WMSMapSwing.FeaturePolygon polygon =
+                                    new WMSMapSwing.FeaturePolygon(
+                                            i.polygon,
+                                            i.title,
+                                            i.id,
+                                            this.atomCRS);
+                            polygonList.add(polygon);
+                            all = all == null
+                                    ? i.polygon : all.union(i.polygon);
+                        }
+                        if (mapAtom != null) {
+                            if (all != null) {
+                                extendATOM = new ReferencedEnvelope(
+                                        all.getEnvelopeInternal(), atomCRS);
+                                mapAtom.setExtend(extendATOM);
                             }
-                            if (mapAtom != null) {
-                                if (all != null) {
-                                    extendATOM = new ReferencedEnvelope(
-                                            all.getEnvelopeInternal(), atomCRS);
-                                    mapAtom.setExtend(extendATOM);
-                                }
-                                mapAtom.drawPolygons(polygonList);
-                            }
+                            mapAtom.drawPolygons(polygonList);
+                        }
                     } catch (FactoryException e) {
                         log.log(Level.SEVERE, e.getMessage(), e);
                     }
@@ -997,8 +1097,7 @@ public class Controller {
     private void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         if (type == ServiceType.Atom) {
-            statusBarText.setText(I18n.format("status.ready"));
-            Atom.Item item = (Atom.Item)data.getItem();
+            Atom.Item item = (Atom.Item) data.getItem();
             try {
                 item.load();
             } catch (URISyntaxException
@@ -1014,7 +1113,7 @@ public class Controller {
             }
             List<Atom.Field> fields = item.fields;
             ObservableList<ItemModel> list =
-                FXCollections.observableArrayList();
+                    FXCollections.observableArrayList();
             for (Atom.Field f : fields) {
                 AtomFieldModel afm = new AtomFieldModel(f);
                 list.add(afm);
@@ -1026,13 +1125,14 @@ public class Controller {
                 f = engine.getClass().getDeclaredField("page");
                 f.setAccessible(true);
                 com.sun.webkit.WebPage page =
-                    (com.sun.webkit.WebPage) f.get(engine);
+                        (com.sun.webkit.WebPage) f.get(engine);
                 page.setBackgroundColor(
-                    (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB());
+                        (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB()
+                );
             } catch (NoSuchFieldException
-                | SecurityException
-                | IllegalArgumentException
-                | IllegalAccessException e) {
+                    | SecurityException
+                    | IllegalArgumentException
+                    | IllegalAccessException e) {
                 // Displays the webview with white background...
             }
             engine.loadContent(item.description);
@@ -1049,14 +1149,14 @@ public class Controller {
                 this.basicWFSX2Y2.setVisible(true);
                 this.referenceSystemChooser.setVisible(true);
                 this.referenceSystemChooserLabel.setVisible(true);
-                WFSMeta.Feature feature = (WFSMeta.Feature)data.getItem();
+                WFSMeta.Feature feature = (WFSMeta.Feature) data.getItem();
                 mapWFS.setExtend(feature.bbox);
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
                 list.addAll(feature.otherCRSs);
                 ObservableList<CRSModel> crsList =
                         FXCollections.observableArrayList();
-                for (String crsStr: list) {
+                for (String crsStr : list) {
                     try {
                         String newcrsStr = crsStr;
                         String seperator = null;
@@ -1069,7 +1169,7 @@ public class Controller {
                             newcrsStr = "EPSG:"
                                     + newcrsStr.substring(
                                     newcrsStr.lastIndexOf(seperator)
-                                    + seperator.length(),
+                                            + seperator.length(),
                                     newcrsStr.length());
                         }
                         CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
@@ -1107,7 +1207,7 @@ public class Controller {
                             this.dataBean.getWFSService().outputFormats;
                 }
                 ObservableList<String> formats =
-                    FXCollections.observableArrayList(outputFormats);
+                        FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
             } else if (data instanceof StoredQueryModel) {
 
@@ -1118,10 +1218,10 @@ public class Controller {
                             this.dataBean.getWFSService().outputFormats;
                 }
                 factory.fillSimpleWFS(
-                    dataBean,
-                    this.simpleWFSContainer,
-                    (WFSMeta.StoredQuery)data.getItem(),
-                    outputFormats);
+                        dataBean,
+                        this.simpleWFSContainer,
+                        (WFSMeta.StoredQuery) data.getItem(),
+                        outputFormats);
                 this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
                 this.basicWFSContainer.setVisible(false);
@@ -1132,7 +1232,7 @@ public class Controller {
     /**
      * Set the DataBean and fill the UI with initial data objects.
      *
-     * @param dataBean  The DataBean object.
+     * @param dataBean The DataBean object.
      */
     public void setDataBean(DataBean dataBean) {
         this.dataBean = dataBean;
@@ -1189,6 +1289,31 @@ public class Controller {
     }
 
     /**
+     * @return the primaryStage
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * @param primaryStage the primaryStage to set
+     */
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    /**
+     * Set the text of the status bar in UI thread.
+     *
+     * @param msg the text to set.
+     */
+    public void setStatusTextUI(String msg) {
+        Platform.runLater(() -> {
+            statusBarText.setText(msg);
+        });
+    }
+
+    /**
      * Handels the Action, when a polygon is selected.
      */
     public class SelectedAtomPolygon implements
@@ -1234,52 +1359,19 @@ public class Controller {
         }
     }
 
-    private static final Logger log
-            = Logger.getLogger(Controller.class.getName());
-
     /**
-     * @return the primaryStage
+     * Keeps track of download progression and errors.
      */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
-    /**
-     * @param primaryStage the primaryStage to set
-     */
-    public void setPrimaryStage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
-
-    /**
-     * Creates the Controller.
-     */
-    public Controller() {
-        this.factory = new UIFactory();
-        Processor.getInstance().addListener(new DownloadListener());
-
-    }
-
-    /** Set the text of the status bar in UI thread.
-     * @param msg the text to set.
-     */
-    public void setStatusTextUI(String msg) {
-        Platform.runLater(() -> {
-            statusBarText.setText(msg);
-        });
-    }
-
-    /** Keeps track of download progression and errors. */
     private class DownloadListener implements ProcessorListener, Runnable {
 
         private String message;
 
-        private synchronized void setMessage(String message) {
-            this.message = message;
-        }
-
         private synchronized String getMessage() {
             return this.message;
+        }
+
+        private synchronized void setMessage(String message) {
+            this.message = message;
         }
 
         @Override
@@ -1290,9 +1382,9 @@ public class Controller {
         @Override
         public void receivedException(ProcessorEvent pe) {
             setMessage(
-                I18n.format(
-                "status.error",
-                pe.getException().getMessage()));
+                    I18n.format(
+                            "status.error",
+                            pe.getException().getMessage()));
             Platform.runLater(this);
         }
 
