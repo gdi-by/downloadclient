@@ -50,7 +50,6 @@ public class DataBean extends Observable {
     private ItemModel dataType;
     private Atom atomService;
     private WFSMeta wfsService;
-    private ArrayList<String> serviceTypes;
     private ArrayList<Attribute> attributes;
     private ArrayList<ProcessingStep> processingSteps;
     private Service selectedService;
@@ -111,9 +110,8 @@ public class DataBean extends Observable {
     /**
      * sets the selected service.
      * @param smi the selected service
-     * @throws IOException when something goes wrong
      */
-    public void setSelectedService(Service smi) throws IOException {
+    public void setSelectedService(Service smi) {
         this.selectedService = smi;
     }
 
@@ -139,6 +137,12 @@ public class DataBean extends Observable {
     public void reset() {
         this.catalogServices.clear();
         this.processingSteps.clear();
+        this.attributes.clear();
+        this.dataType = null;
+        this.atomService = null;
+        this.wfsService = null;
+        this.namePwMap.clear();
+        this.attributes.clear();
     }
 
     /**
@@ -243,22 +247,6 @@ public class DataBean extends Observable {
         }
         return true;
 
-    }
-
-    /**
-     * gets the service Types.
-     * @return serviceTypes
-     */
-    public ArrayList<String> getServiceTypes() {
-        return serviceTypes;
-    }
-
-    /**
-     * sets the service Types.
-     * @param serviceTypes service Types
-     */
-    public void setServiceTypes(ArrayList<String> serviceTypes) {
-        this.serviceTypes = serviceTypes;
     }
 
     /**
