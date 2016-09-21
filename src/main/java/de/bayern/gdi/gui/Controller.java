@@ -108,15 +108,16 @@ public class Controller {
     private static final int BGCOLOR = 244;
     private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
     private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private static final Logger log
+            = Logger.getLogger(Controller.class.getName());
     private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
-
     private Stage primaryStage;
-
     private UIFactory factory;
-
     private boolean catalogReachable;
+    private WMSMapSwing mapAtom;
+    private WMSMapSwing mapWFS;
 
     @FXML
     private Button buttonClose;
@@ -208,8 +209,15 @@ public class Controller {
     private HBox basicWFSX2Y2;
     @FXML
     private Label referenceSystemChooserLabel;
-    private WMSMapSwing mapAtom;
-    private WMSMapSwing mapWFS;
+
+    /**
+     * Creates the Controller.
+     */
+    public Controller() {
+        this.factory = new UIFactory();
+        Processor.getInstance().addListener(new DownloadListener());
+
+    }
 
     /**
      * Handler to close the application.
@@ -244,8 +252,6 @@ public class Controller {
     protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
             try {
-                //Determine first, if the URL comes from the service-List or
-                //if it was entered manually
                 ServiceModel serviceModel =
                         (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
@@ -263,11 +269,26 @@ public class Controller {
                             this.serviceUser.getText(),
                             this.servicePW.getText());
                 }
-                //first selecting the service and make it available in Databean
-                //returns fast if the service is still the same
-                if (selectService(service)) {
-                    chooseSelectedService();
-                }
+                serviceSelection.setDisable(true);
+                serviceURL.getScene().setCursor(Cursor.WAIT);
+                setStatusTextUI(
+                        I18n.format("status.checking-auth"));
+                Task task = new Task() {
+                    protected Integer call() {
+                        try {
+                            if (selectService(service)) {
+                                chooseSelectedService();
+                            }
+                            return 0;
+                        } finally {
+                            serviceSelection.setDisable(false);
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        }
+                    }
+                };
+                Thread th = new Thread(task);
+                th.setDaemon(true);
+                th.start();
             } catch (MalformedURLException e) {
                 setStatusTextUI(
                         I18n.format("status.no-url"));
@@ -347,22 +368,22 @@ public class Controller {
     }
 
     private boolean selectService(Service service) {
-        serviceSelection.setDisable(true);
-        serviceURL.getScene().setCursor(Cursor.WAIT);
-        setStatusTextUI(
-                I18n.format("status.checking-auth"));
         try {
             if (ServiceChecker.isReachable(service.getServiceURL())) {
                 service.load();
             } else {
-                setStatusTextUI(
-                        I18n.format("status.service-not-available"));
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.format("status.service-not-available"));
+                });
                 return false;
             }
             if (dataBean.getSelectedService() != null) {
                 if (dataBean.getSelectedService().equals(service)) {
-                    setStatusTextUI(
-                            I18n.format("status.ready"));
+                    Platform.runLater(() -> {
+                        setStatusTextUI(
+                                I18n.format("status.ready"));
+                    });
                     return false;
                 }
             }
@@ -370,32 +391,40 @@ public class Controller {
             if (dataBean.getSelectedService().getUsername().isEmpty()
                     && dataBean.getSelectedService().getPassword().isEmpty()
                     && dataBean.getSelectedService().isRestricted()) {
-                setStatusTextUI(
-                        I18n.format("status.service-needs-auth"));
-                this.serviceAuthenticationCbx.setSelected(true);
-                this.serviceUser.setDisable(false);
-                this.servicePW.setDisable(false);
+                Platform.runLater(() -> {
+                    setStatusTextUI(
+                            I18n.format("status.service-needs-auth"));
+                    this.serviceAuthenticationCbx.setSelected(true);
+                    this.serviceUser.setDisable(false);
+                    this.servicePW.setDisable(false);
+                });
                 return false;
             } else {
-                this.serviceAuthenticationCbx.setSelected(false);
-                this.serviceUser.setDisable(true);
-                this.servicePW.setDisable(true);
-                clearUserNamePassword();
+                Platform.runLater(() -> {
+                    this.serviceAuthenticationCbx.setSelected(false);
+                    this.serviceUser.setDisable(true);
+                    this.servicePW.setDisable(true);
+                    clearUserNamePassword();
+                });
             }
-            resetGui();
-            this.serviceURL.setText(
-                    dataBean.getSelectedService().getServiceURL().toString());
+            Platform.runLater(() -> {
+                resetGui();
+                this.serviceURL.setText(
+                        dataBean.getSelectedService().getServiceURL().toString()
+                );
+            });
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
-            setStatusTextUI(
-                    I18n.format("status.service.broken"));
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.service.broken"));
+            });
             return false;
-        } finally {
-            serviceSelection.setDisable(false);
-            serviceURL.getScene().setCursor(Cursor.DEFAULT);
         }
-        setStatusTextUI(
-                I18n.format("status.ready"));
+        Platform.runLater(() -> {
+            setStatusTextUI(
+                    I18n.format("status.ready"));
+        });
         return true;
     }
 
@@ -413,7 +442,24 @@ public class Controller {
                         (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
                 if (serviceModel != null) {
-                    selectService(serviceModel.getItem());
+                    serviceSelection.setDisable(true);
+                    serviceURL.getScene().setCursor(Cursor.WAIT);
+                    setStatusTextUI(
+                            I18n.format("status.checking-auth"));
+                    Task task = new Task() {
+                        protected Integer call() {
+                            try {
+                                selectService(serviceModel.getItem());
+                                return 0;
+                            } finally {
+                                serviceSelection.setDisable(false);
+                                serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                            }
+                        }
+                    };
+                    Thread th = new Thread(task);
+                    th.setDaemon(true);
+                    th.start();
                 }
             } else if (event.getClickCount() > 1) {
                 clearUserNamePassword();
@@ -421,7 +467,6 @@ public class Controller {
             }
         }
     }
-
 
     /**
      * Handle authentication required selection.
@@ -713,7 +758,6 @@ public class Controller {
         }
     }
 
-
     private boolean validateInput() {
         String failed = "";
         ArrayList<DataBean.Attribute> attributes
@@ -856,8 +900,10 @@ public class Controller {
     private void chooseSelectedService() {
         switch (dataBean.getSelectedService().getServiceType()) {
             case Atom:
-                setStatusTextUI(
-                        I18n.getMsg("status.type.atom"));
+                Platform.runLater(() -> {
+                            setStatusTextUI(
+                                    I18n.getMsg("status.type.atom"));
+                });
                 Atom atom = null;
                 try {
                     atom = new Atom(
@@ -871,9 +917,11 @@ public class Controller {
                         | ParserConfigurationException
                         | IOException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    setStatusTextUI(
-                            I18n.getMsg("status.service.broken")
-                    );
+                    Platform.runLater(() -> {
+                                setStatusTextUI(
+                                        I18n.getMsg("status.service.broken")
+                                );
+                            });
                     resetGui();
                     return;
                 } finally {
@@ -881,8 +929,10 @@ public class Controller {
                 }
                 break;
             case WFSOne:
-                setStatusTextUI(
-                        I18n.getMsg("status.type.wfsone"));
+                Platform.runLater(() -> {
+                            setStatusTextUI(
+                                    I18n.getMsg("status.type.wfsone"));
+                        });
                 WFSMetaExtractor wfsOne =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -895,16 +945,20 @@ public class Controller {
                 } catch (IOException
                         | URISyntaxException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    setStatusTextUI(
-                            I18n.getMsg("status.service.broken")
-                    );
+                    Platform.runLater(() -> {
+                        setStatusTextUI(
+                                I18n.getMsg("status.service.broken")
+                        );
+                    });
                 } finally {
                     dataBean.setWFSService(metaOne);
                 }
                 break;
             case WFSTwo:
-                setStatusTextUI(
-                        I18n.getMsg("status.type.wfstwo"));
+                Platform.runLater(() -> {
+                            setStatusTextUI(
+                                    I18n.getMsg("status.type.wfstwo"));
+                        });
                 WFSMetaExtractor extractor =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -917,9 +971,11 @@ public class Controller {
                 } catch (IOException
                         | URISyntaxException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    setStatusTextUI(
-                            I18n.getMsg("status.service.broken")
-                    );
+                    Platform.runLater(() -> {
+                        setStatusTextUI(
+                                I18n.getMsg("status.service.broken"));
+                    });
+
                 } finally {
                     dataBean.setWFSService(meta);
                 }
@@ -928,24 +984,26 @@ public class Controller {
                 log.log(Level.WARNING,
                         "Could not determine URL",
                         dataBean.getSelectedService());
+                Platform.runLater(() -> {
                     setStatusTextUI(I18n.getMsg("status.no-url"));
+                });
                 break;
         }
         if (dataBean.isWebServiceSet()) {
-            setServiceTypes();
+            Platform.runLater(() -> {
+                setServiceTypes();
+            });
         } else {
             return;
         }
-        serviceTypeChooser.
-                getSelectionModel().select(0);
-        statusBarText.setText(I18n.getMsg("status.ready"));
-
-        System.out.println("Back to default.");
-        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+        Platform.runLater(() -> {
+                    serviceTypeChooser.
+                            getSelectionModel().select(0);
+                    statusBarText.setText(I18n.getMsg("status.ready"));
+        });
         return;
 
     }
-
 
     /**
      * Sets the Service Types.
@@ -1063,7 +1121,8 @@ public class Controller {
                 com.sun.webkit.WebPage page =
                         (com.sun.webkit.WebPage) f.get(engine);
                 page.setBackgroundColor(
-                        (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB());
+                        (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB()
+                );
             } catch (NoSuchFieldException
                     | SecurityException
                     | IllegalArgumentException
@@ -1224,6 +1283,31 @@ public class Controller {
     }
 
     /**
+     * @return the primaryStage
+     */
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    /**
+     * @param primaryStage the primaryStage to set
+     */
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    /**
+     * Set the text of the status bar in UI thread.
+     *
+     * @param msg the text to set.
+     */
+    public void setStatusTextUI(String msg) {
+        Platform.runLater(() -> {
+            statusBarText.setText(msg);
+        });
+    }
+
+    /**
      * Handels the Action, when a polygon is selected.
      */
     public class SelectedAtomPolygon implements
@@ -1269,43 +1353,6 @@ public class Controller {
         }
     }
 
-    private static final Logger log
-            = Logger.getLogger(Controller.class.getName());
-
-    /**
-     * @return the primaryStage
-     */
-    public Stage getPrimaryStage() {
-        return primaryStage;
-    }
-
-    /**
-     * @param primaryStage the primaryStage to set
-     */
-    public void setPrimaryStage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
-
-    /**
-     * Creates the Controller.
-     */
-    public Controller() {
-        this.factory = new UIFactory();
-        Processor.getInstance().addListener(new DownloadListener());
-
-    }
-
-    /**
-     * Set the text of the status bar in UI thread.
-     *
-     * @param msg the text to set.
-     */
-    public void setStatusTextUI(String msg) {
-        Platform.runLater(() -> {
-            statusBarText.setText(msg);
-        });
-    }
-
     /**
      * Keeps track of download progression and errors.
      */
@@ -1313,12 +1360,12 @@ public class Controller {
 
         private String message;
 
-        private synchronized void setMessage(String message) {
-            this.message = message;
-        }
-
         private synchronized String getMessage() {
             return this.message;
+        }
+
+        private synchronized void setMessage(String message) {
+            this.message = message;
         }
 
         @Override
