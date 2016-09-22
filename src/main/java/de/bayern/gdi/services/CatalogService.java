@@ -18,8 +18,11 @@
 
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -365,11 +368,11 @@ public class CatalogService {
     }
 
     private String loadXMLFilter(String search) {
-        ClassLoader classLoader = CatalogService.class.getClassLoader();
-        InputStream stream =
-                classLoader.getResourceAsStream(CSW_QUERY_FILEPATH);
         StringWriter writer = new StringWriter();
         try {
+
+            InputStream stream = new FileInputStream(
+                    Misc.getResource(CSW_QUERY_FILEPATH));
             IOUtils.copy(stream, writer, "UTF-8");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);

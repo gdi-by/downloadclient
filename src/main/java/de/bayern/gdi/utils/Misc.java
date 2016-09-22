@@ -18,6 +18,8 @@
 package de.bayern.gdi.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -103,5 +105,23 @@ public final class Misc {
         }
 
         return count < MAX_TRIES ? path : null;
+    }
+
+    /**
+     * returns file from resources
+     * @param path path or filename in rsources
+     * @return returns the file
+     * @throws FileNotFoundException if file is not found
+     */
+    public static File getResource(String path) throws FileNotFoundException {
+        URL resource = Misc.class.getClassLoader().getResource(path);
+        if (resource == null) {
+            throw new FileNotFoundException(path + " does not exist");
+        }
+        File file = new File(resource.getFile());
+        if (!file.exists()) {
+            throw new FileNotFoundException(path + " does not exist");
+        }
+        return file;
     }
 }

@@ -19,6 +19,10 @@
 package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.Service;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -268,10 +272,10 @@ public class ServiceSetting {
         return servicesMap;
     }
 
-    private static InputStream getFileStream(String fileName) {
-
-        ClassLoader classLoader = ServiceSetting.class.getClassLoader();
-        InputStream stream = classLoader.getResourceAsStream(fileName);
+    private static InputStream getFileStream(String fileName)
+            throws FileNotFoundException {
+        File xml = Misc.getResource(fileName);
+        InputStream stream = new FileInputStream(xml);
 
         return stream;
     }

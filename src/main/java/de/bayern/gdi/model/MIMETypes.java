@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Model for mapping MIME types to file name extensions. */
@@ -47,7 +48,7 @@ public class MIMETypes {
 
     /** Name of the config file. */
     public static final String MIME_TYPES_FILE =
-        "mimetypes.xml";
+        "de/bayern/gdi/model/mimetypes.xml";
 
     @XmlElement(name = "Type")
     private List<MIMEType> types;
@@ -166,7 +167,7 @@ public class MIMETypes {
     public static MIMETypes loadDefault() {
         InputStream in = null;
         try {
-            in = MIMETypes.class.getResourceAsStream(MIME_TYPES_FILE);
+            in = new FileInputStream(Misc.getResource(MIME_TYPES_FILE));
             if (in == null) {
                 log.log(Level.SEVERE,
                     MIME_TYPES_FILE + " not found");

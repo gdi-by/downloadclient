@@ -240,7 +240,7 @@ public class Controller {
     private void handleAboutAction(final ActionEvent event) {
         try {
             displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
-                    "/about/about_" + I18n.getLocale().toLanguageTag()
+                    "about/about_" + I18n.getLocale().toLanguageTag()
                             + ".html");
         } catch (FileNotFoundException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -252,13 +252,8 @@ public class Controller {
             throws
             FileNotFoundException {
         WebView web = new WebView();
-        File htmlFile
-                = new File(Config.class.getResource(pathToFile).getFile());
-        if (!htmlFile.exists()) {
-            throw new FileNotFoundException(pathToFile + " does not exist");
-        }
-        String path = Config.class.getResource(pathToFile).toExternalForm();
-        web.getEngine().load(path);
+        File file = Misc.getResource(pathToFile);
+        String path = file.toString();
         WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
@@ -270,7 +265,7 @@ public class Controller {
 
     @FXML
     private void handleHelpAction(final ActionEvent event) {
-        String pathToFile = "/help/help_" + I18n.getLocale().toLanguageTag()
+        String pathToFile = "help/help_" + I18n.getLocale().toLanguageTag()
                 + ".txt";
         try {
             openLinkFromFile(pathToFile);
@@ -282,11 +277,7 @@ public class Controller {
 
     private void openLinkFromFile(String pathToFile) throws
             FileNotFoundException {
-        String file = Config.class.getResource(pathToFile).getFile();
-        File helpFile = new File(file);
-        if (!helpFile.exists()) {
-            throw new FileNotFoundException(pathToFile + " does not exist");
-        }
+        File helpFile = Misc.getResource(pathToFile);
         String contents = null;
         try (Scanner scanner = new Scanner(helpFile)) {
             while (scanner.hasNext()) {
