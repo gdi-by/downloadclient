@@ -19,28 +19,10 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.utils.I18n;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.layout.VBox;
-import javafx.scene.web.PopupFeatures;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-import javafx.util.Callback;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.html.HTMLAnchorElement;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -78,6 +60,9 @@ public class WebViewWindow extends Dialog {
         super.setTitle(title);
     }
 
+    /**
+     * displays the given WebView in a Popup window.
+     */
     public void popup() {
         ButtonType confirm = new ButtonType(I18n.getMsg("gui.ok"),
                 ButtonBar.ButtonData.CANCEL_CLOSE);

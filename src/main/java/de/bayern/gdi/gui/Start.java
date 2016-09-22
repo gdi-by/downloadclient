@@ -111,8 +111,8 @@ public class Start extends Application {
                         "/img/icon_118x118_300dpi.jpg").getFile();
                 File imageFile = new File(filePath);
                 if (!imageFile.exists()) {
-                    throw new FileNotFoundException(filePath + " does not " +
-                            "exist");
+                    throw new FileNotFoundException(filePath + " does not "
+                            + "exist");
                 }
                 Image image = new Image(Start.class.getResource(
                         "/img/icon_118x118_300dpi.jpg").toExternalForm());

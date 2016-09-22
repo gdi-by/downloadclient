@@ -46,31 +46,26 @@ import de.bayern.gdi.utils.ServiceSetting;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.bayern.gdi.utils.XML;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -83,7 +78,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
@@ -105,11 +99,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.html.HTMLAnchorElement;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -266,7 +259,7 @@ public class Controller {
         }
         String path = Config.class.getResource(pathToFile).toExternalForm();
         web.getEngine().load(path);
-        WebViewWindow wvw = new WebViewWindow(web ,popuptitle);
+        WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
     /**
