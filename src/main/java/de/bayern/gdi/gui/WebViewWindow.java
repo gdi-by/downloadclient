@@ -19,13 +19,13 @@
 package de.bayern.gdi.gui;
 
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.web.WebView;
-import java.io.IOException;
+
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -49,11 +49,7 @@ public class WebViewWindow extends Dialog {
                          + "{ if ( list.item(i).getAttribute('href') ) "
                          + "{ list.item(i).getAttribute('href'); break; } }");
             if (o != null) {
-                try {
-                    new ProcessBuilder("x-www-browser", o.toString()).start();
-                } catch (IOException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
+                Misc.startExternalBrowser(o.toString());
             }
             return null;
         });

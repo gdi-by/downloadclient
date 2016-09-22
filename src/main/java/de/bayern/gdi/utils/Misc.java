@@ -17,11 +17,16 @@
  */
 package de.bayern.gdi.utils;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Misc helper functions. */
 public final class Misc {
@@ -34,6 +39,9 @@ public final class Misc {
 
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
+
+    private static final Logger log
+            = Logger.getLogger(Misc.class.getName());
 
     private Misc() {
     }
@@ -123,5 +131,64 @@ public final class Misc {
     public static String inputStreamToString(InputStream stream) {
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
+    }
+
+    /**
+     * Tries to start the external default browser.
+     * @param url url
+     */
+    public static void startExternalBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    Desktop.getDesktop().browse(URI.create(url));
+                    return;
+                }
+            } catch (IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        try {
+            new ProcessBuilder("x-www-browser", url).start();
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            Runtime runtime = Runtime.getRuntime();
+            try {
+                runtime.exec("xdg-open " + url);
+            } catch (IOException ex) {
+                log.log(Level.SEVERE, ex.getMessage(), ex);
+                //When every standard fails, do the hard work
+                String os = System.getProperty("os.name").toLowerCase();
+                Runtime rt = Runtime.getRuntime();
+                try {
+                    if (os.contains("win")) {
+                        rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+                    } else if (os.contains("mac")) {
+                        rt.exec("open" + url);
+                    } else {
+                        String[] browsers = {"epiphany",
+                                "firefox",
+                                "mozilla",
+                                "konqueror",
+                                "netscape",
+                                "opera",
+                                "links",
+                                "lynx"};
+
+                        StringBuffer cmd = new StringBuffer();
+                        for (int i = 0; i < browsers.length; i++) {
+                            cmd.append((i == 0 ? "" : " || ")
+                                    + browsers[i]
+                                    + " \""
+                                    + url
+                                    + "\" ");
+                        }
+                        rt.exec(new String[] {"sh", "-c", cmd.toString()});
+                    }
+                } catch (IOException exc) {
+                    log.log(Level.SEVERE, exc.getMessage(), exc);
+                }
+            }
+        }
     }
 }

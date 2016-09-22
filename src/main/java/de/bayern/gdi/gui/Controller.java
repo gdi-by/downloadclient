@@ -284,7 +284,7 @@ public class Controller {
                     && !contents.isEmpty()
                     && !contents.equals("null")) {
                 URL helpURL = new URL(contents);
-                new ProcessBuilder("x-www-browser", helpURL.toString()).start();
+                Misc.startExternalBrowser(helpURL.toString());
             } else {
                 throw new MalformedURLException("URL is Empty");
             }
