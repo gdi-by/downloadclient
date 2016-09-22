@@ -23,6 +23,7 @@ import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Unauthorized;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Application;
@@ -103,7 +104,8 @@ public class Start extends Application {
             FileResponseHandler.setUnauthorized(unauthorized);
             DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
-            URL imageURL = classLoader.getResource(LOGONAME);
+            InputStream is = classLoader.getResourceAsStream(LOGONAME);
+            URL imageURL = classLoader.getResource("img/" + LOGONAME);
             Image image = new Image(imageURL.toExternalForm());
             primaryStage.getIcons().add(image);
             primaryStage.setScene(scene);

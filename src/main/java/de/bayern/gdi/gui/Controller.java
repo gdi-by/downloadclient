@@ -240,8 +240,8 @@ public class Controller {
     private void handleAboutAction(final ActionEvent event) {
         try {
             displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
-                    "/about/" + I18n.getLocale().toLanguageTag()
-                            + "/about.html");
+                    "/about/about_" + I18n.getLocale().toLanguageTag()
+                            + ".html");
         } catch (FileNotFoundException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return;
@@ -270,8 +270,8 @@ public class Controller {
 
     @FXML
     private void handleHelpAction(final ActionEvent event) {
-        String pathToFile = "/help/" + I18n.getLocale().toLanguageTag()
-                + "/help.txt";
+        String pathToFile = "/help/help_" + I18n.getLocale().toLanguageTag()
+                + ".txt";
         try {
             openLinkFromFile(pathToFile);
         } catch (FileNotFoundException e) {
@@ -298,7 +298,6 @@ public class Controller {
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        System.out.println(contents);
         try {
             if (contents != null
                     && !contents.isEmpty()
