@@ -107,14 +107,14 @@ public class Start extends Application {
             DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
             try {
-                String filePath = Start.class.getResource(
+                String filePath = classLoader.getResource(
                         "/img/icon_118x118_300dpi.jpg").getFile();
                 File imageFile = new File(filePath);
                 if (!imageFile.exists()) {
                     throw new FileNotFoundException(filePath + " does not "
                             + "exist");
                 }
-                Image image = new Image(Start.class.getResource(
+                Image image = new Image(classLoader.getResource(
                         "/img/icon_118x118_300dpi.jpg").toExternalForm());
                 if (image == null) {
                     throw new ImageStorageException(
