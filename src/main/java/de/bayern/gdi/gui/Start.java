@@ -23,7 +23,6 @@ import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Unauthorized;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Application;
