@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -252,9 +253,8 @@ public class Controller {
             throws
             IOException {
         WebView web = new WebView();
-        File file = Misc.getResource(pathToFile);
-        String path = file.toURI().toURL().toExternalForm();
-        web.getEngine().load(path);
+        InputStream htmlPage = Misc.getResource(pathToFile);
+        web.getEngine().loadContent(Misc.inputStreamToString(htmlPage));
         WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
@@ -278,18 +278,8 @@ public class Controller {
 
     private void openLinkFromFile(String pathToFile) throws
             FileNotFoundException {
-        File helpFile = Misc.getResource(pathToFile);
-        String contents = null;
-        try (Scanner scanner = new Scanner(helpFile)) {
-            while (scanner.hasNext()) {
-                String line = scanner.nextLine();
-                if (line != null && !line.isEmpty() && !line.equals("null")) {
-                    contents = line;
-                }
-            }
-        } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
+        InputStream is = Misc.getResource(pathToFile);
+        String contents = Misc.inputStreamToString(is);
         try {
             if (contents != null
                     && !contents.isEmpty()

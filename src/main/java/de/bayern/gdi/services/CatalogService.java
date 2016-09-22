@@ -371,8 +371,8 @@ public class CatalogService {
         StringWriter writer = new StringWriter();
         try {
 
-            InputStream stream = new FileInputStream(
-                    Misc.getResource(CSW_QUERY_FILEPATH));
+            InputStream stream =
+                    Misc.getResource(CSW_QUERY_FILEPATH);
             IOUtils.copy(stream, writer, "UTF-8");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);

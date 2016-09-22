@@ -173,7 +173,7 @@ public class ProcessingConfiguration {
     public static ProcessingConfiguration loadDefault() {
         InputStream in = null;
         try {
-            in = new FileInputStream(Misc.getResource(PROCESSING_CONFIG_FILE));
+            in = Misc.getResource(PROCESSING_CONFIG_FILE);
             if (in == null) {
                 log.log(Level.SEVERE,
                     PROCESSING_CONFIG_FILE + " not found");

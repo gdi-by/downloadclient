@@ -167,7 +167,7 @@ public class MIMETypes {
     public static MIMETypes loadDefault() {
         InputStream in = null;
         try {
-            in = new FileInputStream(Misc.getResource(MIME_TYPES_FILE));
+            in = Misc.getResource(MIME_TYPES_FILE);
             if (in == null) {
                 log.log(Level.SEVERE,
                     MIME_TYPES_FILE + " not found");

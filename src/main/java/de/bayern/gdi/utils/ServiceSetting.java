@@ -272,11 +272,8 @@ public class ServiceSetting {
         return servicesMap;
     }
 
-    private static InputStream getFileStream(String fileName)
-            throws FileNotFoundException {
-        File xml = Misc.getResource(fileName);
-        InputStream stream = new FileInputStream(xml);
-
+    private static InputStream getFileStream(String fileName) {
+        InputStream stream = Misc.getResource(fileName);
         return stream;
     }
 }

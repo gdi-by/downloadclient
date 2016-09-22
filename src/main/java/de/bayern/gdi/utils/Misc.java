@@ -19,6 +19,7 @@ package de.bayern.gdi.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -113,15 +114,12 @@ public final class Misc {
      * @return returns the file
      * @throws FileNotFoundException if file is not found
      */
-    public static File getResource(String path) throws FileNotFoundException {
-        URL resource = Misc.class.getClassLoader().getResource(path);
-        if (resource == null) {
-            throw new FileNotFoundException(path + " does not exist");
-        }
-        File file = new File(resource.getFile());
-        if (!file.exists()) {
-            throw new FileNotFoundException(path + " does not exist");
-        }
-        return file;
+    public static InputStream getResource(String path) {
+        return Misc.class.getClassLoader().getResourceAsStream(path);
+    }
+
+    public static String inputStreamToString(InputStream stream) {
+        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }
