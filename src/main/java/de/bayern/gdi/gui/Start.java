@@ -18,10 +18,14 @@
 
 package de.bayern.gdi.gui;
 
+import com.sun.javafx.iio.ImageStorageException;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Unauthorized;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
@@ -31,6 +35,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -101,6 +106,27 @@ public class Start extends Application {
             FileResponseHandler.setUnauthorized(unauthorized);
             DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
+            try {
+                String filePath = Start.class.getResource(
+                        "/img/icon_118x118_300dpi.jpg").getFile();
+                File imageFile = new File(filePath);
+                if (!imageFile.exists()) {
+                    throw new FileNotFoundException(filePath + " does not " +
+                            "exist");
+                }
+                Image image = new Image(Start.class.getResource(
+                        "/img/icon_118x118_300dpi.jpg").toExternalForm());
+                if (image == null) {
+                    throw new ImageStorageException(
+                            filePath + " can't be loaded");
+                }
+                primaryStage.getIcons().add(image);
+            } catch (FileNotFoundException
+                    | ImageStorageException e) {
+                System.out.println(e.getMessage());
+                Platform.exit();
+                System.exit(-1);
+            }
             primaryStage.setScene(scene);
             primaryStage.show();
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
