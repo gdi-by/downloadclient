@@ -108,7 +108,7 @@ public final class Misc {
     }
 
     /**
-     * returns file from resources
+     * returns file from resources.
      * @param path path or filename in rsources
      * @return returns the file
      * @throws FileNotFoundException if file is not found

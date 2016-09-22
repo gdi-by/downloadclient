@@ -26,8 +26,9 @@ import de.bayern.gdi.utils.Unauthorized;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+
 import java.util.concurrent.CountDownLatch;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
