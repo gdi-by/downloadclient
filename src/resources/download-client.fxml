@@ -14,8 +14,10 @@
    <children>
       <MenuBar fx:id="menuBar">
          <menus>
-            <Menu text="%menu.about" onAction="#handleAboutAction"></Menu>
-            <Menu text="%menu.help" onAction="#handleHelpAction"></Menu>
+            <Menu text="%menu.extra">
+               <MenuItem text="%menu.help" onAction="#handleHelpAction" fx:id="menuHelp"/>
+               <MenuItem text="%menu.about" onAction="#handleAboutAction" fx:id="menuAbout"/>
+            </Menu>
          </menus>
       </MenuBar>
       <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">

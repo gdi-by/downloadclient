@@ -44,24 +44,33 @@ import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.bayern.gdi.utils.XML;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -74,7 +83,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -96,6 +107,9 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.html.HTMLAnchorElement;
 import org.xml.sax.SAXException;
 
 /**
@@ -210,13 +224,18 @@ public class Controller {
     @FXML
     private Label referenceSystemChooserLabel;
 
+    @FXML
+    private MenuItem menuHelp;
+    @FXML
+    private MenuItem menuAbout;
+    @FXML
+    private MenuBar menuBar;
     /**
      * Creates the Controller.
      */
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
-
     }
 
     /**
@@ -226,17 +245,79 @@ public class Controller {
      */
     @FXML
     private void handleAboutAction(final ActionEvent event) {
-
+        try {
+            displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
+                    "/about/" + I18n.getLocale().toLanguageTag()
+                            + "/about.html");
+        } catch (FileNotFoundException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return;
+        }
     }
 
+    private void displayHTMLFileAsPopup(String popuptitle, String pathToFile)
+            throws
+            FileNotFoundException {
+        WebView web = new WebView();
+        File htmlFile
+                = new File(Config.class.getResource(pathToFile).getFile());
+        if (!htmlFile.exists()) {
+            throw new FileNotFoundException(pathToFile + " does not exist");
+        }
+        String path = Config.class.getResource(pathToFile).toExternalForm();
+        web.getEngine().load(path);
+        WebViewWindow wvw = new WebViewWindow(web ,popuptitle);
+        wvw.popup();
+    }
     /**
      * Handle action related to "Help" menu item.
      *
      * @param event Event on "Help" menu item.
      */
+
     @FXML
     private void handleHelpAction(final ActionEvent event) {
+        String pathToFile = "/help/" + I18n.getLocale().toLanguageTag()
+                + "/help.txt";
+        try {
+            openLinkFromFile(pathToFile);
+        } catch (FileNotFoundException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return;
+        }
+    }
 
+    private void openLinkFromFile(String pathToFile) throws
+            FileNotFoundException {
+        String file = Config.class.getResource(pathToFile).getFile();
+        File helpFile = new File(file);
+        if (!helpFile.exists()) {
+            throw new FileNotFoundException(pathToFile + " does not exist");
+        }
+        String contents = null;
+        try (Scanner scanner = new Scanner(helpFile)) {
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                if (line != null && !line.isEmpty() && !line.equals("null")) {
+                    contents = line;
+                }
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        System.out.println(contents);
+        try {
+            if (contents != null
+                    && !contents.isEmpty()
+                    && !contents.equals("null")) {
+                URL helpURL = new URL(contents);
+                new ProcessBuilder("x-www-browser", helpURL.toString()).start();
+            } else {
+                throw new MalformedURLException("URL is Empty");
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     /**
