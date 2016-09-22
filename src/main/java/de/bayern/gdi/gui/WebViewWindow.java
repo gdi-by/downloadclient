@@ -44,7 +44,7 @@ public class WebViewWindow extends Dialog {
             Object o = webView
                     .getEngine()
                     .executeScript(
-                         "var list = document.querySelectorAll( ':popout' );"
+                         "var list = document.querySelectorAll( ':hover' );"
                          + "for (i=list.length-1; i>-1; i--) "
                          + "{ if ( list.item(i).getAttribute('href') ) "
                          + "{ list.item(i).getAttribute('href'); break; } }");
