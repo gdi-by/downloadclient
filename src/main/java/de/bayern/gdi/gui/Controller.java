@@ -220,6 +220,26 @@ public class Controller {
     }
 
     /**
+     * Handle action related to "About" menu item.
+     *
+     * @param event Event on "About" menu item.
+     */
+    @FXML
+    private void handleAboutAction(final ActionEvent event) {
+
+    }
+
+    /**
+     * Handle action related to "Help" menu item.
+     *
+     * @param event Event on "Help" menu item.
+     */
+    @FXML
+    private void handleHelpAction(final ActionEvent event) {
+
+    }
+
+    /**
      * Handler to close the application.
      *
      * @param event The event.
