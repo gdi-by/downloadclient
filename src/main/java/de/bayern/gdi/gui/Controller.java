@@ -242,7 +242,7 @@ public class Controller {
             displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
                     "about/about_" + I18n.getLocale().toLanguageTag()
                             + ".html");
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return;
         }
@@ -250,10 +250,11 @@ public class Controller {
 
     private void displayHTMLFileAsPopup(String popuptitle, String pathToFile)
             throws
-            FileNotFoundException {
+            IOException {
         WebView web = new WebView();
         File file = Misc.getResource(pathToFile);
-        String path = file.toString();
+        String path = file.toURI().toURL().toExternalForm();
+        web.getEngine().load(path);
         WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
