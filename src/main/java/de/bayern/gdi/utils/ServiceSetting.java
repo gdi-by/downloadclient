@@ -20,9 +20,6 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;

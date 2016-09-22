@@ -22,7 +22,6 @@ import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;

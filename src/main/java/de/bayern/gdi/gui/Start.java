@@ -24,7 +24,6 @@ import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.Unauthorized;
 
-import java.io.File;
 import java.io.IOException;
 
 import java.net.URL;
@@ -47,8 +46,8 @@ public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
+    private static final int WIDTH = 1024;
+    private static final int HEIGHT = 768;
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
 
 
