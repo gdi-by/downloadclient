@@ -104,7 +104,6 @@ public class Start extends Application {
             FileResponseHandler.setUnauthorized(unauthorized);
             DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
-            InputStream is = classLoader.getResourceAsStream(LOGONAME);
             URL imageURL = classLoader.getResource("img/" + LOGONAME);
             Image image = new Image(imageURL.toExternalForm());
             primaryStage.getIcons().add(image);
