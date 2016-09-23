@@ -480,14 +480,6 @@ public class Controller {
                     dataBean.getSelectedService().getServiceURL().toString()
             );
         });
-        //Check if this thing could be loaded
-        if (dataBean.getSelectedService().getServiceType() == null) {
-            Platform.runLater(() -> {
-                setStatusTextUI(
-                        I18n.format("status.service.broken"));
-            });
-            return false;
-        }
         //Check if Username and Password are given
         if (((dataBean.getSelectedService().getUsername() != null
                 && dataBean.getSelectedService().getPassword() != null)
@@ -509,6 +501,14 @@ public class Controller {
                 this.servicePW.setDisable(true);
                 clearUserNamePassword();
             });
+        }
+        //Check if this thing could be loaded
+        if (dataBean.getSelectedService().getServiceType() == null) {
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.service.broken"));
+            });
+            return false;
         }
 
         Platform.runLater(() -> {
