@@ -1,10 +1,8 @@
 =======================================================
 GDI-BY Download-Client Dokumentation
 =======================================================
-
 :Autor: Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)
 :Kontakt: gdi-by@ldbv.bayern.de
-
 
 Einleitung
 ============
@@ -12,8 +10,6 @@ Einleitung
 Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
 Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-Source-Software unter der Apache License 2.0 zur Verfügung gestellt.
-
-
 
 Installation
 ============
@@ -26,7 +22,6 @@ Voraussetzungen - Softwareumgebung
 **Für die Installation des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
 
 Funktionalität
 ==============
