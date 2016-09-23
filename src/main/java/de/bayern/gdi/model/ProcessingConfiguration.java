@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.model;
 
+import de.bayern.gdi.utils.Misc;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +48,7 @@ public class ProcessingConfiguration {
 
     /** Name of the config file. */
     public static final String PROCESSING_CONFIG_FILE =
-        "verarbeitungsschritte.xml";
+        "de/bayern/gdi/model/verarbeitungsschritte.xml";
 
     @XmlElementWrapper(name = "Eingabeelemente")
     @XmlElement(name = "Eingabeelement")
@@ -171,8 +173,7 @@ public class ProcessingConfiguration {
     public static ProcessingConfiguration loadDefault() {
         InputStream in = null;
         try {
-            in = ProcessingConfiguration.class.getResourceAsStream(
-                PROCESSING_CONFIG_FILE);
+            in = Misc.getResource(PROCESSING_CONFIG_FILE);
             if (in == null) {
                 log.log(Level.SEVERE,
                     PROCESSING_CONFIG_FILE + " not found");

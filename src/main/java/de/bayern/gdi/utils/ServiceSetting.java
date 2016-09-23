@@ -19,6 +19,7 @@
 package de.bayern.gdi.utils;
 
 import de.bayern.gdi.services.Service;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -269,10 +270,7 @@ public class ServiceSetting {
     }
 
     private static InputStream getFileStream(String fileName) {
-
-        ClassLoader classLoader = ServiceSetting.class.getClassLoader();
-        InputStream stream = classLoader.getResourceAsStream(fileName);
-
+        InputStream stream = Misc.getResource(fileName);
         return stream;
     }
 }

@@ -21,16 +21,21 @@ package de.bayern.gdi.gui;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.Unauthorized;
+
 import java.io.IOException;
+
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -41,8 +46,9 @@ public class Start extends Application {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
+    private static final int WIDTH = 1024;
+    private static final int HEIGHT = 768;
+    private static final String LOGONAME = "icon_118x118_300dpi.jpg";
 
 
     /**
@@ -83,7 +89,6 @@ public class Start extends Application {
         try {
             ClassLoader classLoader = Start.class.getClassLoader();
             URL url = classLoader.getResource("download-client.fxml");
-            //System.out.println(url);
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
@@ -101,6 +106,8 @@ public class Start extends Application {
             FileResponseHandler.setUnauthorized(unauthorized);
             DocumentResponseHandler.setUnauthorized(unauthorized);
             primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
+            Image image = new Image(Misc.getResource("img/" + LOGONAME));
+            primaryStage.getIcons().add(image);
             primaryStage.setScene(scene);
             primaryStage.show();
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
