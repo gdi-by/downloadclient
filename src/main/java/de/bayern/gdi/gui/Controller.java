@@ -44,10 +44,14 @@ import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +79,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -94,8 +99,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -210,13 +217,80 @@ public class Controller {
     @FXML
     private Label referenceSystemChooserLabel;
 
+    @FXML
+    private MenuItem menuHelp;
+    @FXML
+    private MenuItem menuAbout;
+    @FXML
+    private MenuBar menuBar;
     /**
      * Creates the Controller.
      */
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
+    }
 
+    /**
+     * Handle action related to "About" menu item.
+     *
+     * @param event Event on "About" menu item.
+     */
+    @FXML
+    private void handleAboutAction(final ActionEvent event) {
+        try {
+            displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
+                    "about/about_" + I18n.getLocale().toLanguageTag()
+                            + ".html");
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return;
+        }
+    }
+
+    private void displayHTMLFileAsPopup(String popuptitle, String pathToFile)
+            throws
+            IOException {
+        WebView web = new WebView();
+        InputStream htmlPage = Misc.getResource(pathToFile);
+        web.getEngine().loadContent(Misc.inputStreamToString(htmlPage));
+        WebViewWindow wvw = new WebViewWindow(web, popuptitle);
+        wvw.popup();
+    }
+    /**
+     * Handle action related to "Help" menu item.
+     *
+     * @param event Event on "Help" menu item.
+     */
+
+    @FXML
+    private void handleHelpAction(final ActionEvent event) {
+        String pathToFile = "help/help_" + I18n.getLocale().toLanguageTag()
+                + ".txt";
+        try {
+            openLinkFromFile(pathToFile);
+        } catch (FileNotFoundException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return;
+        }
+    }
+
+    private void openLinkFromFile(String pathToFile) throws
+            FileNotFoundException {
+        InputStream is = Misc.getResource(pathToFile);
+        String contents = Misc.inputStreamToString(is);
+        try {
+            if (contents != null
+                    && !contents.isEmpty()
+                    && !contents.equals("null")) {
+                URL helpURL = new URL(contents);
+                Misc.startExternalBrowser(helpURL.toString());
+            } else {
+                throw new MalformedURLException("URL is Empty");
+            }
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     /**
