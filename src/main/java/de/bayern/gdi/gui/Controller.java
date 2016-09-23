@@ -330,7 +330,8 @@ public class Controller {
                         (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
                 Service service;
-                if (serviceModel.getUrl().toString().equals(
+                if (serviceModel != null
+                    && serviceModel.getUrl().toString().equals(
                         serviceURL.getText())
                         ) {
                     service = serviceModel.getItem();
