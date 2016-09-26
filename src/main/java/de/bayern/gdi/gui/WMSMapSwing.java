@@ -1094,6 +1094,22 @@ public class WMSMapSwing extends Parent {
         return null;
     }
 
+    /**
+     * resets the map.
+     */
+    public void reset() {
+        clearCoordinateDisplay();
+        this.mapContent.layers().stream()
+                .filter(layer -> layer.getTitle() != null)
+                .filter(layer -> layer.getTitle().equals(POLYGON_LAYER_TITLE))
+                .forEach(layer -> {
+                    mapContent.removeLayer(layer);
+                });
+        this.polygonFeatureCollection = null;
+        this.geomDesc = null;
+        this.geometryAttributeName = null;
+    }
+
     //TODO - Destructor for Swing Item with Maplayer Dispose
 
     /**
