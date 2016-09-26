@@ -913,9 +913,7 @@ public class Controller {
         this.dataBean.reset();
         this.mapAtom.reset();
         this.mapWFS.reset();
-        this.simpleWFSContainer = new VBox();
         this.simpleWFSContainer.setVisible(false);
-        this.basicWFSContainer = new VBox();
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
         this.atomContainer.setVisible(false);
