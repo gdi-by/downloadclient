@@ -20,6 +20,7 @@ package de.bayern.gdi.gui;
 
 
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -101,6 +102,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -510,14 +512,21 @@ public class WMSMapSwing extends Parent {
                 y2,
                 sourceCRS,
                 targetCRS);
-        this.coordinateX1TextField.setText(
-                String.valueOf(p1.getX()));
-        this.coordinateY1TextField.setText(
-                String.valueOf(p1.getY()));
-        this.coordinateX2TextField.setText(
-                String.valueOf(p2.getX()));
-        this.coordinateY2TextField.setText(
-                String.valueOf(p2.getY()));
+        ReferencedEnvelope re = new ReferencedEnvelope(targetCRS);
+        re.include(p1.getX(), p1.getY());
+        re.include(p2.getX(), p2.getY());
+        DirectPosition lowerCorner = re.getLowerCorner();
+        DirectPosition upperCorner = re.getUpperCorner();
+        if (lowerCorner != null && upperCorner != null) {
+            this.coordinateX1TextField.setText(String.valueOf(
+                    lowerCorner.getCoordinate()[0]));
+            this.coordinateY1TextField.setText(
+                    String.valueOf(lowerCorner.getCoordinate()[1]));
+            this.coordinateX2TextField.setText(
+                    String.valueOf(upperCorner.getCoordinate()[0]));
+            this.coordinateY2TextField.setText(
+                    String.valueOf(upperCorner.getCoordinate()[1]));
+        }
     }
 
     private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
