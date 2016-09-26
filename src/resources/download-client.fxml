@@ -18,6 +18,9 @@
                <MenuItem text="%menu.help" onAction="#handleHelpAction" fx:id="menuHelp"/>
                <MenuItem text="%menu.about" onAction="#handleAboutAction" fx:id="menuAbout"/>
             </Menu>
+            <Menu text ="%menu.file">
+               <MenuItem text="%menu.quit" onAction="#handleCloseApp" fx:id="menuQuit"/>
+            </Menu>
          </menus>
       </MenuBar>
       <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
