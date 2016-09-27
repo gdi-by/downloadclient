@@ -45,7 +45,6 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
@@ -920,6 +919,9 @@ public class WMSMapSwing extends Parent {
         });
     }
 
+    /**
+     * repaints the map.
+     */
     public void repaint() {
         Task task = new Task() {
             protected Integer call() {
