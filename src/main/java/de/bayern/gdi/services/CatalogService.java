@@ -289,65 +289,8 @@ public class CatalogService {
             String serviceTypeVersion = (String) XML.xpath(serviceN,
                     serviceTypeVersionExpr,
                     XPathConstants.STRING, context);
-            String onLineExpr = "gmd:distributionInfo"
-                    + "/gmd:MD_Distribution"
-                    + "/gmd:transferOptions"
-                    + "/gmd:MD_DigitalTransferOptions"
-                    + "/gmd:onLine";
-            NodeList onlineNL = (NodeList) XML.xpath(serviceN,
-                    onLineExpr,
-                    XPathConstants.NODESET, context);
-            String serviceURL = null;
-            for (int j = 0; j < onlineNL.getLength(); j++) {
-                Node onlineN = onlineNL.item(j);
-                String urlExpr =
-                        "gmd:CI_OnlineResource"
-                                + "/gmd:linkage"
-                                + "/gmd:URL";
-                String onLineserviceURL = (String) XML.xpath(onlineN,
-                        urlExpr,
-                        XPathConstants.STRING, context);
-                String applicationprofileExpr =
-                        "gmd:CI_OnlineResource"
-                                + "/gmd:applicationProfile"
-                                + "/gco:CharacterString";
-                String applicationProfile = (String) XML.xpath(onlineN,
-                        applicationprofileExpr,
-                        XPathConstants.STRING, context);
-                applicationProfile = applicationProfile.toLowerCase();
-                if (applicationProfile.equals("wfs-url")
-                        || applicationProfile.equals("feed-url")) {
-                    serviceURL = onLineserviceURL;
-                    break;
-                } else if (applicationProfile.equals("dienste-url")
-                        || applicationProfile.equals("download")) {
-                    serviceURL = onLineserviceURL;
-                    break;
-                }
-                String operationNameExpr =
-                        "srv:containsOperations"
-                                + "/srv:SV_OperationMetadata"
-                                + "/srv:operationName"
-                                + "/gco:CharacterString";
-                String operationName = (String) XML.xpath(onlineN,
-                        operationNameExpr,
-                        XPathConstants.STRING, context);
-                if (operationName.equals("GetCapabilities")) {
-                    String operationsURLExpr =
-                            "srv:containsOperations"
-                                    + "/srv:SV_OperationMetadata"
-                                    + "/srv:connectPoint"
-                                    + "/gmd:CI_OnlineResource"
-                                    + "/gmd:linkage"
-                                    + "gmd:URL";
-                    String operationsURL = (String) XML.xpath(onlineN,
-                            operationsURLExpr,
-                            XPathConstants.STRING, context);
-                    serviceURL = operationsURL;
-                } else {
-                    serviceURL = onLineserviceURL;
-                }
-            }
+
+            String serviceURL = getServiceURL(serviceN);
 
             if (serviceTypeVersion.equals("")) {
                 serviceTypeVersion = "ATOM";
@@ -363,6 +306,95 @@ public class CatalogService {
             }
         }
         return services;
+    }
+
+    private String getServiceURL(Node serviceNode) {
+        String onLineExpr = "gmd:distributionInfo"
+                + "/gmd:MD_Distribution"
+                + "/gmd:transferOptions"
+                + "/gmd:MD_DigitalTransferOptions"
+                + "/gmd:onLine";
+        NodeList onlineNL = (NodeList) XML.xpath(serviceNode,
+                onLineExpr,
+                XPathConstants.NODESET, context);
+        for (int j = 0; j < onlineNL.getLength(); j++) {
+            Node onlineN = onlineNL.item(j);
+            String urlExpr =
+                    "gmd:CI_OnlineResource"
+                            + "/gmd:linkage"
+                            + "/gmd:URL";
+            String onLineserviceURL = (String) XML.xpath(onlineN,
+                    urlExpr,
+                    XPathConstants.STRING, context);
+            String applicationprofileExpr =
+                    "gmd:CI_OnlineResource"
+                            + "/gmd:applicationProfile"
+                            + "/gco:CharacterString";
+            String applicationProfile = (String) XML.xpath(onlineN,
+                    applicationprofileExpr,
+                    XPathConstants.STRING, context);
+            applicationProfile = applicationProfile.toLowerCase();
+            if (applicationProfile.equals("wfs-url")
+                    || applicationProfile.equals("feed-url")) {
+                return onLineserviceURL;
+            } else if (applicationProfile.equals("dienste-url")
+                    || applicationProfile.equals("download")) {
+                return onLineserviceURL;
+            }
+        }
+        String operationMetaDataExpr =
+                "gmd:identificationInfo"
+                        + "/srv:SV_ServiceIdentification"
+                        + "/srv:containsOperations";
+        NodeList operationsMetadataNL = (NodeList) XML.xpath(serviceNode,
+                operationMetaDataExpr,
+                XPathConstants.NODESET, context);
+        Node firstNode = null;
+        for (int j = 0; j < operationsMetadataNL.getLength(); j++) {
+            Node operationMetadataNode = operationsMetadataNL.item(j);
+            if (j == 0) {
+                firstNode = operationMetadataNode;
+            }
+            String operationsNameExpr =
+                    "srv:SV_OperationMetadata"
+                            + "/srv:operationName"
+                            + "/gco:CharacterString";
+            String applicationProfile = (String) XML.xpath(
+                    operationMetadataNode,
+                    operationsNameExpr,
+                    XPathConstants.STRING, context);
+            if (applicationProfile.toLowerCase().
+                    equals("getcapabilities")) {
+                String operationsURLExpr =
+                        "srv:SV_OperationMetadata"
+                                + "/srv:connectPoint"
+                                + "/gmd:CI_OnlineResource"
+                                + "/gmd:linkage"
+                                + "/gmd:URL";
+                String operationsURL = (String) XML.xpath(
+                        operationMetadataNode,
+                        operationsURLExpr,
+                        XPathConstants.STRING, context);
+                if (!operationsURL.isEmpty()) {
+                    return operationsURL;
+                }
+            }
+        }
+        if (firstNode != null) {
+            String operationsURLExpr =
+                    "srv:SV_OperationMetadata"
+                            + "/srv:connectPoint"
+                            + "/gmd:CI_OnlineResource"
+                            + "/gmd:linkage"
+                            + "/gmd:URL";
+            String operationsURL = (String) XML.xpath(
+                    firstNode,
+                    operationsURLExpr,
+                    XPathConstants.STRING, context);
+            return operationsURL;
+
+        }
+        return null;
     }
 
     /**
