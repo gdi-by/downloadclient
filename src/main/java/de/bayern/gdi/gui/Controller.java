@@ -653,8 +653,19 @@ public class Controller {
         if (selim != null) {
             Atom.Field selaf = (Atom.Field) selim.getItem();
             this.dataBean.addAttribute("VARIATION", selaf.type, "");
-            this.valueAtomFormat.setText(selaf.format);
-            this.valueAtomRefsys.setText(selaf.crs);
+            System.out.println(selaf.format);
+            if (selaf.format.isEmpty()) {
+                this.valueAtomFormat.setVisible(false);
+            } else {
+                this.valueAtomFormat.setText(selaf.format);
+                this.valueAtomFormat.setVisible(true);
+            }
+            if (selaf.crs.isEmpty()) {
+                this.valueAtomRefsys.setVisible(false);
+            } else {
+                this.valueAtomRefsys.setVisible(true);
+                this.valueAtomRefsys.setText(selaf.crs);
+            }
             this.dataBean.addAttribute("outputformat", selaf.format, "");
         } else {
             this.dataBean.addAttribute("VARIATION", "", "");

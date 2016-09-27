@@ -37,6 +37,8 @@ public final class Misc {
     /** Number of tries before giving up searching for collisions. */
     private static final int MAX_TRIES = 5000;
 
+    private static final int TEN = 10;
+
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
 
@@ -133,6 +135,33 @@ public final class Misc {
         return s.hasNext() ? s.next() : "";
     }
 
+    /**
+     * Checks if a String is an Integer.
+     * @param s string
+     * @return true if integer; false if not
+     */
+    public static boolean isInteger(String s) {
+        return isInteger(s, TEN);
+    }
+
+    private static boolean isInteger(String s, int radix) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-') {
+                if (s.length() == 1) {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+            if (Character.digit(s.charAt(i), radix) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * Tries to start the external default browser.
      * @param url url
