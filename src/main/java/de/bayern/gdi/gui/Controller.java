@@ -911,6 +911,8 @@ public class Controller {
             this.serviceTypeChooser.getItems().retainAll();
         });
         this.dataBean.reset();
+        this.mapAtom.reset();
+        this.mapWFS.reset();
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
@@ -1173,6 +1175,9 @@ public class Controller {
                         serviceTypeChooser.setValue(opts.get(0));
                         chooseType(serviceTypeChooser.getValue());
                     }
+                    Platform.runLater(() -> {
+                        mapAtom.repaint();
+                    });
                 default:
             }
         }
@@ -1194,6 +1199,9 @@ public class Controller {
             }
             if (mapAtom != null) {
                 mapAtom.highlightSelectedPolygon(item.id);
+                Platform.runLater(() -> {
+                    mapAtom.repaint();
+                });
             }
             List<Atom.Field> fields = item.fields;
             ObservableList<ItemModel> list =

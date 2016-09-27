@@ -43,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -101,6 +102,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -510,14 +512,21 @@ public class WMSMapSwing extends Parent {
                 y2,
                 sourceCRS,
                 targetCRS);
-        this.coordinateX1TextField.setText(
-                String.valueOf(p1.getX()));
-        this.coordinateY1TextField.setText(
-                String.valueOf(p1.getY()));
-        this.coordinateX2TextField.setText(
-                String.valueOf(p2.getX()));
-        this.coordinateY2TextField.setText(
-                String.valueOf(p2.getY()));
+        ReferencedEnvelope re = new ReferencedEnvelope(targetCRS);
+        re.include(p1.getX(), p1.getY());
+        re.include(p2.getX(), p2.getY());
+        DirectPosition lowerCorner = re.getLowerCorner();
+        DirectPosition upperCorner = re.getUpperCorner();
+        if (lowerCorner != null && upperCorner != null) {
+            this.coordinateX1TextField.setText(String.valueOf(
+                    lowerCorner.getCoordinate()[0]));
+            this.coordinateY1TextField.setText(
+                    String.valueOf(lowerCorner.getCoordinate()[1]));
+            this.coordinateX2TextField.setText(
+                    String.valueOf(upperCorner.getCoordinate()[0]));
+            this.coordinateY2TextField.setText(
+                    String.valueOf(upperCorner.getCoordinate()[1]));
+        }
     }
 
     private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
@@ -620,7 +629,7 @@ public class WMSMapSwing extends Parent {
                         } else {
                             clickCount = 0;
                         }
-                        mapPane.repaint();
+                        repaint();
                     } else {
                         DirectPosition2D pos = ev.getWorldPos();
                         MapContent content = mapPane.getMapContent();
@@ -777,7 +786,6 @@ public class WMSMapSwing extends Parent {
                     }
                 }
                 ((FeatureLayer) layer).setStyle(style);
-                mapPane.repaint();
             }
         }
     }
@@ -912,6 +920,21 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * repaints the map.
+     */
+    public void repaint() {
+        Task task = new Task() {
+            protected Integer call() {
+                mapPane.repaint();
+                return 0;
+            }
+        };
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
+
+    /**
      * Draws Polygons on the maps.
      *
      * @param featurePolygons List of drawable Polygons
@@ -970,9 +993,7 @@ public class WMSMapSwing extends Parent {
                     }
                 }
             }
-            //polygonLayer.setVisible(false);
             mapContent.addLayer(polygonLayer);
-            mapPane.repaint();
         } catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -1092,6 +1113,22 @@ public class WMSMapSwing extends Parent {
             }
         }
         return null;
+    }
+
+    /**
+     * resets the map.
+     */
+    public void reset() {
+        clearCoordinateDisplay();
+        this.mapContent.layers().stream()
+                .filter(layer -> layer.getTitle() != null)
+                .filter(layer -> layer.getTitle().equals(POLYGON_LAYER_TITLE))
+                .forEach(layer -> {
+                    mapContent.removeLayer(layer);
+                });
+        this.polygonFeatureCollection = null;
+        this.geomDesc = null;
+        this.geometryAttributeName = null;
     }
 
     //TODO - Destructor for Swing Item with Maplayer Dispose

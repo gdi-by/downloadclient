@@ -14,6 +14,9 @@
    <children>
       <MenuBar fx:id="menuBar">
          <menus>
+            <Menu text ="%menu.file">
+               <MenuItem text="%menu.quit" onAction="#handleCloseApp" fx:id="menuQuit"/>
+            </Menu>
             <Menu text="%menu.extra">
                <MenuItem text="%menu.help" onAction="#handleHelpAction" fx:id="menuHelp"/>
                <MenuItem text="%menu.about" onAction="#handleAboutAction" fx:id="menuAbout"/>
