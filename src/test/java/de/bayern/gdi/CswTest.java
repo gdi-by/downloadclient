@@ -17,11 +17,13 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.gui.ServiceModel;
 import de.bayern.gdi.services.CatalogService;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import de.bayern.gdi.services.Service;
 import junit.framework.TestCase;
 import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
@@ -63,14 +65,14 @@ public class CswTest extends TestCase {
     }
 
     @Test
-    public void testCswClient() throws IOException {
+    public void testCswClient() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell search");
         run("/csw/atom-feeds", "/csw202/atom-feeds.xml");
     }
 
 
     private void run(String queryPath, String queryResource)
-                throws IOException {
+                throws IOException, URISyntaxException {
 
         String body = IOUtils.toString(
                 CswTest.class.getResourceAsStream(queryResource), "UTF-8"
@@ -82,7 +84,7 @@ public class CswTest extends TestCase {
         CatalogService catalogService =
                 new CatalogService(buildGetCapabilitiesUrl(port()));
 
-        List<ServiceModel> services = catalogService.
+        List<Service> services = catalogService.
                 getServicesByFilter("not-required-because-mocked");
 
 

@@ -21,6 +21,7 @@ import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMeta.Feature;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import junit.framework.TestCase;
 import static net.jadler.Jadler.closeJadler;
@@ -59,13 +60,13 @@ public class WfsTest extends TestCase {
     }
 
     @Test
-    public void testGeoServer() throws IOException {
+    public void testGeoServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell GeoServer");
         run("/geoserver/wfs", "/wfs20/geoserver/geoserver-capabilities.xml");
     }
 
     @Test
-    public void testXtraServer() throws IOException {
+    public void testXtraServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell XtraServer");
         run("/xtraserver/wfs", "/wfs20/xtraserver/xtraserver-capabilities.xml");
     }
@@ -73,7 +74,7 @@ public class WfsTest extends TestCase {
 
 
     private void run(String queryPath, String queryResource)
-                throws IOException {
+                throws IOException, URISyntaxException {
 
         String body = IOUtils.toString(
                 WfsTest.class.getResourceAsStream(queryResource), "UTF-8"
