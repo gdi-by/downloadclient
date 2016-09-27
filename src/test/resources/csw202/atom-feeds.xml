@@ -1,0 +1,1388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
+    <csw:SearchStatus timestamp="2016-06-22T16:44:51" />
+    <csw:SearchResults numberOfRecordsMatched="3" numberOfRecordsReturned="3" elementSet="full" nextRecord="0">
+        <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:geonet="http://www.fao.org/geonetwork" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+            <gmd:fileIdentifier>
+                <gco:CharacterString>a7708c3b-1f93-37af-9988-e4583c449600</gco:CharacterString>
+            </gmd:fileIdentifier>
+            <gmd:language>
+                <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2" codeListValue="ger">Deutsch</gmd:LanguageCode>
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+            </gmd:characterSet>
+            <gmd:hierarchyLevel>
+                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+            </gmd:hierarchyLevel>
+            <gmd:contact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:individualName>
+                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                    </gmd:individualName>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                    </gmd:voice>
+                                    <gmd:facsimile>
+                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                    </gmd:facsimile>
+                                </gmd:CI_Telephone>
+                            </gmd:phone>
+                            <gmd:address>
+                                <gmd:CI_Address>
+                                    <gmd:deliveryPoint>
+                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                    </gmd:deliveryPoint>
+                                    <gmd:city>
+                                        <gco:CharacterString>München</gco:CharacterString>
+                                    </gmd:city>
+                                    <gmd:administrativeArea>
+                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                    </gmd:administrativeArea>
+                                    <gmd:postalCode>
+                                        <gco:CharacterString>80538</gco:CharacterString>
+                                    </gmd:postalCode>
+                                    <gmd:country>
+                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                    </gmd:country>
+                                    <gmd:electronicMailAddress>
+                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+                            </gmd:address>
+                            <gmd:onlineResource>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onlineResource>
+                            <gmd:hoursOfService>
+                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                            </gmd:hoursOfService>
+                            <gmd:contactInstructions>
+                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                            </gmd:contactInstructions>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:contact>
+            <gmd:dateStamp>
+                <gco:Date>2015-09-04</gco:Date>
+            </gmd:dateStamp>
+            <gmd:metadataStandardName>
+                <gco:CharacterString>ISO 19115 - Geographic Information - Metadata; Metadatenprofil der GDI Bayern</gco:CharacterString>
+            </gmd:metadataStandardName>
+            <gmd:metadataStandardVersion>
+                <gco:CharacterString>ISO 19115:2003/Cor. 1:2006; ISO 19119:2005/Amd 1:2008</gco:CharacterString>
+            </gmd:metadataStandardVersion>
+            <gmd:identificationInfo>
+                <!-- ######################################################################## -->
+                <srv:SV_ServiceIdentification uuid="55e05eec-1dc2-369b-b003-0ffb7c6ad76f">
+                    <!-- ######################################################################## -->
+                    <gmd:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Pre-defined Atom Freilichtmuseen</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                                <gmd:CI_Date>
+                                    <gmd:date>
+                                        <gco:Date>2015-03-26</gco:Date>
+                                    </gmd:date>
+                                    <gmd:dateType>
+                                        <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
+                                    </gmd:dateType>
+                                </gmd:CI_Date>
+                            </gmd:date>
+                            <gmd:identifier>
+                                <gmd:MD_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>http://geoportal.bayern.de/service/55e05eec-1dc2-369b-b003-0ffb7c6ad76f</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:MD_Identifier>
+                            </gmd:identifier>
+                        </gmd:CI_Citation>
+                    </gmd:citation>
+                    <gmd:abstract>
+                        <gco:CharacterString>Hier finden Sie eine Auswahl an Freilichtmuseen in Bayern.Die Daten werden durch die Bayerische Vermessungsverwaltung (BVV) bereitgestellt und sind vor einem Download zu lizenzieren. Bei Fragen wenden Sie sich an den Kundenservice: service@geodaten.bayern.de - 089/2129 11 11. Quelle: Bayerische Vermessungsverwaltung; Foto Themenbild: © Andreas P - Fotolia</gco:CharacterString>
+                    </gmd:abstract>
+                    <gmd:pointOfContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:individualName>
+                                <gco:CharacterString>Kundenservice</gco:CharacterString>
+                            </gmd:individualName>
+                            <gmd:organisationName>
+                                <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:phone>
+                                        <gmd:CI_Telephone>
+                                            <gmd:voice>
+                                                <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                            </gmd:voice>
+                                            <gmd:facsimile>
+                                                <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                            </gmd:facsimile>
+                                        </gmd:CI_Telephone>
+                                    </gmd:phone>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>München</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:administrativeArea>
+                                                <gco:CharacterString>Bayern</gco:CharacterString>
+                                            </gmd:administrativeArea>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>80538</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:country>
+                                                <gco:CharacterString>Deutschland</gco:CharacterString>
+                                            </gmd:country>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                            </gmd:linkage>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                    <gmd:hoursOfService>
+                                        <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                    </gmd:hoursOfService>
+                                    <gmd:contactInstructions>
+                                        <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                    </gmd:contactInstructions>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:pointOfContact>
+                    <gmd:resourceMaintenance>
+                        <gmd:MD_MaintenanceInformation>
+                            <gmd:maintenanceAndUpdateFrequency>
+                                <gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="asNeeded">asNeeded</gmd:MD_MaintenanceFrequencyCode>
+                            </gmd:maintenanceAndUpdateFrequency>
+                        </gmd:MD_MaintenanceInformation>
+                    </gmd:resourceMaintenance>
+                    <gmd:graphicOverview>
+                        <gmd:MD_BrowseGraphic>
+                            <gmd:fileName>
+                                <gco:CharacterString>http://www.geodaten.bayern.de/gdiadmin/images/51350/freilichtmuseen-info.png</gco:CharacterString>
+                            </gmd:fileName>
+                            <gmd:fileDescription>
+                                <gco:CharacterString>Vorschaubild</gco:CharacterString>
+                            </gmd:fileDescription>
+                        </gmd:MD_BrowseGraphic>
+                    </gmd:graphicOverview>
+                    <gmd:descriptiveKeywords>
+                        <gmd:MD_Keywords>
+                            <gmd:keyword>
+                                <gco:CharacterString>Open Data</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>OpenData</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Sehenswürdigkeit</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Freilichtmuseen</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>historisch</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Museum</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Sommer</gco:CharacterString>
+                            </gmd:keyword>
+                        </gmd:MD_Keywords>
+                    </gmd:descriptiveKeywords>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:accessConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="copyright">copyright</gmd:MD_RestrictionCode>
+                            </gmd:accessConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:useLimitation>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:useLimitation>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="license">license</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:otherConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>{ "id": "cc-by", "name": "Creative Commons Namensnennung (CC BY)", "quelle": "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de", "url": "http://creativecommons.org/licenses/by/3.0/deed.de" }</gco:CharacterString>
+                            </gmd:otherConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_SecurityConstraints>
+                            <gmd:classification>
+                                <gmd:MD_ClassificationCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ClassificationCode" codeListValue="unclassified">unclassified</gmd:MD_ClassificationCode>
+                            </gmd:classification>
+                        </gmd:MD_SecurityConstraints>
+                    </gmd:resourceConstraints>
+                    <!-- ######################################################################## -->
+                    <srv:serviceType>
+                        <gco:LocalName>download</gco:LocalName>
+                    </srv:serviceType>
+                    <srv:serviceTypeVersion>
+                        <gco:CharacterString>Atom Implementation of Pre-defined Dataset Download Services</gco:CharacterString>
+                    </srv:serviceTypeVersion>
+                    <srv:extent>
+                        <gmd:EX_Extent>
+                            <gmd:description>
+                                <gco:CharacterString>Bayern</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:geographicElement>
+                                <gmd:EX_GeographicBoundingBox>
+                                    <gmd:westBoundLongitude>
+                                        <gco:Decimal>8.945096154917964</gco:Decimal>
+                                    </gmd:westBoundLongitude>
+                                    <gmd:eastBoundLongitude>
+                                        <gco:Decimal>13.908908586487573</gco:Decimal>
+                                    </gmd:eastBoundLongitude>
+                                    <gmd:southBoundLatitude>
+                                        <gco:Decimal>47.24843532655711</gco:Decimal>
+                                    </gmd:southBoundLatitude>
+                                    <gmd:northBoundLatitude>
+                                        <gco:Decimal>50.56420950059199</gco:Decimal>
+                                    </gmd:northBoundLatitude>
+                                </gmd:EX_GeographicBoundingBox>
+                            </gmd:geographicElement>
+                        </gmd:EX_Extent>
+                    </srv:extent>
+                    <srv:couplingType>
+                        <srv:SV_CouplingType codeList="./resources/codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="tight">tight</srv:SV_CouplingType>
+                    </srv:couplingType>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetDownloadServiceMetadata</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/2dd4a263-1785-4c40-ad42-a0d6f9b0bd36</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>DescribeSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/2dd4a263-1785-4c40-ad42-a0d6f9b0bd36</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/2dd4a263-1785-4c40-ad42-a0d6f9b0bd36</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:operatesOn uuidref="2547d2dd-7dc1-47d3-9e55-5c2569b39b18" xlink:href="http://geoportal.bayern.de/dataset/2547d2dd-7dc1-47d3-9e55-5c2569b39b18" xlink:title="Freilichtmuseen" />
+                </srv:SV_ServiceIdentification>
+                <!-- ######################################################################## -->
+            </gmd:identificationInfo>
+            <gmd:distributionInfo>
+                <gmd:MD_Distribution>
+                    <gmd:distributionFormat>
+                        <gmd:MD_Format>
+                            <gmd:name gco:nilReason="missing" />
+                            <gmd:version gco:nilReason="missing" />
+                        </gmd:MD_Format>
+                    </gmd:distributionFormat>
+                    <gmd:distributor>
+                        <gmd:MD_Distributor>
+                            <gmd:distributorContact>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:individualName>
+                                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                                    </gmd:individualName>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:phone>
+                                                <gmd:CI_Telephone>
+                                                    <gmd:voice>
+                                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                                    </gmd:voice>
+                                                    <gmd:facsimile>
+                                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                                    </gmd:facsimile>
+                                                </gmd:CI_Telephone>
+                                            </gmd:phone>
+                                            <gmd:address>
+                                                <gmd:CI_Address>
+                                                    <gmd:deliveryPoint>
+                                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                                    </gmd:deliveryPoint>
+                                                    <gmd:city>
+                                                        <gco:CharacterString>München</gco:CharacterString>
+                                                    </gmd:city>
+                                                    <gmd:administrativeArea>
+                                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                                    </gmd:administrativeArea>
+                                                    <gmd:postalCode>
+                                                        <gco:CharacterString>80538</gco:CharacterString>
+                                                    </gmd:postalCode>
+                                                    <gmd:country>
+                                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                                    </gmd:country>
+                                                    <gmd:electronicMailAddress>
+                                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                                    </gmd:electronicMailAddress>
+                                                </gmd:CI_Address>
+                                            </gmd:address>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                                    </gmd:linkage>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                            <gmd:hoursOfService>
+                                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                            </gmd:hoursOfService>
+                                            <gmd:contactInstructions>
+                                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                            </gmd:contactInstructions>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:distributorContact>
+                            <gmd:distributionOrderProcess>
+                                <gmd:MD_StandardOrderProcess>
+                                    <gmd:fees>
+                                        <gco:CharacterString>geldleistungsfrei</gco:CharacterString>
+                                    </gmd:fees>
+                                </gmd:MD_StandardOrderProcess>
+                            </gmd:distributionOrderProcess>
+                        </gmd:MD_Distributor>
+                    </gmd:distributor>
+                    <gmd:transferOptions>
+                        <gmd:MD_DigitalTransferOptions>
+                            <gmd:onLine>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/2dd4a263-1785-4c40-ad42-a0d6f9b0bd36</gmd:URL>
+                                    </gmd:linkage>
+                                    <gmd:applicationProfile>
+                                        <gco:CharacterString>Feed-URL</gco:CharacterString>
+                                    </gmd:applicationProfile>
+                                    <gmd:name>
+                                        <gco:CharacterString>URL des Dienstes</gco:CharacterString>
+                                    </gmd:name>
+                                    <gmd:description>
+                                        <gco:CharacterString>URL des Dienstes</gco:CharacterString>
+                                    </gmd:description>
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="Download">Download</gmd:CI_OnLineFunctionCode>
+                                    </gmd:function>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onLine>
+                        </gmd:MD_DigitalTransferOptions>
+                    </gmd:transferOptions>
+                </gmd:MD_Distribution>
+            </gmd:distributionInfo>
+            <gmd:dataQualityInfo>
+                <gmd:DQ_DataQuality>
+                    <gmd:scope>
+                        <gmd:DQ_Scope>
+                            <gmd:level>
+                                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+                            </gmd:level>
+                        </gmd:DQ_Scope>
+                    </gmd:scope>
+                    <gmd:lineage>
+                        <gmd:LI_Lineage>
+                            <gmd:statement>
+                                <gco:CharacterString>Abgeleitet aus dem Topographischen Informationsmanagemen des LDBV Bayern</gco:CharacterString>
+                            </gmd:statement>
+                        </gmd:LI_Lineage>
+                    </gmd:lineage>
+                </gmd:DQ_DataQuality>
+            </gmd:dataQualityInfo>
+        </gmd:MD_Metadata>
+        <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:geonet="http://www.fao.org/geonetwork" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+            <gmd:fileIdentifier>
+                <gco:CharacterString>d4dce4d0-e410-3d0e-a547-336b0d838684</gco:CharacterString>
+            </gmd:fileIdentifier>
+            <gmd:language>
+                <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2" codeListValue="ger">Deutsch</gmd:LanguageCode>
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+            </gmd:characterSet>
+            <gmd:hierarchyLevel>
+                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+            </gmd:hierarchyLevel>
+            <gmd:contact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:individualName>
+                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                    </gmd:individualName>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                    </gmd:voice>
+                                    <gmd:facsimile>
+                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                    </gmd:facsimile>
+                                </gmd:CI_Telephone>
+                            </gmd:phone>
+                            <gmd:address>
+                                <gmd:CI_Address>
+                                    <gmd:deliveryPoint>
+                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                    </gmd:deliveryPoint>
+                                    <gmd:city>
+                                        <gco:CharacterString>München</gco:CharacterString>
+                                    </gmd:city>
+                                    <gmd:administrativeArea>
+                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                    </gmd:administrativeArea>
+                                    <gmd:postalCode>
+                                        <gco:CharacterString>80538</gco:CharacterString>
+                                    </gmd:postalCode>
+                                    <gmd:country>
+                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                    </gmd:country>
+                                    <gmd:electronicMailAddress>
+                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+                            </gmd:address>
+                            <gmd:onlineResource>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onlineResource>
+                            <gmd:hoursOfService>
+                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                            </gmd:hoursOfService>
+                            <gmd:contactInstructions>
+                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                            </gmd:contactInstructions>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:contact>
+            <gmd:dateStamp>
+                <gco:Date>2015-09-04</gco:Date>
+            </gmd:dateStamp>
+            <gmd:metadataStandardName>
+                <gco:CharacterString>ISO 19115 - Geographic Information - Metadata; Metadatenprofil der GDI Bayern</gco:CharacterString>
+            </gmd:metadataStandardName>
+            <gmd:metadataStandardVersion>
+                <gco:CharacterString>ISO 19115:2003/Cor. 1:2006; ISO 19119:2005/Amd 1:2008</gco:CharacterString>
+            </gmd:metadataStandardVersion>
+            <gmd:identificationInfo>
+                <!-- ######################################################################## -->
+                <srv:SV_ServiceIdentification uuid="42a6a34a-faf2-3c0e-afa7-ff9e369727ba">
+                    <!-- ######################################################################## -->
+                    <gmd:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Pre-defined Atom Freizeitparks</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                                <gmd:CI_Date>
+                                    <gmd:date>
+                                        <gco:Date>2015-03-26</gco:Date>
+                                    </gmd:date>
+                                    <gmd:dateType>
+                                        <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
+                                    </gmd:dateType>
+                                </gmd:CI_Date>
+                            </gmd:date>
+                            <gmd:identifier>
+                                <gmd:MD_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>http://geoportal.bayern.de/service/42a6a34a-faf2-3c0e-afa7-ff9e369727ba</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:MD_Identifier>
+                            </gmd:identifier>
+                        </gmd:CI_Citation>
+                    </gmd:citation>
+                    <gmd:abstract>
+                        <gco:CharacterString>Hier finden Sie eine Auswahl an Freizeitparks in Bayern. Die Daten werden durch die Bayerische Vermessungsverwaltung (BVV) bereitgestellt und sind vor einem Download zu lizenzieren. Bei Fragen wenden Sie sich an den Kundenservice: service@geodaten.bayern.de - 089/2129 11 11. Quelle: Bayerische Vermessungsverwaltung; Foto Themenbild: © Marine26 - Fotolia.com</gco:CharacterString>
+                    </gmd:abstract>
+                    <gmd:pointOfContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:individualName>
+                                <gco:CharacterString>Kundenservice</gco:CharacterString>
+                            </gmd:individualName>
+                            <gmd:organisationName>
+                                <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:phone>
+                                        <gmd:CI_Telephone>
+                                            <gmd:voice>
+                                                <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                            </gmd:voice>
+                                            <gmd:facsimile>
+                                                <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                            </gmd:facsimile>
+                                        </gmd:CI_Telephone>
+                                    </gmd:phone>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>München</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:administrativeArea>
+                                                <gco:CharacterString>Bayern</gco:CharacterString>
+                                            </gmd:administrativeArea>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>80538</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:country>
+                                                <gco:CharacterString>Deutschland</gco:CharacterString>
+                                            </gmd:country>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                            </gmd:linkage>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                    <gmd:hoursOfService>
+                                        <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                    </gmd:hoursOfService>
+                                    <gmd:contactInstructions>
+                                        <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                    </gmd:contactInstructions>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:pointOfContact>
+                    <gmd:resourceMaintenance>
+                        <gmd:MD_MaintenanceInformation>
+                            <gmd:maintenanceAndUpdateFrequency>
+                                <gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="asNeeded">asNeeded</gmd:MD_MaintenanceFrequencyCode>
+                            </gmd:maintenanceAndUpdateFrequency>
+                        </gmd:MD_MaintenanceInformation>
+                    </gmd:resourceMaintenance>
+                    <gmd:graphicOverview>
+                        <gmd:MD_BrowseGraphic>
+                            <gmd:fileName>
+                                <gco:CharacterString>http://www.geodaten.bayern.de/gdiadmin/images/51350/freizeitparks-info.png</gco:CharacterString>
+                            </gmd:fileName>
+                            <gmd:fileDescription>
+                                <gco:CharacterString>Vorschaubild</gco:CharacterString>
+                            </gmd:fileDescription>
+                        </gmd:MD_BrowseGraphic>
+                    </gmd:graphicOverview>
+                    <gmd:descriptiveKeywords>
+                        <gmd:MD_Keywords>
+                            <gmd:keyword>
+                                <gco:CharacterString>Open Data</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>OpenData</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Freizeitparks</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Freizeit</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Fahrgeschäfte</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Ausflugsziel</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Sommerthema</gco:CharacterString>
+                            </gmd:keyword>
+                        </gmd:MD_Keywords>
+                    </gmd:descriptiveKeywords>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:accessConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="copyright">copyright</gmd:MD_RestrictionCode>
+                            </gmd:accessConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:useLimitation>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:useLimitation>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="license">license</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:otherConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>{ "id": "cc-by", "name": "Creative Commons Namensnennung (CC BY)", "quelle": "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de", "url": "http://creativecommons.org/licenses/by/3.0/deed.de" }</gco:CharacterString>
+                            </gmd:otherConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_SecurityConstraints>
+                            <gmd:classification>
+                                <gmd:MD_ClassificationCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ClassificationCode" codeListValue="unclassified">unclassified</gmd:MD_ClassificationCode>
+                            </gmd:classification>
+                        </gmd:MD_SecurityConstraints>
+                    </gmd:resourceConstraints>
+                    <!-- ######################################################################## -->
+                    <srv:serviceType>
+                        <gco:LocalName>download</gco:LocalName>
+                    </srv:serviceType>
+                    <srv:serviceTypeVersion>
+                        <gco:CharacterString>Atom Implementation of Pre-defined Dataset Download Services</gco:CharacterString>
+                    </srv:serviceTypeVersion>
+                    <srv:extent>
+                        <gmd:EX_Extent>
+                            <gmd:description>
+                                <gco:CharacterString>Bayern</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:geographicElement>
+                                <gmd:EX_GeographicBoundingBox>
+                                    <gmd:westBoundLongitude>
+                                        <gco:Decimal>8.945096154917964</gco:Decimal>
+                                    </gmd:westBoundLongitude>
+                                    <gmd:eastBoundLongitude>
+                                        <gco:Decimal>13.908908586487573</gco:Decimal>
+                                    </gmd:eastBoundLongitude>
+                                    <gmd:southBoundLatitude>
+                                        <gco:Decimal>47.24843532655711</gco:Decimal>
+                                    </gmd:southBoundLatitude>
+                                    <gmd:northBoundLatitude>
+                                        <gco:Decimal>50.56420950059199</gco:Decimal>
+                                    </gmd:northBoundLatitude>
+                                </gmd:EX_GeographicBoundingBox>
+                            </gmd:geographicElement>
+                        </gmd:EX_Extent>
+                    </srv:extent>
+                    <srv:couplingType>
+                        <srv:SV_CouplingType codeList="./resources/codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="tight">tight</srv:SV_CouplingType>
+                    </srv:couplingType>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetDownloadServiceMetadata</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/ac6302cf-54c2-489a-aca6-43b3a093279b</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>DescribeSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/ac6302cf-54c2-489a-aca6-43b3a093279b</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/ac6302cf-54c2-489a-aca6-43b3a093279b</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:operatesOn uuidref="e78661c5-01c5-436f-ad82-294b3489adbe" xlink:href="http://geoportal.bayern.de/dataset/e78661c5-01c5-436f-ad82-294b3489adbe" xlink:title="Freizeitparks" />
+                </srv:SV_ServiceIdentification>
+                <!-- ######################################################################## -->
+            </gmd:identificationInfo>
+            <gmd:distributionInfo>
+                <gmd:MD_Distribution>
+                    <gmd:distributionFormat>
+                        <gmd:MD_Format>
+                            <gmd:name gco:nilReason="missing" />
+                            <gmd:version gco:nilReason="missing" />
+                        </gmd:MD_Format>
+                    </gmd:distributionFormat>
+                    <gmd:distributor>
+                        <gmd:MD_Distributor>
+                            <gmd:distributorContact>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:individualName>
+                                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                                    </gmd:individualName>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:phone>
+                                                <gmd:CI_Telephone>
+                                                    <gmd:voice>
+                                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                                    </gmd:voice>
+                                                    <gmd:facsimile>
+                                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                                    </gmd:facsimile>
+                                                </gmd:CI_Telephone>
+                                            </gmd:phone>
+                                            <gmd:address>
+                                                <gmd:CI_Address>
+                                                    <gmd:deliveryPoint>
+                                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                                    </gmd:deliveryPoint>
+                                                    <gmd:city>
+                                                        <gco:CharacterString>München</gco:CharacterString>
+                                                    </gmd:city>
+                                                    <gmd:administrativeArea>
+                                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                                    </gmd:administrativeArea>
+                                                    <gmd:postalCode>
+                                                        <gco:CharacterString>80538</gco:CharacterString>
+                                                    </gmd:postalCode>
+                                                    <gmd:country>
+                                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                                    </gmd:country>
+                                                    <gmd:electronicMailAddress>
+                                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                                    </gmd:electronicMailAddress>
+                                                </gmd:CI_Address>
+                                            </gmd:address>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                                    </gmd:linkage>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                            <gmd:hoursOfService>
+                                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                            </gmd:hoursOfService>
+                                            <gmd:contactInstructions>
+                                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                            </gmd:contactInstructions>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:distributorContact>
+                            <gmd:distributionOrderProcess>
+                                <gmd:MD_StandardOrderProcess>
+                                    <gmd:fees>
+                                        <gco:CharacterString>geldleistungsfrei</gco:CharacterString>
+                                    </gmd:fees>
+                                </gmd:MD_StandardOrderProcess>
+                            </gmd:distributionOrderProcess>
+                        </gmd:MD_Distributor>
+                    </gmd:distributor>
+                    <gmd:transferOptions>
+                        <gmd:MD_DigitalTransferOptions>
+                            <gmd:onLine>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/ac6302cf-54c2-489a-aca6-43b3a093279b</gmd:URL>
+                                    </gmd:linkage>
+                                    <gmd:applicationProfile>
+                                        <gco:CharacterString>Dienste-URL</gco:CharacterString>
+                                    </gmd:applicationProfile>
+                                    <gmd:name>
+                                        <gco:CharacterString>URL des Dienstes</gco:CharacterString>
+                                    </gmd:name>
+                                    <gmd:description>
+                                        <gco:CharacterString>URL des Dienstes</gco:CharacterString>
+                                    </gmd:description>
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="Download">Download</gmd:CI_OnLineFunctionCode>
+                                    </gmd:function>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onLine>
+                        </gmd:MD_DigitalTransferOptions>
+                    </gmd:transferOptions>
+                </gmd:MD_Distribution>
+            </gmd:distributionInfo>
+            <gmd:dataQualityInfo>
+                <gmd:DQ_DataQuality>
+                    <gmd:scope>
+                        <gmd:DQ_Scope>
+                            <gmd:level>
+                                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+                            </gmd:level>
+                        </gmd:DQ_Scope>
+                    </gmd:scope>
+                    <gmd:lineage>
+                        <gmd:LI_Lineage>
+                            <gmd:statement>
+                                <gco:CharacterString>Abgeleitet aus dem Topographischen Informationsmanagemen des LDBV Bayern</gco:CharacterString>
+                            </gmd:statement>
+                        </gmd:LI_Lineage>
+                    </gmd:lineage>
+                </gmd:DQ_DataQuality>
+            </gmd:dataQualityInfo>
+        </gmd:MD_Metadata>
+        <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:geonet="http://www.fao.org/geonetwork" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+            <gmd:fileIdentifier>
+                <gco:CharacterString>1532d899-8bfa-3fe5-9ad0-ea79ad060f54</gco:CharacterString>
+            </gmd:fileIdentifier>
+            <gmd:language>
+                <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2" codeListValue="ger">Deutsch</gmd:LanguageCode>
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+            </gmd:characterSet>
+            <gmd:hierarchyLevel>
+                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+            </gmd:hierarchyLevel>
+            <gmd:contact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:individualName>
+                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                    </gmd:individualName>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                    </gmd:voice>
+                                    <gmd:facsimile>
+                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                    </gmd:facsimile>
+                                </gmd:CI_Telephone>
+                            </gmd:phone>
+                            <gmd:address>
+                                <gmd:CI_Address>
+                                    <gmd:deliveryPoint>
+                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                    </gmd:deliveryPoint>
+                                    <gmd:city>
+                                        <gco:CharacterString>München</gco:CharacterString>
+                                    </gmd:city>
+                                    <gmd:administrativeArea>
+                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                    </gmd:administrativeArea>
+                                    <gmd:postalCode>
+                                        <gco:CharacterString>80538</gco:CharacterString>
+                                    </gmd:postalCode>
+                                    <gmd:country>
+                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                    </gmd:country>
+                                    <gmd:electronicMailAddress>
+                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+                            </gmd:address>
+                            <gmd:onlineResource>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onlineResource>
+                            <gmd:hoursOfService>
+                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                            </gmd:hoursOfService>
+                            <gmd:contactInstructions>
+                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                            </gmd:contactInstructions>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:contact>
+            <gmd:dateStamp>
+                <gco:Date>2015-09-04</gco:Date>
+            </gmd:dateStamp>
+            <gmd:metadataStandardName>
+                <gco:CharacterString>ISO 19115 - Geographic Information - Metadata; Metadatenprofil der GDI Bayern</gco:CharacterString>
+            </gmd:metadataStandardName>
+            <gmd:metadataStandardVersion>
+                <gco:CharacterString>ISO 19115:2003/Cor. 1:2006; ISO 19119:2005/Amd 1:2008</gco:CharacterString>
+            </gmd:metadataStandardVersion>
+            <gmd:identificationInfo>
+                <!-- ######################################################################## -->
+                <srv:SV_ServiceIdentification uuid="96e51280-29d6-3c10-bdbb-6ff5bb9ab6c0">
+                    <!-- ######################################################################## -->
+                    <gmd:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Pre-defined Atom Tiergärten</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                                <gmd:CI_Date>
+                                    <gmd:date>
+                                        <gco:Date>2015-03-26</gco:Date>
+                                    </gmd:date>
+                                    <gmd:dateType>
+                                        <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
+                                    </gmd:dateType>
+                                </gmd:CI_Date>
+                            </gmd:date>
+                            <gmd:identifier>
+                                <gmd:MD_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>http://geoportal.bayern.de/service/96e51280-29d6-3c10-bdbb-6ff5bb9ab6c0</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:MD_Identifier>
+                            </gmd:identifier>
+                        </gmd:CI_Citation>
+                    </gmd:citation>
+                    <gmd:abstract>
+                        <gco:CharacterString>Hier finden Sie eine Auswahl an Tiergärten, Zoos, Wild- und Safariparks in Bayern. Die Daten werden durch die Bayerische Vermessungsverwaltung (BVV) bereitgestellt und sind vor einem Download zu lizenzieren. Bei Fragen wenden Sie sich an den Kundenservice: service@geodaten.bayern.de - 089/2129 11 11. Quelle: Bayerische Vermessungsverwaltung; Foto Themenbild: © Glenda Powers - Fotolia.com</gco:CharacterString>
+                    </gmd:abstract>
+                    <gmd:pointOfContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:individualName>
+                                <gco:CharacterString>Kundenservice</gco:CharacterString>
+                            </gmd:individualName>
+                            <gmd:organisationName>
+                                <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:phone>
+                                        <gmd:CI_Telephone>
+                                            <gmd:voice>
+                                                <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                            </gmd:voice>
+                                            <gmd:facsimile>
+                                                <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                            </gmd:facsimile>
+                                        </gmd:CI_Telephone>
+                                    </gmd:phone>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>München</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:administrativeArea>
+                                                <gco:CharacterString>Bayern</gco:CharacterString>
+                                            </gmd:administrativeArea>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>80538</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:country>
+                                                <gco:CharacterString>Deutschland</gco:CharacterString>
+                                            </gmd:country>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                            </gmd:linkage>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                    <gmd:hoursOfService>
+                                        <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                    </gmd:hoursOfService>
+                                    <gmd:contactInstructions>
+                                        <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                    </gmd:contactInstructions>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:pointOfContact>
+                    <gmd:resourceMaintenance>
+                        <gmd:MD_MaintenanceInformation>
+                            <gmd:maintenanceAndUpdateFrequency>
+                                <gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="annually">annually</gmd:MD_MaintenanceFrequencyCode>
+                            </gmd:maintenanceAndUpdateFrequency>
+                        </gmd:MD_MaintenanceInformation>
+                    </gmd:resourceMaintenance>
+                    <gmd:graphicOverview>
+                        <gmd:MD_BrowseGraphic>
+                            <gmd:fileName>
+                                <gco:CharacterString>http://www.geodaten.bayern.de/gdiadmin/images/51350/tiergaerten-info.png</gco:CharacterString>
+                            </gmd:fileName>
+                            <gmd:fileDescription>
+                                <gco:CharacterString>Vorschaubild</gco:CharacterString>
+                            </gmd:fileDescription>
+                        </gmd:MD_BrowseGraphic>
+                    </gmd:graphicOverview>
+                    <gmd:descriptiveKeywords>
+                        <gmd:MD_Keywords>
+                            <gmd:keyword>
+                                <gco:CharacterString>Open Data</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>OpenData</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Tiergärten</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Safariparks</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Ausflugsziel</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Freizeit</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Wildparks</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Zoos</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Tiere</gco:CharacterString>
+                            </gmd:keyword>
+                            <gmd:keyword>
+                                <gco:CharacterString>Sommerthema</gco:CharacterString>
+                            </gmd:keyword>
+                        </gmd:MD_Keywords>
+                    </gmd:descriptiveKeywords>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:accessConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="copyright">copyright</gmd:MD_RestrictionCode>
+                            </gmd:accessConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_LegalConstraints>
+                            <gmd:useLimitation>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:useLimitation>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="license">license</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:useConstraints>
+                                <gmd:MD_RestrictionCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+                            </gmd:useConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>Nutzungsbedingungen: Der Datensatz/Dienst steht unter der folgender Lizenz: Creative Commons Namensnennung (CC BY). Die Namensnennung hat in folgender Weise zu erfolgen: "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de".</gco:CharacterString>
+                            </gmd:otherConstraints>
+                            <gmd:otherConstraints>
+                                <gco:CharacterString>{ "id": "cc-by", "name": "Creative Commons Namensnennung (CC BY)", "quelle": "Datenquelle: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de", "url": "http://creativecommons.org/licenses/by/3.0/deed.de" }</gco:CharacterString>
+                            </gmd:otherConstraints>
+                        </gmd:MD_LegalConstraints>
+                    </gmd:resourceConstraints>
+                    <gmd:resourceConstraints>
+                        <gmd:MD_SecurityConstraints>
+                            <gmd:classification>
+                                <gmd:MD_ClassificationCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ClassificationCode" codeListValue="unclassified">unclassified</gmd:MD_ClassificationCode>
+                            </gmd:classification>
+                        </gmd:MD_SecurityConstraints>
+                    </gmd:resourceConstraints>
+                    <!-- ######################################################################## -->
+                    <srv:serviceType>
+                        <gco:LocalName>download</gco:LocalName>
+                    </srv:serviceType>
+                    <srv:serviceTypeVersion>
+                        <gco:CharacterString>Atom Implementation of Pre-defined Dataset Download Services</gco:CharacterString>
+                    </srv:serviceTypeVersion>
+                    <srv:extent>
+                        <gmd:EX_Extent>
+                            <gmd:description>
+                                <gco:CharacterString>Bayern</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:geographicElement>
+                                <gmd:EX_GeographicBoundingBox>
+                                    <gmd:westBoundLongitude>
+                                        <gco:Decimal>8.945096154917964</gco:Decimal>
+                                    </gmd:westBoundLongitude>
+                                    <gmd:eastBoundLongitude>
+                                        <gco:Decimal>13.908908586487573</gco:Decimal>
+                                    </gmd:eastBoundLongitude>
+                                    <gmd:southBoundLatitude>
+                                        <gco:Decimal>47.24843532655711</gco:Decimal>
+                                    </gmd:southBoundLatitude>
+                                    <gmd:northBoundLatitude>
+                                        <gco:Decimal>50.56420950059199</gco:Decimal>
+                                    </gmd:northBoundLatitude>
+                                </gmd:EX_GeographicBoundingBox>
+                            </gmd:geographicElement>
+                        </gmd:EX_Extent>
+                    </srv:extent>
+                    <srv:couplingType>
+                        <srv:SV_CouplingType codeList="./resources/codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="tight">tight</srv:SV_CouplingType>
+                    </srv:couplingType>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetDownloadServiceMetadata</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/3a721245-8242-4a35-8828-c5d40e477850</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>DescribeSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/3a721245-8242-4a35-8828-c5d40e477850</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:containsOperations>
+                        <srv:SV_OperationMetadata>
+                            <srv:operationName>
+                                <gco:CharacterString>GetSpatialDataset</gco:CharacterString>
+                            </srv:operationName>
+                            <srv:DCP>
+                                <srv:DCPList codeList="./resources/Codelist/gmxCodelists.xml#DCPList" codeListValue="WebServices" />
+                            </srv:DCP>
+                            <srv:connectPoint>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/3a721245-8242-4a35-8828-c5d40e477850</gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+                            </srv:connectPoint>
+                        </srv:SV_OperationMetadata>
+                    </srv:containsOperations>
+                    <srv:operatesOn uuidref="f6509334-1527-4c59-8dcd-78e991711add" xlink:href="http://geoportal.bayern.de/dataset/f6509334-1527-4c59-8dcd-78e991711add" xlink:title="Tiergärten" />
+                </srv:SV_ServiceIdentification>
+                <!-- ######################################################################## -->
+            </gmd:identificationInfo>
+            <gmd:distributionInfo>
+                <gmd:MD_Distribution>
+                    <gmd:distributionFormat>
+                        <gmd:MD_Format>
+                            <gmd:name gco:nilReason="missing" />
+                            <gmd:version gco:nilReason="missing" />
+                        </gmd:MD_Format>
+                    </gmd:distributionFormat>
+                    <gmd:distributor>
+                        <gmd:MD_Distributor>
+                            <gmd:distributorContact>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:individualName>
+                                        <gco:CharacterString>Kundenservice</gco:CharacterString>
+                                    </gmd:individualName>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>Landesamt für Digitalisierung, Breitband und Vermessung</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:phone>
+                                                <gmd:CI_Telephone>
+                                                    <gmd:voice>
+                                                        <gco:CharacterString>+49-89-2129-1111</gco:CharacterString>
+                                                    </gmd:voice>
+                                                    <gmd:facsimile>
+                                                        <gco:CharacterString>+49-89-2129-1113</gco:CharacterString>
+                                                    </gmd:facsimile>
+                                                </gmd:CI_Telephone>
+                                            </gmd:phone>
+                                            <gmd:address>
+                                                <gmd:CI_Address>
+                                                    <gmd:deliveryPoint>
+                                                        <gco:CharacterString>Alexandrastraße 4</gco:CharacterString>
+                                                    </gmd:deliveryPoint>
+                                                    <gmd:city>
+                                                        <gco:CharacterString>München</gco:CharacterString>
+                                                    </gmd:city>
+                                                    <gmd:administrativeArea>
+                                                        <gco:CharacterString>Bayern</gco:CharacterString>
+                                                    </gmd:administrativeArea>
+                                                    <gmd:postalCode>
+                                                        <gco:CharacterString>80538</gco:CharacterString>
+                                                    </gmd:postalCode>
+                                                    <gmd:country>
+                                                        <gco:CharacterString>Deutschland</gco:CharacterString>
+                                                    </gmd:country>
+                                                    <gmd:electronicMailAddress>
+                                                        <gco:CharacterString>service@geodaten.bayern.de</gco:CharacterString>
+                                                    </gmd:electronicMailAddress>
+                                                </gmd:CI_Address>
+                                            </gmd:address>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>http://www.geodaten.bayern.de</gmd:URL>
+                                                    </gmd:linkage>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                            <gmd:hoursOfService>
+                                                <gco:CharacterString>Mo.-Do. 8:00-16:00 und Fr. 8:00-14:00 Uhr</gco:CharacterString>
+                                            </gmd:hoursOfService>
+                                            <gmd:contactInstructions>
+                                                <gco:CharacterString>Bei Fragen zu den Geodaten und -diensten der Bayerischen Vermessungsverwaltung können Sie uns während der Sprechzeiten anrufen. Unsere Mitarbeiterinnen und Mitarbeiter beraten Sie gern. Bestellungen richten Sie bitte in schriftlicher Form (E-Mail, Fax, Brief, Kontaktformular) an unseren Kundenservice.</gco:CharacterString>
+                                            </gmd:contactInstructions>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:distributorContact>
+                            <gmd:distributionOrderProcess>
+                                <gmd:MD_StandardOrderProcess>
+                                    <gmd:fees>
+                                        <gco:CharacterString>geldleistungsfrei</gco:CharacterString>
+                                    </gmd:fees>
+                                </gmd:MD_StandardOrderProcess>
+                            </gmd:distributionOrderProcess>
+                        </gmd:MD_Distributor>
+                    </gmd:distributor>
+                </gmd:MD_Distribution>
+            </gmd:distributionInfo>
+            <gmd:dataQualityInfo>
+                <gmd:DQ_DataQuality>
+                    <gmd:scope>
+                        <gmd:DQ_Scope>
+                            <gmd:level>
+                                <gmd:MD_ScopeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode" codeListValue="service">service</gmd:MD_ScopeCode>
+                            </gmd:level>
+                        </gmd:DQ_Scope>
+                    </gmd:scope>
+                    <gmd:lineage>
+                        <gmd:LI_Lineage>
+                            <gmd:statement>
+                                <gco:CharacterString>Abgeleitet aus dem Topographischen Informationsmanagemen des LDBV Bayern</gco:CharacterString>
+                            </gmd:statement>
+                        </gmd:LI_Lineage>
+                    </gmd:lineage>
+                </gmd:DQ_DataQuality>
+            </gmd:dataQualityInfo>
+        </gmd:MD_Metadata>
+    </csw:SearchResults>
+</csw:GetRecordsResponse>
+
