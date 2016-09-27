@@ -201,108 +201,12 @@ public class CatalogService {
                 log.log(Level.SEVERE, excpetion, xml);
                 return null;
             }
-            String numberOfResultsExpr =
-                    "//csw:SearchResults/@numberOfRecordsReturned";
-            Double numberOfResults = (Double) XML.xpath(xml,
-                    numberOfResultsExpr,
-                    XPathConstants.NUMBER, this.context);
             String nodeListOfServicesExpr =
                     "//csw:SearchResults//gmd:MD_Metadata";
             NodeList servicesNL = (NodeList) XML.xpath(xml,
                     nodeListOfServicesExpr,
                     XPathConstants.NODESET, this.context);
-            for (int i = 0; i < numberOfResults; i++) {
-                Node serviceN = servicesNL.item(i);
-                String nameExpr =
-                        "gmd:identificationInfo"
-                                + "/srv:SV_ServiceIdentification"
-                                + "/gmd:citation"
-                                + "/gmd:CI_Citation"
-                                + "/gmd:title"
-                                + "/gco:CharacterString";
-                String serviceName = (String) XML.xpath(serviceN,
-                        nameExpr,
-                        XPathConstants.STRING, context);
-                String restrictionExpr =
-                        "gmd:identificationInfo"
-                                + "/srv:SV_ServiceIdentification"
-                                + "/gmd:resourceConstraints"
-                                + "/gmd:MD_SecurityConstraints"
-                                + "/gmd:classification"
-                                + "/gmd:MD_ClassificationCode";
-                String restriction = (String) XML.xpath(serviceN,
-                        restrictionExpr,
-                        XPathConstants.STRING, context);
-                boolean restricted = false;
-                if ("restricted".equals(restriction)) {
-                    restricted = true;
-                }
-                String typeExpr =
-                        "gmd:identificationInfo"
-                                + "/srv:SV_ServiceIdentification"
-                                + "/srv:serviceType"
-                                + "/gco:LocalName";
-                String serviceType = (String) XML.xpath(serviceN,
-                        typeExpr,
-                        XPathConstants.STRING, context);
-                String serviceTypeVersionExpr =
-                        "gmd:identificationInfo"
-                                + "/srv:SV_ServiceIdentification"
-                                + "/srv:serviceTypeVersion"
-                                + "/gco:CharacterString";
-                String serviceTypeVersion = (String) XML.xpath(serviceN,
-                        serviceTypeVersionExpr,
-                        XPathConstants.STRING, context);
-                String onLineExpr = "gmd:distributionInfo"
-                        + "/gmd:MD_Distribution"
-                        + "/gmd:transferOptions"
-                        + "/gmd:MD_DigitalTransferOptions"
-                        + "/gmd:onLine";
-                NodeList onlineNL = (NodeList) XML.xpath(serviceN,
-                        onLineExpr,
-                        XPathConstants.NODESET, context);
-                String serviceURL = null;
-                for (int j = 0; j < onlineNL.getLength(); j++) {
-                    Node onlineN = onlineNL.item(j);
-                    String urlExpr =
-                            "gmd:CI_OnlineResource"
-                                    + "/gmd:linkage"
-                                    + "/gmd:URL";
-                    String onLineserviceURL = (String) XML.xpath(onlineN,
-                            urlExpr,
-                            XPathConstants.STRING, context);
-                    String applicationprofileExpr =
-                            "gmd:CI_OnlineResource"
-                                    + "/gmd:applicationProfile"
-                                    + "/gco:CharacterString";
-                    String applicationProfile = (String) XML.xpath(onlineN,
-                            applicationprofileExpr,
-                            XPathConstants.STRING, context);
-                    applicationProfile = applicationProfile.toLowerCase();
-                    if (applicationProfile.equals("wfs-url")
-                            || applicationProfile.equals("feed-url")) {
-                        serviceURL = onLineserviceURL;
-                        break;
-                    } else if (applicationProfile.equals("dienste-url")
-                            || applicationProfile.equals("download")) {
-                        serviceURL = onLineserviceURL;
-                    }
-                }
-
-                if (serviceTypeVersion.equals("")) {
-                    serviceTypeVersion = "ATOM";
-                }
-                    if (!serviceName.equals("") && serviceURL != null) {
-                        serviceURL = makeCapabiltiesURL(serviceURL,
-                                serviceTypeVersion);
-                        Service service = new Service(new URL(serviceURL),
-                                serviceName,
-                                restricted,
-                                Service.guessServiceType(serviceTypeVersion));
-                        services.add(service);
-                    }
-                }
-
+            services = parseServices(servicesNL);
         }
         return services;
     }
@@ -332,6 +236,133 @@ public class CatalogService {
             versionNumber = "1.1.0";
         }
         return versionNumber;
+    }
+
+    /**
+     * parses the services
+     * @param servicesNL node list of service entries
+     * @return list of services
+     * @throws MalformedURLException if url is wrong
+     */
+    public List<Service> parseServices(NodeList servicesNL)
+            throws MalformedURLException {
+        List<Service> services = new ArrayList<Service>();
+        for (int i = 0; i < servicesNL.getLength(); i++) {
+            Node serviceN = servicesNL.item(i);
+            String nameExpr =
+                    "gmd:identificationInfo"
+                            + "/srv:SV_ServiceIdentification"
+                            + "/gmd:citation"
+                            + "/gmd:CI_Citation"
+                            + "/gmd:title"
+                            + "/gco:CharacterString";
+            String serviceName = (String) XML.xpath(serviceN,
+                    nameExpr,
+                    XPathConstants.STRING, context);
+            String restrictionExpr =
+                    "gmd:identificationInfo"
+                            + "/srv:SV_ServiceIdentification"
+                            + "/gmd:resourceConstraints"
+                            + "/gmd:MD_SecurityConstraints"
+                            + "/gmd:classification"
+                            + "/gmd:MD_ClassificationCode";
+            String restriction = (String) XML.xpath(serviceN,
+                    restrictionExpr,
+                    XPathConstants.STRING, context);
+            boolean restricted = false;
+            if ("restricted".equals(restriction)) {
+                restricted = true;
+            }
+            String typeExpr =
+                    "gmd:identificationInfo"
+                            + "/srv:SV_ServiceIdentification"
+                            + "/srv:serviceType"
+                            + "/gco:LocalName";
+            String serviceType = (String) XML.xpath(serviceN,
+                    typeExpr,
+                    XPathConstants.STRING, context);
+            String serviceTypeVersionExpr =
+                    "gmd:identificationInfo"
+                            + "/srv:SV_ServiceIdentification"
+                            + "/srv:serviceTypeVersion"
+                            + "/gco:CharacterString";
+            String serviceTypeVersion = (String) XML.xpath(serviceN,
+                    serviceTypeVersionExpr,
+                    XPathConstants.STRING, context);
+            String onLineExpr = "gmd:distributionInfo"
+                    + "/gmd:MD_Distribution"
+                    + "/gmd:transferOptions"
+                    + "/gmd:MD_DigitalTransferOptions"
+                    + "/gmd:onLine";
+            NodeList onlineNL = (NodeList) XML.xpath(serviceN,
+                    onLineExpr,
+                    XPathConstants.NODESET, context);
+            String serviceURL = null;
+            for (int j = 0; j < onlineNL.getLength(); j++) {
+                Node onlineN = onlineNL.item(j);
+                String urlExpr =
+                        "gmd:CI_OnlineResource"
+                                + "/gmd:linkage"
+                                + "/gmd:URL";
+                String onLineserviceURL = (String) XML.xpath(onlineN,
+                        urlExpr,
+                        XPathConstants.STRING, context);
+                String applicationprofileExpr =
+                        "gmd:CI_OnlineResource"
+                                + "/gmd:applicationProfile"
+                                + "/gco:CharacterString";
+                String applicationProfile = (String) XML.xpath(onlineN,
+                        applicationprofileExpr,
+                        XPathConstants.STRING, context);
+                applicationProfile = applicationProfile.toLowerCase();
+                if (applicationProfile.equals("wfs-url")
+                        || applicationProfile.equals("feed-url")) {
+                    serviceURL = onLineserviceURL;
+                    break;
+                } else if (applicationProfile.equals("dienste-url")
+                        || applicationProfile.equals("download")) {
+                    serviceURL = onLineserviceURL;
+                    break;
+                }
+                String operationNameExpr =
+                        "srv:containsOperations"
+                                + "/srv:SV_OperationMetadata"
+                                + "/srv:operationName"
+                                + "/gco:CharacterString";
+                String operationName = (String) XML.xpath(onlineN,
+                        operationNameExpr,
+                        XPathConstants.STRING, context);
+                if (operationName.equals("GetCapabilities")) {
+                    String operationsURLExpr =
+                            "srv:containsOperations"
+                                    + "/srv:SV_OperationMetadata"
+                                    + "/srv:connectPoint"
+                                    + "/gmd:CI_OnlineResource"
+                                    + "/gmd:linkage"
+                                    + "gmd:URL";
+                    String operationsURL = (String) XML.xpath(onlineN,
+                            operationsURLExpr,
+                            XPathConstants.STRING, context);
+                    serviceURL = operationsURL;
+                } else {
+                    serviceURL = onLineserviceURL;
+                }
+            }
+
+            if (serviceTypeVersion.equals("")) {
+                serviceTypeVersion = "ATOM";
+            }
+            if (!serviceName.equals("") && serviceURL != null) {
+                serviceURL = makeCapabiltiesURL(serviceURL,
+                        serviceTypeVersion);
+                Service service = new Service(new URL(serviceURL),
+                        serviceName,
+                        restricted,
+                        Service.guessServiceType(serviceTypeVersion));
+                services.add(service);
+            }
+        }
+        return services;
     }
 
     /**
