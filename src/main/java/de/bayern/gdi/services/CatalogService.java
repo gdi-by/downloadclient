@@ -239,7 +239,7 @@ public class CatalogService {
     }
 
     /**
-     * parses the services
+     * parses the services.
      * @param servicesNL node list of service entries
      * @return list of services
      * @throws MalformedURLException if url is wrong

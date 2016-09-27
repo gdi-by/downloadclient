@@ -39,6 +39,8 @@ import org.junit.Test;
  */
 public class CswTest extends TestCase {
 
+    private static final int THREE = 3;
+
     public static final int HTTP_OKAY = 200;
 
     public static final String
@@ -84,9 +86,10 @@ public class CswTest extends TestCase {
                 getServicesByFilter("not-required-because-mocked");
 
 
-        System.out.println("Anzahl der ermittelten Dienste: " + services.size());
+        System.out.println("Anzahl der ermittelten Dienste: "
+                + services.size());
 
-        assertTrue(services.size() == 3);
+        assertTrue(services.size() == THREE);
     }
 
 

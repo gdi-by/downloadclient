@@ -231,5 +231,10 @@
             <name>myGrid Repository</name>
             <url>http://www.mygrid.org.uk/maven/repository</url>
         </repository>
+        <repository>
+            <id>mvnrepository</id>
+            <name>MVN Repository</name>
+            <url>https://mvnrepository.com/</url>
+        </repository>
     </repositories>
 </project>
