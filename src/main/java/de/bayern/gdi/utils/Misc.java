@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.gui.WarningPopup;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,12 +141,10 @@ public final class Misc {
         try {
             new ProcessBuilder("x-www-browser", url).start();
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
             Runtime runtime = Runtime.getRuntime();
             try {
                 runtime.exec("xdg-open " + url);
             } catch (IOException ex) {
-                log.log(Level.SEVERE, ex.getMessage(), ex);
                 //When every standard fails, do the hard work
                 String os = System.getProperty("os.name").toLowerCase();
                 Runtime rt = Runtime.getRuntime();
@@ -174,7 +174,13 @@ public final class Misc {
                         rt.exec(new String[] {"sh", "-c", cmd.toString()});
                     }
                 } catch (IOException exc) {
-                    log.log(Level.SEVERE, exc.getMessage(), exc);
+                    WarningPopup wp = new WarningPopup();
+                    wp.popup(I18n.format("gui.link-fail", url));
+                    log.log(Level.SEVERE, "First Call"
+                             + e.getMessage() + "\n\n\n" + "Second Call"
+                                    + ex.getMessage() + "\n\n\n" + "Third Call"
+                                    + exc.getMessage(),
+                            exc);
                 }
             }
         }
