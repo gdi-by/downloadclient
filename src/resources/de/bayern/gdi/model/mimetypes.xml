@@ -20,4 +20,7 @@
     <Type name="text/xml; subformattyp=gml/2.1.2" ext="gml" formattyp="vektor"/>
     <Type name="text/xml; subformattyp=gml/3.1.1" ext="gml" formattyp="vektor"/>
     <Type name="shape-zip" ext="zip" formattyp="vektor"/>
+    <Type name="text/xml; subtype=gml/3.2" ext="gml" formattyp="vektor"/>
+    <Type name="text/xml; subtype=gml/2.1.2" ext="gml" formattyp="vektor"/>
+    <Type name="text/xml; subtype=gml/3.1.1" ext="gml" formattyp="vektor"/>
 </MIMETypes>
