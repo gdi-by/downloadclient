@@ -43,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -628,7 +629,7 @@ public class WMSMapSwing extends Parent {
                         } else {
                             clickCount = 0;
                         }
-                        mapPane.repaint();
+                        repaint();
                     } else {
                         DirectPosition2D pos = ev.getWorldPos();
                         MapContent content = mapPane.getMapContent();
@@ -785,7 +786,6 @@ public class WMSMapSwing extends Parent {
                     }
                 }
                 ((FeatureLayer) layer).setStyle(style);
-                mapPane.repaint();
             }
         }
     }
@@ -920,6 +920,21 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
+     * repaints the map.
+     */
+    public void repaint() {
+        Task task = new Task() {
+            protected Integer call() {
+                mapPane.repaint();
+                return 0;
+            }
+        };
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
+
+    /**
      * Draws Polygons on the maps.
      *
      * @param featurePolygons List of drawable Polygons
@@ -978,9 +993,7 @@ public class WMSMapSwing extends Parent {
                     }
                 }
             }
-            //polygonLayer.setVisible(false);
             mapContent.addLayer(polygonLayer);
-            mapPane.repaint();
         } catch (SchemaException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }

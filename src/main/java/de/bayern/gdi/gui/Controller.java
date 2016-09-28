@@ -1186,6 +1186,9 @@ public class Controller {
                         serviceTypeChooser.setValue(opts.get(0));
                         chooseType(serviceTypeChooser.getValue());
                     }
+                    Platform.runLater(() -> {
+                        mapAtom.repaint();
+                    });
                 default:
             }
         }
@@ -1207,6 +1210,9 @@ public class Controller {
             }
             if (mapAtom != null) {
                 mapAtom.highlightSelectedPolygon(item.id);
+                Platform.runLater(() -> {
+                    mapAtom.repaint();
+                });
             }
             List<Atom.Field> fields = item.fields;
             ObservableList<ItemModel> list =
