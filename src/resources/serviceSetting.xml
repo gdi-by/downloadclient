@@ -1,52 +1,18 @@
 <settings>
-    <catalogues>
-        <catalog>
-            <name>CSW GDI-BY</name>
-            <url>http://geoportal.bayern.de/csw/gdi?service=CSW&amp;request=GetCapabilities</url>
-        </catalog>
-    </catalogues>
-    <wms>
-        <service>
-            <name>WMS WebAtlasDE.light Graustufen</name>
-            <url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
-            <layer>webatlasde.light_grau</layer>
-            <source>© GeoBasis-DE / BKG </source>
-        </service>
-    </wms>
-    <services>
-        <service>
-            <name>INSPIRE WFS 2.0 DemoServer Verwaltungsgrenzen Bayern</name>
-            <url>http://geoserv.weichand.de:8080/geoserver/wfs?service=wfs&amp;version=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>UMN MapServer 7 - WFS 2.0 Vorschau</name>
-            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>(Vendor Specific) UMN MapServer 7 - WFS 2.0 Vorschau</name>
-            <url>http://geoserv.weichand.de/cgi-bin/mapserv-dev?map=/home/wei/wfs20-example.map&amp;service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>(Auth http) UMN MapServer 7 - WFS 2.0 Vorschau</name>
-            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7-pwd.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-            <restricted>true</restricted>
-        </service>
-        <service>
-            <name>(Auth https) UMN MapServer 7 - WFS 2.0 Vorschau</name>
-            <url>https://geoserv.weichand.de/cgi-bin/test-mapserver7-pwd-https.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-            <restricted>true</restricted>
-        </service>
-        <service>
-            <name>(Paging) UMN MapServer 7 - WFS 2.0 Vorschau</name>
-            <url>http://geoserv.weichand.de/cgi-bin/test-mapserver7-limited.cgi?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>(complex) INSPIRE Addresses</name>
-            <url>http://demo.deegree.org/inspire-workspace/services/wfs?service=WFS&amp;acceptversions=2.0.0&amp;request=GetCapabilities</url>
-        </service>
-        <service>
-            <name>INSPIRE ATOM Demoserver</name>
-            <url>http://www.geodaten.bayern.de/inspire/dls/dop200.xml</url>
-        </service>
-    </services>
+	<services>
+		<catalogues>
+			<catalog>
+				<name>CSW GDI-BY</name>
+				<url>http://geoportal.bayern.de/csw/gdi?service=CSW&amp;request=GetCapabilities</url>
+			</catalog>
+		</catalogues>
+		<wms>
+			<service>
+				<name>WMS WebAtlasDE.light Graustufen</name>
+				<url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
+				<layer>webatlasde.light_grau</layer>
+				<source>© GeoBasis-DE / BKG </source>
+			</service>
+		</wms>
+	</services>
 </settings>
