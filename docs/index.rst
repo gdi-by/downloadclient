@@ -14,14 +14,25 @@ Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-
 Installation
 ============
 
-Installationspakete für Windows und Linux stehen vrstl. ab Oktober 2016 hier bereit: http://gdi.bayern/downloadclient
+Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: http://www.gdi.bayern/downloadclient
 
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
-**Für die Installation des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
+**Für die Ausführung des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+Inbetriebnahme
+--------------
+
+Das Zip-Archiv an einen geigneten Ort entpacken.
+
+Starten der Anwendung:
+----------------------
+
+Die Datei "startup.bat" ausführen.
+
 
 Funktionalität
 ==============
@@ -150,9 +161,9 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
-Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
+Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. *Hinweis:* **diese Funktionalität steht im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
-.. image:: img/DLC_Weiterverarbeitung_DOP.png
+.. image:: img/DLC_Weiterverarbeitung_DOP.pn
 
 Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112013-0" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
 
@@ -171,13 +182,13 @@ Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (
 
 Variante a) Ausführungswiederholung mit Windows Eingabeaufforderung (CMD)
 
-- Angaben: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad sowie ggf. - bei zugriffsgeschützten Diensten - Username und Passwort.
-- Bsp.: ``startup-headless.bat C:\TEMP\config20160909142610.xml foo bar``
+- Angaben: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad
+- Bsp.: ``startup-headless.bat C:\TEMP\config20160909142610.xml``
 
 Variante b) Ausführungswiederholung mit Windows Aufgabenplanung (Voraussetzung: Ausführung als Administrator)
 
 - Programm/Skript: ausführbare Eingabeaufforderungsdatei inkl. Pfad (Bsp.: ``C:\Windows\SysWOW64\cmd.exe``)
-- Argumente: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad sowie ggf. - bei zugriffsgeschützten Diensten - Username und Passwort (Bsp.:  ``/c"startup-headless.bat C:\TEMP\config20160909142610.xml foo bar"``)
+- Argumente: Batch-Skript startup-headless.bat und o.g. XML-Konfigurationsdatei inkl. Pfad (Bsp.:  ``/c"startup-headless.bat C:\TEMP\config20160909142610.xml"``)
 - Starten in: Pfad, unter der Batch-Datei startup-headless.bat liegt
 
 
@@ -188,6 +199,7 @@ Die Ausführungswiederholung ist über Cronjobs möglich.
 
 Benutzerdefinierte Erweiterungsmöglichkeiten 
 =============================================
+*Hinweis:* **diese Funktionalitäten stehen im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
 Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
 
