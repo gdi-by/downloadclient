@@ -5,7 +5,7 @@ Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von G
 
 ## Systemvoraussetzungen
 
-Für die Installation des Download-Clients wird mindestens Java 1.8.0.40 benötigt.
+Für die Ausführung des Download-Clients wird mindestens Java 1.8.0.40 benötigt.
 
 Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
