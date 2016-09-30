@@ -33,6 +33,13 @@ Starten der Anwendung
 
 Die Datei "startup.bat" ausführen.
 
+Proxy-Einstellungen
+--------------------
+
+Falls notwendig, können im Unterordner config des entpackten Download-Client-Programmordners Proxy-Einstellungen in einer Datei mit Namen ``proxy.xml`` abgelegt werden. Der config-Ordner beinhaltet hierfür eine beispielhafte Datei ``proxy.xml.sample``, die folgende Felder zur Konfiguration von HTTP(S) Proxy-Einstellungen enthält:
+
+ <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
+Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
 
 Funktionalität
 ==============
@@ -199,17 +206,9 @@ Die Ausführungswiederholung ist über Cronjobs möglich.
 
 Benutzerdefinierte Erweiterungsmöglichkeiten 
 =============================================
-*Hinweis:* **diese Funktionalitäten stehen im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
 Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
 
-proxy.xml
----------
-
-Der config Ordner enthält eine beispielhafte Datei ``proxy.xml.sample``, die zur Konfiguration von folgenden HTTP(S) Proxy-Einstellungen herangezogen werden kann:
-
- <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
-Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
 
 serviceSetting.xml
 ---------------------
@@ -225,6 +224,7 @@ Hier können folgende Einstellungen angepasst werden:
 verarbeitungsschritte.xml
 ---------------------------
 
+*Hinweis:* **diese Funktionalität steht im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
