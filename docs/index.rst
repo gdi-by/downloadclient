@@ -163,7 +163,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. *Hinweis:* **diese Funktionalität steht im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
-.. image:: img/DLC_Weiterverarbeitung_DOP.pn
+.. image:: img/DLC_Weiterverarbeitung_DOP.png
 
 Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112013-0" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
 
@@ -204,9 +204,9 @@ Benutzerdefinierte Erweiterungsmöglichkeiten
 Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
 
 proxy.xml
-----------
+---------
 
-Alternative HTTP(S) Proxy-Einstellungen können folgendermaßen konfiguriert werden:
+Der config Ordner enthält eine beispielhafte Datei ``proxy.xml.sample``, die zur Konfiguration von folgenden HTTP(S) Proxy-Einstellungen herangezogen werden kann:
 
  <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
 Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
