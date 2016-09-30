@@ -28,7 +28,7 @@ Inbetriebnahme
 
 Das Zip-Archiv an einen geigneten Ort entpacken.
 
-Starten der Anwendung:
+Starten der Anwendung
 ----------------------
 
 Die Datei "startup.bat" ausführen.
