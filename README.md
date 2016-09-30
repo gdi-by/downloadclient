@@ -28,4 +28,4 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 
 ## Lizenz
 
-Der Download-Client ist als Open-Source-Software unter der Apache License 2.0 veröffentlicht (Details s. LICENSE-Datei).
+Der Download-Client ist als Freie Software unter der Apache License 2.0 veröffentlicht (Details s. LICENSE-Datei).
