@@ -1123,13 +1123,15 @@ public class Controller {
                             dataBean.getWFSService().storedQueries;
                     ObservableList<ItemModel> types =
                             FXCollections.observableArrayList();
-                    for (WFSMeta.Feature f : features) {
-                        types.add(new FeatureModel(f));
-                        if (f.bbox != null) {
-                            if (extendWFS == null) {
-                                extendWFS = f.bbox;
-                            } else {
-                                extendWFS.expandToInclude(f.bbox);
+                    if (!dataBean.getWFSService().isSimple()) {
+                        for (WFSMeta.Feature f : features) {
+                            types.add(new FeatureModel(f));
+                            if (f.bbox != null) {
+                                if (extendWFS == null) {
+                                    extendWFS = f.bbox;
+                                } else {
+                                    extendWFS.expandToInclude(f.bbox);
+                                }
                             }
                         }
                     }
