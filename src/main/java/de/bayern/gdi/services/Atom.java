@@ -233,7 +233,8 @@ public class Atom {
             throws URISyntaxException, SAXException,
                 ParserConfigurationException, IOException {
             Document entryDoc = null;
-            URL entryDocUrl = Atom.buildURL(this.baseURL, this.describedBy);
+            URL entryDocUrl = HTTP.buildAbsoluteURL(
+                    this.baseURL, this.describedBy);
             entryDoc = Atom.getDocument(entryDocUrl,
                     this.username, this.password);
 
@@ -259,11 +260,12 @@ public class Atom {
                         XPathConstants.STRING,
                         context);
                 try {
-                    URL targetURL = Atom.buildURL(entryDocUrl, targetURLStr);
+                    URL targetURL = HTTP.buildAbsoluteURL(
+                            entryDocUrl, targetURLStr);
                     itemformat = targetURL.getFile().substring(
                             targetURL.getFile().lastIndexOf(".") + 1,
                             targetURL.getFile().length());
-                } catch (MalformedURLException e) {
+                } catch (URISyntaxException | MalformedURLException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
                 }
             }
@@ -730,26 +732,5 @@ public class Atom {
             }
         }
         return crs;
-    }
-
-    /**
-     * builds the URL.
-     * @param baseURL of the service
-     * @param url the URL
-     * @return the URL
-     * @throws MalformedURLException when url is wrong
-     */
-    public static URL buildURL(URL baseURL,
-                               String url) throws
-            MalformedURLException {
-        URL retURL = baseURL;
-        if (url != null && !url.isEmpty()) {
-            try {
-                retURL = new URL(url);
-            } catch (MalformedURLException e) {
-                retURL = new URL(baseURL, url);
-            }
-        }
-        return retURL;
     }
 }

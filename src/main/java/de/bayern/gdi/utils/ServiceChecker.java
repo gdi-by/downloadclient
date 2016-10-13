@@ -18,7 +18,6 @@
 
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -207,7 +206,7 @@ public class ServiceChecker {
                 return false;
             }
             try {
-                URL entryURL = Atom.buildURL(url, describedBy);
+                URL entryURL = HTTP.buildAbsoluteURL(url, describedBy);
                 if (simpleRestricted(url)) {
                     return true;
                 }
@@ -228,9 +227,9 @@ public class ServiceChecker {
                 if (describedBy == null) {
                     return false;
                 }
-                URL downloadURL = Atom.buildURL(url, downloadURLStr);
+                URL downloadURL = HTTP.buildAbsoluteURL(url, downloadURLStr);
                 return simpleRestricted(downloadURL);
-            } catch (MalformedURLException e) {
+            } catch (URISyntaxException | MalformedURLException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {
