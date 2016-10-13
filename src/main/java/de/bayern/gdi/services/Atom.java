@@ -24,6 +24,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+import de.bayern.gdi.utils.HTTP;
+import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.XML;
@@ -41,6 +43,12 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
+
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -68,6 +76,17 @@ public class Atom {
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final String EPSG = "EPSG";
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
+    private static final int FOUR = 4;
+    private static final int FIVE = 5;
+    private static final int SIX = 6;
+    private static final int SEVEN = 7;
+    private static final int EIGHT = 8;
+    private static final int NINE = 9;
+    private static final int TEN = 10;
 
     /** Field for the Atom Item. */
     public static class Field {
@@ -170,7 +189,10 @@ public class Atom {
 
         private NamespaceContext context;
 
-        public Item() {
+        private URL baseURL;
+
+        public Item(URL url) {
+            this.baseURL = url;
             otherCRSs = new ArrayList<>();
             fields = new ArrayList<>();
             format = null;
@@ -211,26 +233,62 @@ public class Atom {
             throws URISyntaxException, SAXException,
                 ParserConfigurationException, IOException {
             Document entryDoc = null;
-            URL url = new URL(this.describedBy);
-            entryDoc = Atom.getDocument(url, this.username, this.password);
+            URL entryDocUrl = Atom.buildURL(this.baseURL, this.describedBy);
+            entryDoc = Atom.getDocument(entryDocUrl,
+                    this.username, this.password);
 
             if (entryDoc == null) {
                 entryDoc = XML.getDocument(this.describedBy);
             }
-            format = getFormat(entryDoc);
-            fields = getFieldForEntry(entryDoc);
+            format = getFormat(entryDoc, entryDocUrl);
+            fields = getFieldForEntry(entryDoc, entryDocUrl);
         }
 
-        private String getFormat(Document entryDoc) {
+        private String getFormat(Document entryDoc,
+                                 URL entryDocUrl) {
             String getType = "//entry/link/@type";
             String itemformat = (String) XML.xpath(entryDoc,
                     getType,
                     XPathConstants.STRING,
                     context);
+            //If the Format is not at the link, then extract it
+            if (itemformat.isEmpty()) {
+                String getTarget = "//entry/link/@href";
+                String targetURLStr = (String) XML.xpath(entryDoc,
+                        getTarget,
+                        XPathConstants.STRING,
+                        context);
+                try {
+                    URL targetURL = Atom.buildURL(entryDocUrl, targetURLStr);
+                    itemformat = targetURL.getFile().substring(
+                            targetURL.getFile().lastIndexOf(".") + 1,
+                            targetURL.getFile().length());
+                } catch (MalformedURLException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
             return itemformat;
         }
 
-        private ArrayList<Field> getFieldForEntry(Document entryDoc) {
+        private static String getMimeType(URL url, String userName,
+                                           String password) {
+            CloseableHttpClient httpCl =
+                    HTTP.getClient(url, userName, password);
+            try {
+                HttpHead getRequest = HTTP.getHeadRequest(url);
+                CloseableHttpResponse execute = httpCl.execute(getRequest);
+                Header firstHeader =
+                        execute.getFirstHeader("Content-Type");
+                return firstHeader.getValue();
+            } catch (URISyntaxException
+                    | IOException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+            return "";
+        }
+
+        private ArrayList<Field> getFieldForEntry(Document entryDoc,
+                                                  URL entryDocUrl) {
             ArrayList<Field> attrFields = new ArrayList<>();
             //Predefined in ATOM Service
             String getCategories = "//entry";
@@ -252,10 +310,33 @@ public class Atom {
                         "link/@type",
                         XPathConstants.STRING,
                         this.context);
+                if (type.isEmpty()) {
+                    type = entryId.substring(entryId.lastIndexOf(".") + 1,
+                            entryId.length());
+                }
                 String crs = (String) XML.xpath(entryNode,
                         "category/@label",
                         XPathConstants.STRING,
                         this.context);
+                if (crs.isEmpty()) {
+                    if (entryDescription.contains("EPSG:")) {
+                        String temp = entryDescription.substring(
+                                entryDescription.lastIndexOf("EPSG:"),
+                                entryDescription.length());
+                        String epsgNum = new String();
+                        for (int j = "EPSG:".length();
+                            j < temp.length() - 1;
+                            j++) {
+                            String isNum = temp.substring(j, j + 1);
+                            if (Misc.isInteger(isNum)) {
+                                epsgNum += isNum;
+                            } else {
+                                break;
+                            }
+                        }
+                        crs = "EPSG:" + epsgNum;
+                    }
+                }
                 Field field = new Field(ATTRIBUTENAME,
                         entryId,
                         crs,
@@ -317,9 +398,9 @@ public class Atom {
      * @throws IOException if something in io is wrong
      */
     public Atom(String serviceURL, String userName, String password)
-            throws URISyntaxException, SAXException,
+            throws URISyntaxException,
             ParserConfigurationException, IOException,
-            IllegalArgumentException {
+            IllegalArgumentException, SAXException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
@@ -331,11 +412,16 @@ public class Atom {
         }
         //System.out.println(this.serviceURL);
         this.nscontext = new NamespaceContextMap(
-                null , "http://www.w3.org/2005/Atom",
+                null, "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
                 "inspire_dls",
                 "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
         this.mainDoc = getDocument(url, this.username, this.password);
+        preLoad();
+    }
+
+    private void preLoad() throws MalformedURLException,
+            ParserConfigurationException {
         items = new ArrayList<>();
         String getTitle = "//title";
         this.title = (String) XML.xpath(this.mainDoc,
@@ -358,24 +444,25 @@ public class Atom {
                 XPathConstants.NODESET,
                 this.nscontext);
         for (int i = 0; i < entries.getLength(); i++) {
-            //ong beginRead = System.currentTimeMillis();
             Node entry = entries.item(i);
             String getEntryTitle = "title";
-            //System.out.println("title: " + title);
             Node titleN = (Node) XML.xpath(entry,
                     getEntryTitle,
                     XPathConstants.NODE,
                     this.nscontext);
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + "  ms\tTitle: " + titleN.getTextContent());
             String getEntryid = "*[local-name()"
                     + "='spatial_dataset_identifier_code']";
             Node id = (Node) XML.xpath(entry,
                     getEntryid,
                     XPathConstants.NODE,
                     this.nscontext);
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + "ms \tID: " + id.getTextContent());
+            if (id == null) {
+                getEntryid = "id";
+                id = (Node) XML.xpath(entry,
+                        getEntryid,
+                        XPathConstants.NODE,
+                        this.nscontext);
+            }
             String summaryExpr = "summary";
             Node description = (Node) XML.xpath(entry,
                     summaryExpr,
@@ -386,53 +473,93 @@ public class Atom {
                     describedByExpr,
                     XPathConstants.NODE,
                     this.nscontext);
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + " ms\tDescirption: " + description.getTextContent());
+            if (describedBy == null) {
+                describedByExpr = "link/@href";
+                describedBy = (Node) XML.xpath(entry,
+                        describedByExpr,
+                        XPathConstants.NODE,
+                        this.nscontext);
+            }
             String borderPolygonExpr = "*[local-name()"
                                        + "='polygon']";
             Node borderPolyGonN = (Node) XML.xpath(entry,
                     borderPolygonExpr,
                     XPathConstants.NODE,
                     this.nscontext);
-            Item it = new Item();
-            it.id = id.getTextContent();
-            it.title = titleN.getTextContent();
-            it.description = description.getTextContent();
-            it.describedBy = describedBy.getTextContent();
-            it.otherCRSs = getCRS(entry);
+            if (borderPolyGonN == null) {
+                borderPolygonExpr = "*[local-name()"
+                        + "='box']";
+                borderPolyGonN = (Node) XML.xpath(entry,
+                        borderPolygonExpr,
+                        XPathConstants.NODE,
+                        this.nscontext);
+            }
+            Item it = new Item(new URL(this.serviceURL));
+            if (id != null) {
+                it.id = id.getTextContent();
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. ID not found");
+            }
+            if (title != null) {
+                it.title = titleN.getTextContent();
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. Title not found");
+            }
+            if (description != null) {
+                it.description = description.getTextContent();
+            } else {
+                it.description = it.title;
+            }
+            if (describedBy != null) {
+                it.describedBy = describedBy.getTextContent();
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. DescribedBy not found");
+            }
+            if (entry != null) {
+                it.otherCRSs = getCRS(entry);
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. Entry not found");
+            }
+            if (it.otherCRSs != null) {
+                it.defaultCRS = it.otherCRSs.get(0);
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. CRSs not found");
+            }
             it.username = this.username;
             it.password = this.password;
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + " ms\totherCRS: " + it.otherCRSs);
-            it.defaultCRS = it.otherCRSs.get(0);
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + " ms\tdefaultCRS: " + it.defaultCRS);
-            //System.out.println((System.currentTimeMillis() - beginRead)
-            //        + " ms\tformat: " + it.format);
-            WKTReader reader = new WKTReader(new GeometryFactory());
 
             // XXX: GML, anyone?
-            String bboxStr = convertPolygonToWKT(
-                borderPolyGonN.getTextContent());
+            if (borderPolyGonN != null) {
+                WKTReader reader = new WKTReader(new GeometryFactory());
+                String bboxStr = convertPolygonToWKT(
+                        borderPolyGonN.getTextContent());
 
-            Geometry polygon = null;
-            try {
-                polygon = reader.read(bboxStr);
-            } catch (ParseException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                continue;
-            } catch (IllegalArgumentException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                throw e;
+                Geometry polygon = null;
+                try {
+                    polygon = reader.read(bboxStr);
+                } catch (ParseException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    continue;
+                } catch (IllegalArgumentException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    throw e;
+                }
+
+                Envelope env = polygon.getEnvelopeInternal();
+                if (env == null || !(polygon instanceof Polygon)) {
+                    continue;
+                }
+
+                it.polygon = (Polygon) polygon;
+            } else {
+                throw new ParserConfigurationException("Could not Parse "
+                        + "Service. Bounding Box not Found");
             }
-
-            Envelope env = polygon.getEnvelopeInternal();
-            if (env == null || !(polygon instanceof Polygon)) {
-                continue;
-            }
-
-            it.polygon = (Polygon)polygon;
-
             items.add(it);
         }
     }
@@ -443,12 +570,6 @@ public class Atom {
 
     private static final Pattern CRS_CODE
             = Pattern.compile("[0-9]{2,}");
-
-    private static final int ZERO = 0;
-    private static final int ONE = 1;
-    private static final int TWO = 2;
-    private static final int THREE = 3;
-    private static final int FOUR = 4;
 
     // XXX: This should be coded more defensively!
     private static CoordinateReferenceSystem decodeCRS(String term)
@@ -488,9 +609,56 @@ public class Atom {
 
     private static String convertPolygonToWKT(String text) {
         String[] sep = text.split(" ");
+        String[] seperators = new String[TWO];
+        seperators[ZERO] = ",";
+        seperators[ONE] = ".";
+        //cleaning the strings if they have trailing or beginning , or .
+        for (int i = 0; i < sep.length; i++) {
+            String aSep = sep[i];
+            for (String seperator: seperators) {
+                if (aSep.contains(seperator)) {
+                    if (aSep.lastIndexOf(seperator) == aSep.length() - 1) {
+                        aSep = aSep.substring(ZERO,
+                                aSep.lastIndexOf(seperator));
 
+                    }
+                    if (aSep.indexOf(seperator) == ZERO) {
+                        aSep = aSep.substring(ONE, aSep.length());
+                    }
+                }
+            }
+            sep[i] = aSep;
+        }
+        //Check for length. If Only Two Pairs are in there, calculate the Box
+        //of it.
+        if (sep.length == FOUR) {
+            ReferencedEnvelope ref = new ReferencedEnvelope();
+            ref.include(Double.parseDouble(sep[ZERO]),
+                    Double.parseDouble(sep[ONE]));
+            ref.include(Double.parseDouble(sep[TWO]),
+                    Double.parseDouble(sep[THREE]));
+            Double maxX = ref.getMaxX();
+            Double minX = ref.getMinX();
+            Double maxY = ref.getMaxY();
+            Double minY = ref.getMinY();
+            sep = new String[TEN];
+            //Upper Left
+            sep[ZERO] = String.valueOf(minX);
+            sep[ONE] = String.valueOf(maxY);
+            //Upper Right
+            sep[TWO] = String.valueOf(maxX);
+            sep[THREE] = String.valueOf(maxY);
+            //Lower Right
+            sep[FOUR] = String.valueOf(maxX);
+            sep[FIVE] = String.valueOf(minY);
+            //Lower Left
+            sep[SIX] = String.valueOf(minX);
+            sep[SEVEN] = String.valueOf(minY);
+            //Upper Right
+            sep[EIGHT] = sep[ZERO];
+            sep[NINE] = sep[ONE];
+        }
         StringBuilder sb = new StringBuilder("POLYGON((");
-
         for (int j = 0; j < sep.length; j += 2) {
             if (j > 0) {
                 sb.append(", ");
@@ -562,5 +730,26 @@ public class Atom {
             }
         }
         return crs;
+    }
+
+    /**
+     * builds the URL.
+     * @param baseURL of the service
+     * @param url the URL
+     * @return the URL
+     * @throws MalformedURLException when url is wrong
+     */
+    public static URL buildURL(URL baseURL,
+                               String url) throws
+            MalformedURLException {
+        URL retURL = baseURL;
+        if (url != null && !url.isEmpty()) {
+            try {
+                retURL = new URL(url);
+            } catch (MalformedURLException e) {
+                retURL = new URL(baseURL, url);
+            }
+        }
+        return retURL;
     }
 }
