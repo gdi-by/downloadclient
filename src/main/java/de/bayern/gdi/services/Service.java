@@ -180,39 +180,40 @@ public class Service extends Object {
      * @throws IOException when something goes worng
      */
     public void load() throws IOException {
-        if (!this.loaded) {
-            try {
-                this.additionalMessage = new String();
-                int headStatus = ServiceChecker.tryHead(serviceURL);
-                if (headStatus == HttpStatus.SC_OK) {
-                    this.restricted = ServiceChecker.isRestricted(
-                            this.serviceURL
-                    );
-                    if (this.serviceType == null) {
-                        checkServiceType();
-                        if (this.serviceType == null) {
-                            if (!checkURLOptionsAndSetType()) {
-                                return;
-                            }
-                        }
-                    }
-                } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
-                    this.restricted = true;
+        if (this.loaded) {
+            return;
+        }
+        try {
+            this.additionalMessage = "";
+            int headStatus = ServiceChecker.tryHead(serviceURL);
+            if (headStatus == HttpStatus.SC_OK) {
+                this.restricted = ServiceChecker.isRestricted(
+                        this.serviceURL
+                );
+                if (this.serviceType == null) {
                     checkServiceType();
-                    if (serviceType == null) {
+                    if (this.serviceType == null) {
                         if (!checkURLOptionsAndSetType()) {
                             return;
                         }
                     }
-                } else {
+                }
+            } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
+                this.restricted = true;
+                checkServiceType();
+                if (serviceType == null) {
                     if (!checkURLOptionsAndSetType()) {
                         return;
                     }
                 }
-                additionalMessage = "The service could not be determined";
-            } finally {
-                loaded = true;
+            } else {
+                if (!checkURLOptionsAndSetType()) {
+                    return;
+                }
             }
+            additionalMessage = "The service could not be determined";
+        } finally {
+            loaded = true;
         }
     }
 
