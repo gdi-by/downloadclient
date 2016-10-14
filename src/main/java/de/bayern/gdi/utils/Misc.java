@@ -181,7 +181,7 @@ public final class Misc {
                     if (os.contains("win")) {
                         rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
                     } else if (os.contains("mac")) {
-                        rt.exec("open" + url);
+                        rt.exec("open " + url);
                     } else {
                         String[] browsers = {"epiphany",
                                 "firefox",
