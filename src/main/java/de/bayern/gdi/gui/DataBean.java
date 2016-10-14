@@ -59,7 +59,7 @@ public class DataBean extends Observable {
     /**
      * Attribute representation.
      */
-    public class Attribute {
+    public static class Attribute {
         /** name. */
         public String name;
 
