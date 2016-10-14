@@ -340,12 +340,13 @@ public class Service extends Object {
         typeString = typeString.toLowerCase();
         if (typeString.contains(ATOM)) {
             return ServiceType.Atom;
-        } else if (typeString.contains(WFSONE)) {
-            return ServiceType.WFSOne;
-        } else if (typeString.contains(WFSTWO)) {
-            return ServiceType.WFSTwo;
-        } else {
-            return null;
         }
+        if (typeString.contains(WFSONE)) {
+            return ServiceType.WFSOne;
+        }
+        if (typeString.contains(WFSTWO)) {
+            return ServiceType.WFSTwo;
+        }
+        return null;
     }
 }
