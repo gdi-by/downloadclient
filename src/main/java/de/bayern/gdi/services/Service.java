@@ -276,6 +276,7 @@ public class Service extends Object {
      * returns the hashcode.
      * @return the hashcode
      */
+    @Override
     public int hashCode() {
         int code = 0;
         if (this.name != null) {
@@ -296,18 +297,29 @@ public class Service extends Object {
         return code;
     }
 
+    private static boolean equals(Object a, Object b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
+    }
+
     /**
      * checks if given object is equal.
      * @param s given object
      * @return true if equal; false if not
      */
-    public boolean equals(Service s) {
-        if (s != null) {
-            if (s.hashCode() == this.hashCode()) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public boolean equals(Object o) {
+        Service s = (Service)o;
+        return s != null
+            && equals(this.name, s.name)
+            && equals(this.serviceURL, s.serviceURL)
+            && equals(this.username, s.username)
+            && equals(this.serviceType, s.serviceType);
     }
 
     /**
