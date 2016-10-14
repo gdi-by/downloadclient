@@ -266,21 +266,24 @@ public class StringUtils {
 
     /**
      * Splits a given string by a separator and ignores parts
-     * that starts with a given prefix (case insensitve).
+     * that starts with a given prefixes (case insensitve).
      * Afterwards the parts are re-joined with the separator.
      * @param s The string.
      * @param sep The separator.
-     * @param prefix The prefix.
+     * @param prefixes The prefixes.
      * @return The treated string.
      */
     public static String ignorePartsWithPrefix(
-        String s, String sep, String prefix) {
-        prefix = prefix.toLowerCase();
+        String s, String sep, String[] prefixes) {
         List<String> use = new ArrayList<>();
+parts:
         for (String part: s.split(Pattern.quote(sep))) {
-            if (!part.toLowerCase().startsWith(prefix)) {
-                use.add(part);
+            for (String prefix: prefixes) {
+                if (part.toLowerCase().startsWith(prefix.toLowerCase())) {
+                    continue parts;
+                }
             }
+            use.add(part);
         }
         return join(use, sep);
     }

@@ -174,6 +174,23 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
+    private static final String[] IGNORE_WFS = {
+        "service=",
+        "request=",
+        "acceptversions="
+    };
+
+    private static String vendorSpecific(String url) {
+        int idx = url.lastIndexOf('?');
+        if (idx < 0) {
+            return "";
+        }
+        return StringUtils.ignorePartsWithPrefix(
+            url.substring(idx + 1),
+            "&",
+            IGNORE_WFS);
+    }
+
     private static String baseURL(String url) {
         int idx = url.indexOf('?');
         return idx >= 0 ? url.substring(0, idx) : url;
@@ -193,6 +210,7 @@ public class DownloadStepConverter {
 
         String url = dls.getServiceURL();
         String base = baseURL(url);
+        String vendor = vendorSpecific(url);
 
         String version = StringUtils.urlEncode(
             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
@@ -227,6 +245,10 @@ public class DownloadStepConverter {
         String parameters = encodeParameters(dls.getParameters(), usedVars);
         if (parameters.length() > 0) {
             sb.append('&').append(parameters);
+        }
+
+        if (!vendor.isEmpty()) {
+            sb.append('&').append(vendor);
         }
 
         return sb.toString();
@@ -285,6 +307,10 @@ public class DownloadStepConverter {
         }
     }
 
+    private static final String[] OUTPUTFORMAT = new String[] {
+        "outputformat="
+    };
+
     private static String hitsURL(String wfsURL) {
         // outputformat parameters irritates wfs servers
         // when doing hits requests.
@@ -293,7 +319,7 @@ public class DownloadStepConverter {
             String prefix = wfsURL.substring(0, idx + 1);
             String rest = wfsURL.substring(idx + 1);
             wfsURL = prefix + StringUtils.ignorePartsWithPrefix(
-                rest, "&", "outputformat=");
+                rest, "&", OUTPUTFORMAT);
         }
         return wfsURL + "&resultType=hits";
     }
@@ -356,6 +382,11 @@ public class DownloadStepConverter {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String cap = capURL(base);
+        String vendor = vendorSpecific(url);
+
+        if (!vendor.isEmpty()) {
+            cap += "&" + vendor;
+        }
 
         WFSMetaExtractor extractor =
             new WFSMetaExtractor(cap, this.user, this.password);
@@ -368,7 +399,13 @@ public class DownloadStepConverter {
             throw new ConverterException("Cannot load meta data", ioe);
         }
 
-        Integer fpp = meta.findOperation("GetFeature").featuresPerPage();
+        WFSMeta.Operation getFeatureOp = meta.findOperation("GetFeature");
+        if (getFeatureOp == null) {
+            // TODO: I18n
+            throw new ConverterException("'GetFeature' not supported.");
+        }
+
+        Integer fpp = getFeatureOp.featuresPerPage();
         if (fpp == null) { // Fall back to global default.
             fpp = meta.featuresPerPage();
         }
