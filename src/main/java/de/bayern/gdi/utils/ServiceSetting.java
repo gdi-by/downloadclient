@@ -178,12 +178,11 @@ public class ServiceSetting {
             vars.put("NAME", name);
             String value = (String) XML.xpath(
                 xmlDocument, SERVICE_XPATH, XPathConstants.STRING, null, vars);
-            if (value != null && !value.isEmpty()) {
-                map.put(name, value);
-            } else {
+            if (value == null || value.isEmpty()) {
                 throw new IOException(name + " in " + nodeName + " Node not "
                         + "Found - Config broken");
             }
+            map.put(name, value);
         }
         return map;
     }
