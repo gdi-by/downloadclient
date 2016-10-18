@@ -110,23 +110,13 @@ public class App {
             helpAndExit();
         }
 
-        String config = useConfig(args);
-        if (config != null) {
-            try {
-                Config.load(config);
-            } catch (NullPointerException | IOException ioe) {
-                System.err.println(
-                    "Loading config failed: " + ioe.getMessage());
-                System.exit(1);
-            }
-        } else {
-            try {
-                Config.uninitialized();
-            } catch (IOException e) {
-                System.err.println(
-                        "Loading config failed: " + e.getMessage());
-                System.exit(1);
-            }
+        try {
+            Config.initialize(useConfig(args));
+        } catch (NullPointerException | IOException ioe) {
+            // TODO: Remove the NPE above!
+            System.err.println(
+                "Loading config failed: " + ioe.getMessage());
+            System.exit(1);
         }
 
         if (runHeadless(args)) {

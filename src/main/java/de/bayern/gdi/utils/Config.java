@@ -99,7 +99,7 @@ public class Config {
      * Mark global config as unused.
      * @throws IOException when anythong goes wrong
      */
-    public static void uninitialized()
+    private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
             try {
@@ -123,18 +123,22 @@ public class Config {
      * @param dirname The directory with the configuration files.
      * @throws IOException If something went wrong.
      */
-    public static void load(String dirname) throws IOException {
-        synchronized (Holder.INSTANCE) {
-            try {
-                loadInternal(dirname);
-            } finally {
-                Holder.INSTANCE.initialized = true;
-                Holder.INSTANCE.notifyAll();
+    public static void initialize(String dirname) throws IOException {
+        if (dirname == null) {
+            uninitialized();
+        } else {
+            synchronized (Holder.INSTANCE) {
+                try {
+                    load(dirname);
+                } finally {
+                    Holder.INSTANCE.initialized = true;
+                    Holder.INSTANCE.notifyAll();
+                }
             }
         }
     }
 
-    private static void loadInternal(String dirname) throws IOException {
+    private static void load(String dirname) throws IOException {
         log.info("config directory: " + dirname);
 
         File dir = new File(dirname);
