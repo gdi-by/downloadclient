@@ -559,13 +559,9 @@ public class Controller {
      */
     @FXML
     protected void handleAuthenticationRequired(ActionEvent event) {
-        if (this.serviceAuthenticationCbx.isSelected()) {
-            this.serviceUser.setDisable(false);
-            this.servicePW.setDisable(false);
-        } else {
-            this.serviceUser.setDisable(true);
-            this.servicePW.setDisable(true);
-        }
+        boolean flag = !this.serviceAuthenticationCbx.isSelected();
+        this.serviceUser.setDisable(flag);
+        this.servicePW.setDisable(flag);
     }
 
     /**
