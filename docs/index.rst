@@ -227,7 +227,7 @@ Hier können folgende Einstellungen angepasst werden:
     
         ``<name>Ein WFS Name</name>``
         
-        ``<url>EineWFSURL?service=WFS&amp;request=GetCapabilities&amp;acceptversions=2.0.0</url>``
+        ``<url>EineWFSURL?</url>``
         
       ``</service>``
     
