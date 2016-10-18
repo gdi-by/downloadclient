@@ -160,13 +160,12 @@ public final class Misc {
         try {
             new ProcessBuilder("x-www-browser", url).start();
         } catch (IOException e) {
-            Runtime runtime = Runtime.getRuntime();
+            Runtime rt = Runtime.getRuntime();
             try {
-                runtime.exec("xdg-open " + url);
+                rt.exec("xdg-open " + url);
             } catch (IOException ex) {
                 //When every standard fails, do the hard work
                 String os = System.getProperty("os.name").toLowerCase();
-                Runtime rt = Runtime.getRuntime();
                 try {
                     if (os.contains("win")) {
                         rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
@@ -182,13 +181,13 @@ public final class Misc {
                                 "links",
                                 "lynx"};
 
-                        StringBuffer cmd = new StringBuffer();
+                        StringBuilder cmd = new StringBuilder();
                         for (int i = 0; i < browsers.length; i++) {
-                            cmd.append((i == 0 ? "" : " || ")
-                                    + browsers[i]
-                                    + " \""
-                                    + url
-                                    + "\" ");
+                            cmd.append(i == 0 ? "" : " || ")
+                               .append(browsers[i])
+                               .append(" \"")
+                               .append(url)
+                               .append("\" ");
                         }
                         rt.exec(new String[] {"sh", "-c", cmd.toString()});
                     }
