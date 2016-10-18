@@ -44,7 +44,6 @@ import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.io.InputStream;
@@ -104,6 +103,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.xml.sax.SAXException;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -253,7 +254,8 @@ public class Controller {
             IOException {
         WebView web = new WebView();
         InputStream htmlPage = Misc.getResource(pathToFile);
-        web.getEngine().loadContent(Misc.inputStreamToString(htmlPage));
+        String content = IOUtils.toString(htmlPage, "UTF-8");
+        web.getEngine().loadContent(content);
         WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
@@ -269,28 +271,21 @@ public class Controller {
                 + ".txt";
         try {
             openLinkFromFile(pathToFile);
-        } catch (FileNotFoundException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return;
-        }
-    }
-
-    private void openLinkFromFile(String pathToFile) throws
-            FileNotFoundException {
-        InputStream is = Misc.getResource(pathToFile);
-        String contents = Misc.inputStreamToString(is);
-        try {
-            if (contents != null
-                    && !contents.isEmpty()
-                    && !contents.equals("null")) {
-                URL helpURL = new URL(contents);
-                Misc.startExternalBrowser(helpURL.toString());
-            } else {
-                throw new MalformedURLException("URL is Empty");
-            }
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private void openLinkFromFile(String pathToFile) throws IOException {
+        InputStream is = Misc.getResource(pathToFile);
+        String contents = IOUtils.toString(is, "UTF-8");
+        if (contents == null
+        || contents.isEmpty()
+        || contents.equals("null")) {
+            throw new MalformedURLException("URL is Empty");
+        }
+        URL helpURL = new URL(contents);
+        Misc.startExternalBrowser(helpURL.toString());
     }
 
     /**

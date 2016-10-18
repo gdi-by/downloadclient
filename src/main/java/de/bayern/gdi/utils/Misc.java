@@ -126,16 +126,6 @@ public final class Misc {
     }
 
     /**
-     * converts an input Stream to String.
-     * @param stream stream
-     * @return String
-     */
-    public static String inputStreamToString(InputStream stream) {
-        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    /**
      * Checks if a String is an Integer.
      * @param s string
      * @return true if integer; false if not
