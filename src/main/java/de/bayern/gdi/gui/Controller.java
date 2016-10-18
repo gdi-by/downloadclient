@@ -245,7 +245,6 @@ public class Controller {
                             + ".html");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
-            return;
         }
     }
 
