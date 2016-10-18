@@ -22,16 +22,13 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
-
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
+
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-//import java.util.logging.Level;
 
 /** Load configurations from specified directory. */
 public class Config {
@@ -95,6 +92,23 @@ public class Config {
         return processingConfig;
     }
 
+    private static ServiceSetting loadServiceSettings(File file)
+        throws IOException {
+        try {
+            if (file != null && file.isFile() && file.canRead()) {
+                return new ServiceSetting(file);
+            }
+            return new ServiceSetting();
+        } catch (SAXException
+                | ParserConfigurationException
+                | IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
+            throwConfigFailureException(ServiceSetting.getName());
+        }
+        // Not reached.
+        return null;
+    }
+
     /**
      * Mark global config as unused.
      * @throws IOException when anythong goes wrong
@@ -102,14 +116,7 @@ public class Config {
     private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
-            try {
-                Holder.INSTANCE.services = new ServiceSetting();
-            } catch (SAXException
-                    | ParserConfigurationException
-                    | IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
-                throwConfigFailureException(ServiceSetting.getName());
-            }
+            Holder.INSTANCE.services = loadServiceSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
@@ -154,25 +161,10 @@ public class Config {
         }
 
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
-        if (services.isFile() && services.canRead()) {
-            try {
-                Document doc = XML.getDocument(services);
-                if (doc == null) {
-                    throw new IOException(
-                        "Cannot parse XML file for '"
-                                + ServiceSetting.getName()
-                                + "'");
-                }
-                Holder.INSTANCE.services = new ServiceSetting(doc);
-            } catch (SAXException
-                    | ParserConfigurationException
-                    | IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
-                throwConfigFailureException(ServiceSetting.getName());
-            }
-        } else {
-            throwConfigFailureException(ServiceSetting.getName());
-        }
+        Holder.INSTANCE.services = loadServiceSettings(
+            services.isFile() && services.canRead()
+            ? services
+            : null);
 
         File procConfig = new File(
             dir, ProcessingConfiguration.PROCESSING_CONFIG_FILE);
@@ -188,8 +180,7 @@ public class Config {
             throwConfigFailureException(ProcessingConfiguration.getName());
         }
 
-        File mimeTypes = new File(
-            dir, MIMETypes.MIME_TYPES_FILE);
+        File mimeTypes = new File(dir, MIMETypes.MIME_TYPES_FILE);
         if (mimeTypes.isFile() && mimeTypes.canRead()) {
             Holder.INSTANCE.mimeTypes =
                 MIMETypes.read(mimeTypes);

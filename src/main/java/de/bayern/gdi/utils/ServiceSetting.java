@@ -22,6 +22,7 @@ import de.bayern.gdi.services.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,6 +68,11 @@ public class ServiceSetting {
     public ServiceSetting(String filePath)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(getFileStream(filePath)));
+    }
+
+    public ServiceSetting(File file)
+        throws SAXException, ParserConfigurationException, IOException {
+        this(XML.getDocument(file));
     }
 
     public ServiceSetting(Document doc) throws IOException {
