@@ -219,7 +219,28 @@ Hier können folgende Einstellungen angepasst werden:
 
 - im Element ``<wms>``: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
 
-- im Element ``<services>``: in die Dienstesuche fest eingebundene Downloaddienste
+- im Element ``<services>`` können Downloaddienste folgendermaßen fest in die Dienstesuche eingebunden werden:
+
+  ``<services>``
+
+      ``<service>``
+    
+        ``<name>Ein WFS Name</name>``
+        
+        ``<url>EineWFSURL?service=WFS&amp;request=GetCapabilities&amp;acceptversions=2.0.0</url>``
+        
+      ``</service>``
+    
+      ``<service>``
+    
+        ``<name>Ein ATOM-Feed Name</name>``
+    
+        ``<url>EineAtomFeedURL</url>``
+    
+      ``</service>``
+    
+  ``</services>``
+
 
 verarbeitungsschritte.xml
 ---------------------------
