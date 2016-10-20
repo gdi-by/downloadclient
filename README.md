@@ -1,89 +1,31 @@
 # GDI-BY DownloadClient 
+[![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)](https://travis-ci.org/gdi-by/downloadclient)
 
-A Java 8 / JavaFX based desktop client to download geo data.
+Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
-## Build
+## Systemvoraussetzungen
+
+Für die Ausführung des Download-Clients wird mindestens Java 1.8.0.40 benötigt.
+
+Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+
+## Dokumentation
+
+Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.readthedocs.io/de/docs/index.html
+
+
+## Hinweise für Entwickler
+
+### Build
 
     $ mvn clean compile
 
-## Bundle
+### Bundle
 
     $ mvn clean package
 
-## Run
-To start with UI:
 
-    $ mvn exec:java
+## Lizenz
 
-To start in headless mode:
-
-    $ mvn exec:java -Dexec.args=-headless [download-steps.xml ...]
-
-
-With download-steps.xml being one or more download step files.
-If you have built the jar file, run:
-
-    $ java -jar target/downloadclient-1.0-SNAPSHOT.jar
-
-or in headless mode:
-
-    $ java -jar target/downloadclient-1.0-SNAPSHOT.jar --headless [download-steps.xml]
-
-To access protected services you can pass the needed credentials with `--user=<user>` and `--password=<password>`
-to the downloader.
-
-With `--config=<directory>` a folder with configuration files can be
-specified which overwrite the defaults.
-
-* `proxy.xml` To configure alternative HTTP(S) proxy settings.
-
-      <ProxyConfiguration overrideSystemSetting="true|false" enableSNIExtension="true|false">
-        <!-- HTTP settings: -->
-        <HTTPProxyHost>HOST</HTTPProxyHost>
-        <HTTPProxyPort>PORT</HTTPProxyPort>
-        <HTTPProxyUser>USER</HTTPProxyUser>
-        <HTTPProxyUser>PASSWORD</HTTPProxyPassword>
-        <HTTPNonProxyHosts>HOST1|HOST2|...</HTTPNonProxyHost>
-        <!-- HTTPS settings: -->
-        <HTTPSProxyHost>HOST</HTTPSProxyHost>
-        <HTTPSProxyPort>PORT</HTTPSProxyPort>
-        <HTTPSProxyUser>USER</HTTPSProxyUser>
-        <HTTPSProxyUser>PASSWORD</HTTPSProxyPassword>
-        <HTTPSNonProxyHosts>HOST1|HOST2|...</HTTPSNonProxyHost>
-      </ProxyConfiguration>
-
-  All fields are optional. To avoid application of the settings set
-  `overrideSystemSetting="false"`. `enableSNIExtension` enables/disables
-  Server Name Indication. This might be needed in case of some problematic
-  SSL-Hosts.
-
-* `serviceSetting.xml` A pre-selected set of services.
-* `verarbeitungsschritte.xml` A list of post-processing steps after successful downloads.
-
-
-
-## License
-
-This is Free Software covered by the terms of the Apache License 2.0.  
-See LICENSE file for details.
-
-
-## Environments
-
-### Windows
-
-The software requires Java 8 with JavaFX.
-Download a recent JRE from http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-In order to process data after downloading it, you might require additional
-tools, such as ogr2ogr.
-One solution to have this tool available is to install gdal.
-
-### Linux
-
-The software was developed using OpenJDK on Debian and Arch Linux, we expect it
-to run fine if you are using a recent OpenJDK.
-
-In order to process data after downloading it, you might require additional
-tools, such as ogr2ogr. Use the Package Manager of your distribution to install
-the required applications.
+Der Download-Client ist als Freie Software unter der Apache License 2.0 veröffentlicht (Details s. LICENSE-Datei).
