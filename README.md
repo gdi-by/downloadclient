@@ -25,6 +25,13 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 
     $ mvn clean package
 
+## Release
+Um eine verteilbare Version des Downloadclienten zu erzeugen, führen Sie
+`misc/build.sh` aus dem Wurzelverzeichnis der Anwendung aus.
+Dies erzeugt eine Zip-Datei. In der Zip-Datei sind die Binärdateien
+für ogr2ogr auf Windows inkludiert.
+Um `build.sh` auszuführen benötigen Sie `xmlstartlet`, `wget` und `bash`
+
 
 ## Lizenz
 
