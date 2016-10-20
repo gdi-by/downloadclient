@@ -1,0 +1,44 @@
+GDI-BY Downloadclient
+=====================
+
+Version: {VERSION}
+
+Inbetriebnahme:
+---------------
+Das Zip-Archiv an einen geigneten Ort entpacken.
+
+
+Starten der Anwendung:
+----------------------
+Mit grafischer Oberfläche:
+Die Datei "startup.bat" ausführen.
+
+
+Ohne grafischer Oberfläche:
+Die Datei "startup-headless.bat" ausführen.
+
+Dieses Skript erwartet einen zusätzlichen Parameter "Downloadschritt",
+welcher den Pfad zu einer Downloadschritt-Datei definiert.
+
+
+Externe Abhängigkeiten:
+-----------------------
+Der Downloadclient benötigt Java 8 mit Java FX
+
+Der Downloadclient benötigt GDAL / OGR2OGR um Verarbeitungsschritte
+durchzuführen.
+
+Das Zip-Archiv enthält diese Anwendungen für Windows 32 Bit im Ordner
+"bin\gisinternals".
+
+Damit die Awendung verfügbar ist muss die Pfadvariable von Windows um diesen
+Ordner ergänzt werden. Die Skript "startup.bat" und "startup-headless.bat"
+tun dies für Sie.
+
+Lizenzen
+--------
+Die Lizenzen der externen Abhängigkeiten sind in ausschließlich englischer
+Sprache beschrieben, oder verlinkt im Dokument: 3rdPartyLicenses.txt
+
+Diese Anwendung ist Freie Software und Lizenziert unter der Apache License
+Version 2.0, eine Kopie der Lizenz finden Sie im Dokument License.txt
