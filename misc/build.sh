@@ -1,5 +1,8 @@
 #!/bin/bash
-echo 'Building Downloadclient Release' $1
+VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
+
+echo ''
+echo 'Building Downloadclient Release ' $VERSION
 echo ''
 echo ''
 
@@ -10,7 +13,6 @@ echo 'Creating Build directories'
 mkdir build
 mkdir build/config
 
-VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
 
 echo ''
 echo 'Copying config from resources to config folder'
@@ -27,10 +29,18 @@ echo ''
 echo 'Copying Starter-Scripts'
 cp misc/scripts/* build/
 
+echo ''
+echo 'Altering the about_*.html to contain the Version ' $VERSION
+sed -i s/{project.version}/$VERSION/g src/resources/about/about_*.html
+
 
 echo ''
 echo 'Building Downloadclient Package'
 mvn clean compile package
+
+#tidy up the version-number alteration above
+git checkout -- src/resources/about
+
 cp target/downloadclient-*.jar build/downloadclient.jar
 chmod u+x build/downloadclient.jar
 
