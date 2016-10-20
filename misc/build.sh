@@ -10,6 +10,8 @@ echo 'Creating Build directories'
 mkdir build
 mkdir build/config
 
+VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
+
 echo ''
 echo 'Copying config from resources to config folder'
 cp src/resources/serviceSetting.xml build/config
@@ -19,7 +21,7 @@ cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
 echo ''
 echo 'Populating Textfiles'
 cp misc/textfiles/* build/
-sed -i s/{VERSION}/$1/g build/LIESMICH.txt
+sed -i s/{VERSION}/$VERSION/g build/LIESMICH.txt
 
 echo ''
 echo 'Copying Starter-Scripts'
@@ -63,7 +65,7 @@ popd
 echo ''
 echo 'Zipping into one file'
 pushd build/
-zip -pTr downloadclient-$1.zip *
+zip -pTr downloadclient-$VERSION.zip *
 popd
 
 exit 0
