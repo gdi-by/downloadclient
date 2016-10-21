@@ -143,14 +143,31 @@ public class CatalogService {
                     + "/ows:Operation[@name='GetRecords']"
                     + "/ows:DCP"
                     + "/ows:HTTP"
-                    + "/ows:Post"
-                    + "/@*[name()='xlink:href']";
-            String getRecordsURLStr = (String) XML.xpath(xml,
+                    + "/ows:Post";
+
+            NodeList rL = (NodeList) XML.xpath(xml,
                     getRecordsURLExpr,
-                    XPathConstants.STRING,
+                    XPathConstants.NODESET,
                     context);
-            this.getRecordsURL = null;
-            this.getRecordsURL = new URL(getRecordsURLStr);
+
+            for (int i = 0; i < rL.getLength(); i++) {
+                Node gruNode = rL.item(i);
+                String getRecordsValueStr = (String) XML.xpath(gruNode,
+                        "ows:Constraint/ows:Value/text()",
+                        XPathConstants.STRING,
+                        this.context);
+                if (getRecordsValueStr == null
+                        || !getRecordsValueStr.equals("SOAP")) {
+
+                    String getRecordsURLStr = (String) XML.xpath(gruNode,
+                            "@*[name()='xlink:href']",
+                            XPathConstants.STRING,
+                            this.context);
+
+                    this.getRecordsURL = null;
+                    this.getRecordsURL = new URL(getRecordsURLStr);
+                }
+            }
         }
     }
 
