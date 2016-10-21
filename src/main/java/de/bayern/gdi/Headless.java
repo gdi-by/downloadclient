@@ -31,6 +31,10 @@ import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.utils.Unauthorized;
+import de.bayern.gdi.utils.UnauthorizedLog;
+import de.bayern.gdi.utils.DocumentResponseHandler;
+import de.bayern.gdi.utils.FileResponseHandler;
 
 /**
  * The command line tool.
@@ -61,7 +65,12 @@ public class Headless implements ProcessorListener {
      * @return Non zero if the operation fails.
      */
     public static int main(String [] args, String user, String password) {
+
         log.info("Running in headless mode");
+
+        Unauthorized unauthorized = new UnauthorizedLog();
+        DocumentResponseHandler.setUnauthorized(unauthorized);
+        FileResponseHandler.setUnauthorized(unauthorized);
 
         ArrayList<File> files = new ArrayList<>();
 

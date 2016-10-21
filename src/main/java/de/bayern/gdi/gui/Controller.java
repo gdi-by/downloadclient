@@ -44,7 +44,6 @@ import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSetting;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.io.InputStream;
@@ -104,6 +103,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.xml.sax.SAXException;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -244,7 +245,6 @@ public class Controller {
                             + ".html");
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
-            return;
         }
     }
 
@@ -253,7 +253,8 @@ public class Controller {
             IOException {
         WebView web = new WebView();
         InputStream htmlPage = Misc.getResource(pathToFile);
-        web.getEngine().loadContent(Misc.inputStreamToString(htmlPage));
+        String content = IOUtils.toString(htmlPage, "UTF-8");
+        web.getEngine().loadContent(content);
         WebViewWindow wvw = new WebViewWindow(web, popuptitle);
         wvw.popup();
     }
@@ -269,28 +270,21 @@ public class Controller {
                 + ".txt";
         try {
             openLinkFromFile(pathToFile);
-        } catch (FileNotFoundException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-            return;
-        }
-    }
-
-    private void openLinkFromFile(String pathToFile) throws
-            FileNotFoundException {
-        InputStream is = Misc.getResource(pathToFile);
-        String contents = Misc.inputStreamToString(is);
-        try {
-            if (contents != null
-                    && !contents.isEmpty()
-                    && !contents.equals("null")) {
-                URL helpURL = new URL(contents);
-                Misc.startExternalBrowser(helpURL.toString());
-            } else {
-                throw new MalformedURLException("URL is Empty");
-            }
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
+    }
+
+    private void openLinkFromFile(String pathToFile) throws IOException {
+        InputStream is = Misc.getResource(pathToFile);
+        String contents = IOUtils.toString(is, "UTF-8");
+        if (contents == null
+        || contents.isEmpty()
+        || contents.equals("null")) {
+            throw new MalformedURLException("URL is Empty");
+        }
+        URL helpURL = new URL(contents);
+        Misc.startExternalBrowser(helpURL.toString());
     }
 
     /**
@@ -565,13 +559,9 @@ public class Controller {
      */
     @FXML
     protected void handleAuthenticationRequired(ActionEvent event) {
-        if (this.serviceAuthenticationCbx.isSelected()) {
-            this.serviceUser.setDisable(false);
-            this.servicePW.setDisable(false);
-        } else {
-            this.serviceUser.setDisable(true);
-            this.servicePW.setDisable(true);
-        }
+        boolean flag = !this.serviceAuthenticationCbx.isSelected();
+        this.serviceUser.setDisable(flag);
+        this.servicePW.setDisable(flag);
     }
 
     /**
@@ -653,8 +643,19 @@ public class Controller {
         if (selim != null) {
             Atom.Field selaf = (Atom.Field) selim.getItem();
             this.dataBean.addAttribute("VARIATION", selaf.type, "");
-            this.valueAtomFormat.setText(selaf.format);
-            this.valueAtomRefsys.setText(selaf.crs);
+            System.out.println(selaf.format);
+            if (selaf.format.isEmpty()) {
+                this.valueAtomFormat.setVisible(false);
+            } else {
+                this.valueAtomFormat.setText(selaf.format);
+                this.valueAtomFormat.setVisible(true);
+            }
+            if (selaf.crs.isEmpty()) {
+                this.valueAtomRefsys.setVisible(false);
+            } else {
+                this.valueAtomRefsys.setVisible(true);
+                this.valueAtomRefsys.setText(selaf.crs);
+            }
             this.dataBean.addAttribute("outputformat", selaf.format, "");
         } else {
             this.dataBean.addAttribute("VARIATION", "", "");
@@ -1112,13 +1113,15 @@ public class Controller {
                             dataBean.getWFSService().storedQueries;
                     ObservableList<ItemModel> types =
                             FXCollections.observableArrayList();
-                    for (WFSMeta.Feature f : features) {
-                        types.add(new FeatureModel(f));
-                        if (f.bbox != null) {
-                            if (extendWFS == null) {
-                                extendWFS = f.bbox;
-                            } else {
-                                extendWFS.expandToInclude(f.bbox);
+                    if (!dataBean.getWFSService().isSimple()) {
+                        for (WFSMeta.Feature f : features) {
+                            types.add(new FeatureModel(f));
+                            if (f.bbox != null) {
+                                if (extendWFS == null) {
+                                    extendWFS = f.bbox;
+                                } else {
+                                    extendWFS.expandToInclude(f.bbox);
+                                }
                             }
                         }
                     }

@@ -1,0 +1,9 @@
+3rd Party Licenses
+        
+This Software makes use of, and also distributes GDAL Binaries.
+Those copied from http://download.gisinternals.com/sdk/downloads/release-1800-gdal-1-11-4-mapserver-6-4-3.zip
+
+Build by Tamas Szekeres
+
+The copies of these licenseses can be found in:
+/bin/gisinternals/

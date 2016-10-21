@@ -48,6 +48,10 @@ public class ProcessingConfiguration {
 
     /** Name of the config file. */
     public static final String PROCESSING_CONFIG_FILE =
+        "verarbeitungsschritte.xml";
+
+    /** Name of the config file in ressources. */
+    public static final String PROCESSING_CONFIG_FILE_RES =
         "de/bayern/gdi/model/verarbeitungsschritte.xml";
 
     @XmlElementWrapper(name = "Eingabeelemente")
@@ -173,7 +177,7 @@ public class ProcessingConfiguration {
     public static ProcessingConfiguration loadDefault() {
         InputStream in = null;
         try {
-            in = Misc.getResource(PROCESSING_CONFIG_FILE);
+            in = Misc.getResource(PROCESSING_CONFIG_FILE_RES);
             if (in == null) {
                 log.log(Level.SEVERE,
                     PROCESSING_CONFIG_FILE + " not found");

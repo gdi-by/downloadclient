@@ -73,8 +73,12 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
     private Document getDocument(String urlString)
         throws JobExecutionException {
+        return getDocument(toURL(urlString));
+    }
 
-        URL docURL = toURL(urlString);
+    private Document getDocument(URL docURL)
+        throws JobExecutionException {
+
         CloseableHttpClient client = getClient(docURL);
         HttpGet httpget = getGetRequest(docURL);
 
@@ -86,12 +90,12 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
             Document document = client.execute(httpget, responseHandler);
             if (document == null) {
                 throw new JobExecutionException(
-                    I18n.format("atom.bad.xml", urlString));
+                    I18n.format("atom.bad.xml", docURL.toString()));
             }
             return document;
         } catch (IOException ioe) {
             throw new JobExecutionException(
-                I18n.format("atom.bad.download", urlString), ioe);
+                I18n.format("atom.bad.download", docURL.toString()), ioe);
         } finally {
             HTTP.closeGraceful(client);
         }
@@ -104,7 +108,8 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     private static final String DATASOURCE_XPATH
         = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
         + " inspire_dls:spatial_dataset_identifier_code/text()=$CODE]"
-        + "/atom:link[@type='application/atom+xml']/@href";
+        + "/atom:link[not(boolean(@type)) or"
+        + " @type='application/atom+xml']/@href";
 
     private static final NamespaceContext NAMESPACE_CONTEXT =
         new NamespaceContextMap(
@@ -113,10 +118,12 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         "georss", "http://www.georss.org/georss");
 
     private String figureoutDatasource() throws JobExecutionException {
+
+        Document doc = getDocument(this.url);
         HashMap<String, String> vars = new HashMap<>();
         vars.put("CODE", this.dataset);
 
-        String ds = (String)XML.xpath(getDocument(this.url),
+        String ds = (String)XML.xpath(doc,
             DATASOURCE_XPATH, XPathConstants.STRING,
             NAMESPACE_CONTEXT, vars);
 
@@ -129,7 +136,9 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
     @Override
     protected void download() throws JobExecutionException {
-        Document ds = getDocument(figureoutDatasource());
+        String dsURL = figureoutDatasource();
+        URL root = absoluteURL(this.url, dsURL);
+        Document ds = getDocument(root);
         HashMap<String, String> vars = new HashMap<>();
         vars.put("VARIATION", this.variation);
         NodeList nl = (NodeList)XML.xpath(
@@ -145,7 +154,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
             if (href.isEmpty()) {
                 continue;
             }
-            URL dataURL = toURL(href);
+            URL dataURL = absoluteURL(root, href);
             String fileName;
             // Service call?
             if (dataURL.getQuery() != null) {

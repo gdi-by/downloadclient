@@ -69,6 +69,9 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATIONS
         = "//ows:OperationsMetadata/ows:Operation";
 
+    private static final String XPATH_CONSTRAINTS_ALLOWED
+        = "ows:AllowedValues/ows:Value/text()";
+
     private static final String XPATH_CONSTRAINTS
         = "//ows:OperationsMetadata/ows:Constraint";
 
@@ -319,6 +322,14 @@ public class WFSMetaExtractor {
             NodeList defVals = el.getElementsByTagNameNS(OWS, "DefaultValue");
             if (defVals.getLength() > 0) {
                 constraint.value = defVals.item(0).getTextContent();
+            }
+            NodeList allowed = (NodeList)XML.xpath(
+                el, XPATH_CONSTRAINTS_ALLOWED,
+                XPathConstants.NODESET, NAMESPACES);
+            if (allowed != null) {
+                for (int j = 0, m = allowed.getLength(); j < m; j++) {
+                    constraint.allowed.add(allowed.item(j).getTextContent());
+                }
             }
             meta.constraints.add(constraint);
         }

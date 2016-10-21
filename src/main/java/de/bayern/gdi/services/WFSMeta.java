@@ -154,13 +154,19 @@ public class WFSMeta {
         public String name;
         /** value. */
         public String value;
+        /** allowed. */
+        public List<String> allowed;
 
         public Constraint() {
+            allowed = new ArrayList<>();
         }
 
         @Override
         public String toString() {
-            return "[ name: " + name + ", value: " + value + "]";
+            return "[ name: " + name
+                + ", value: " + value
+                + ", allowed: [" + StringUtils.join(allowed, ", ")
+                + "]]";
         }
     }
 
@@ -288,6 +294,52 @@ public class WFSMeta {
         return versions.size() > 0
             ? versions.get(versions.size() - 1)
             : def;
+    }
+
+    /**
+     * Tells if this service is a SimpleWFS.
+     * @return true if it is simple otherwise false.
+     */
+    public boolean isSimple() {
+        for (Constraint c: constraints) {
+            if (c.name.equals("QueryExpressions")) {
+                boolean query = false;
+                boolean storedQuery = false;
+                for (String value: c.allowed) {
+                    if (value.equals("wfs:Query")) {
+                        query = true;
+                    }
+                    if (value.equals("wfs:StoredQuery")) {
+                        storedQuery = true;
+                    }
+                }
+                return !query && storedQuery;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Tells if this service is a BasicWFS.
+     * @return true if it is basic otherwise false.
+     */
+    public boolean isBasic() {
+        for (Constraint c: constraints) {
+            if (c.name.equals("QueryExpressions")) {
+                boolean query = false;
+                boolean storedQuery = false;
+                for (String value: c.allowed) {
+                    if (value.equals("wfs:Query")) {
+                        query = true;
+                    }
+                    if (value.equals("wfs:StoredQuery")) {
+                        storedQuery = true;
+                    }
+                }
+                return query && storedQuery;
+            }
+        }
+        return false;
     }
 
     private static Integer featuresPerPage(List<Constraint> constraints) {

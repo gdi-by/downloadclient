@@ -206,7 +206,7 @@ public class ServiceChecker {
                 return false;
             }
             try {
-                URL entryURL = new URL(describedBy);
+                URL entryURL = HTTP.buildAbsoluteURL(url, describedBy);
                 if (simpleRestricted(url)) {
                     return true;
                 }
@@ -227,9 +227,9 @@ public class ServiceChecker {
                 if (describedBy == null) {
                     return false;
                 }
-                URL downloadURL = new URL(downloadURLStr);
+                URL downloadURL = HTTP.buildAbsoluteURL(url, downloadURLStr);
                 return simpleRestricted(downloadURL);
-            } catch (MalformedURLException e) {
+            } catch (URISyntaxException | MalformedURLException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {

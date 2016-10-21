@@ -48,6 +48,10 @@ public class MIMETypes {
 
     /** Name of the config file. */
     public static final String MIME_TYPES_FILE =
+        "mimetypes.xml";
+
+    /** Name of the config file in ressources. */
+    public static final String MIME_TYPES_FILE_RES =
         "de/bayern/gdi/model/mimetypes.xml";
 
     @XmlElement(name = "Type")
@@ -167,7 +171,7 @@ public class MIMETypes {
     public static MIMETypes loadDefault() {
         InputStream in = null;
         try {
-            in = Misc.getResource(MIME_TYPES_FILE);
+            in = Misc.getResource(MIME_TYPES_FILE_RES);
             if (in == null) {
                 log.log(Level.SEVERE,
                     MIME_TYPES_FILE + " not found");

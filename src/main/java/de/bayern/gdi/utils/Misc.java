@@ -37,6 +37,8 @@ public final class Misc {
     /** Number of tries before giving up searching for collisions. */
     private static final int MAX_TRIES = 5000;
 
+    private static final int TEN = 10;
+
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
 
@@ -124,15 +126,32 @@ public final class Misc {
     }
 
     /**
-     * converts an input Stream to String.
-     * @param stream stream
-     * @return String
+     * Checks if a String is an Integer.
+     * @param s string
+     * @return true if integer; false if not
      */
-    public static String inputStreamToString(InputStream stream) {
-        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+    public static boolean isInteger(String s) {
+        return isInteger(s, TEN);
     }
 
+    private static boolean isInteger(String s, int radix) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 && s.charAt(i) == '-') {
+                if (s.length() == 1) {
+                    return false;
+                } else {
+                    continue;
+                }
+            }
+            if (Character.digit(s.charAt(i), radix) < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * Tries to start the external default browser.
      * @param url url
@@ -141,18 +160,17 @@ public final class Misc {
         try {
             new ProcessBuilder("x-www-browser", url).start();
         } catch (IOException e) {
-            Runtime runtime = Runtime.getRuntime();
+            Runtime rt = Runtime.getRuntime();
             try {
-                runtime.exec("xdg-open " + url);
+                rt.exec("xdg-open " + url);
             } catch (IOException ex) {
                 //When every standard fails, do the hard work
                 String os = System.getProperty("os.name").toLowerCase();
-                Runtime rt = Runtime.getRuntime();
                 try {
                     if (os.contains("win")) {
                         rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
                     } else if (os.contains("mac")) {
-                        rt.exec("open" + url);
+                        rt.exec("open " + url);
                     } else {
                         String[] browsers = {"epiphany",
                                 "firefox",
@@ -163,13 +181,13 @@ public final class Misc {
                                 "links",
                                 "lynx"};
 
-                        StringBuffer cmd = new StringBuffer();
+                        StringBuilder cmd = new StringBuilder();
                         for (int i = 0; i < browsers.length; i++) {
-                            cmd.append((i == 0 ? "" : " || ")
-                                    + browsers[i]
-                                    + " \""
-                                    + url
-                                    + "\" ");
+                            cmd.append(i == 0 ? "" : " || ")
+                               .append(browsers[i])
+                               .append(" \"")
+                               .append(url)
+                               .append("\" ");
                         }
                         rt.exec(new String[] {"sh", "-c", cmd.toString()});
                     }

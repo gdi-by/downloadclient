@@ -19,11 +19,7 @@ package de.bayern.gdi;
 
 import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.utils.Config;
-import de.bayern.gdi.utils.DocumentResponseHandler;
-import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.StringUtils;
-import de.bayern.gdi.utils.Unauthorized;
-import de.bayern.gdi.utils.UnauthorizedLog;
 import java.io.IOException;
 
 /**
@@ -114,29 +110,16 @@ public class App {
             helpAndExit();
         }
 
-        String config = useConfig(args);
-        if (config != null) {
-            try {
-                Config.load(config);
-            } catch (NullPointerException | IOException ioe) {
-                System.err.println(
-                    "Loading config failed: " + ioe.getMessage());
-                System.exit(1);
-            }
-        } else {
-            try {
-                Config.uninitialized();
-            } catch (IOException e) {
-                System.err.println(
-                        "Loading config failed: " + e.getMessage());
-                System.exit(1);
-            }
+        try {
+            Config.initialize(useConfig(args));
+        } catch (NullPointerException | IOException ioe) {
+            // TODO: Remove the NPE above!
+            System.err.println(
+                "Loading config failed: " + ioe.getMessage());
+            System.exit(1);
         }
 
         if (runHeadless(args)) {
-            Unauthorized unauthorized = new UnauthorizedLog();
-            DocumentResponseHandler.setUnauthorized(unauthorized);
-            FileResponseHandler.setUnauthorized(unauthorized);
             System.exit(Headless.main(args, user(args), password(args)));
         }
         // Its kind of complicated to start a javafx application from

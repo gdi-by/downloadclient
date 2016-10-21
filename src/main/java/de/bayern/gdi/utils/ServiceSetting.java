@@ -22,6 +22,7 @@ import de.bayern.gdi.services.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,7 +70,12 @@ public class ServiceSetting {
         this(XML.getDocument(getFileStream(filePath)));
     }
 
-    public ServiceSetting(Document doc) {
+    public ServiceSetting(File file)
+        throws SAXException, ParserConfigurationException, IOException {
+        this(XML.getDocument(file));
+    }
+
+    public ServiceSetting(Document doc) throws IOException {
         parseDocument(doc);
     }
 
@@ -146,7 +152,7 @@ public class ServiceSetting {
         return this.wms.get("layer");
     }
 
-    private void parseDocument(Document xmlDocument) {
+    private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
         this.wms = parseSchema(xmlDocument,
@@ -168,7 +174,7 @@ public class ServiceSetting {
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
     private Map<String, String> parseSchema(Document xmlDocument, String
-            nodeName, String... names) {
+            nodeName, String... names) throws IOException {
         Map<String, String> map = new HashMap<String, String>();
 
         HashMap<String, String> vars = new HashMap<>();
@@ -178,9 +184,11 @@ public class ServiceSetting {
             vars.put("NAME", name);
             String value = (String) XML.xpath(
                 xmlDocument, SERVICE_XPATH, XPathConstants.STRING, null, vars);
-            if (value != null) {
-                map.put(name, value);
+            if (value == null || value.isEmpty()) {
+                throw new IOException(name + " in " + nodeName + " Node not "
+                        + "Found - Config broken");
             }
+            map.put(name, value);
         }
         return map;
     }
@@ -234,11 +242,15 @@ public class ServiceSetting {
     }
 
     private Map<String, String> parseNameURLScheme(Document xmlDocument,
-                                                   String nodeName) {
+                                                   String nodeName)
+            throws IOException {
         Map<String, String> servicesMap = new HashMap<String, String>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName(nodeName);
         Node servicesNode = servicesNL.item(0);
+        if (servicesNode == null) {
+            throw new IOException(nodeName + " Node not found - Config broken");
+        }
         NodeList serviceNL = servicesNode.getChildNodes();
         Node serviceNode, serviceValueNode;
 
@@ -265,6 +277,10 @@ public class ServiceSetting {
                     servicesMap.put(serviceName, serviceURL);
                 }
             }
+        }
+        if (servicesMap.isEmpty()) {
+            throw new IOException(nodeName + " seeems to be empty - Config "
+                    + "broken");
         }
         return servicesMap;
     }

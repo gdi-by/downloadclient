@@ -180,39 +180,40 @@ public class Service extends Object {
      * @throws IOException when something goes worng
      */
     public void load() throws IOException {
-        if (!this.loaded) {
-            try {
-                this.additionalMessage = new String();
-                int headStatus = ServiceChecker.tryHead(serviceURL);
-                if (headStatus == HttpStatus.SC_OK) {
-                    this.restricted = ServiceChecker.isRestricted(
-                            this.serviceURL
-                    );
-                    if (this.serviceType == null) {
-                        checkServiceType();
-                        if (this.serviceType == null) {
-                            if (!checkURLOptionsAndSetType()) {
-                                return;
-                            }
-                        }
-                    }
-                } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
-                    this.restricted = true;
+        if (this.loaded) {
+            return;
+        }
+        try {
+            this.additionalMessage = "";
+            int headStatus = ServiceChecker.tryHead(serviceURL);
+            if (headStatus == HttpStatus.SC_OK) {
+                this.restricted = ServiceChecker.isRestricted(
+                        this.serviceURL
+                );
+                if (this.serviceType == null) {
                     checkServiceType();
-                    if (serviceType == null) {
+                    if (this.serviceType == null) {
                         if (!checkURLOptionsAndSetType()) {
                             return;
                         }
                     }
-                } else {
+                }
+            } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
+                this.restricted = true;
+                checkServiceType();
+                if (serviceType == null) {
                     if (!checkURLOptionsAndSetType()) {
                         return;
                     }
                 }
-                additionalMessage = "The service could not be determined";
-            } finally {
-                loaded = true;
+            } else {
+                if (!checkURLOptionsAndSetType()) {
+                    return;
+                }
             }
+            additionalMessage = "The service could not be determined";
+        } finally {
+            loaded = true;
         }
     }
 
@@ -276,6 +277,7 @@ public class Service extends Object {
      * returns the hashcode.
      * @return the hashcode
      */
+    @Override
     public int hashCode() {
         int code = 0;
         if (this.name != null) {
@@ -296,18 +298,29 @@ public class Service extends Object {
         return code;
     }
 
+    private static boolean equals(Object a, Object b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
+    }
+
     /**
      * checks if given object is equal.
      * @param s given object
      * @return true if equal; false if not
      */
-    public boolean equals(Service s) {
-        if (s != null) {
-            if (s.hashCode() == this.hashCode()) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public boolean equals(Object o) {
+        Service s = (Service)o;
+        return s != null
+            && equals(this.name, s.name)
+            && equals(this.serviceURL, s.serviceURL)
+            && equals(this.username, s.username)
+            && equals(this.serviceType, s.serviceType);
     }
 
     /**
@@ -327,12 +340,13 @@ public class Service extends Object {
         typeString = typeString.toLowerCase();
         if (typeString.contains(ATOM)) {
             return ServiceType.Atom;
-        } else if (typeString.contains(WFSONE)) {
-            return ServiceType.WFSOne;
-        } else if (typeString.contains(WFSTWO)) {
-            return ServiceType.WFSTwo;
-        } else {
-            return null;
         }
+        if (typeString.contains(WFSONE)) {
+            return ServiceType.WFSOne;
+        }
+        if (typeString.contains(WFSTWO)) {
+            return ServiceType.WFSTwo;
+        }
+        return null;
     }
 }

@@ -125,6 +125,37 @@ public abstract class AbstractDownloadJob
         }
     }
 
+
+    /**
+     * Creates an absolute URL from a base and a relative parts.
+     * @param base The base part.
+     * @param rel The relative part.
+     * @return The created absoluet URL.
+     * @throws JobExecutionException Something went wrong.
+     */
+    protected URL absoluteURL(String base, String rel)
+        throws JobExecutionException {
+        return absoluteURL(toURL(base), rel);
+    }
+
+    /**
+     * Creates an absolute URL from a base and a relative parts.
+     * @param base The base part.
+     * @param rel The relative part.
+     * @return The created absoluet URL.
+     * @throws JobExecutionException Something went wrong.
+     */
+    protected URL absoluteURL(URL base, String rel)
+        throws JobExecutionException {
+        try {
+            return HTTP.buildAbsoluteURL(base, rel);
+        } catch (MalformedURLException | URISyntaxException e) {
+            String msg = I18n.format("file.download.bad.url", e.getMessage());
+            log(msg);
+            throw new JobExecutionException(msg);
+        }
+    }
+
     /**
      * Creates a configured GET request.
      * @param url The URL to browse.

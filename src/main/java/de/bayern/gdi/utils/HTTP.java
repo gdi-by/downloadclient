@@ -20,7 +20,9 @@ package de.bayern.gdi.utils;
 import java.io.IOException;
 import java.net.ProxySelector;
 import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,5 +139,27 @@ public final class HTTP {
      */
     public static HttpHead getHeadRequest(URL url)  throws URISyntaxException {
         return new HttpHead(url.toURI());
+    }
+
+    /**
+     * buildAbsoluteURL creates an absolute URL from
+     * a base URL and a path. If the relative part
+     * is already an absolute URL this is returned.
+     * @param baseURL The base URL to derive from.
+     * @param url The relative part of the URL.
+     * @return The new absolute URL.
+     * @throws MalformedURLException if the URL construction failed.
+     * @throws URISyntaxException if the URL scheme is not valid.
+     */
+    public static URL buildAbsoluteURL(URL baseURL, String url)
+    throws MalformedURLException, URISyntaxException {
+        if (url == null || url.isEmpty()) {
+            return baseURL;
+        }
+        URI uri = new URI(url);
+        if (uri.isAbsolute()) {
+            return uri.toURL();
+        }
+        return new URL(baseURL, url);
     }
 }
