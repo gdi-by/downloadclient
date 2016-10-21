@@ -156,8 +156,10 @@ public class CatalogService {
                         "ows:Constraint/ows:Value/text()",
                         XPathConstants.STRING,
                         this.context);
+                
                 if (getRecordsValueStr == null
-                        || !getRecordsValueStr.equals("SOAP")) {
+                        || getRecordsValueStr.isEmpty()
+                        || getRecordsValueStr.equals("XML")) {
 
                     String getRecordsURLStr = (String) XML.xpath(gruNode,
                             "@*[name()='xlink:href']",
@@ -166,6 +168,7 @@ public class CatalogService {
 
                     this.getRecordsURL = null;
                     this.getRecordsURL = new URL(getRecordsURLStr);
+                    break;
                 }
             }
         }
