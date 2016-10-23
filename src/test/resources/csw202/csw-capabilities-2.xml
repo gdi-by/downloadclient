@@ -104,11 +104,13 @@
         <ows:Operation name="GetRecords">
             <ows:DCP>
                 <ows:HTTP>
+                    <!-- SOAP isn't supported by the DLC --> 
                     <ows:Post xlink:href="http://does.not.support.soap">
                         <ows:Constraint name="PostEncoding">
                             <ows:Value>SOAP</ows:Value>
                         </ows:Constraint>
                     </ows:Post>
+                    <!-- XML is supported by the DLC -->
                     <ows:Post xlink:href="{GETRECORDS_URL}">
                         <ows:Constraint name="PostEncoding">
                             <ows:Value>XML</ows:Value>
