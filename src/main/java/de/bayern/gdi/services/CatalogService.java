@@ -156,7 +156,7 @@ public class CatalogService {
                         "ows:Constraint/ows:Value/text()",
                         XPathConstants.STRING,
                         this.context);
-                
+
                 if (getRecordsValueStr == null
                         || getRecordsValueStr.isEmpty()
                         || getRecordsValueStr.equals("XML")) {
