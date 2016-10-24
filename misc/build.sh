@@ -19,6 +19,7 @@ echo 'Copying config from resources to config folder'
 cp src/resources/serviceSetting.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
+cp src/resources/de/bayern/gdi/model/proxy.xml build/config
 
 echo ''
 echo 'Populating Textfiles'
