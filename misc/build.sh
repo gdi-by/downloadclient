@@ -1,4 +1,8 @@
 #!/bin/bash
+
+#Assuming we're still in the "misc" dir
+cd ..
+
 VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
 
 echo ''
