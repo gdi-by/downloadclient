@@ -1,18 +1,16 @@
 <settings>
-	<services>
-		<catalogues>
-			<catalog>
-				<name>CSW GDI-BY</name>
-				<url>http://geoportal.bayern.de/csw/gdi?service=CSW&amp;request=GetCapabilities</url>
-			</catalog>
-		</catalogues>
-		<wms>
-			<service>
-				<name>WMS WebAtlasDE.light Graustufen</name>
-				<url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
-				<layer>webatlasde.light_grau</layer>
-				<source>© GeoBasis-DE / BKG </source>
-			</service>
-		</wms>
-	</services>
+	<catalogues>
+		<catalog>
+			<name>CSW GDI-BY</name>
+			<url>http://geoportal.bayern.de/csw/gdi?service=CSW&amp;request=GetCapabilities</url>
+		</catalog>
+	</catalogues>
+	<wms>
+		<service>
+			<name>WMS WebAtlasDE.light Graustufen</name>
+			<url>http://sg.geodatenzentrum.de/wms_webatlasde.light_grau</url>
+			<layer>webatlasde.light_grau</layer>
+			<source>© GeoBasis-DE / BKG </source>
+		</service>
+	</wms>
 </settings>
