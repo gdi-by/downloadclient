@@ -73,6 +73,10 @@ rm $GISINTERNALS
 popd
 
 echo ''
+echo 'Populating BeTA2007'
+cp misc/ntv2/* build/bin/gisinternals/bin/proj/SHARE
+
+echo ''
 echo 'Zipping into one file'
 pushd build/
 zip -pTr downloadclient-$VERSION.zip *
