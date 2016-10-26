@@ -56,8 +56,8 @@ echo '*WARNING DONWLOADING FROM UNSAFE EXTERNAL SOURCE!*'
 echo '**************************************************'
 echo ''
 
-GISINTERNALS='release-1800-gdal-mapserver.zip'
-GISINTERNALSSHA256='ea43d6d3219e9b512913b07ac05b75e2619b328290b67b00b16ee09ec161d118'
+GISINTERNALS='release-1800-gdal-2-1-0-mapserver-7-0-1.zip'
+GISINTERNALSSHA256='d3e2108377113065c8771ccb172d9dd60699fb601dbe79cefda6cc38caa93ed4'
 wget http://download.gisinternals.com/sdk/downloads/$GISINTERNALS
 
 echo 'Testing if SHA256 sums are equal...'
