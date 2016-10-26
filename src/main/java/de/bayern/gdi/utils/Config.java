@@ -116,6 +116,8 @@ public class Config {
     private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
+            log.info("No config directory given, starting with standard "
+                    + "values...");
             Holder.INSTANCE.services = loadServiceSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
@@ -158,13 +160,17 @@ public class Config {
         if (proxy.isFile() && proxy.canRead()) {
             ProxyConfiguration proxyConfig = ProxyConfiguration.read(proxy);
             proxyConfig.apply();
+        } else {
+            log.info("No Proxy config found, starting without proxy.");
         }
 
         File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
-        Holder.INSTANCE.services = loadServiceSettings(
-            services.isFile() && services.canRead()
-            ? services
-            : null);
+        if (services.isFile() && services.canRead()) {
+            Holder.INSTANCE.services = loadServiceSettings(services);
+        } else {
+            Holder.INSTANCE.services = loadServiceSettings(null);
+            log.info("ServiceSettings config not found, using fallback...");
+        }
 
         File procConfig = new File(
             dir, ProcessingConfiguration.PROCESSING_CONFIG_FILE);
@@ -174,6 +180,7 @@ public class Config {
         } else {
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
+            log.info("Processing config not found, using fallback...");
         }
 
         if (Holder.INSTANCE.getProcessingConfig() == null) {
@@ -186,6 +193,7 @@ public class Config {
                 MIMETypes.read(mimeTypes);
         } else {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
+            log.info("MimeTypes config not found, using fallback...");
         }
 
         if (Holder.INSTANCE.getMimeTypes() == null) {
