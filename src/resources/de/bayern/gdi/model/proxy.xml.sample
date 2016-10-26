@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProxyConfiguration overrideSystemSettings="true" enableSNIExtension="true">
+    <HTTPProxyHost>some-proxy-host</HTTPProxyHost>
+    <HTTPProxyPort>80</HTTPProxyPort>
+    <HTTPNonProxyHosts>localhost</HTTPNonProxyHosts>
+    <HTTPSProxyHost>some-proxy-host</HTTPSProxyHost>
+    <HTTPSProxyPort>80</HTTPSProxyPort>
+    <HTTPSNonProxyHosts>localhost</HTTPSNonProxyHosts>
+</ProxyConfiguration>

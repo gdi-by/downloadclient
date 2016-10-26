@@ -1,4 +1,8 @@
 #!/bin/bash
+
+#Assuming we're still in the "misc" dir
+cd ..
+
 VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
 
 echo ''
@@ -19,6 +23,7 @@ echo 'Copying config from resources to config folder'
 cp src/resources/serviceSetting.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
+cp src/resources/de/bayern/gdi/model/proxy.xml build/config
 
 echo ''
 echo 'Populating Textfiles'
