@@ -13,4 +13,5 @@
 			<source>© GeoBasis-DE / BKG </source>
 		</service>
 	</wms>
+	<services></services>
 </settings>
