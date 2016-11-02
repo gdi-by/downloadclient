@@ -1,4 +1,8 @@
 #!/bin/bash
+
+#Assuming we're still in the "misc" dir
+cd ..
+
 VERSION=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v '/pom:project/pom:version' pom.xml)
 
 echo ''
@@ -19,6 +23,7 @@ echo 'Copying config from resources to config folder'
 cp src/resources/serviceSetting.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
+cp src/resources/de/bayern/gdi/model/proxy.xml.sample build/config
 
 echo ''
 echo 'Populating Textfiles'
@@ -56,8 +61,8 @@ echo '*WARNING DONWLOADING FROM UNSAFE EXTERNAL SOURCE!*'
 echo '**************************************************'
 echo ''
 
-GISINTERNALS='release-1800-gdal-mapserver.zip'
-GISINTERNALSSHA256='ea43d6d3219e9b512913b07ac05b75e2619b328290b67b00b16ee09ec161d118'
+GISINTERNALS='release-1800-gdal-2-1-0-mapserver-7-0-1.zip'
+GISINTERNALSSHA256='d3e2108377113065c8771ccb172d9dd60699fb601dbe79cefda6cc38caa93ed4'
 wget http://download.gisinternals.com/sdk/downloads/$GISINTERNALS
 
 echo 'Testing if SHA256 sums are equal...'
