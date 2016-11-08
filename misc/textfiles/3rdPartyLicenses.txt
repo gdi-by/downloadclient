@@ -7,3 +7,8 @@ Build by Tamas Szekeres
 
 The copies of these licenseses can be found in:
 /bin/gisinternals/
+
+
+By coordinate transformations from DE_DHDN/GK_3 to ETRS89/UTM 
+this software makes use of NTv2-BeTA operation method 
+(http://crs.bkg.bund.de/crseu/crs/descrtrans/BeTA/de_dhdn2etrs_beta.php). 
