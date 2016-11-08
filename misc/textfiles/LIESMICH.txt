@@ -23,16 +23,21 @@ welcher den Pfad zu einer Downloadschritt-Datei definiert.
 
 Externe Abhängigkeiten:
 -----------------------
-Der Downloadclient benötigt Java 8 mit Java FX
+Der Downloadclient benötigt Java 8 ab Version 1.8.0_40 mit Java FX
 
-Der Downloadclient benötigt GDAL / OGR2OGR um Verarbeitungsschritte
+Der Downloadclient benötigt GDAL/OGR um Verarbeitungsschritte
 durchzuführen.
 
 Das Zip-Archiv enthält diese Anwendungen für Windows 32 Bit im Ordner
 "bin\gisinternals".
 
-Damit die Awendung verfügbar ist muss die Pfadvariable von Windows um diesen
-Ordner ergänzt werden. Die Skript "startup.bat" und "startup-headless.bat"
+Für Koordinatentransformationen von DHDN/Gauss-Krüger nach ETRS89/UTM 
+wird die Bundeseinheitliche Transformation für ATKIS (BeTA2007) der AdV verwendet 
+(http://crs.bkg.bund.de/crseu/crs/descrtrans/BeTA/de_dhdn2etrs_beta.php). 
+Die entsprechende Gitterdatei ist für Windows ebenfalls o.g. Ordner enthalten.
+
+Damit die Anwendung verfügbar ist, muss die Pfadvariable von Windows um diesen
+Ordner ergänzt werden. Die Skripte "startup.bat" und "startup-headless.bat"
 tun dies für Sie.
 
 Lizenzen
