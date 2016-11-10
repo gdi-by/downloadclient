@@ -11,11 +11,11 @@ Das Zip-Archiv an einen geigneten Ort entpacken.
 Starten der Anwendung:
 ----------------------
 Mit grafischer Oberfläche:
-Die Datei "startup.bat" ausführen.
+Die Datei "startup.sh" ausführen.
 
 
 Ohne grafischer Oberfläche:
-Die Datei "startup-headless.bat" ausführen.
+Die Datei "startup-headless.sh" ausführen.
 
 Dieses Skript erwartet einen zusätzlichen Parameter "Downloadschritt",
 welcher den Pfad zu einer Downloadschritt-Datei definiert.
