@@ -643,7 +643,6 @@ public class Controller {
         if (selim != null) {
             Atom.Field selaf = (Atom.Field) selim.getItem();
             this.dataBean.addAttribute("VARIATION", selaf.type, "");
-            System.out.println(selaf.format);
             if (selaf.format.isEmpty()) {
                 this.valueAtomFormat.setVisible(false);
             } else {

@@ -1,2 +1,4 @@
 #!/bin/sh
-java -jar downloadclient.jar --headless $1 --config=config
+FILE=$1
+shift
+java -jar downloadclient.jar -headless $FILE --config=config $@
