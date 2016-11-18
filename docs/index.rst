@@ -4,12 +4,14 @@ GDI-BY Download-Client Dokumentation
 :Autor: Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)
 :Kontakt: gdi-by@ldbv.bayern.de
 
+
 Einleitung
 ============
 
 Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
 Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-Source-Software unter der Apache License 2.0 zur Verfügung gestellt.
+
 
 Installation
 ============
@@ -40,6 +42,7 @@ Falls notwendig, können im Unterordner config des entpackten Download-Client-Pr
 
  <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
 Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
+
 
 Funktionalität
 ==============
@@ -168,7 +171,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
-Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. *Hinweis:* **diese Funktionalität steht im aktuellen Release des Download-Clients noch nicht zur Verfügung**
+Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. 
 
 .. image:: img/DLC_Weiterverarbeitung_DOP.png
 
@@ -244,8 +247,6 @@ Hier können folgende Einstellungen angepasst werden:
 
 verarbeitungsschritte.xml
 ---------------------------
-
-*Hinweis:* **diese Funktionalität steht im aktuellen Release des Download-Clients noch nicht zur Verfügung**
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
