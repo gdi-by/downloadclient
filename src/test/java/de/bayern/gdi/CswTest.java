@@ -65,20 +65,30 @@ public class CswTest extends TestCase {
     }
 
     @Test
-    public void testCswClient() throws IOException, URISyntaxException {
+    public void testCswClient1() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell search");
-        run("/csw/atom-feeds", "/csw202/atom-feeds.xml");
+        run("/csw/atom-feeds",
+            "/csw202/atom-feeds.xml",
+            "/csw202/csw-capabilities-1.xml");
+    }
+
+    @Test
+    public void testCswClient2() throws IOException, URISyntaxException {
+        System.out.println("... Testing virtuell search");
+        run("/csw/atom-feeds",
+            "/csw202/atom-feeds.xml",
+            "/csw202/csw-capabilities-2.xml");
     }
 
 
-    private void run(String queryPath, String queryResource)
+    private void run(String queryPath, String queryResource, String capResource)
                 throws IOException, URISyntaxException {
 
         String body = IOUtils.toString(
                 CswTest.class.getResourceAsStream(queryResource), "UTF-8"
         );
 
-        prepareGetCapabilities(queryPath);
+        prepareGetCapabilities(queryPath, capResource);
         prepareResource(queryPath, body);
 
         CatalogService catalogService =
@@ -116,12 +126,11 @@ public class CswTest extends TestCase {
     }
 
 
-    private void prepareGetCapabilities(String queryPath) throws IOException {
-
-        String queryResource = "/csw202/csw-capabilities.xml";
+    private void prepareGetCapabilities(String queryPath, String capResource)
+            throws IOException {
 
         String body = IOUtils.toString(
-                WfsTest.class.getResourceAsStream(queryResource), "UTF-8"
+                WfsTest.class.getResourceAsStream(capResource), "UTF-8"
         );
 
         body = body.replace("{GETRECORDS_URL}",
