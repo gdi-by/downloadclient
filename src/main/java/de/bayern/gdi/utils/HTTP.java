@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
@@ -38,11 +39,12 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 /** Helper for HTTP. */
 public final class HTTP {
+
+    private static final int TIMEOUT = 10 * 1000; //s * ms
 
     private static final Logger log
         = Logger.getLogger(HTTP.class.getName());
@@ -64,9 +66,13 @@ public final class HTTP {
         SystemDefaultRoutePlanner routePlanner
             = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
 
-        HttpClientBuilder builder = HttpClients
-            .custom()
-            .setRoutePlanner(routePlanner);
+        RequestConfig requestConfig = RequestConfig.
+                custom().
+                setConnectTimeout(TIMEOUT).build();
+        HttpClientBuilder builder = HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig);
+        builder.setRoutePlanner(routePlanner);
+
 
         builder.setUserAgent(getUserAgent());
         if (user != null && password != null) {
@@ -91,6 +97,7 @@ public final class HTTP {
 
             builder.setDefaultCredentialsProvider(credsProv);
         }
+
 
         return builder.build();
     }
