@@ -68,6 +68,7 @@ public final class HTTP {
             .custom()
             .setRoutePlanner(routePlanner);
 
+        builder.setUserAgent(getUserAgent());
         if (user != null && password != null) {
 
             UsernamePasswordCredentials defaultCreds =
@@ -161,5 +162,15 @@ public final class HTTP {
             return uri.toURL();
         }
         return new URL(baseURL, url);
+    }
+
+    /**
+     * gets the user Agent.
+     * @return user agent
+     */
+    public static String getUserAgent() {
+        //https://tools.ietf.org/html/rfc2616#section-14.43
+        return Info.getName() + "/" + Info.getVersion() + " ("
+                + Info.getComment() + ")";
     }
 }
