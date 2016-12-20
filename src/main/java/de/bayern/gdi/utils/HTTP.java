@@ -35,10 +35,7 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 /** Helper for HTTP. */
@@ -71,8 +68,8 @@ public final class HTTP {
                 setConnectTimeout(TIMEOUT).build();
         HttpClientBuilder builder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig);
+        builder.setRetryHandler(new StandardHttpRequestRetryHandler(1, true));
         builder.setRoutePlanner(routePlanner);
-
 
         builder.setUserAgent(getUserAgent());
         if (user != null && password != null) {

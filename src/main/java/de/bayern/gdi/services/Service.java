@@ -207,9 +207,7 @@ public class Service extends Object {
                     }
                 }
             } else {
-                if (!checkURLOptionsAndSetType()) {
-                    return;
-                }
+                return;
             }
             additionalMessage = "The service could not be determined";
         } finally {

@@ -20,6 +20,7 @@ package de.bayern.gdi.gui;
 
 
 import com.vividsolutions.jts.geom.Polygon;
+import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import java.awt.Color;
 import java.awt.Dimension;
