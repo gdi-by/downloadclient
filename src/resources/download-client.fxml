@@ -157,7 +157,7 @@
                                                    <children>
                                                       <HBox fx:id="basicWFSX1Y1" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                          <children>
-                                                            <Label text="x1">
+                                                            <Label text="x1" fx:id="lablbasicx1">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -167,7 +167,7 @@
                                                                   <Tooltip text="%tooltip.x1" />
                                                                </tooltip>
                                                             </NumberTextField>
-                                                            <Label text="y1">
+                                                            <Label text="y1" fx:id="lablbasicy1">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -181,7 +181,7 @@
                                                       </HBox>
                                                       <HBox fx:id="basicWFSX2Y2" prefHeight="31.0" prefWidth="200.0">
                                                          <children>
-                                                            <Label text="x2">
+                                                            <Label text="x2" fx:id="lablbasicx2">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>
@@ -191,7 +191,7 @@
                                                                   <Tooltip text="%tooltip.x2" />
                                                                </tooltip>
                                                             </NumberTextField>
-                                                            <Label text="y2">
+                                                            <Label text="y2" fx:id="lablbasicy2">
                                                                <HBox.margin>
                                                                   <Insets bottom="5.0" left="15.0" right="5.0" top="5.0" />
                                                                </HBox.margin>

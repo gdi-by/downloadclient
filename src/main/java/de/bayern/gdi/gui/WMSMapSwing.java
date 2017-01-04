@@ -47,6 +47,7 @@ import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javax.swing.BorderFactory;
@@ -106,6 +107,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -129,6 +131,10 @@ public class WMSMapSwing extends Parent {
     private TextField coordinateY1TextField;
     private TextField coordinateX2TextField;
     private TextField coordinateY2TextField;
+    private Label coordinateX1Label;
+    private Label coordinateX2Label;
+    private Label coordinateY1Label;
+    private Label coordinateY2Label;
     private ExtJMapPane mapPane;
     private Layer baseLayer;
     private StyleBuilder sb;
@@ -463,16 +469,44 @@ public class WMSMapSwing extends Parent {
      * @param y1 y1
      * @param x2 x2
      * @param y2 y2
+     * @param label_x1 label x1
+     * @param label_x2 label x2
+     * @param label_y1 label y1
+     * @param label_y2 label y2
+     */
+    public void setCoordinateDisplay(
+            TextField x1,
+            TextField y1,
+            TextField x2,
+            TextField y2,
+            Label label_x1,
+            Label label_x2,
+            Label label_y1,
+            Label label_y2) {
+        this.coordinateX1TextField = x1;
+        this.coordinateY1TextField = y1;
+        this.coordinateX2TextField = x2;
+        this.coordinateY2TextField = y2;
+        this.coordinateX1Label = label_x1;
+        this.coordinateX2Label = label_x2;
+        this.coordinateY1Label = label_y1;
+        this.coordinateY2Label = label_y2;
+    }
+
+    /**
+     * sets text fields for coordinates.
+     * @param x1 x1
+     * @param y1 y1
+     * @param x2 x2
+     * @param y2 y2
      */
     public void setCoordinateDisplay(
             TextField x1,
             TextField y1,
             TextField x2,
             TextField y2) {
-        this.coordinateX1TextField = x1;
-        this.coordinateY1TextField = y1;
-        this.coordinateX2TextField = x2;
-        this.coordinateY2TextField = y2;
+        setCoordinateDisplay(x1, y1, x2, y2, new Label(), new Label(),  new
+                Label(), new Label());
     }
 
     private void setDisplayCoordinates(
@@ -518,6 +552,14 @@ public class WMSMapSwing extends Parent {
         DirectPosition lowerCorner = re.getLowerCorner();
         DirectPosition upperCorner = re.getUpperCorner();
         if (lowerCorner != null && upperCorner != null) {
+            this.coordinateY1Label.setText("Y1 - " + targetCRS
+                    .getCoordinateSystem().getAxis(1).getName().getCode());
+            this.coordinateY2Label.setText("Y2 - " + targetCRS
+                    .getCoordinateSystem().getAxis(1).getName().getCode());
+            this.coordinateX1Label.setText("X1 - " + targetCRS
+                    .getCoordinateSystem().getAxis(0).getName().getCode());
+            this.coordinateX2Label.setText("X2 - " + targetCRS
+                    .getCoordinateSystem().getAxis(0).getName().getCode());
             this.coordinateX1TextField.setText(String.valueOf(
                     lowerCorner.getCoordinate()[0]));
             this.coordinateY1TextField.setText(
