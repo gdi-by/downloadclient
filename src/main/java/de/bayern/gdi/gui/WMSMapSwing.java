@@ -552,6 +552,44 @@ public class WMSMapSwing extends Parent {
         DirectPosition lowerCorner = re.getLowerCorner();
         DirectPosition upperCorner = re.getUpperCorner();
         if (lowerCorner != null && upperCorner != null) {
+            double valX1 = lowerCorner.getCoordinate()[0];
+            double valY1 = lowerCorner.getCoordinate()[1];
+            double valX2 = upperCorner.getCoordinate()[0];
+            double valY2 = upperCorner.getCoordinate()[1];
+            if(CRS.getProjectedCRS(targetCRS) != null) {
+                //5
+                this.coordinateX1TextField.setText(String.valueOf(
+                        Math.round(valX1 * 100000.0)/100000.0
+                ));
+                this.coordinateY1TextField.setText(String.valueOf(
+                        Math.round(valY1 * 100000.0)/100000.0
+                ));
+                this.coordinateX2TextField.setText(String.valueOf(
+                        Math.round(valX2 * 100000.0)/100000.0
+                ));
+                this.coordinateY2TextField.setText(String.valueOf(
+                        Math.round(valY2 * 100000.0)/100000.0
+                ));
+            } else {
+                this.coordinateX1TextField.setText(String.valueOf(
+                        Math.round((float) valX1)
+                ));
+                this.coordinateY1TextField.setText(String.valueOf(
+                        Math.round((float) valX1)
+                ));
+                this.coordinateX2TextField.setText(String.valueOf(
+                        Math.round((float) valX1)
+                ));
+                this.coordinateY2TextField.setText(String.valueOf(
+                        Math.round((float) valX1)
+                ));
+                //none
+
+                valX1 = Math.round(valX1)/1.0;
+                valX2 = Math.round(valX2)/1.0;
+                valY1 = Math.round(valY1)/1.0;
+                valY2 = Math.round(valY2)/1.0;
+            }
             this.coordinateY1Label.setText("Y1 - " + targetCRS
                     .getCoordinateSystem().getAxis(1).getName().getCode());
             this.coordinateY2Label.setText("Y2 - " + targetCRS
@@ -560,14 +598,10 @@ public class WMSMapSwing extends Parent {
                     .getCoordinateSystem().getAxis(0).getName().getCode());
             this.coordinateX2Label.setText("X2 - " + targetCRS
                     .getCoordinateSystem().getAxis(0).getName().getCode());
-            this.coordinateX1TextField.setText(String.valueOf(
-                    lowerCorner.getCoordinate()[0]));
-            this.coordinateY1TextField.setText(
-                    String.valueOf(lowerCorner.getCoordinate()[1]));
-            this.coordinateX2TextField.setText(
-                    String.valueOf(upperCorner.getCoordinate()[0]));
-            this.coordinateY2TextField.setText(
-                    String.valueOf(upperCorner.getCoordinate()[1]));
+            this.coordinateX1TextField.setText(String.valueOf(valX1));
+            this.coordinateY1TextField.setText(String.valueOf(valY1));
+            this.coordinateX2TextField.setText(String.valueOf(valX2));
+            this.coordinateY2TextField.setText(String.valueOf(valY2));
         }
     }
 
