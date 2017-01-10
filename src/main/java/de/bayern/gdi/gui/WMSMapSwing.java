@@ -585,23 +585,32 @@ public class WMSMapSwing extends Parent {
                 ));
                 //none
 
+                /*
                 valX1 = Math.round(valX1)/1.0;
                 valX2 = Math.round(valX2)/1.0;
                 valY1 = Math.round(valY1)/1.0;
                 valY2 = Math.round(valY2)/1.0;
+                */
             }
-            this.coordinateY1Label.setText("Y1 - " + targetCRS
-                    .getCoordinateSystem().getAxis(1).getName().getCode());
-            this.coordinateY2Label.setText("Y2 - " + targetCRS
-                    .getCoordinateSystem().getAxis(1).getName().getCode());
-            this.coordinateX1Label.setText("X1 - " + targetCRS
-                    .getCoordinateSystem().getAxis(0).getName().getCode());
-            this.coordinateX2Label.setText("X2 - " + targetCRS
-                    .getCoordinateSystem().getAxis(0).getName().getCode());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    coordinateY1Label.setText("Y1 - " + targetCRS
+                            .getCoordinateSystem().getAxis(1).getName().getCode());
+                    coordinateY2Label.setText("Y2 - " + targetCRS
+                            .getCoordinateSystem().getAxis(1).getName().getCode());
+                    coordinateX1Label.setText("X1 - " + targetCRS
+                            .getCoordinateSystem().getAxis(0).getName().getCode());
+                    coordinateX2Label.setText("X2 - " + targetCRS
+                            .getCoordinateSystem().getAxis(0).getName().getCode());
+                }
+            });
+            /*
             this.coordinateX1TextField.setText(String.valueOf(valX1));
             this.coordinateY1TextField.setText(String.valueOf(valY1));
             this.coordinateX2TextField.setText(String.valueOf(valX2));
             this.coordinateY2TextField.setText(String.valueOf(valY2));
+            */
         }
     }
 
