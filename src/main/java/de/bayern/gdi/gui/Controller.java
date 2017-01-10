@@ -347,7 +347,7 @@ public class Controller {
                 }
                 if (service == null) {
                     setStatusTextUI(
-                            I18n.format("status.status.service-not-available"));
+                            I18n.format("status.service-not-available"));
                     serviceSelection.setDisable(false);
                     serviceURL.getScene().setCursor(Cursor.DEFAULT);
                     return;
