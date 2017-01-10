@@ -190,6 +190,7 @@ public class Service extends Object {
                 this.restricted = ServiceChecker.isRestricted(
                         this.serviceURL
                 );
+                //Checking for validity before?!
                 if (this.serviceType == null) {
                     checkServiceType();
                     if (this.serviceType == null) {
