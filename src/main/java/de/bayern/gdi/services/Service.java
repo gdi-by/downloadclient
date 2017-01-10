@@ -190,6 +190,7 @@ public class Service extends Object {
                 this.restricted = ServiceChecker.isRestricted(
                         this.serviceURL
                 );
+                //Checking for validity before?!
                 if (this.serviceType == null) {
                     checkServiceType();
                     if (this.serviceType == null) {
@@ -207,9 +208,7 @@ public class Service extends Object {
                     }
                 }
             } else {
-                if (!checkURLOptionsAndSetType()) {
-                    return;
-                }
+                return;
             }
             additionalMessage = "The service could not be determined";
         } finally {

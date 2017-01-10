@@ -323,31 +323,45 @@ public class Controller {
                 ServiceModel serviceModel =
                         (ServiceModel) this.serviceList.getSelectionModel()
                                 .getSelectedItems().get(0);
-                Service service;
+                Service service = null;
                 if (serviceModel != null
                     && serviceModel.getUrl().toString().equals(
                         serviceURL.getText())
                         ) {
-                    service = serviceModel.getItem();
-                    service.setPassword(this.servicePW.getText());
-                    service.setUsername(this.serviceUser.getText());
+                    if (ServiceChecker.isReachable(serviceModel.getItem()
+                            .getServiceURL())) {
+                        service = serviceModel.getItem();
+                        service.setPassword(this.servicePW.getText());
+                        service.setUsername(this.serviceUser.getText());
+                    }
                 } else {
                     URL sURL = new URL(this.serviceURL.getText());
-                    service = new Service(
-                            sURL,
-                            "",
-                            ServiceChecker.isRestricted(sURL),
-                            this.serviceUser.getText(),
-                            this.servicePW.getText());
+                    if (ServiceChecker.isReachable(sURL)) {
+                        service = new Service(
+                                sURL,
+                                "",
+                                true,
+                                this.serviceUser.getText(),
+                                this.servicePW.getText());
+                    }
+                }
+                if (service == null) {
+                    setStatusTextUI(
+                            I18n.format("status.service-not-available"));
+                    serviceSelection.setDisable(false);
+                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                    return;
                 }
                 serviceSelection.setDisable(true);
                 serviceURL.getScene().setCursor(Cursor.WAIT);
                 setStatusTextUI(
                         I18n.format("status.checking-auth"));
+                Service finalService = service;
                 Task task = new Task() {
                     protected Integer call() {
                         try {
-                            boolean serviceSelected = selectService(service);
+                            boolean serviceSelected = selectService(
+                                    finalService);
                             if (serviceSelected) {
                                 chooseSelectedService();
                             }
