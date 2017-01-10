@@ -360,8 +360,8 @@ public class Controller {
                 Task task = new Task() {
                     protected Integer call() {
                         try {
-                            boolean serviceSelected = selectService
-                                    (finalService);
+                            boolean serviceSelected = selectService(
+                                    finalService);
                             if (serviceSelected) {
                                 chooseSelectedService();
                             }
