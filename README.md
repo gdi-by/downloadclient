@@ -32,7 +32,6 @@ Dies erzeugt eine Zip-Datei. In der Zip-Datei sind die Binärdateien
 für ogr2ogr auf Windows inkludiert.
 Um `build.sh` auszuführen benötigen Sie `xmlstartlet`, `wget` und `bash`
 
-
 ## Lizenz
 
 Der Download-Client ist als Freie Software unter der Apache License 2.0 veröffentlicht (Details s. LICENSE-Datei).

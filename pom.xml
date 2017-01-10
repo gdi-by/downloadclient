@@ -6,7 +6,7 @@
     <groupId>de.bayern.gdi</groupId>
     <artifactId>downloadclient</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>downloadclient</name>
     <url>http://maven.apache.org</url>
     <properties>
@@ -94,6 +94,8 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>de.bayern.gdi.App</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>
@@ -120,6 +122,8 @@
                     <archive>
                         <manifest>
                             <mainClass>de.bayern.gdi.App</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -28,7 +28,9 @@ cp src/resources/de/bayern/gdi/model/proxy.xml.sample build/config
 echo ''
 echo 'Populating Textfiles'
 cp misc/textfiles/* build/
-sed -i s/{VERSION}/$VERSION/g build/LIESMICH.txt
+sed -i s/{VERSION}/$VERSION/g build/LIESMICH_Linux.txt
+sed -i s/{VERSION}/$VERSION/g build/LIESMICH_Windows.txt
+
 
 echo ''
 echo 'Copying Starter-Scripts'
