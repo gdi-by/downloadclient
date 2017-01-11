@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
@@ -38,11 +39,13 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 
 /** Helper for HTTP. */
 public final class HTTP {
+
+    private static final int TIMEOUT = 10 * 1000; //s * ms
 
     private static final Logger log
         = Logger.getLogger(HTTP.class.getName());
@@ -64,10 +67,15 @@ public final class HTTP {
         SystemDefaultRoutePlanner routePlanner
             = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
 
-        HttpClientBuilder builder = HttpClients
-            .custom()
-            .setRoutePlanner(routePlanner);
+        RequestConfig requestConfig = RequestConfig.
+                custom().
+                setConnectTimeout(TIMEOUT).build();
+        HttpClientBuilder builder = HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig);
+        builder.setRetryHandler(new StandardHttpRequestRetryHandler(1, true));
+        builder.setRoutePlanner(routePlanner);
 
+        builder.setUserAgent(getUserAgent());
         if (user != null && password != null) {
 
             UsernamePasswordCredentials defaultCreds =
@@ -90,6 +98,7 @@ public final class HTTP {
 
             builder.setDefaultCredentialsProvider(credsProv);
         }
+
 
         return builder.build();
     }
@@ -161,5 +170,15 @@ public final class HTTP {
             return uri.toURL();
         }
         return new URL(baseURL, url);
+    }
+
+    /**
+     * gets the user Agent.
+     * @return user agent
+     */
+    public static String getUserAgent() {
+        //https://tools.ietf.org/html/rfc2616#section-14.43
+        return Info.getName() + "/" + Info.getVersion() + " ("
+                + Info.getComment() + ")";
     }
 }
