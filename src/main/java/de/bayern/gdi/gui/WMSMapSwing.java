@@ -410,6 +410,7 @@ public class WMSMapSwing extends Parent {
         }
         this.oldDisplayCRS = this.displayCRS;
         this.displayCRS = crs;
+        changeLabels(crs);
         if (this.coordinateX1TextField != null
                 && this.coordinateY1TextField != null
                 && this.coordinateX2TextField != null
@@ -575,32 +576,35 @@ public class WMSMapSwing extends Parent {
                         Math.round((float) valY2)
                 ));
             }
-            if (coordinateY1Label != null
-                    && coordinateX1Label != null
-                    && coordinateY2Label != null
-                    && coordinateX2Label != null) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        String axis1 = targetCRS
-                                .getCoordinateSystem().getAxis(1).getName()
-                                .getCode();
-                        String axis0 = targetCRS
-                                .getCoordinateSystem().getAxis(0).getName()
-                                .getCode();
-                        axis0 = axis0.replace(" ", "");
-                        axis0 = "gui." + axis0.toLowerCase();
-                        axis1 = axis1.replace(" ", "");
-                        axis1 = "gui." + axis1.toLowerCase();
-                        axis0 = I18n.getMsg(axis0);
-                        axis1 = I18n.getMsg(axis1);
-                        coordinateY1Label.setText(axis1);
-                        coordinateY2Label.setText(axis1);
-                        coordinateX1Label.setText(axis0);
-                        coordinateX2Label.setText(axis0);
-                    }
-                });
-            }
+        }
+    }
+
+    private void changeLabels(CoordinateReferenceSystem targetCRS) {
+        if (coordinateY1Label != null
+                && coordinateX1Label != null
+                && coordinateY2Label != null
+                && coordinateX2Label != null) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    String axis1 = targetCRS
+                            .getCoordinateSystem().getAxis(1).getName()
+                            .getCode();
+                    String axis0 = targetCRS
+                            .getCoordinateSystem().getAxis(0).getName()
+                            .getCode();
+                    axis0 = axis0.replace(" ", "");
+                    axis0 = "gui." + axis0.toLowerCase();
+                    axis1 = axis1.replace(" ", "");
+                    axis1 = "gui." + axis1.toLowerCase();
+                    axis0 = I18n.getMsg(axis0);
+                    axis1 = I18n.getMsg(axis1);
+                    coordinateY1Label.setText(axis1);
+                    coordinateY2Label.setText(axis1);
+                    coordinateX1Label.setText(axis0);
+                    coordinateX2Label.setText(axis0);
+                }
+            });
         }
     }
 
