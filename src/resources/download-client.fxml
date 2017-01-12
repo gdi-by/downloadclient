@@ -222,9 +222,17 @@
                                                                                   prefHeight="30.0"
                                                                                   prefWidth="200.0"
                                                                                   VBox.vgrow="SOMETIMES">
-                                                                                <Label
-                                                                                        text="%gui.buttom">
-                                                                                </Label>
+                                                                                <HBox>
+                                                                                    <Label
+                                                                                            text="%gui.buttom">
+                                                                                        <HBox.margin>
+                                                                                            <Insets bottom="5.0"
+                                                                                                    left="5.0"
+                                                                                                    right="5.0"
+                                                                                                    top="5.0"/>
+                                                                                        </HBox.margin>
+                                                                                    </Label>
+                                                                                </HBox>
                                                                                 <HBox>
                                                                                     <Label text="%gui.x1"
                                                                                            fx:id="lablbasicx1"
@@ -274,53 +282,61 @@
                                                                                   prefHeight="31.0"
                                                                                   prefWidth="200.0"
                                                                                   VBox.vgrow="SOMETIMES">
+                                                                                <HBox>
                                                                                     <Label
-                                                                                        text="%gui.top">
+                                                                                            text="%gui.top">
+                                                                                        <HBox.margin>
+                                                                                            <Insets bottom="5.0"
+                                                                                                    left="5.0"
+                                                                                                    right="15.0"
+                                                                                                    top="5.0"/>
+                                                                                        </HBox.margin>
                                                                                     </Label>
-                                                                                    <HBox>
-                                                                                        <Label text="%gui.x2"
-                                                                                               fx:id="lablbasicx2"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="15.0"
-                                                                                                        right="5.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                        </Label>
-                                                                                        <NumberTextField
-                                                                                                fx:id="basicX2"
-                                                                                                minWidth="-Infinity"
-                                                                                                prefWidth="140.0">
-                                                                                            <tooltip>
-                                                                                                <Tooltip
-                                                                                                        text="%tooltip.x2"/>
-                                                                                            </tooltip>
-                                                                                        </NumberTextField>
-                                                                                    </HBox>
-                                                                                    <HBox>
-                                                                                        <Label text="%gui.y2"
-                                                                                               fx:id="lablbasicy2"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="15.0"
-                                                                                                        right="5.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                        </Label>
-                                                                                        <NumberTextField
-                                                                                                fx:id="basicY2"
-                                                                                                minWidth="-Infinity"
-                                                                                                prefWidth="140.0">
-                                                                                            <tooltip>
-                                                                                                <Tooltip
-                                                                                                        text="%tooltip.y2"/>
-                                                                                            </tooltip>
-                                                                                        </NumberTextField>
-                                                                                    </HBox>
+                                                                                </HBox>
+                                                                                <HBox>
+                                                                                    <Label text="%gui.x2"
+                                                                                           fx:id="lablbasicx2"
+                                                                                           prefWidth="175"
+                                                                                           minWidth="120">
+                                                                                        <HBox.margin>
+                                                                                            <Insets bottom="5.0"
+                                                                                                    left="15.0"
+                                                                                                    right="5.0"
+                                                                                                    top="5.0"/>
+                                                                                        </HBox.margin>
+                                                                                    </Label>
+                                                                                    <NumberTextField
+                                                                                            fx:id="basicX2"
+                                                                                            minWidth="-Infinity"
+                                                                                            prefWidth="140.0">
+                                                                                        <tooltip>
+                                                                                            <Tooltip
+                                                                                                    text="%tooltip.x2"/>
+                                                                                        </tooltip>
+                                                                                    </NumberTextField>
+                                                                                </HBox>
+                                                                                <HBox>
+                                                                                    <Label text="%gui.y2"
+                                                                                           fx:id="lablbasicy2"
+                                                                                           prefWidth="175"
+                                                                                           minWidth="120">
+                                                                                        <HBox.margin>
+                                                                                            <Insets bottom="5.0"
+                                                                                                    left="15.0"
+                                                                                                    right="5.0"
+                                                                                                    top="5.0"/>
+                                                                                        </HBox.margin>
+                                                                                    </Label>
+                                                                                    <NumberTextField
+                                                                                            fx:id="basicY2"
+                                                                                            minWidth="-Infinity"
+                                                                                            prefWidth="140.0">
+                                                                                        <tooltip>
+                                                                                            <Tooltip
+                                                                                                    text="%tooltip.y2"/>
+                                                                                        </tooltip>
+                                                                                    </NumberTextField>
+                                                                                </HBox>
                                                                             </VBox>
                                                                         </HBox>
                                                                         <Separator
