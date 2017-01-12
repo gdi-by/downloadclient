@@ -548,7 +548,7 @@ public class WMSMapSwing extends Parent {
             double valY1 = lowerCorner.getCoordinate()[1];
             double valX2 = upperCorner.getCoordinate()[0];
             double valY2 = upperCorner.getCoordinate()[1];
-            if (CRS.getProjectedCRS(targetCRS) != null) {
+            if (CRS.getProjectedCRS(targetCRS) == null) {
                 this.coordinateX1TextField.setText(String.valueOf(
                         Math.round(valX1 * HOUNDREDTHOUSAND) / HOUNDREDTHOUSAND
                 ));
