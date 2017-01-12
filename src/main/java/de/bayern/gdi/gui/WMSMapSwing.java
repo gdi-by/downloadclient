@@ -107,7 +107,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -163,6 +162,8 @@ public class WMSMapSwing extends Parent {
     private static final double INITIAL_EXTEND_X2 = 1681693;
     private static final double INITIAL_EXTEND_Y2 = 5977713;
     private static final String INITIAL_CRS = "EPSG:3857";
+
+    private static final Double HOUNDREDTHOUSAND = 100000.0D;
 
     private static final Color OUTLINE_COLOR = Color.BLACK;
     private static final Color SELECTED_COLOUR = Color.YELLOW;
@@ -469,44 +470,35 @@ public class WMSMapSwing extends Parent {
      * @param y1 y1
      * @param x2 x2
      * @param y2 y2
-     * @param label_x1 label x1
-     * @param label_x2 label x2
-     * @param label_y1 label y1
-     * @param label_y2 label y2
-     */
-    public void setCoordinateDisplay(
-            TextField x1,
-            TextField y1,
-            TextField x2,
-            TextField y2,
-            Label label_x1,
-            Label label_x2,
-            Label label_y1,
-            Label label_y2) {
-        this.coordinateX1TextField = x1;
-        this.coordinateY1TextField = y1;
-        this.coordinateX2TextField = x2;
-        this.coordinateY2TextField = y2;
-        this.coordinateX1Label = label_x1;
-        this.coordinateX2Label = label_x2;
-        this.coordinateY1Label = label_y1;
-        this.coordinateY2Label = label_y2;
-    }
-
-    /**
-     * sets text fields for coordinates.
-     * @param x1 x1
-     * @param y1 y1
-     * @param x2 x2
-     * @param y2 y2
      */
     public void setCoordinateDisplay(
             TextField x1,
             TextField y1,
             TextField x2,
             TextField y2) {
-        setCoordinateDisplay(x1, y1, x2, y2, new Label(), new Label(),  new
-                Label(), new Label());
+        this.coordinateX1TextField = x1;
+        this.coordinateY1TextField = y1;
+        this.coordinateX2TextField = x2;
+        this.coordinateY2TextField = y2;
+    }
+
+    /**
+     * Sets the Labels.
+     * @param labelx1 label x1
+     * @param labelx2 label x2
+     * @param labely1 label y1
+     * @param labely2 label y2
+     */
+    public void setCoordinateLabel(
+            Label labelx1,
+            Label labelx2,
+            Label labely1,
+            Label labely2
+    ) {
+        this.coordinateX1Label = labelx1;
+        this.coordinateX2Label = labelx2;
+        this.coordinateY1Label = labely1;
+        this.coordinateY2Label = labely2;
     }
 
     private void setDisplayCoordinates(
@@ -556,61 +548,59 @@ public class WMSMapSwing extends Parent {
             double valY1 = lowerCorner.getCoordinate()[1];
             double valX2 = upperCorner.getCoordinate()[0];
             double valY2 = upperCorner.getCoordinate()[1];
-            if(CRS.getProjectedCRS(targetCRS) != null) {
-                //5
+            if (CRS.getProjectedCRS(targetCRS) != null) {
                 this.coordinateX1TextField.setText(String.valueOf(
-                        Math.round(valX1 * 100000.0)/100000.0
+                        Math.round(valX1 * HOUNDREDTHOUSAND) / HOUNDREDTHOUSAND
                 ));
                 this.coordinateY1TextField.setText(String.valueOf(
-                        Math.round(valY1 * 100000.0)/100000.0
+                        Math.round(valY1 * HOUNDREDTHOUSAND) / HOUNDREDTHOUSAND
                 ));
                 this.coordinateX2TextField.setText(String.valueOf(
-                        Math.round(valX2 * 100000.0)/100000.0
+                        Math.round(valX2 * HOUNDREDTHOUSAND) / HOUNDREDTHOUSAND
                 ));
                 this.coordinateY2TextField.setText(String.valueOf(
-                        Math.round(valY2 * 100000.0)/100000.0
+                        Math.round(valY2 * HOUNDREDTHOUSAND) / HOUNDREDTHOUSAND
                 ));
             } else {
                 this.coordinateX1TextField.setText(String.valueOf(
                         Math.round((float) valX1)
                 ));
                 this.coordinateY1TextField.setText(String.valueOf(
-                        Math.round((float) valX1)
+                        Math.round((float) valY1)
                 ));
                 this.coordinateX2TextField.setText(String.valueOf(
-                        Math.round((float) valX1)
+                        Math.round((float) valX2)
                 ));
                 this.coordinateY2TextField.setText(String.valueOf(
-                        Math.round((float) valX1)
+                        Math.round((float) valY2)
                 ));
-                //none
-
-                /*
-                valX1 = Math.round(valX1)/1.0;
-                valX2 = Math.round(valX2)/1.0;
-                valY1 = Math.round(valY1)/1.0;
-                valY2 = Math.round(valY2)/1.0;
-                */
             }
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    coordinateY1Label.setText("Y1 - " + targetCRS
-                            .getCoordinateSystem().getAxis(1).getName().getCode());
-                    coordinateY2Label.setText("Y2 - " + targetCRS
-                            .getCoordinateSystem().getAxis(1).getName().getCode());
-                    coordinateX1Label.setText("X1 - " + targetCRS
-                            .getCoordinateSystem().getAxis(0).getName().getCode());
-                    coordinateX2Label.setText("X2 - " + targetCRS
-                            .getCoordinateSystem().getAxis(0).getName().getCode());
-                }
-            });
-            /*
-            this.coordinateX1TextField.setText(String.valueOf(valX1));
-            this.coordinateY1TextField.setText(String.valueOf(valY1));
-            this.coordinateX2TextField.setText(String.valueOf(valX2));
-            this.coordinateY2TextField.setText(String.valueOf(valY2));
-            */
+            if (coordinateY1Label != null
+                    && coordinateX1Label != null
+                    && coordinateY2Label != null
+                    && coordinateX2Label != null) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        String axis1 = targetCRS
+                                .getCoordinateSystem().getAxis(1).getName()
+                                .getCode();
+                        String axis0 = targetCRS
+                                .getCoordinateSystem().getAxis(0).getName()
+                                .getCode();
+                        axis0 = axis0.replace(" ", "");
+                        axis0 = "gui." + axis0.toLowerCase();
+                        axis1 = axis1.replace(" ", "");
+                        axis1 = "gui." + axis1.toLowerCase();
+                        axis0 = I18n.getMsg(axis0);
+                        axis1 = I18n.getMsg(axis1);
+                        coordinateY1Label.setText(axis1);
+                        coordinateY2Label.setText(axis1);
+                        coordinateX1Label.setText(axis0);
+                        coordinateX2Label.setText(axis0);
+                    }
+                });
+            }
         }
     }
 

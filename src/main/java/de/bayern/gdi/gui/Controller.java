@@ -228,9 +228,9 @@ public class Controller {
     @FXML
     private HBox processStepContainter;
     @FXML
-    private HBox basicWFSX1Y1;
+    private VBox basicWFSX1Y1;
     @FXML
-    private HBox basicWFSX2Y2;
+    private VBox basicWFSX2Y2;
     @FXML
     private Label referenceSystemChooserLabel;
 
@@ -1384,8 +1384,8 @@ public class Controller {
             mapWFS.setCoordinateDisplay(basicX1,
                     basicY1,
                     basicX2,
-                    basicY2,
-                    lablbasicx1,
+                    basicY2);
+            mapWFS.setCoordinateLabel(lablbasicx1,
                     lablbasicx2,
                     lablbasicy1,
                     lablbasicy2);
