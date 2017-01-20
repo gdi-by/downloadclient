@@ -176,6 +176,14 @@ public class Controller {
     @FXML
     private TextField basicY2;
     @FXML
+    private Label lablbasicx1;
+    @FXML
+    private Label lablbasicy1;
+    @FXML
+    private Label lablbasicx2;
+    @FXML
+    private Label lablbasicy2;
+    @FXML
     private TextField atomX1;
     @FXML
     private TextField atomY1;
@@ -183,6 +191,14 @@ public class Controller {
     private TextField atomX2;
     @FXML
     private TextField atomY2;
+    @FXML
+    private Label lablatomx1;
+    @FXML
+    private Label lablatomy1;
+    @FXML
+    private Label lablatomx2;
+    @FXML
+    private Label lablatomy2;
     @FXML
     private Label labelURL;
     @FXML
@@ -212,9 +228,9 @@ public class Controller {
     @FXML
     private HBox processStepContainter;
     @FXML
-    private HBox basicWFSX1Y1;
+    private VBox basicWFSX1Y1;
     @FXML
-    private HBox basicWFSX2Y2;
+    private VBox basicWFSX2Y2;
     @FXML
     private Label referenceSystemChooserLabel;
 
@@ -1369,6 +1385,10 @@ public class Controller {
                     basicY1,
                     basicX2,
                     basicY2);
+            mapWFS.setCoordinateLabel(lablbasicx1,
+                    lablbasicx2,
+                    lablbasicy1,
+                    lablbasicy2);
             this.mapNodeWFS.getChildren().add(mapWFS);
 
             mapAtom = new WMSMapSwing(url,
