@@ -69,7 +69,7 @@ public final class HTTP {
 
         RequestConfig requestConfig = RequestConfig.
                 custom().
-                setConnectTimeout(TIMEOUT).build();
+                setSocketTimeout(TIMEOUT).build();
         HttpClientBuilder builder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig);
         builder.setRetryHandler(new StandardHttpRequestRetryHandler(1, true));
