@@ -401,6 +401,10 @@ public class Controller {
                         setStatusTextUI(
                                 I18n.format("status.no-url"));
                         log.log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        serviceSelection.setDisable(false);
+                        serviceURL.getScene()
+                                .setCursor(Cursor.DEFAULT);
                     }
                 }
             }).start();
@@ -1267,7 +1271,12 @@ public class Controller {
                     | IllegalAccessException e) {
                 // Displays the webview with white background...
             }
-            engine.loadContent(item.description);
+            engine.loadContent("<head> <style>"
+                    + ".description-content" + "{"
+                    + "font-family: Sans-Serif" + "}"
+                    + "</style> </head>"
+                    + "<div class=\"description-content\">"
+                    + item.description + "</div>");
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
