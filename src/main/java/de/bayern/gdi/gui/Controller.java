@@ -401,7 +401,6 @@ public class Controller {
                         setStatusTextUI(
                                 I18n.format("status.no-url"));
                         log.log(Level.SEVERE, e.getMessage(), e);
-                    } finally {
                         serviceSelection.setDisable(false);
                         serviceURL.getScene()
                                 .setCursor(Cursor.DEFAULT);
