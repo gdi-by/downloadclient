@@ -337,6 +337,8 @@ public class Controller {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
             serviceSelection.setDisable(true);
             serviceURL.getScene().setCursor(Cursor.WAIT);
+            serviceURL.setDisable(true);
+            resetGui();
             new Thread(new Runnable() {
                 public void run() {
                     try {
@@ -370,6 +372,7 @@ public class Controller {
                                 I18n.format("status.service-timeout"));
                             dataBean.setSelectedService(null);
                             serviceSelection.setDisable(false);
+                            serviceURL.setDisable(false);
                             serviceURL.getScene().setCursor(Cursor.DEFAULT);
                             return;
                         }
@@ -377,6 +380,7 @@ public class Controller {
                         serviceURL.getScene().setCursor(Cursor.WAIT);
                         setStatusTextUI(
                                 I18n.format("status.checking-auth"));
+                        serviceURL.setDisable(true);
                         Service finalService = service;
                         Task task = new Task() {
                             protected Integer call() {
@@ -391,6 +395,7 @@ public class Controller {
                                     serviceSelection.setDisable(false);
                                     serviceURL.getScene()
                                             .setCursor(Cursor.DEFAULT);
+                                    serviceURL.setDisable(false);
                                 }
                             }
                         };
@@ -404,6 +409,7 @@ public class Controller {
                         serviceSelection.setDisable(false);
                         serviceURL.getScene()
                                 .setCursor(Cursor.DEFAULT);
+                        serviceURL.setDisable(false);
                     }
                 }
             }).start();
