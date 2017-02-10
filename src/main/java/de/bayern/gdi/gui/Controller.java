@@ -80,6 +80,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -105,6 +106,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import org.apache.commons.io.IOUtils;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -156,6 +158,8 @@ public class Controller {
     @FXML
     private ComboBox<CRSModel> referenceSystemChooser;
     @FXML
+    private SplitPane mapSplitPane;
+   @FXML
     private VBox simpleWFSContainer;
     @FXML
     private VBox basicWFSContainer;
@@ -240,6 +244,7 @@ public class Controller {
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
+
     /**
      * Creates the Controller.
      */
@@ -1390,6 +1395,7 @@ public class Controller {
                     lablbasicy1,
                     lablbasicy2);
             this.mapNodeWFS.getChildren().add(mapWFS);
+            this.mapNodeWFS.setAutoSizeChildren(false);
 
             mapAtom = new WMSMapSwing(url,
                     MAP_WIDTH,
@@ -1402,8 +1408,14 @@ public class Controller {
                     atomY1,
                     atomX2,
                     atomY2);
-
             this.mapNodeAtom.getChildren().add(mapAtom);
+            this.mapNodeAtom.setAutoSizeChildren(false);
+
+            this.mapSplitPane.widthProperty().addListener(
+                    (obs, oldVal, newVal) -> {
+                mapWFS.resizeSwingContent(newVal.doubleValue());
+                mapAtom.resizeSwingContent(newVal.doubleValue());
+            });
         } else {
             statusBarText.setText(I18n.format("status.wms-not-available"));
         }
