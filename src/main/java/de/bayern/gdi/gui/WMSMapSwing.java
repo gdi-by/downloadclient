@@ -924,6 +924,8 @@ public class WMSMapSwing extends Parent {
 
                 bounds.translate(-1 * dXWorldCoord , 0);
                 mapPane.setDisplayArea(bounds);
+                mapPane.deleteGraphics();
+                clearCoordinateDisplay();
             }
         } catch (NullPointerException e) { }
     }
