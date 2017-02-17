@@ -907,13 +907,25 @@ public class WMSMapSwing extends Parent {
     }
 
     /**
-      * Resizes swing content.
+      * Resizes swing content and centers map.
       * @param width The new content width.
       */
     public void resizeSwingContent(double width) {
-        if (width >= mapWidth) {
-            this.mapNode.resize(width - MAP_NODE_MARGIN, mapHeight);
-        }
+        try {
+            if (width >= mapWidth) {
+                double oldWidth = mapPane.getWidth();
+
+                this.mapNode.resize(width - MAP_NODE_MARGIN, mapHeight);
+                double scale = mapPane.getWorldToScreenTransform().getScaleX();
+                ReferencedEnvelope bounds = mapPane.getDisplayArea();
+
+                double dXScreenCoord = (width - MAP_NODE_MARGIN - oldWidth) / 2;
+                double dXWorldCoord = dXScreenCoord / scale;
+
+                bounds.translate(-1 * dXWorldCoord , 0);
+                mapPane.setDisplayArea(bounds);
+            }
+        } catch (NullPointerException e) { }
     }
 
     private void createSwingContent(final SwingNode swingNode) {
