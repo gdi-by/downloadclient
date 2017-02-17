@@ -177,7 +177,7 @@
                                 <Label fx:id="labelSelectType"
                                        text="%gui.choose-dataset">
                                     <VBox.margin>
-                                        <Insets bottom="5.0" left="10.0"
+                                        <Insets bottom="5.0" left="20.0"
                                                 top="10.0"/>
                                     </VBox.margin>
                                 </Label>
@@ -185,7 +185,7 @@
                                           minWidth="200.0"
                                           onAction="#handleServiceTypeSelect">
                                     <VBox.margin>
-                                        <Insets bottom="5.0" left="15.0"
+                                        <Insets bottom="5.0" left="20.0"
                                                 right="15.0"/>
                                     </VBox.margin>
                                     <tooltip>
@@ -193,7 +193,8 @@
                                                 text="%tooltip.choose_dataset"/>
                                     </tooltip>
                                 </ComboBox>
-                                <SplitPane dividerPositions="0.8"
+                                <SplitPane fx:id="mapSplitPane"
+                                           dividerPositions="0.8"
                                            orientation="VERTICAL"
                                            VBox.vgrow="ALWAYS">
                                     <items>
@@ -209,8 +210,8 @@
                                                                        VBox.vgrow="ALWAYS">
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
-                                                                                left="5.0"
-                                                                                right="5.0"
+                                                                                left="20.0"
+                                                                                right="0.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
                                                                 </Group>
@@ -227,8 +228,8 @@
                                                                                             text="%gui.buttom">
                                                                                         <HBox.margin>
                                                                                             <Insets bottom="5.0"
-                                                                                                    left="5.0"
-                                                                                                    right="5.0"
+                                                                                                    left="20.0"
+                                                                                                    right="20.0"
                                                                                                     top="5.0"/>
                                                                                         </HBox.margin>
                                                                                     </Label>
@@ -240,7 +241,7 @@
                                                                                            minWidth="120">
                                                                                         <HBox.margin>
                                                                                             <Insets bottom="5.0"
-                                                                                                    left="15.0"
+                                                                                                    left="20.0"
                                                                                                     right="5.0"
                                                                                                     top="5.0"/>
                                                                                         </HBox.margin>
@@ -262,7 +263,7 @@
                                                                                            minWidth="120">
                                                                                         <HBox.margin>
                                                                                             <Insets bottom="5.0"
-                                                                                                    left="15.0"
+                                                                                                    left="20.0"
                                                                                                     right="5.0"
                                                                                                     top="5.0"/>
                                                                                         </HBox.margin>
@@ -287,8 +288,8 @@
                                                                                             text="%gui.top">
                                                                                         <HBox.margin>
                                                                                             <Insets bottom="5.0"
-                                                                                                    left="5.0"
-                                                                                                    right="15.0"
+                                                                                                    left="15.0"
+                                                                                                    right="5.0"
                                                                                                     top="5.0"/>
                                                                                         </HBox.margin>
                                                                                     </Label>
@@ -351,7 +352,7 @@
                                                                                                text="%gui.data-format">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
-                                                                                                        left="15.0"
+                                                                                                        left="20.0"
                                                                                                         right="5.0"
                                                                                                         top="5.0"/>
                                                                                             </HBox.margin>
@@ -383,7 +384,7 @@
                                                                                                text="%gui.reference-system">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
-                                                                                                        left="15.0"
+                                                                                                        left="20.0"
                                                                                                         right="5.0"
                                                                                                         top="5.0"/>
                                                                                             </HBox.margin>
@@ -420,8 +421,8 @@
                                                                        VBox.vgrow="ALWAYS">
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
-                                                                                left="5.0"
-                                                                                right="5.0"
+                                                                                left="20.0"
+                                                                                right="0.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
                                                                 </Group>
@@ -435,7 +436,7 @@
                                                                     </font>
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
-                                                                                left="15.0"
+                                                                                left="20.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
                                                                 </Label>
@@ -449,8 +450,8 @@
                                                                         VBox.vgrow="ALWAYS">
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
-                                                                                left="15.0"
-                                                                                right="5.0"
+                                                                                left="20.0"
+                                                                                right="20.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
                                                                 </WebView>
@@ -465,7 +466,7 @@
                                                                                text="%gui.variants">
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
-                                                                                        left="15.0"
+                                                                                        left="20.0"
                                                                                         right="5.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
@@ -475,7 +476,7 @@
                                                                                 onAction="#handleVariationSelect"
                                                                                 HBox.hgrow="ALWAYS">
                                                                             <HBox.margin>
-                                                                                <Insets right="5.0"/>
+                                                                                <Insets right="20.0"/>
                                                                             </HBox.margin>
                                                                             <tooltip>
                                                                                 <Tooltip
@@ -493,7 +494,7 @@
                                                                                text="%gui.data-format">
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
-                                                                                        left="15.0"
+                                                                                        left="20.0"
                                                                                         right="5.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
@@ -505,7 +506,7 @@
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
                                                                                         left="5.0"
-                                                                                        right="15.0"
+                                                                                        right="20.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
                                                                         </Label>
@@ -518,7 +519,7 @@
                                                                                text="%gui.coordinate-ref-system">
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
-                                                                                        left="15.0"
+                                                                                        left="20.0"
                                                                                         right="5.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
@@ -530,7 +531,7 @@
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
                                                                                         left="5.0"
-                                                                                        right="15.0"
+                                                                                        right="20.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
                                                                         </Label>
@@ -553,7 +554,7 @@
                                                                 onAction="#handleChainCheckbox"
                                                                 text="%gui.post_process">
                                                             <VBox.margin>
-                                                                <Insets left="15.0"
+                                                                <Insets left="20.0"
                                                                         top="5.0"/>
                                                             </VBox.margin>
                                                             <tooltip>
@@ -576,7 +577,7 @@
                                                                             </font>
                                                                             <HBox.margin>
                                                                                 <Insets bottom="5.0"
-                                                                                        left="15.0"
+                                                                                        left="20.0"
                                                                                         right="10.0"
                                                                                         top="5.0"/>
                                                                             </HBox.margin>
@@ -612,7 +613,7 @@
                                                 text="%gui.download"
                                                 textAlignment="CENTER">
                                             <HBox.margin>
-                                                <Insets bottom="5.0" left="15.0"
+                                                <Insets bottom="5.0" left="5.0"
                                                         right="10.0" top="5.0"/>
                                             </HBox.margin>
                                             <tooltip>
@@ -647,7 +648,7 @@
                                                 text="%gui.quit">
                                             <HBox.margin>
                                                 <Insets bottom="5.0" left="5.0"
-                                                        right="10.0" top="5.0"/>
+                                                        right="5.0" top="5.0"/>
                                             </HBox.margin>
                                             <tooltip>
                                                 <Tooltip text="%tooltip.quit"/>

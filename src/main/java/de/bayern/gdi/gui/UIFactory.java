@@ -60,6 +60,7 @@ public class UIFactory {
     private static final int MARGIN_0 = 0;
     private static final int MARGIN_5 = 5;
     private static final int MARGIN_15 = 15;
+    private static final int MARGIN_20 = 20;
     private static final int PREF_HEIGHT = 31;
     private static final int BGCOLOR = 244;
     private static final double FONTSCALE = 0.8;
@@ -227,7 +228,7 @@ public class UIFactory {
         });
         subroot.getChildren().addAll(box, remove);
         subroot.setMargin(box, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
+            MARGIN_5, MARGIN_5, MARGIN_20));
         subroot.setMargin(remove, new Insets(MARGIN_5,
             MARGIN_5, MARGIN_5, MARGIN_5));
         Separator sep = new Separator();
