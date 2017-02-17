@@ -224,7 +224,7 @@
                                                                                   VBox.vgrow="SOMETIMES">
                                                                                 <HBox>
                                                                                     <Label
-                                                                                            text="%gui.buttom">
+                                                                                            text="%gui.bottom">
                                                                                         <HBox.margin>
                                                                                             <Insets bottom="5.0"
                                                                                                     left="5.0"
