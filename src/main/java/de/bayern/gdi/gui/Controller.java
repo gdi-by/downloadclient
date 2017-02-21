@@ -80,6 +80,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -105,6 +106,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import org.apache.commons.io.IOUtils;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -156,6 +158,8 @@ public class Controller {
     @FXML
     private ComboBox<CRSModel> referenceSystemChooser;
     @FXML
+    private SplitPane mapSplitPane;
+   @FXML
     private VBox simpleWFSContainer;
     @FXML
     private VBox basicWFSContainer;
@@ -240,6 +244,7 @@ public class Controller {
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
+
     /**
      * Creates the Controller.
      */
@@ -335,67 +340,84 @@ public class Controller {
     @FXML
     protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            try {
-                ServiceModel serviceModel =
-                        (ServiceModel) this.serviceList.getSelectionModel()
-                                .getSelectedItems().get(0);
-                Service service = null;
-                if (serviceModel != null
-                    && serviceModel.getUrl().toString().equals(
-                        serviceURL.getText())
-                        ) {
-                    if (ServiceChecker.isReachable(serviceModel.getItem()
-                            .getServiceURL())) {
-                        service = serviceModel.getItem();
-                        service.setPassword(this.servicePW.getText());
-                        service.setUsername(this.serviceUser.getText());
-                    }
-                } else {
-                    URL sURL = new URL(this.serviceURL.getText());
-                    if (ServiceChecker.isReachable(sURL)) {
-                        service = new Service(
-                                sURL,
-                                "",
-                                true,
-                                this.serviceUser.getText(),
-                                this.servicePW.getText());
-                    }
-                }
-                if (service == null) {
-                    setStatusTextUI(
-                            I18n.format("status.service-not-available"));
-                    serviceSelection.setDisable(false);
-                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                    return;
-                }
-                serviceSelection.setDisable(true);
-                serviceURL.getScene().setCursor(Cursor.WAIT);
-                setStatusTextUI(
-                        I18n.format("status.checking-auth"));
-                Service finalService = service;
-                Task task = new Task() {
-                    protected Integer call() {
-                        try {
-                            boolean serviceSelected = selectService(
-                                    finalService);
-                            if (serviceSelected) {
-                                chooseSelectedService();
+            serviceSelection.setDisable(true);
+            serviceURL.getScene().setCursor(Cursor.WAIT);
+            serviceURL.setDisable(true);
+            resetGui();
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        ServiceModel serviceModel =
+                                (ServiceModel) serviceList.getSelectionModel()
+                                        .getSelectedItems().get(0);
+                        Service service = null;
+                        if (serviceModel != null
+                            && serviceModel.getUrl().toString().equals(
+                                serviceURL.getText())
+                                ) {
+                            if (ServiceChecker.isReachable(serviceModel
+                                        .getItem().getServiceURL())) {
+                                service = serviceModel.getItem();
+                                service.setPassword(servicePW.getText());
+                                service.setUsername(serviceUser.getText());
                             }
-                            return 0;
-                        } finally {
-                            serviceSelection.setDisable(false);
-                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        } else {
+                            URL sURL = new URL(serviceURL.getText());
+                            if (ServiceChecker.isReachable(sURL)) {
+                                service = new Service(
+                                        sURL,
+                                        "",
+                                        true,
+                                        serviceUser.getText(),
+                                        servicePW.getText());
+                            }
                         }
+                        if (service == null) {
+                            setStatusTextUI(
+                                I18n.format("status.service-timeout"));
+                            dataBean.setSelectedService(null);
+                            serviceSelection.setDisable(false);
+                            serviceURL.setDisable(false);
+                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                            return;
+                        }
+                        serviceSelection.setDisable(true);
+                        serviceURL.getScene().setCursor(Cursor.WAIT);
+                        setStatusTextUI(
+                                I18n.format("status.checking-auth"));
+                        serviceURL.setDisable(true);
+                        Service finalService = service;
+                        Task task = new Task() {
+                            protected Integer call() {
+                                try {
+                                    boolean serviceSelected = selectService(
+                                            finalService);
+                                    if (serviceSelected) {
+                                        chooseSelectedService();
+                                    }
+                                    return 0;
+                                } finally {
+                                    serviceSelection.setDisable(false);
+                                    serviceURL.getScene()
+                                            .setCursor(Cursor.DEFAULT);
+                                    serviceURL.setDisable(false);
+                                }
+                            }
+                        };
+                        Thread th = new Thread(task);
+                        th.setDaemon(true);
+                        th.start();
+                    } catch (MalformedURLException e) {
+                        setStatusTextUI(
+                                I18n.format("status.no-url"));
+                        log.log(Level.SEVERE, e.getMessage(), e);
+                        serviceSelection.setDisable(false);
+                        serviceURL.getScene()
+                                .setCursor(Cursor.DEFAULT);
+                        serviceURL.setDisable(false);
                     }
-                };
-                Thread th = new Thread(task);
-                th.setDaemon(true);
-                th.start();
-            } catch (MalformedURLException e) {
-                setStatusTextUI(
-                        I18n.format("status.no-url"));
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
+                }
+            }).start();
         }
     }
 
@@ -1259,7 +1281,12 @@ public class Controller {
                     | IllegalAccessException e) {
                 // Displays the webview with white background...
             }
-            engine.loadContent(item.description);
+            engine.loadContent("<head> <style>"
+                    + ".description-content" + "{"
+                    + "font-family: Sans-Serif" + "}"
+                    + "</style> </head>"
+                    + "<div class=\"description-content\">"
+                    + item.description + "</div>");
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
@@ -1390,6 +1417,7 @@ public class Controller {
                     lablbasicy1,
                     lablbasicy2);
             this.mapNodeWFS.getChildren().add(mapWFS);
+            this.mapNodeWFS.setAutoSizeChildren(false);
 
             mapAtom = new WMSMapSwing(url,
                     MAP_WIDTH,
@@ -1402,8 +1430,14 @@ public class Controller {
                     atomY1,
                     atomX2,
                     atomY2);
-
             this.mapNodeAtom.getChildren().add(mapAtom);
+            this.mapNodeAtom.setAutoSizeChildren(false);
+
+            this.mapSplitPane.widthProperty().addListener(
+                    (obs, oldVal, newVal) -> {
+                mapWFS.resizeSwingContent(newVal.doubleValue());
+                mapAtom.resizeSwingContent(newVal.doubleValue());
+            });
         } else {
             statusBarText.setText(I18n.format("status.wms-not-available"));
         }

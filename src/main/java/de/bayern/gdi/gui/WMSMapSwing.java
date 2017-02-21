@@ -165,6 +165,8 @@ public class WMSMapSwing extends Parent {
 
     private static final Double HOUNDREDTHOUSAND = 100000.0D;
 
+    private static final int MAP_NODE_MARGIN = 40;
+
     private static final Color OUTLINE_COLOR = Color.BLACK;
     private static final Color SELECTED_COLOUR = Color.YELLOW;
     private static final Color FILL_COLOR = Color.CYAN;
@@ -177,6 +179,7 @@ public class WMSMapSwing extends Parent {
     private String geometryAttributeName;
     private String source;
     private CursorAction bboxAction;
+
 
     /**
      * Represents all Infos needed for drawing a Polyon.
@@ -373,6 +376,7 @@ public class WMSMapSwing extends Parent {
             this.mapContent = new MapContent();
             this.mapContent.setTitle(this.title);
             this.mapNode = new SwingNode();
+            this.mapNode.setManaged(false);
             //this.add(this.layerLabel);
             //this.add(this.wmsLayers);
             this.add(this.mapNode);
@@ -902,6 +906,30 @@ public class WMSMapSwing extends Parent {
         return rule;
     }
 
+    /**
+      * Resizes swing content and centers map.
+      * @param width The new content width.
+      */
+    public void resizeSwingContent(double width) {
+        try {
+            if (width >= mapWidth) {
+                double oldWidth = mapPane.getWidth();
+
+                this.mapNode.resize(width - MAP_NODE_MARGIN, mapHeight);
+                double scale = mapPane.getWorldToScreenTransform().getScaleX();
+                ReferencedEnvelope bounds = mapPane.getDisplayArea();
+
+                double dXScreenCoord = (width - MAP_NODE_MARGIN - oldWidth) / 2;
+                double dXWorldCoord = dXScreenCoord / scale;
+
+                bounds.translate(-1 * dXWorldCoord , 0);
+                mapPane.setDisplayArea(bounds);
+                mapPane.deleteGraphics();
+                clearCoordinateDisplay();
+            }
+        } catch (NullPointerException e) { }
+    }
+
     private void createSwingContent(final SwingNode swingNode) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -915,10 +943,6 @@ public class WMSMapSwing extends Parent {
                         stringBuilder.toString()));
 
                 mapPane = new ExtJMapPane(mapContent);
-
-                mapPane.setPreferredSize(new Dimension(mapWidth,
-                        mapHeight));
-                mapPane.setSize(mapWidth, mapHeight);
                 mapPane.setMinimumSize(new Dimension(mapWidth,
                         mapHeight));
                 mapPane.addFocusListener(new FocusAdapter() {
