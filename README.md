@@ -30,7 +30,7 @@ Um eine verteilbare Version des Downloadclienten zu erzeugen, führen Sie
 `build.sh` aus dem `misc`-Verzeichnis aus.
 Dies erzeugt eine Zip-Datei. In der Zip-Datei sind die Binärdateien
 für ogr2ogr auf Windows inkludiert.
-Um `build.sh` auszuführen benötigen Sie `xmlstartlet`, `wget` und `bash`
+Um `build.sh` auszuführen benötigen Sie `xmlstartlet`, `wget` und `bash`.
 
 ## Lizenz
 
