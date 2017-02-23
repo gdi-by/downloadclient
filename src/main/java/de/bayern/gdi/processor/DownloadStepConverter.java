@@ -211,6 +211,12 @@ public class DownloadStepConverter {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String vendor = vendorSpecific(url);
+        String getFeaturesURL = meta.findOperation("GetFeature").get;
+        if (getFeaturesURL.startsWith("/")) {
+            base += getFeaturesURL;
+        } else {
+            base = getFeaturesURL;
+        }
 
         String version = StringUtils.urlEncode(
             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
