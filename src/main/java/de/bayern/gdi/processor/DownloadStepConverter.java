@@ -277,6 +277,7 @@ public class DownloadStepConverter {
         jl.addJob(fdj);
         if (ext.equals("gml")) {
             jl.addJob(new GMLCheckJob(gml, logger));
+            jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
         }
     }
 
@@ -453,6 +454,7 @@ public class DownloadStepConverter {
 
         jl.addJob(fdj);
         jl.addJob(gcj);
+        jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
     }
 
 
