@@ -33,6 +33,7 @@ import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.StringUtils;
 
@@ -59,10 +60,11 @@ public class ProcessingStepConverter {
     throws ConverterException {
 
         ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
-        if (steps == null) {
+        if (steps == null || steps.size() == 0) {
             return;
         }
 
+        jobs.add(new BroadcastJob(I18n.getMsg("processing_chain.start")));
         ProcessingConfiguration config =
             Config.getInstance().getProcessingConfig();
 
@@ -158,6 +160,7 @@ public class ProcessingStepConverter {
                 logger);
 
             jobs.add(epj);
+            jobs.add(new BroadcastJob(I18n.getMsg("processing_chain.end")));
         }
     }
 
