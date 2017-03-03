@@ -60,6 +60,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.HTTPClient;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
@@ -460,6 +461,14 @@ public class WMSMapSwing extends Parent {
     }
 
     private void displayMap(Layer wmsLayer) {
+        CRSEnvelope targetEnv = null;
+        for (CRSEnvelope env  : wmsLayer.getLayerBoundingBoxes()) {
+            if (env.getEPSGCode().equals(INITIAL_CRS)) {
+                targetEnv = env;
+            }
+        }
+        wmsLayer.setBoundingBoxes(targetEnv);
+
         WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
         this.mapContent.addLayer(displayLayer);
         setMapCRS(this
