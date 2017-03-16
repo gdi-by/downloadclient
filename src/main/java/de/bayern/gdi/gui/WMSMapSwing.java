@@ -167,6 +167,7 @@ public class WMSMapSwing extends Parent {
     private static final Double HOUNDREDTHOUSAND = 100000.0D;
 
     private static final int MAP_NODE_MARGIN = 40;
+    private static final int SOURCE_LABEL_HEIGHT = 70;
 
     private static final Color OUTLINE_COLOR = Color.BLACK;
     private static final Color SELECTED_COLOUR = Color.YELLOW;
@@ -1022,6 +1023,7 @@ public class WMSMapSwing extends Parent {
                 panel.add(mapPane, "grow");
                 if (source != null) {
                     JLabel sourceLabel = new JLabel(source);
+                    mapHeight += SOURCE_LABEL_HEIGHT;
                     panel.add(sourceLabel, "grow");
                 }
                 swingNode.setContent(panel);
