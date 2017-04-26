@@ -138,6 +138,8 @@ public class Controller {
     @FXML
     private TextField searchField;
     @FXML
+    private Button searchButton;
+    @FXML
     private TextField serviceURL;
     @FXML
     private CheckBox serviceAuthenticationCbx;
@@ -422,6 +424,17 @@ public class Controller {
     }
 
     /**
+     * Handle search button clicks.
+     * Hide search button and start search
+     *
+     * @param event the event
+     */
+    @FXML
+    protected void handleSearchButtonClick(MouseEvent event) {
+        handleSearch(null);
+    }
+
+    /**
      * Handle search and filter the service list.
      *
      * @param event the event
@@ -437,6 +450,7 @@ public class Controller {
         if ("".equals(currentText) || currentText == null) {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
+
         String searchValue = currentText.toUpperCase();
         ObservableList<ServiceModel> subentries
                 = FXCollections.observableArrayList();
@@ -455,7 +469,10 @@ public class Controller {
                 @Override
                 protected Integer call() throws Exception {
                     Platform.runLater(() -> {
+                        searchButton.setVisible(false);
+                        searchButton.setManaged(false);
                         progressSearch.setVisible(true);
+                        progressSearch.setManaged(true);
                     });
                     if (catalogReachable) {
                         List<Service> catalog =
@@ -472,6 +489,9 @@ public class Controller {
                     }
                     Platform.runLater(() -> {
                         progressSearch.setVisible(false);
+                        progressSearch.setManaged(false);
+                        searchButton.setManaged(true);
+                        searchButton.setVisible(true);
                     });
                     return 0;
                 }
