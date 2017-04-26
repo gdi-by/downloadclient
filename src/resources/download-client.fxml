@@ -18,8 +18,6 @@
         <MenuBar fx:id="menuBar">
             <menus>
                 <Menu text="%menu.file">
-                    <MenuItem text="%menu.load_config" onAction="#handleLoadConfig"
-                              fx:id="menuLoadConfig" />
                     <MenuItem text="%menu.quit" onAction="#handleCloseApp"
                               fx:id="menuQuit"/>
                 </Menu>
