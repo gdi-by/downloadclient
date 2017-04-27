@@ -38,6 +38,7 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
@@ -52,6 +53,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -118,6 +120,10 @@ public class Controller {
     private static final int BGCOLOR = 244;
     private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
     private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private static final int BBOX_X1_INDEX = 0;
+    private static final int BBOX_Y1_INDEX = 1;
+    private static final int BBOX_X2_INDEX = 2;
+    private static final int BBOX_Y2_INDEX = 3;
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
     private CoordinateReferenceSystem atomCRS;
@@ -156,12 +162,12 @@ public class Controller {
     @FXML
     private ComboBox<ItemModel> atomVariationChooser;
     @FXML
-    private ComboBox dataFormatChooser;
+    private ComboBox<String> dataFormatChooser;
     @FXML
     private ComboBox<CRSModel> referenceSystemChooser;
     @FXML
     private SplitPane mapSplitPane;
-   @FXML
+    @FXML
     private VBox simpleWFSContainer;
     @FXML
     private VBox basicWFSContainer;
@@ -334,93 +340,264 @@ public class Controller {
         }
     }
 
+   /**
+    * Handle click at load config menu items.
+    * Opens a file chooser dialog and loads a download config from a XML file.
+    *
+    * @param event The Event.
+    */
+    @FXML
+    protected void handleLoadConfig(ActionEvent event) {
+        //Choose config file
+        FileChooser fileChooser = new FileChooser();
+        File initialDir = new File(System.getProperty("user.dir"));
+        fileChooser.setInitialDirectory(initialDir);
+        fileChooser.setTitle(I18n.getMsg("menu.load_config"));
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
+            new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File configFile = fileChooser.showOpenDialog(primaryStage);
+
+        if (configFile != null) {
+            try {
+                DownloadConfig conf = new DownloadConfig(configFile);
+
+                //Set service URL and select service
+                serviceURL.setText(conf.getServiceURL());
+
+                doSelectService(conf);
+            } catch (Exception e) {
+                //TODO: Error message at gui log
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
+
+   /**
+    * Fills GUI with data from a download config.
+    *
+    * @param conf Download config to be loaded
+    */
+    private void loadDownloadConfig(DownloadConfig conf) {
+
+        //Load dataset
+        String dataset = conf.getDataset();
+        if (dataset != null) {
+            List<ItemModel> datasets = serviceTypeChooser.
+                    getItems();
+            for (ItemModel iItem : datasets) {
+                if (iItem.getDataset().equals(dataset)) {
+                    serviceTypeChooser.
+                            getSelectionModel().select(iItem);
+                }
+            }
+        }
+
+        //Load service type dependent GUI objects
+        switch (conf.getServiceType()) {
+            case "ATOM":
+                //Set atom variant
+                for (ItemModel i: atomVariationChooser.getItems()) {
+                    Atom.Field field = (Atom.Field) i.getItem();
+                    if (field.type.equals(conf.getAtomVariation())) {
+                        atomVariationChooser.getSelectionModel().select(i);
+                    }
+                }
+
+                break;
+            case "WFS2_BASIC":
+                //Set crs
+                try {
+                    CoordinateReferenceSystem targetCRS =
+                            CRS.decode(conf.getSRSName());
+                    for (CRSModel crsModel: referenceSystemChooser.getItems()) {
+                            if (CRS.equalsIgnoreMetadata(targetCRS,
+                                    crsModel.getCRS())) {
+                            referenceSystemChooser.getSelectionModel()
+                                    .select(crsModel);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+
+                //Set bounding box
+                if (conf.getBoundingBox() != null) {
+                    String[] bBox = conf.getBoundingBox().split(",");
+                    basicX1.setText(bBox[BBOX_X1_INDEX]);
+                    basicY1.setText(bBox[BBOX_Y1_INDEX]);
+                    basicX2.setText(bBox[BBOX_X2_INDEX]);
+                    basicY2.setText(bBox[BBOX_Y2_INDEX]);
+                }
+                //Set output format
+                for (String i: dataFormatChooser.getItems()) {
+                    if (i.equals(conf.getOutputFormat())) {
+                        dataFormatChooser.getSelectionModel().select(i);
+                    }
+                }
+                break;
+            case "WFS2_SIMPLE":
+                ObservableList<Node> children
+                         = simpleWFSContainer.getChildren();
+                HashMap<String, String> parameters = conf.getParams();
+
+                //Set all available parameter fields
+                for (Node node: children) {
+                    if (node instanceof HBox) {
+                        HBox hb = (HBox) node;
+                        Node n1 = hb.getChildren().get(0);
+                        Node n2 = hb.getChildren().get(1);
+
+                        //If HBox contains an input field
+                        if (n1 instanceof Label
+                            && n2 instanceof TextField) {
+                            Label paramLabel = (Label) n1;
+                            TextField paramBox = (TextField) n2;
+                            String targetValue = parameters.get(paramLabel
+                                    .getText());
+                            if (targetValue != null) {
+                                paramBox.setText(targetValue);
+                            }
+                        }
+                        //If HBox contains the outputformat combo box
+                        if (n2 instanceof ComboBox) {
+                            ComboBox<String> cb = (ComboBox<String>) n2;
+                            for (String i: cb.getItems()) {
+                                if (i.equals(conf.getOutputFormat())) {
+                                    cb.getSelectionModel().select(i);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            default:
+                //TODO: Error message at gui log
+                break;
+        }
+
+        //Processing steps
+        ArrayList<DownloadConfig.ProcessingStep> steps =
+                conf.getProcessingSteps();
+        factory.removeAllChainAttributes(this.dataBean, chainContainer);
+        if (steps != null) {
+            chkChain.setSelected(true);
+            handleChainCheckbox(new ActionEvent());
+
+            for (DownloadConfig.ProcessingStep iStep : steps) {
+                factory.addChainAttribute(this.dataBean, chainContainer,
+                        iStep.name, iStep.params);
+            }
+        } else {
+            chkChain.setSelected(false);
+            handleChainCheckbox(new ActionEvent());
+        }
+    }
+
     /**
-     * Handle the service selection.
+     * Handle the service selection button event.
      *
      * @param event The mouse click event.
      */
     @FXML
     protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            serviceSelection.setDisable(true);
-            serviceURL.getScene().setCursor(Cursor.WAIT);
-            serviceURL.setDisable(true);
-            resetGui();
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        ServiceModel serviceModel =
-                                (ServiceModel) serviceList.getSelectionModel()
-                                        .getSelectedItems().get(0);
-                        Service service = null;
-                        if (serviceModel != null
-                            && serviceModel.getUrl().toString().equals(
-                                serviceURL.getText())
-                                ) {
-                            if (ServiceChecker.isReachable(serviceModel
-                                        .getItem().getServiceURL())) {
-                                service = serviceModel.getItem();
-                                service.setPassword(servicePW.getText());
-                                service.setUsername(serviceUser.getText());
-                            }
-                        } else {
-                            URL sURL = new URL(serviceURL.getText());
-                            if (ServiceChecker.isReachable(sURL)) {
-                                service = new Service(
-                                        sURL,
-                                        "",
-                                        true,
-                                        serviceUser.getText(),
-                                        servicePW.getText());
-                            }
-                        }
-                        if (service == null) {
-                            setStatusTextUI(
-                                I18n.format("status.service-timeout"));
-                            dataBean.setSelectedService(null);
-                            serviceSelection.setDisable(false);
-                            serviceURL.setDisable(false);
-                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                            return;
-                        }
-                        serviceSelection.setDisable(true);
-                        serviceURL.getScene().setCursor(Cursor.WAIT);
-                        setStatusTextUI(
-                                I18n.format("status.checking-auth"));
-                        serviceURL.setDisable(true);
-                        Service finalService = service;
-                        Task task = new Task() {
-                            protected Integer call() {
-                                try {
-                                    boolean serviceSelected = selectService(
-                                            finalService);
-                                    if (serviceSelected) {
-                                        chooseSelectedService();
-                                    }
-                                    return 0;
-                                } finally {
-                                    serviceSelection.setDisable(false);
-                                    serviceURL.getScene()
-                                            .setCursor(Cursor.DEFAULT);
-                                    serviceURL.setDisable(false);
-                                }
-                            }
-                        };
-                        Thread th = new Thread(task);
-                        th.setDaemon(true);
-                        th.start();
-                    } catch (MalformedURLException e) {
-                        setStatusTextUI(
-                                I18n.format("status.no-url"));
-                        log.log(Level.SEVERE, e.getMessage(), e);
-                        serviceSelection.setDisable(false);
-                        serviceURL.getScene()
-                                .setCursor(Cursor.DEFAULT);
-                        serviceURL.setDisable(false);
-                    }
-                }
-            }).start();
+            doSelectService();
         }
+    }
+
+   /**
+    * Select a service according to service url textfield.
+    */
+    protected void doSelectService() {
+        doSelectService(null);
+    }
+
+   /**
+    * Select a service according to service url textfield.
+    *
+    * @param downloadConf Loaded download config, null if a service is chosen
+    *    from an URL or the service List
+    */
+    protected void doSelectService(DownloadConfig downloadConf) {
+        serviceSelection.setDisable(true);
+        serviceURL.getScene().setCursor(Cursor.WAIT);
+        serviceURL.setDisable(true);
+        resetGui();
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    ServiceModel serviceModel =
+                            (ServiceModel) serviceList.getSelectionModel()
+                                    .getSelectedItems().get(0);
+                    Service service = null;
+                    if (serviceModel != null
+                        && serviceModel.getUrl().toString().equals(
+                            serviceURL.getText())
+                            ) {
+                        if (ServiceChecker.isReachable(serviceModel
+                                    .getItem().getServiceURL())) {
+                            service = serviceModel.getItem();
+                            service.setPassword(servicePW.getText());
+                            service.setUsername(serviceUser.getText());
+                        }
+                    } else {
+                        URL sURL = new URL(serviceURL.getText());
+                        if (ServiceChecker.isReachable(sURL)) {
+                            service = new Service(
+                                    sURL,
+                                    "",
+                                    true,
+                                    serviceUser.getText(),
+                                    servicePW.getText());
+                        }
+                    }
+                    if (service == null) {
+                        setStatusTextUI(
+                            I18n.format("status.service-timeout"));
+                        dataBean.setSelectedService(null);
+                        serviceSelection.setDisable(false);
+                        serviceURL.setDisable(false);
+                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        return;
+                    }
+                    serviceSelection.setDisable(true);
+                    serviceURL.getScene().setCursor(Cursor.WAIT);
+                    setStatusTextUI(
+                            I18n.format("status.checking-auth"));
+                    serviceURL.setDisable(true);
+                    Service finalService = service;
+                    Task task = new Task() {
+                        protected Integer call() {
+                            try {
+                                boolean serviceSelected = selectService(
+                                        finalService);
+                                if (serviceSelected) {
+                                    chooseSelectedService(downloadConf);
+                                }
+                                return 0;
+                            } finally {
+                                serviceSelection.setDisable(false);
+                                serviceURL.getScene()
+                                        .setCursor(Cursor.DEFAULT);
+                                serviceURL.setDisable(false);
+                            }
+                        }
+                    };
+                    Thread th = new Thread(task);
+                    th.setDaemon(true);
+                    th.start();
+                } catch (MalformedURLException e) {
+                    setStatusTextUI(
+                            I18n.format("status.no-url"));
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    serviceSelection.setDisable(false);
+                    serviceURL.getScene()
+                            .setCursor(Cursor.DEFAULT);
+                    serviceURL.setDisable(false);
+                }
+            }
+        }).start();
     }
 
     /**
@@ -1059,9 +1236,12 @@ public class Controller {
     }
 
     /**
-     * Use selection to request the service data and fill th UI.
+     * Use selection to request the service data and fill the UI.
+     *
+     * @param downloadConf Loaded download config, null if service
+     *      was chosen from an URL or the service list
      */
-    private void chooseSelectedService() {
+    private void chooseSelectedService(DownloadConfig downloadConf) {
         switch (dataBean.getSelectedService().getServiceType()) {
             case Atom:
                 Platform.runLater(() -> {
@@ -1163,6 +1343,9 @@ public class Controller {
         Platform.runLater(() -> {
             serviceTypeChooser.
                     getSelectionModel().select(0);
+            if (downloadConf != null) {
+                loadDownloadConfig(downloadConf);
+            }
             statusBarText.setText(I18n.getMsg("status.ready"));
         });
         return;
