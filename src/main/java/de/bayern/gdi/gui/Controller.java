@@ -78,6 +78,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -89,12 +90,14 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -134,6 +137,7 @@ public class Controller {
     private boolean catalogReachable;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
+    private DownloadConfig downloadConfig;
 
     @FXML
     private Button buttonClose;
@@ -359,16 +363,21 @@ public class Controller {
         File configFile = fileChooser.showOpenDialog(primaryStage);
 
         if (configFile != null) {
+            resetGui();
             try {
-                DownloadConfig conf = new DownloadConfig(configFile);
-
-                //Set service URL and select service
-                serviceURL.setText(conf.getServiceURL());
-
-                doSelectService(conf);
-            } catch (Exception e) {
-                //TODO: Error message at gui log
+                this.downloadConfig = new DownloadConfig(configFile);
+                serviceURL.setText(this.downloadConfig.getServiceURL());
+                doSelectService(downloadConfig);
+            } catch (IOException
+                        | ParserConfigurationException
+                        | SAXException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
+                setStatusTextUI(
+                        I18n.format("status.config.invalid-xml"));
+                return;
+            } catch (DownloadConfig.NoServiceURLException urlEx) {
+                setStatusTextUI(
+                        I18n.format("status.config.no-url-provided"));
             }
         }
     }
@@ -379,29 +388,75 @@ public class Controller {
     * @param conf Download config to be loaded
     */
     private void loadDownloadConfig(DownloadConfig conf) {
-
-        //Load dataset
         String dataset = conf.getDataset();
+
         if (dataset != null) {
+            boolean datasetAvailable = false;
             List<ItemModel> datasets = serviceTypeChooser.
                     getItems();
             for (ItemModel iItem : datasets) {
                 if (iItem.getDataset().equals(dataset)) {
                     serviceTypeChooser.
                             getSelectionModel().select(iItem);
+                    datasetAvailable = true;
                 }
             }
+            if (!datasetAvailable) {
+                MiscItemModel errorItem = new MiscItemModel();
+                errorItem.setDataset(dataset);
+                errorItem.setItem(conf.getDataset());
+                setStatusTextUI(
+                        I18n.format("gui.dataset-not-available"));
+                serviceTypeChooser.getItems().add(errorItem);
+                serviceTypeChooser.
+                        getSelectionModel().select(errorItem);
+            }
         }
+        serviceTypeChooser.setCellFactory(
+                new Callback<ListView<ItemModel>,
+                ListCell<ItemModel>>() {
+            @Override
+            public ListCell<ItemModel> call(ListView<ItemModel> list) {
+                return new ServiceCell() {
+                };
+            }
+        });
+        atomVariationChooser.setCellFactory(
+                new Callback<ListView<ItemModel>,
+                ListCell<ItemModel>>() {
+            @Override
+            public ListCell<ItemModel> call(ListView<ItemModel> list) {
+                return new ServiceCell() {
+                };
+            }
+        });
+        referenceSystemChooser.setCellFactory(
+                new Callback<ListView<CRSModel>,
+                ListCell<CRSModel>>() {
+            @Override
+            public ListCell<CRSModel> call(ListView<CRSModel> list) {
+                return new CRSCell() {
+                };
+            }
+        });
 
         //Load service type dependent GUI objects
         switch (conf.getServiceType()) {
             case "ATOM":
                 //Set atom variant
+                boolean variantAvailable = false;
                 for (ItemModel i: atomVariationChooser.getItems()) {
                     Atom.Field field = (Atom.Field) i.getItem();
                     if (field.type.equals(conf.getAtomVariation())) {
+                        variantAvailable = true;
                         atomVariationChooser.getSelectionModel().select(i);
                     }
+                }
+                if (!variantAvailable) {
+                    MiscItemModel errorVariant = new MiscItemModel();
+                    errorVariant.setItem(downloadConfig.getAtomVariation());
+                    atomVariationChooser.getItems().add(errorVariant);
+                    atomVariationChooser.getSelectionModel().select(errorVariant);
                 }
 
                 break;
@@ -410,12 +465,21 @@ public class Controller {
                 try {
                     CoordinateReferenceSystem targetCRS =
                             CRS.decode(conf.getSRSName());
+                    boolean crsAvailable = false;
                     for (CRSModel crsModel: referenceSystemChooser.getItems()) {
-                            if (CRS.equalsIgnoreMetadata(targetCRS,
+                        if (CRS.equalsIgnoreMetadata(targetCRS,
                                     crsModel.getCRS())) {
+                            crsAvailable = true;
                             referenceSystemChooser.getSelectionModel()
                                     .select(crsModel);
                         }
+                    }
+                    if (!crsAvailable) {
+                        CRSModel crsErrorModel = new CRSModel(targetCRS);
+                        crsErrorModel.setAvailable(false);
+                        referenceSystemChooser.getItems().add(crsErrorModel);
+                        referenceSystemChooser.getSelectionModel()
+                                .select(crsErrorModel);
                     }
                 } catch (Exception e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
@@ -430,10 +494,15 @@ public class Controller {
                     basicY2.setText(bBox[BBOX_Y2_INDEX]);
                 }
                 //Set output format
+                boolean outputFormatAvailable = false;
                 for (String i: dataFormatChooser.getItems()) {
                     if (i.equals(conf.getOutputFormat())) {
                         dataFormatChooser.getSelectionModel().select(i);
+                        outputFormatAvailable = true;
                     }
+                }
+                if (!outputFormatAvailable) {
+                   //TODO: 
                 }
                 break;
             case "WFS2_SIMPLE":
@@ -462,10 +531,17 @@ public class Controller {
                         //If HBox contains the outputformat combo box
                         if (n2 instanceof ComboBox) {
                             ComboBox<String> cb = (ComboBox<String>) n2;
+                            boolean formatAvailable = false;
                             for (String i: cb.getItems()) {
                                 if (i.equals(conf.getOutputFormat())) {
                                     cb.getSelectionModel().select(i);
+                                    formatAvailable = true;
                                 }
+                            }
+                            if (!formatAvailable) {
+                                String format = downloadConfig.getOutputFormat();
+                                cb.getItems().add(format);
+                                cb.getSelectionModel().select(format);
                             }
                         }
                     }
@@ -502,6 +578,7 @@ public class Controller {
     @FXML
     protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
+            this.downloadConfig = null;
             doSelectService();
         }
     }
@@ -862,6 +939,13 @@ public class Controller {
      */
     @FXML
     protected void handleReferenceSystemSelect(ActionEvent event) {
+        if (referenceSystemChooser.getValue() != null) {
+            if (referenceSystemChooser.getValue().isAvailable()) {
+                referenceSystemChooser.setStyle("-fx-border-color: null;");
+            } else {
+                referenceSystemChooser.setStyle("-fx-border-color: red;");
+            }
+        }
         this.dataBean.addAttribute("srsName",
                 referenceSystemChooser.getValue() != null
                         ? referenceSystemChooser.
@@ -889,8 +973,22 @@ public class Controller {
     @FXML
     protected void handleVariationSelect(ActionEvent event) {
         ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
+        boolean variationAvailable = false;
+        if (selim instanceof MiscItemModel) {
+            atomVariationChooser.setStyle("-fx-border-color: red;");
+        } else {
+            atomVariationChooser.setStyle("-fx-border-color: null;");
+            variationAvailable = true;
+        }
         if (selim != null) {
-            Atom.Field selaf = (Atom.Field) selim.getItem();
+            Atom.Field selaf;
+            if (variationAvailable) {
+                selaf = (Atom.Field) selim.getItem();
+            } else {
+                selaf = new Atom.Field();
+                selaf.format = "";
+                selaf.crs = "";
+            }
             this.dataBean.addAttribute("VARIATION", selaf.type, "");
             if (selaf.format.isEmpty()) {
                 this.valueAtomFormat.setVisible(false);
@@ -1159,6 +1257,7 @@ public class Controller {
         Platform.runLater(() -> {
             this.serviceTypeChooser.getItems().retainAll();
         });
+        this.serviceTypeChooser.setStyle("-fx-border-color: null;");
         this.dataBean.reset();
         this.mapAtom.reset();
         this.mapWFS.reset();
@@ -1440,19 +1539,39 @@ public class Controller {
         }
     }
 
-    private void chooseType(ItemModel data) {
+    private void chooseType(ItemModel data){
         ServiceType type = this.dataBean.getServiceType();
+        boolean datasetAvailable = false;
+        if (data instanceof MiscItemModel) {
+            serviceTypeChooser.setStyle("-fx-border-color: red;");
+            setStatusTextUI(I18n.format("gui.dataset-not-available"));
+        } else {
+            serviceTypeChooser.setStyle("-fx-border-color: null;");
+            datasetAvailable = true;
+            setStatusTextUI(I18n.format("status.ready"));
+        }
         if (type == ServiceType.Atom) {
-            Atom.Item item = (Atom.Item) data.getItem();
-            try {
-                item.load();
-            } catch (URISyntaxException
-                    | SAXException
-                    | ParserConfigurationException
-                    | IOException e) {
-                log.log(Level.SEVERE, "Could not Load Item\n"
-                        + e.getMessage(), item);
-                return;
+            Atom.Item item;
+            if(datasetAvailable) {
+                item = (Atom.Item) data.getItem();
+                try {
+                    item.load();
+                } catch (URISyntaxException
+                        | SAXException
+                        | ParserConfigurationException
+                        | IOException e) {
+                    log.log(Level.SEVERE, "Could not Load Item\n"
+                            + e.getMessage(), item);
+                    return;
+                }
+            } else {
+                try {
+                    item = new Atom.Item(new URL(
+                            this.downloadConfig.getServiceURL()));
+                    item.description = "";
+                } catch (Exception e) {
+                    return;
+                }
             }
             if (mapAtom != null) {
                 mapAtom.highlightSelectedPolygon(item.id);
@@ -1494,7 +1613,9 @@ public class Controller {
             this.basicWFSContainer.setVisible(false);
             this.atomContainer.setVisible(true);
         } else if (type == ServiceType.WFSTwo) {
-            if (data instanceof FeatureModel) {
+            if (data instanceof FeatureModel
+                || (!datasetAvailable
+                &&downloadConfig.getServiceType() == "WFS2_BASIC")){
                 this.simpleWFSContainer.setVisible(false);
                 this.basicWFSContainer.setVisible(true);
                 this.mapNodeWFS.setVisible(true);
@@ -1503,7 +1624,12 @@ public class Controller {
                 this.basicWFSX2Y2.setVisible(true);
                 this.referenceSystemChooser.setVisible(true);
                 this.referenceSystemChooserLabel.setVisible(true);
-                WFSMeta.Feature feature = (WFSMeta.Feature) data.getItem();
+                WFSMeta.Feature feature;
+                if (datasetAvailable) {
+                    feature = (WFSMeta.Feature) data.getItem();
+                } else {
+                    feature = new WFSMeta.Feature();
+                }
                 mapWFS.setExtend(feature.bbox);
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(feature.defaultCRS);
@@ -1563,18 +1689,25 @@ public class Controller {
                 ObservableList<String> formats =
                         FXCollections.observableArrayList(outputFormats);
                 this.dataFormatChooser.setItems(formats);
-            } else if (data instanceof StoredQueryModel) {
-
+            } else if (data instanceof StoredQueryModel
+                    || (!datasetAvailable
+                    && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))){
                 List<String> outputFormats = this.dataBean.getWFSService()
                         .findOperation("GetFeature").outputFormats;
                 if (outputFormats.isEmpty()) {
                     outputFormats =
                             this.dataBean.getWFSService().outputFormats;
                 }
+                WFSMeta.StoredQuery storedQuery;
+                if (datasetAvailable) {
+                    storedQuery = (WFSMeta.StoredQuery) data.getItem();
+                } else {
+                    storedQuery = new WFSMeta.StoredQuery();
+                }
                 factory.fillSimpleWFS(
                         dataBean,
                         this.simpleWFSContainer,
-                        (WFSMeta.StoredQuery) data.getItem(),
+                        storedQuery,
                         outputFormats);
                 this.atomContainer.setVisible(false);
                 this.simpleWFSContainer.setVisible(true);
@@ -1757,6 +1890,47 @@ public class Controller {
         public void receivedMessage(ProcessorEvent pe) {
             setMessage(pe.getMessage());
             Platform.runLater(this);
+        }
+    }
+   /**
+    * Cell class, changing its font color and weight
+    * depending on its content.
+    */
+    private class ServiceCell extends ListCell<ItemModel> {
+        public ServiceCell() { }
+        @Override
+        protected void updateItem(ItemModel item,
+                boolean empty) {
+            super.updateItem(item, empty);
+            setText(item == null ? "" : item.toString());
+            if (item instanceof MiscItemModel) {
+                setTextFill(Color.RED);
+                setStyle("-fx-font-weight: bold;");
+            } else {
+                setTextFill(Color.BLACK);
+                setStyle("-fx-font-weight: normal;");
+            }
+        }
+    }
+
+   /**
+    * Cell class, changing its font color and weight
+    * depending whether the crs is available on the current
+    * WFS.
+    */
+    private class CRSCell extends ListCell<CRSModel> {
+        @Override
+        protected void updateItem(CRSModel item,
+                boolean empty) {
+            super.updateItem(item, empty);
+            setText(item == null ? "" : item.toString());
+            if (item != null && !item.isAvailable()) {
+                setTextFill(Color.RED);
+                setStyle("-fx-font-weight: bold;");
+            } else {
+                setTextFill(Color.BLACK);
+                setStyle("-fx-font-weight: normal;");
+            }
         }
     }
 }
