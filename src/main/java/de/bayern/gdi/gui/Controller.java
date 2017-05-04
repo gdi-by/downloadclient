@@ -353,7 +353,6 @@ public class Controller {
     */
     @FXML
     protected void handleLoadConfig(ActionEvent event) {
-        //Choose config file
         FileChooser fileChooser = new FileChooser();
         File initialDir = new File(System.getProperty("user.dir"));
         fileChooser.setInitialDirectory(initialDir);
@@ -1245,17 +1244,29 @@ public class Controller {
             }
         }
 
+        if (serviceTypeChooser.isVisible()
+                && downloadConfig != null
+                && serviceTypeChooser.getValue() instanceof MiscItemModel) {
+            failed += I18n.format("gui.dataset") + ", ";
+        }
+
+        if (atomContainer.isVisible()
+                && downloadConfig != null
+                && atomVariationChooser.getValue() instanceof MiscItemModel) {
+            failed += I18n.format("gui.variants") + ", ";
+        }
+
         if (referenceSystemChooser.isVisible()
                 && downloadConfig != null
                 && !referenceSystemChooser.getValue().isAvailable()) {
-            failed += I18n.format("gui.reference-system");
+            failed += I18n.format("gui.reference-system") + ", ";
         }
 
         if (basicWFSContainer.isVisible()
                 &&  dataFormatChooser.isVisible()
                 && downloadConfig != null
                 && !dataFormatChooser.getValue().isAvailable()) {
-            failed += I18n.format("gui.data-format");
+            failed += I18n.format("gui.data-format") + ", ";
         }
 
         if (simpleWFSContainer.isVisible()
@@ -1275,6 +1286,10 @@ public class Controller {
                     }
                 }
             }
+        }
+
+        if (failed.endsWith(", ")) {
+            failed = failed.substring(0, failed.length() - 2);
         }
 
         if (!failed.equals("")) {
