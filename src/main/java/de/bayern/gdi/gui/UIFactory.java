@@ -89,7 +89,7 @@ public class UIFactory {
         DataBean dataBean,
         VBox container,
         WFSMeta.StoredQuery type,
-        List <String> outputFormats
+        List <OutputFormatModel> outputFormats
     ) {
         createSimpleWFS(dataBean,
                 type,
@@ -101,7 +101,7 @@ public class UIFactory {
         DataBean dataBean,
         WFSMeta.StoredQuery type,
         VBox container,
-        List <String> outputFormats
+        List <OutputFormatModel> outputFormats
     ) {
         container.getChildren().clear();
         Label descriptionHead = new Label();
@@ -151,7 +151,7 @@ public class UIFactory {
         outputFormatLabel.setText(I18n.format("gui.data-format"));
         ComboBox outputFormat = new ComboBox();
         outputFormat.setId(DATAFORMAT_ID);
-        ObservableList<String> out =
+        ObservableList<OutputFormatModel> out =
                 FXCollections.observableArrayList();
         out.addAll(outputFormats);
         outputFormat.setItems(out);

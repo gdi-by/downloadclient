@@ -105,6 +105,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.xml.sax.SAXException;
@@ -482,6 +483,8 @@ public class Controller {
                         referenceSystemChooser.getSelectionModel()
                                 .select(crsErrorModel);
                     }
+                } catch (NoSuchAuthorityCodeException nsace) {
+                    setStatusTextUI(I18n.format("status.config.invalid-epsg"));
                 } catch (Exception e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
                 }
@@ -527,10 +530,27 @@ public class Controller {
                             }
                         }
                         if (n2 instanceof ComboBox) {
-                            ComboBox<String> cb = (ComboBox<String>) n2;
+                            ComboBox<OutputFormatModel> cb
+                                    = (ComboBox<OutputFormatModel>) n2;
+                            cb.setCellFactory(
+                                    new Callback<ListView<OutputFormatModel>,
+                                    ListCell<OutputFormatModel>>() {
+                                @Override
+                                public ListCell<OutputFormatModel>
+                                        call(ListView<OutputFormatModel> list) {
+                                    return new CellTypes.StringCell();
+                                }
+                            });
+                            cb.setOnAction((event) -> {
+                                if (cb.getValue().isAvailable()) {
+                                    cb.setStyle("-fx-border-color: null;");
+                                } else {
+                                    cb.setStyle("-fx-border-color: red;");
+                                }
+                            });
                             boolean formatAvailable = false;
-                            for (String i: cb.getItems()) {
-                                if (i.equals(downloadConfig
+                            for (OutputFormatModel i: cb.getItems()) {
+                                if (i.getItem().equals(downloadConfig
                                         .getOutputFormat())) {
                                     cb.getSelectionModel().select(i);
                                     formatAvailable = true;
@@ -539,8 +559,16 @@ public class Controller {
                             if (!formatAvailable) {
                                 String format = downloadConfig
                                         .getOutputFormat();
-                                cb.getItems().add(format);
-                                cb.getSelectionModel().select(format);
+                                OutputFormatModel m = new OutputFormatModel();
+                                m.setItem(format);
+                                m.setAvailable(false);
+                                cb.getItems().add(m);
+                                cb.getSelectionModel().select(m);
+                            }
+                            if (cb.getValue().isAvailable()) {
+                                cb.setStyle("-fx-border-color: null;");
+                            } else {
+                                cb.setStyle("-fx-border-color: red;");
                             }
                         }
                     }
@@ -550,7 +578,6 @@ public class Controller {
                 setStatusTextUI(I18n.format("status.config.invalid-xml"));
                 break;
         }
-        //Processing steps
         ArrayList<DownloadConfig.ProcessingStep> steps =
                 downloadConfig.getProcessingSteps();
         factory.removeAllChainAttributes(this.dataBean, chainContainer);
@@ -1217,6 +1244,39 @@ public class Controller {
                 }
             }
         }
+
+        if (referenceSystemChooser.isVisible()
+                && downloadConfig != null
+                && !referenceSystemChooser.getValue().isAvailable()) {
+            failed += I18n.format("gui.reference-system");
+        }
+
+        if (basicWFSContainer.isVisible()
+                &&  dataFormatChooser.isVisible()
+                && downloadConfig != null
+                && !dataFormatChooser.getValue().isAvailable()) {
+            failed += I18n.format("gui.data-format");
+        }
+
+        if (simpleWFSContainer.isVisible()
+                && downloadConfig != null) {
+            ObservableList<Node> children
+                    = simpleWFSContainer.getChildren();
+            for (Node node: children) {
+                if (node instanceof HBox) {
+                    HBox hb = (HBox) node;
+                    Node n2 = hb.getChildren().get(1);
+                    if (n2 instanceof ComboBox) {
+                        ComboBox<OutputFormatModel> cb
+                                = (ComboBox<OutputFormatModel>) n2;
+                        if (!cb.getValue().isAvailable()) {
+                            failed += I18n.format("gui.data-format");
+                        }
+                    }
+                }
+            }
+        }
+
         if (!failed.equals("")) {
             statusBarText.setText(
                     I18n.format("status.validation-fail", failed));
@@ -1713,6 +1773,14 @@ public class Controller {
                 outputFormats =
                         this.dataBean.getWFSService().outputFormats;
             }
+            List<OutputFormatModel> formatModels =
+                new ArrayList<OutputFormatModel>();
+            for (String i : outputFormats) {
+                OutputFormatModel m = new OutputFormatModel();
+                m.setItem(i);
+                m.setAvailable(true);
+                formatModels.add(m);
+            }
             WFSMeta.StoredQuery storedQuery;
             if (datasetAvailable) {
                 storedQuery = (WFSMeta.StoredQuery) data.getItem();
@@ -1723,7 +1791,7 @@ public class Controller {
                     dataBean,
                     this.simpleWFSContainer,
                     storedQuery,
-                    outputFormats);
+                    formatModels);
             this.atomContainer.setVisible(false);
             this.simpleWFSContainer.setVisible(true);
             this.basicWFSContainer.setVisible(false);
