@@ -39,6 +39,7 @@ public class DownloadConfig {
 
     private Document configDoc;
     private String dataset;
+    private String downloadPath;
     private String serviceType;
     private String serviceURL;
     private HashMap<String, String> parameters = null;
@@ -80,6 +81,11 @@ public class DownloadConfig {
             dataset = getValueByTagName("Dataset", root);
         } catch (Exception ex) {
             dataset = null;
+        }
+        try {
+            downloadPath = getValueByTagName("DownloadPfad", root);
+        } catch (Exception exc) {
+            downloadPath = null;
         }
 
         //Read parameters
@@ -147,6 +153,15 @@ public class DownloadConfig {
     */
     public String getDataset() {
         return dataset;
+    }
+
+   /**
+    * Returns the download path as string.
+    *
+    * @return The download path
+    */
+    public String getDownloadPath() {
+        return downloadPath;
     }
 
    /**

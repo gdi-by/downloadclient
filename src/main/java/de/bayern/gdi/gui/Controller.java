@@ -90,7 +90,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
@@ -412,8 +411,7 @@ public class Controller {
                 ListCell<ItemModel>>() {
             @Override
             public ListCell<ItemModel> call(ListView<ItemModel> list) {
-                return new ServiceCell() {
-                };
+                return new CellTypes.ItemCell();
             }
         });
         atomVariationChooser.setCellFactory(
@@ -421,8 +419,7 @@ public class Controller {
                 ListCell<ItemModel>>() {
             @Override
             public ListCell<ItemModel> call(ListView<ItemModel> list) {
-                return new ServiceCell() {
-                };
+                return new CellTypes.ItemCell();
             }
         });
         referenceSystemChooser.setCellFactory(
@@ -430,7 +427,7 @@ public class Controller {
                 ListCell<CRSModel>>() {
             @Override
             public ListCell<CRSModel> call(ListView<CRSModel> list) {
-                return new CRSCell() {
+                return new CellTypes.CRSCell() {
                 };
             }
         });
@@ -440,7 +437,7 @@ public class Controller {
             @Override
             public ListCell<OutputFormatModel>
                     call(ListView<OutputFormatModel> list) {
-                return new StringCell();
+                return new CellTypes.StringCell();
             }
         });
         loadGUIComponents();
@@ -497,15 +494,15 @@ public class Controller {
                 }
                 boolean outputFormatAvailable = false;
                 for (OutputFormatModel i: dataFormatChooser.getItems()) {
-                    if (i.item.equals(downloadConfig.getOutputFormat())) {
+                    if (i.getItem().equals(downloadConfig.getOutputFormat())) {
                         dataFormatChooser.getSelectionModel().select(i);
                         outputFormatAvailable = true;
                     }
                 }
                 if (!outputFormatAvailable) {
                     OutputFormatModel output = new OutputFormatModel();
-                    output.available = false;
-                    output.item = downloadConfig.getOutputFormat();
+                    output.setAvailable(false);
+                    output.setItem(downloadConfig.getOutputFormat());
                     dataFormatChooser.getItems().add(output);
                     dataFormatChooser.getSelectionModel().select(output);
                 }
@@ -916,7 +913,7 @@ public class Controller {
     @FXML
     protected void handleDataformatSelect(ActionEvent event) {
         if (dataFormatChooser.getValue() != null) {
-            if (dataFormatChooser.getValue().available) {
+            if (dataFormatChooser.getValue().isAvailable()) {
                 dataFormatChooser.setStyle("-fx-border-color: null;");
             } else {
                 dataFormatChooser.setStyle("-fx-border-color: red;");
@@ -1240,6 +1237,17 @@ public class Controller {
         if (validateInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            if (downloadConfig != null
+                        && downloadConfig.getDownloadPath() != null) {
+                try {
+                    File dir =  new File(downloadConfig.getDownloadPath());
+                    if (dir.exists()) {
+                        dirChooser.setInitialDirectory(dir);
+                    }
+                } catch (Exception e) {
+
+                }
+            }
             File selectedDir = dirChooser.showDialog(getPrimaryStage());
             if (selectedDir == null) {
                 return;
@@ -1689,8 +1697,8 @@ public class Controller {
                     = new ArrayList<OutputFormatModel>();
             for (String s : outputFormats) {
                 OutputFormatModel m = new OutputFormatModel();
-                m.item = s;
-                m.available = true;
+                m.setItem(s);
+                m.setAvailable(true);
                 formatModels.add(m);
             }
             ObservableList<OutputFormatModel> formats =
@@ -1914,84 +1922,6 @@ public class Controller {
         public void receivedMessage(ProcessorEvent pe) {
             setMessage(pe.getMessage());
             Platform.runLater(this);
-        }
-    }
-
-   /**
-    * Simple Model containing a format string and a bool if the format is
-    * available on the WFS.
-    */
-    private class OutputFormatModel {
-        public String item;
-        public boolean available = true;
-        public String toString() {
-            return item;
-        }
-    }
-
-   /**
-    * Cell class, changing its font color and weight
-    * depending on its content.
-    */
-    private class ServiceCell extends ListCell<ItemModel> {
-        public ServiceCell() { }
-        @Override
-        protected void updateItem(ItemModel item,
-                boolean empty) {
-            super.updateItem(item, empty);
-            setText(item == null ? "" : item.toString());
-            if (item instanceof MiscItemModel) {
-                setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
-            } else {
-                setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
-            }
-        }
-    }
-
-   /**
-    * Cell class, changing its font color and weight
-    * depending whether the crs is available on the current WFS.
-    */
-    private class CRSCell extends ListCell<CRSModel> {
-        @Override
-        protected void updateItem(CRSModel item,
-                boolean empty) {
-            super.updateItem(item, empty);
-            setText(item == null ? "" : item.toString());
-            if (item != null && !item.isAvailable()) {
-                setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
-            } else {
-                setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
-            }
-        }
-    }
-
-   /**
-    * Cell class, changing its font color and weight
-    * depending whether the output format is available on the current WFS.
-    */
-    private class StringCell extends ListCell<OutputFormatModel> {
-        @Override
-        protected void updateItem(OutputFormatModel item,
-                boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null) {
-                return;
-            }
-            if (!item.available) {
-                setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
-
-            } else {
-                setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
-
-            }
-            setText(item == null ? "" : item.item);
         }
     }
 }
