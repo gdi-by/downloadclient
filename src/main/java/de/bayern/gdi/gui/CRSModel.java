@@ -83,7 +83,7 @@ public class CRSModel {
     }
 
    /**
-    * Sets the available status
+    * Sets the available status.
     *
     * @param available The new value
     */
