@@ -19,6 +19,7 @@ package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import de.bayern.gdi.model.ConfigurationParameter;
@@ -88,7 +89,7 @@ public class UIFactory {
         DataBean dataBean,
         VBox container,
         WFSMeta.StoredQuery type,
-        List <String> outputFormats
+        List <OutputFormatModel> outputFormats
     ) {
         createSimpleWFS(dataBean,
                 type,
@@ -100,7 +101,7 @@ public class UIFactory {
         DataBean dataBean,
         WFSMeta.StoredQuery type,
         VBox container,
-        List <String> outputFormats
+        List <OutputFormatModel> outputFormats
     ) {
         container.getChildren().clear();
         Label descriptionHead = new Label();
@@ -150,7 +151,7 @@ public class UIFactory {
         outputFormatLabel.setText(I18n.format("gui.data-format"));
         ComboBox outputFormat = new ComboBox();
         outputFormat.setId(DATAFORMAT_ID);
-        ObservableList<String> out =
+        ObservableList<OutputFormatModel> out =
                 FXCollections.observableArrayList();
         out.addAll(outputFormats);
         outputFormat.setItems(out);
@@ -237,6 +238,78 @@ public class UIFactory {
 
         container.getChildren().add(root);
     }
+
+    /**
+     * Add new post process chain item with pre-selected process name
+     * and parameters.
+     *
+     * @param dataBean The databean
+     * @param container The container
+     * @param processName The process' name
+     * @param params The parameters
+     */
+    public void addChainAttribute(DataBean dataBean, VBox container,
+            String processName, HashMap<String, String> params) {
+        VBox root = new VBox();
+        VBox dynroot = new VBox();
+        HBox subroot = new HBox();
+        ComboBox<ProcessingStepConfiguration> box =
+                new ComboBox<ProcessingStepConfiguration>();
+        ProcessingConfiguration config =
+            Config.getInstance().getProcessingConfig();
+        List<ProcessingStepConfiguration> steps = config.getProcessingSteps();
+        ObservableList<ProcessingStepConfiguration> conf =
+            FXCollections.observableArrayList(steps);
+        box.setItems(conf);
+        box.setId("process_name");
+        box.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                generateChainItem(
+                    (ProcessingStepConfiguration)box.getValue(),
+                    dynroot,
+                    config);
+            }
+        });
+        Button remove = new Button(I18n.getMsg("gui.remove"));
+        remove.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                ObservableList<Node> items = container.getChildren();
+                items.remove(root);
+            }
+        });
+        subroot.getChildren().addAll(box, remove);
+        subroot.setMargin(box, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_20));
+        subroot.setMargin(remove, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
+        Separator sep = new Separator();
+        root.getChildren().addAll(subroot, dynroot, sep);
+        root.setId("process_parameter");
+
+        for (ProcessingStepConfiguration cfg : box.getItems()) {
+            if (cfg.getName().equals(processName)) {
+                box.getSelectionModel().select(cfg);
+            }
+        }
+        generateChainItem(
+                (ProcessingStepConfiguration)box.getValue(),
+                dynroot,
+                config);
+
+        for (Node node: dynroot.getChildren()) {
+            HBox n = (HBox) node;
+            ComboBox<Option> cb = (ComboBox<Option>) n.getChildren().get(1);
+            Label paramLabel = (Label) n.getChildren().get(0);
+            String targetvalue = params.get(paramLabel.getText());
+            for (Option o: cb.getItems()) {
+                if (o.getValue().equals(targetvalue)) {
+                    cb.getSelectionModel().select(o);
+                }
+            }
+        }
+        container.getChildren().add(root);
+    }
+
 
     /**
      * removes all Processing attributes.
