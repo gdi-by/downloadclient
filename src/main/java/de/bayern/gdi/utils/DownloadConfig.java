@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 public class DownloadConfig {
 
     private Document configDoc;
+    private File configFile;
     private String dataset;
     private String downloadPath;
     private String serviceType;
@@ -64,6 +65,11 @@ public class DownloadConfig {
             throws IOException, ParserConfigurationException,
             SAXException, NoServiceURLException {
 
+        if (configFile == null) {
+            return;
+        }
+
+        this.configFile = configFile;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         configDoc = db.parse(configFile);
@@ -162,6 +168,15 @@ public class DownloadConfig {
     */
     public String getDownloadPath() {
         return downloadPath;
+    }
+
+   /**
+    * Returns the config file object.
+    *
+    * @return The file object
+    */
+    public File getFile() {
+        return configFile;
     }
 
    /**
