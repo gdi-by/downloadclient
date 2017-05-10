@@ -241,10 +241,14 @@ public class DownloadConfig {
     * @return The value as string
     */
     private String getValueByTagName(String tagName, Element parent) {
-        NodeList nodes = parent.getElementsByTagName(tagName).item(0)
-                .getChildNodes();
-        Node valueNode = (Node) nodes.item(0);
-        return valueNode.getNodeValue();
+        try {
+            NodeList nodes = parent.getElementsByTagName(tagName).item(0)
+                    .getChildNodes();
+            Node valueNode = (Node) nodes.item(0);
+            return valueNode.getNodeValue();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

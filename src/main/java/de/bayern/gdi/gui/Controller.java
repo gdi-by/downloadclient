@@ -621,6 +621,7 @@ public class Controller {
     *    from an URL or the service List
     */
     protected void doSelectService(DownloadConfig downloadConf) {
+        dataBean.resetSelectedService();
         serviceSelection.setDisable(true);
         serviceURL.getScene().setCursor(Cursor.WAIT);
         serviceURL.setDisable(true);
@@ -724,6 +725,7 @@ public class Controller {
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
+        dataBean.resetCatalogLists();
         if ("".equals(currentText) || currentText == null) {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
