@@ -133,6 +133,13 @@ public class DataBean extends Observable {
         return namePwMap;
     }
 
+   /**
+    * Reset the catalog services list.
+    */
+    public void resetCatalogLists() {
+        this.catalogServices.clear();
+    }
+
     /**
      * Reset the services list.
      */

@@ -724,6 +724,7 @@ public class Controller {
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
+        dataBean.resetCatalogLists();
         if ("".equals(currentText) || currentText == null) {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
