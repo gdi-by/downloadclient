@@ -1388,22 +1388,35 @@ public class Controller {
         extractBoundingBox();
         if (validateInput()) {
             FileChooser fileChooser = new FileChooser();
+            DirectoryChooser dirChooser = new DirectoryChooser();
             File downloadDir;
+            File initDir;
+
+            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
 
             if (downloadConfig == null) {
-                downloadDir = new File(System.getProperty("user.dir"));
+                downloadDir = dirChooser.showDialog(getPrimaryStage());
+                initDir = new File(System.getProperty("user.dir"));
                 File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
                         null);
                 fileChooser.setInitialFileName(uniqueName.getName());
             } else {
+                File downloadInitDir
+                        = new File(downloadConfig.getDownloadPath());
+                if (!downloadInitDir.exists()) {
+                    downloadInitDir = new File(System.getProperty("user.dir"));
+                }
+                dirChooser.setInitialDirectory(downloadInitDir);
+                downloadDir = dirChooser.showDialog(getPrimaryStage());
+
                 String path = downloadConfig.getFile().getAbsolutePath();
                 path = path.substring(0, path.lastIndexOf(File.separator));
-                downloadDir = new File(path);
+                initDir = new File(path);
                 fileChooser.setInitialFileName(downloadConfig.getFile()
                         .getName());
             }
 
-            fileChooser.setInitialDirectory(downloadDir);
+            fileChooser.setInitialDirectory(initDir);
             FileChooser.ExtensionFilter xmlFilter =
                     new FileChooser.ExtensionFilter("xml files (*.xml)",
                             "*.xml");
