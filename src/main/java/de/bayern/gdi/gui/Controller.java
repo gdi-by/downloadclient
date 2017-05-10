@@ -1387,30 +1387,36 @@ public class Controller {
         extractStoredQuery();
         extractBoundingBox();
         if (validateInput()) {
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-            File downloadDir = dirChooser.showDialog(getPrimaryStage());
-            if (downloadDir == null) {
-                return;
+            FileChooser fileChooser = new FileChooser();
+            File downloadDir;
+
+            if (downloadConfig == null) {
+                downloadDir = new File(System.getProperty("user.dir"));
+                File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
+                        null);
+                fileChooser.setInitialFileName(uniqueName.getName());
+            } else {
+                String path = downloadConfig.getFile().getAbsolutePath();
+                path = path.substring(0, path.lastIndexOf(File.separator));
+                downloadDir = new File(path);
+                fileChooser.setInitialFileName(downloadConfig.getFile()
+                        .getName());
             }
 
-            FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(downloadDir);
             FileChooser.ExtensionFilter xmlFilter =
                     new FileChooser.ExtensionFilter("xml files (*.xml)",
-                            "xml");
-            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
-                    null);
-            fileChooser.setInitialFileName(uniqueName.getName());
-            fileChooser.getExtensionFilters().add(xmlFilter);
+                            "*.xml");
+                        fileChooser.getExtensionFilters().add(xmlFilter);
             fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-            if (!configFile.toString().endsWith(".xml")) {
-                configFile = new File(configFile.toString() + ".xml");
-            }
             if (configFile == null) {
                 return;
+            }
+
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
             }
 
             this.dataBean.setProcessingSteps(extractProcessingSteps());
