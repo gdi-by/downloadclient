@@ -621,6 +621,7 @@ public class Controller {
     *    from an URL or the service List
     */
     protected void doSelectService(DownloadConfig downloadConf) {
+        dataBean.resetSelectedService();
         serviceSelection.setDisable(true);
         serviceURL.getScene().setCursor(Cursor.WAIT);
         serviceURL.setDisable(true);

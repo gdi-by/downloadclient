@@ -140,6 +140,17 @@ public class DataBean extends Observable {
         this.catalogServices.clear();
     }
 
+   /**
+    * Reset the selected service.
+    */
+    public void resetSelectedService() {
+        this.atomService = null;
+        this.wfsService = null;
+        this.namePwMap.clear();
+        this.dataType = null;
+        this.attributes.clear();
+    }
+
     /**
      * Reset the services list.
      */
