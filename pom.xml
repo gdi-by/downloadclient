@@ -6,7 +6,7 @@
     <groupId>de.bayern.gdi</groupId>
     <artifactId>downloadclient</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>downloadclient</name>
     <url>http://maven.apache.org</url>
     <properties>

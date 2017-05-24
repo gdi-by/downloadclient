@@ -28,13 +28,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class CRSModel {
     private CoordinateReferenceSystem crs;
     private String oldName;
-
+    private boolean available;
     /**
      * Constructor.
      * @param crs crs
      */
     public CRSModel(CoordinateReferenceSystem crs) {
         this.crs = crs;
+        available = true;
     }
 
     /**
@@ -70,6 +71,24 @@ public class CRSModel {
     @Override
     public int hashCode() {
         return this.getCRS().toString().hashCode();
+    }
+
+   /**
+    * Returns true if CRS is available on the current
+    * WFS.
+    * @return true if available, false if not
+    */
+    public boolean isAvailable() {
+        return available;
+    }
+
+   /**
+    * Sets the available status.
+    *
+    * @param available The new value
+    */
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     /**

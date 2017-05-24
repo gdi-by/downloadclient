@@ -38,6 +38,7 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
@@ -52,6 +53,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -76,6 +78,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -93,6 +96,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -101,6 +105,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.xml.sax.SAXException;
@@ -118,8 +123,13 @@ public class Controller {
     private static final int BGCOLOR = 244;
     private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
     private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private static final int BBOX_X1_INDEX = 0;
+    private static final int BBOX_Y1_INDEX = 1;
+    private static final int BBOX_X2_INDEX = 2;
+    private static final int BBOX_Y2_INDEX = 3;
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
+    private static final String UNAVAILABLE_PREFIX = "N/A:";
     private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
@@ -128,6 +138,7 @@ public class Controller {
     private boolean catalogReachable;
     private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
+    private DownloadConfig downloadConfig;
 
     @FXML
     private Button buttonClose;
@@ -137,6 +148,8 @@ public class Controller {
     private ListView serviceList;
     @FXML
     private TextField searchField;
+    @FXML
+    private Button searchButton;
     @FXML
     private TextField serviceURL;
     @FXML
@@ -154,12 +167,12 @@ public class Controller {
     @FXML
     private ComboBox<ItemModel> atomVariationChooser;
     @FXML
-    private ComboBox dataFormatChooser;
+    private ComboBox<OutputFormatModel> dataFormatChooser;
     @FXML
     private ComboBox<CRSModel> referenceSystemChooser;
     @FXML
     private SplitPane mapSplitPane;
-   @FXML
+    @FXML
     private VBox simpleWFSContainer;
     @FXML
     private VBox basicWFSContainer;
@@ -332,93 +345,372 @@ public class Controller {
         }
     }
 
+   /**
+    * Handle click at load config menu items.
+    * Opens a file chooser dialog and loads a download config from a XML file.
+    *
+    * @param event The Event.
+    */
+    @FXML
+    protected void handleLoadConfig(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        File initialDir = new File(System.getProperty("user.dir"));
+        fileChooser.setInitialDirectory(initialDir);
+        fileChooser.setTitle(I18n.getMsg("menu.load_config"));
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
+            new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File configFile = fileChooser.showOpenDialog(primaryStage);
+
+        if (configFile != null) {
+            resetGui();
+            try {
+                this.downloadConfig = new DownloadConfig(configFile);
+                serviceURL.setText(this.downloadConfig.getServiceURL());
+                doSelectService(downloadConfig);
+            } catch (IOException
+                        | ParserConfigurationException
+                        | SAXException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+                setStatusTextUI(
+                        I18n.format("status.config.invalid-xml"));
+                return;
+            } catch (DownloadConfig.NoServiceURLException urlEx) {
+                setStatusTextUI(
+                        I18n.format("status.config.no-url-provided"));
+            }
+        }
+    }
+
+    private void loadDownloadConfig(DownloadConfig conf) {
+        String dataset = conf.getDataset();
+        if (dataset != null) {
+            boolean datasetAvailable = false;
+            List<ItemModel> datasets = serviceTypeChooser.
+                    getItems();
+            for (ItemModel iItem : datasets) {
+                if (iItem.getDataset().equals(dataset)) {
+                    serviceTypeChooser.
+                            getSelectionModel().select(iItem);
+                    datasetAvailable = true;
+                }
+            }
+            if (!datasetAvailable) {
+                MiscItemModel errorItem = new MiscItemModel();
+                errorItem.setDataset(dataset);
+                errorItem.setItem(conf.getDataset());
+                setStatusTextUI(
+                        I18n.format("gui.dataset-not-available"));
+                serviceTypeChooser.getItems().add(errorItem);
+                serviceTypeChooser.
+                        getSelectionModel().select(errorItem);
+            }
+        }
+        serviceTypeChooser.setCellFactory(
+                new Callback<ListView<ItemModel>,
+                ListCell<ItemModel>>() {
+            @Override
+            public ListCell<ItemModel> call(ListView<ItemModel> list) {
+                return new CellTypes.ItemCell();
+            }
+        });
+        atomVariationChooser.setCellFactory(
+                new Callback<ListView<ItemModel>,
+                ListCell<ItemModel>>() {
+            @Override
+            public ListCell<ItemModel> call(ListView<ItemModel> list) {
+                return new CellTypes.ItemCell();
+            }
+        });
+        referenceSystemChooser.setCellFactory(
+                new Callback<ListView<CRSModel>,
+                ListCell<CRSModel>>() {
+            @Override
+            public ListCell<CRSModel> call(ListView<CRSModel> list) {
+                return new CellTypes.CRSCell() {
+                };
+            }
+        });
+        dataFormatChooser.setCellFactory(
+                new Callback<ListView<OutputFormatModel>,
+                ListCell<OutputFormatModel>>() {
+            @Override
+            public ListCell<OutputFormatModel>
+                    call(ListView<OutputFormatModel> list) {
+                return new CellTypes.StringCell();
+            }
+        });
+        loadGUIComponents();
+    }
+
+    private void loadGUIComponents() {
+        switch (downloadConfig.getServiceType()) {
+            case "ATOM":
+                boolean variantAvailable = false;
+                for (ItemModel i: atomVariationChooser.getItems()) {
+                    Atom.Field field = (Atom.Field) i.getItem();
+                    if (field.type.equals(downloadConfig.getAtomVariation())) {
+                        variantAvailable = true;
+                        atomVariationChooser.getSelectionModel().select(i);
+                    }
+                }
+                if (!variantAvailable) {
+                    MiscItemModel errorVariant = new MiscItemModel();
+                    errorVariant.setItem(downloadConfig.getAtomVariation());
+                    atomVariationChooser.getItems().add(errorVariant);
+                    atomVariationChooser.getSelectionModel()
+                            .select(errorVariant);
+                }
+                break;
+            case "WFS2_BASIC":
+                try {
+                    CoordinateReferenceSystem targetCRS =
+                            CRS.decode(downloadConfig.getSRSName());
+                    boolean crsAvailable = false;
+                    for (CRSModel crsModel: referenceSystemChooser.getItems()) {
+                        if (CRS.equalsIgnoreMetadata(targetCRS,
+                                    crsModel.getCRS())) {
+                            crsAvailable = true;
+                            referenceSystemChooser.getSelectionModel()
+                                    .select(crsModel);
+                        }
+                    }
+                    if (!crsAvailable) {
+                        CRSModel crsErrorModel = new CRSModel(targetCRS);
+                        crsErrorModel.setAvailable(false);
+                        referenceSystemChooser.getItems().add(crsErrorModel);
+                        referenceSystemChooser.getSelectionModel()
+                                .select(crsErrorModel);
+                    }
+                } catch (NoSuchAuthorityCodeException nsace) {
+                    setStatusTextUI(I18n.format("status.config.invalid-epsg"));
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+                if (downloadConfig.getBoundingBox() != null) {
+                    String[] bBox = downloadConfig.getBoundingBox().split(",");
+                    basicX1.setText(bBox[BBOX_X1_INDEX]);
+                    basicY1.setText(bBox[BBOX_Y1_INDEX]);
+                    basicX2.setText(bBox[BBOX_X2_INDEX]);
+                    basicY2.setText(bBox[BBOX_Y2_INDEX]);
+                }
+                boolean outputFormatAvailable = false;
+                for (OutputFormatModel i: dataFormatChooser.getItems()) {
+                    if (i.getItem().equals(downloadConfig.getOutputFormat())) {
+                        dataFormatChooser.getSelectionModel().select(i);
+                        outputFormatAvailable = true;
+                    }
+                }
+                if (!outputFormatAvailable) {
+                    OutputFormatModel output = new OutputFormatModel();
+                    output.setAvailable(false);
+                    output.setItem(downloadConfig.getOutputFormat());
+                    dataFormatChooser.getItems().add(output);
+                    dataFormatChooser.getSelectionModel().select(output);
+                }
+                break;
+            case "WFS2_SIMPLE":
+                ObservableList<Node> children
+                         = simpleWFSContainer.getChildren();
+                HashMap<String, String> parameters = downloadConfig.getParams();
+                for (Node node: children) {
+                    if (node instanceof HBox) {
+                        HBox hb = (HBox) node;
+                        Node n1 = hb.getChildren().get(0);
+                        Node n2 = hb.getChildren().get(1);
+                        if (n1 instanceof Label
+                            && n2 instanceof TextField) {
+                            Label paramLabel = (Label) n1;
+                            TextField paramBox = (TextField) n2;
+                            String targetValue = parameters.get(paramLabel
+                                    .getText());
+                            if (targetValue != null) {
+                                paramBox.setText(targetValue);
+                            }
+                        }
+                        if (n2 instanceof ComboBox) {
+                            ComboBox<OutputFormatModel> cb
+                                    = (ComboBox<OutputFormatModel>) n2;
+                            cb.setCellFactory(
+                                    new Callback<ListView<OutputFormatModel>,
+                                    ListCell<OutputFormatModel>>() {
+                                @Override
+                                public ListCell<OutputFormatModel>
+                                        call(ListView<OutputFormatModel> list) {
+                                    return new CellTypes.StringCell();
+                                }
+                            });
+                            cb.setOnAction((event) -> {
+                                if (cb.getValue().isAvailable()) {
+                                    cb.setStyle("-fx-border-color: null;");
+                                } else {
+                                    cb.setStyle("-fx-border-color: red;");
+                                }
+                            });
+                            boolean formatAvailable = false;
+                            for (OutputFormatModel i: cb.getItems()) {
+                                if (i.getItem().equals(downloadConfig
+                                        .getOutputFormat())) {
+                                    cb.getSelectionModel().select(i);
+                                    formatAvailable = true;
+                                }
+                            }
+                            if (!formatAvailable) {
+                                String format = downloadConfig
+                                        .getOutputFormat();
+                                OutputFormatModel m = new OutputFormatModel();
+                                m.setItem(format);
+                                m.setAvailable(false);
+                                cb.getItems().add(m);
+                                cb.getSelectionModel().select(m);
+                            }
+                            if (cb.getValue().isAvailable()) {
+                                cb.setStyle("-fx-border-color: null;");
+                            } else {
+                                cb.setStyle("-fx-border-color: red;");
+                            }
+                        }
+                    }
+                }
+                break;
+            default:
+                setStatusTextUI(I18n.format("status.config.invalid-xml"));
+                break;
+        }
+        ArrayList<DownloadConfig.ProcessingStep> steps =
+                downloadConfig.getProcessingSteps();
+        factory.removeAllChainAttributes(this.dataBean, chainContainer);
+        if (steps != null) {
+            chkChain.setSelected(true);
+            handleChainCheckbox(new ActionEvent());
+
+            for (DownloadConfig.ProcessingStep iStep : steps) {
+                factory.addChainAttribute(this.dataBean, chainContainer,
+                        iStep.name, iStep.params);
+            }
+        } else {
+            chkChain.setSelected(false);
+            handleChainCheckbox(new ActionEvent());
+        }
+    }
+
     /**
-     * Handle the service selection.
+     * Handle the service selection button event.
      *
      * @param event The mouse click event.
      */
     @FXML
     protected void handleServiceSelectButton(MouseEvent event) {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
-            serviceSelection.setDisable(true);
-            serviceURL.getScene().setCursor(Cursor.WAIT);
-            serviceURL.setDisable(true);
-            resetGui();
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        ServiceModel serviceModel =
-                                (ServiceModel) serviceList.getSelectionModel()
-                                        .getSelectedItems().get(0);
-                        Service service = null;
-                        if (serviceModel != null
-                            && serviceModel.getUrl().toString().equals(
-                                serviceURL.getText())
-                                ) {
-                            if (ServiceChecker.isReachable(serviceModel
-                                        .getItem().getServiceURL())) {
-                                service = serviceModel.getItem();
-                                service.setPassword(servicePW.getText());
-                                service.setUsername(serviceUser.getText());
-                            }
-                        } else {
-                            URL sURL = new URL(serviceURL.getText());
-                            if (ServiceChecker.isReachable(sURL)) {
-                                service = new Service(
-                                        sURL,
-                                        "",
-                                        true,
-                                        serviceUser.getText(),
-                                        servicePW.getText());
-                            }
-                        }
-                        if (service == null) {
-                            setStatusTextUI(
-                                I18n.format("status.service-timeout"));
-                            dataBean.setSelectedService(null);
-                            serviceSelection.setDisable(false);
-                            serviceURL.setDisable(false);
-                            serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                            return;
-                        }
-                        serviceSelection.setDisable(true);
-                        serviceURL.getScene().setCursor(Cursor.WAIT);
-                        setStatusTextUI(
-                                I18n.format("status.checking-auth"));
-                        serviceURL.setDisable(true);
-                        Service finalService = service;
-                        Task task = new Task() {
-                            protected Integer call() {
-                                try {
-                                    boolean serviceSelected = selectService(
-                                            finalService);
-                                    if (serviceSelected) {
-                                        chooseSelectedService();
-                                    }
-                                    return 0;
-                                } finally {
-                                    serviceSelection.setDisable(false);
-                                    serviceURL.getScene()
-                                            .setCursor(Cursor.DEFAULT);
-                                    serviceURL.setDisable(false);
-                                }
-                            }
-                        };
-                        Thread th = new Thread(task);
-                        th.setDaemon(true);
-                        th.start();
-                    } catch (MalformedURLException e) {
-                        setStatusTextUI(
-                                I18n.format("status.no-url"));
-                        log.log(Level.SEVERE, e.getMessage(), e);
-                        serviceSelection.setDisable(false);
-                        serviceURL.getScene()
-                                .setCursor(Cursor.DEFAULT);
-                        serviceURL.setDisable(false);
-                    }
-                }
-            }).start();
+            this.downloadConfig = null;
+            doSelectService();
         }
+    }
+
+   /**
+    * Select a service according to service url textfield.
+    */
+    protected void doSelectService() {
+        doSelectService(null);
+    }
+
+   /**
+    * Select a service according to service url textfield.
+    *
+    * @param downloadConf Loaded download config, null if a service is chosen
+    *    from an URL or the service List
+    */
+    protected void doSelectService(DownloadConfig downloadConf) {
+        dataBean.resetSelectedService();
+        serviceSelection.setDisable(true);
+        serviceURL.getScene().setCursor(Cursor.WAIT);
+        serviceURL.setDisable(true);
+        resetGui();
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    ServiceModel serviceModel =
+                            (ServiceModel) serviceList.getSelectionModel()
+                                    .getSelectedItems().get(0);
+                    Service service = null;
+                    if (serviceModel != null
+                        && serviceModel.getUrl().toString().equals(
+                            serviceURL.getText())
+                            ) {
+                        if (ServiceChecker.isReachable(serviceModel
+                                    .getItem().getServiceURL())) {
+                            service = serviceModel.getItem();
+                            service.setPassword(servicePW.getText());
+                            service.setUsername(serviceUser.getText());
+                        }
+                    } else {
+                        URL sURL = new URL(serviceURL.getText());
+                        if (ServiceChecker.isReachable(sURL)) {
+                            service = new Service(
+                                    sURL,
+                                    "",
+                                    true,
+                                    serviceUser.getText(),
+                                    servicePW.getText());
+                        }
+                    }
+                    if (service == null) {
+                        setStatusTextUI(
+                            I18n.format("status.service-timeout"));
+                        dataBean.setSelectedService(null);
+                        serviceSelection.setDisable(false);
+                        serviceURL.setDisable(false);
+                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                        return;
+                    }
+                    serviceSelection.setDisable(true);
+                    serviceURL.getScene().setCursor(Cursor.WAIT);
+                    setStatusTextUI(
+                            I18n.format("status.checking-auth"));
+                    serviceURL.setDisable(true);
+                    Service finalService = service;
+                    Task task = new Task() {
+                        protected Integer call() {
+                            try {
+                                boolean serviceSelected = selectService(
+                                        finalService);
+                                if (serviceSelected) {
+                                    chooseSelectedService(downloadConf);
+                                }
+                                return 0;
+                            } finally {
+                                serviceSelection.setDisable(false);
+                                serviceURL.getScene()
+                                        .setCursor(Cursor.DEFAULT);
+                                serviceURL.setDisable(false);
+                            }
+                        }
+                    };
+                    Thread th = new Thread(task);
+                    th.setDaemon(true);
+                    th.start();
+                } catch (MalformedURLException e) {
+                    setStatusTextUI(
+                            I18n.format("status.no-url"));
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                    serviceSelection.setDisable(false);
+                    serviceURL.getScene()
+                            .setCursor(Cursor.DEFAULT);
+                    serviceURL.setDisable(false);
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * Handle search button clicks.
+     * Hide search button and start search
+     *
+     * @param event the event
+     */
+    @FXML
+    protected void handleSearchButtonClick(MouseEvent event) {
+        handleSearch(null);
     }
 
     /**
@@ -433,10 +725,11 @@ public class Controller {
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
-        this.dataBean.reset();
+        dataBean.resetCatalogLists();
         if ("".equals(currentText) || currentText == null) {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
+
         String searchValue = currentText.toUpperCase();
         ObservableList<ServiceModel> subentries
                 = FXCollections.observableArrayList();
@@ -455,7 +748,10 @@ public class Controller {
                 @Override
                 protected Integer call() throws Exception {
                     Platform.runLater(() -> {
+                        searchButton.setVisible(false);
+                        searchButton.setManaged(false);
                         progressSearch.setVisible(true);
+                        progressSearch.setManaged(true);
                     });
                     if (catalogReachable) {
                         List<Service> catalog =
@@ -472,6 +768,9 @@ public class Controller {
                     }
                     Platform.runLater(() -> {
                         progressSearch.setVisible(false);
+                        progressSearch.setManaged(false);
+                        searchButton.setManaged(true);
+                        searchButton.setVisible(true);
                     });
                     return 0;
                 }
@@ -640,6 +939,13 @@ public class Controller {
      */
     @FXML
     protected void handleDataformatSelect(ActionEvent event) {
+        if (dataFormatChooser.getValue() != null) {
+            if (dataFormatChooser.getValue().isAvailable()) {
+                dataFormatChooser.setStyle("-fx-border-color: null;");
+            } else {
+                dataFormatChooser.setStyle("-fx-border-color: red;");
+            }
+        }
         ComboBox source = (ComboBox) event.getSource();
         dataBean.addAttribute("outputformat",
                 source.getValue() != null
@@ -665,6 +971,13 @@ public class Controller {
      */
     @FXML
     protected void handleReferenceSystemSelect(ActionEvent event) {
+        if (referenceSystemChooser.getValue() != null) {
+            if (referenceSystemChooser.getValue().isAvailable()) {
+                referenceSystemChooser.setStyle("-fx-border-color: null;");
+            } else {
+                referenceSystemChooser.setStyle("-fx-border-color: red;");
+            }
+        }
         this.dataBean.addAttribute("srsName",
                 referenceSystemChooser.getValue() != null
                         ? referenceSystemChooser.
@@ -692,8 +1005,22 @@ public class Controller {
     @FXML
     protected void handleVariationSelect(ActionEvent event) {
         ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
+        boolean variationAvailable = false;
+        if (selim instanceof MiscItemModel) {
+            atomVariationChooser.setStyle("-fx-border-color: red;");
+        } else {
+            atomVariationChooser.setStyle("-fx-border-color: null;");
+            variationAvailable = true;
+        }
         if (selim != null) {
-            Atom.Field selaf = (Atom.Field) selim.getItem();
+            Atom.Field selaf;
+            if (variationAvailable) {
+                selaf = (Atom.Field) selim.getItem();
+            } else {
+                selaf = new Atom.Field();
+                selaf.format = "";
+                selaf.crs = "";
+            }
             this.dataBean.addAttribute("VARIATION", selaf.type, "");
             if (selaf.format.isEmpty()) {
                 this.valueAtomFormat.setVisible(false);
@@ -917,6 +1244,55 @@ public class Controller {
                 }
             }
         }
+
+        if (serviceTypeChooser.isVisible()
+                && downloadConfig != null
+                && serviceTypeChooser.getValue() instanceof MiscItemModel) {
+            failed += I18n.format("gui.dataset") + ", ";
+        }
+
+        if (atomContainer.isVisible()
+                && downloadConfig != null
+                && atomVariationChooser.getValue() instanceof MiscItemModel) {
+            failed += I18n.format("gui.variants") + ", ";
+        }
+
+        if (referenceSystemChooser.isVisible()
+                && downloadConfig != null
+                && !referenceSystemChooser.getValue().isAvailable()) {
+            failed += I18n.format("gui.reference-system") + ", ";
+        }
+
+        if (basicWFSContainer.isVisible()
+                &&  dataFormatChooser.isVisible()
+                && downloadConfig != null
+                && !dataFormatChooser.getValue().isAvailable()) {
+            failed += I18n.format("gui.data-format") + ", ";
+        }
+
+        if (simpleWFSContainer.isVisible()
+                && downloadConfig != null) {
+            ObservableList<Node> children
+                    = simpleWFSContainer.getChildren();
+            for (Node node: children) {
+                if (node instanceof HBox) {
+                    HBox hb = (HBox) node;
+                    Node n2 = hb.getChildren().get(1);
+                    if (n2 instanceof ComboBox) {
+                        ComboBox<OutputFormatModel> cb
+                                = (ComboBox<OutputFormatModel>) n2;
+                        if (!cb.getValue().isAvailable()) {
+                            failed += I18n.format("gui.data-format");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (failed.endsWith(", ")) {
+            failed = failed.substring(0, failed.length() - 2);
+        }
+
         if (!failed.equals("")) {
             statusBarText.setText(
                     I18n.format("status.validation-fail", failed));
@@ -937,6 +1313,17 @@ public class Controller {
         if (validateInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+            if (downloadConfig != null
+                        && downloadConfig.getDownloadPath() != null) {
+                try {
+                    File dir =  new File(downloadConfig.getDownloadPath());
+                    if (dir.exists()) {
+                        dirChooser.setInitialDirectory(dir);
+                    }
+                } catch (Exception e) {
+
+                }
+            }
             File selectedDir = dirChooser.showDialog(getPrimaryStage());
             if (selectedDir == null) {
                 return;
@@ -962,6 +1349,7 @@ public class Controller {
         Platform.runLater(() -> {
             this.serviceTypeChooser.getItems().retainAll();
         });
+        this.serviceTypeChooser.setStyle("-fx-border-color: null;");
         this.dataBean.reset();
         this.mapAtom.reset();
         this.mapWFS.reset();
@@ -1000,30 +1388,49 @@ public class Controller {
         extractStoredQuery();
         extractBoundingBox();
         if (validateInput()) {
+            FileChooser fileChooser = new FileChooser();
             DirectoryChooser dirChooser = new DirectoryChooser();
+            File downloadDir;
+            File initDir;
+
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-            File downloadDir = dirChooser.showDialog(getPrimaryStage());
-            if (downloadDir == null) {
-                return;
+
+            if (downloadConfig == null) {
+                downloadDir = dirChooser.showDialog(getPrimaryStage());
+                initDir = new File(System.getProperty("user.dir"));
+                File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
+                        null);
+                fileChooser.setInitialFileName(uniqueName.getName());
+            } else {
+                File downloadInitDir
+                        = new File(downloadConfig.getDownloadPath());
+                if (!downloadInitDir.exists()) {
+                    downloadInitDir = new File(System.getProperty("user.dir"));
+                }
+                dirChooser.setInitialDirectory(downloadInitDir);
+                downloadDir = dirChooser.showDialog(getPrimaryStage());
+
+                String path = downloadConfig.getFile().getAbsolutePath();
+                path = path.substring(0, path.lastIndexOf(File.separator));
+                initDir = new File(path);
+                fileChooser.setInitialFileName(downloadConfig.getFile()
+                        .getName());
             }
 
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(downloadDir);
+            fileChooser.setInitialDirectory(initDir);
             FileChooser.ExtensionFilter xmlFilter =
                     new FileChooser.ExtensionFilter("xml files (*.xml)",
-                            "xml");
-            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
-                    null);
-            fileChooser.setInitialFileName(uniqueName.getName());
-            fileChooser.getExtensionFilters().add(xmlFilter);
+                            "*.xml");
+                        fileChooser.getExtensionFilters().add(xmlFilter);
             fileChooser.setSelectedExtensionFilter(xmlFilter);
             fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
             File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-            if (!configFile.toString().endsWith(".xml")) {
-                configFile = new File(configFile.toString() + ".xml");
-            }
             if (configFile == null) {
                 return;
+            }
+
+            if (!configFile.toString().endsWith(".xml")) {
+                configFile = new File(configFile.toString() + ".xml");
             }
 
             this.dataBean.setProcessingSteps(extractProcessingSteps());
@@ -1039,9 +1446,12 @@ public class Controller {
     }
 
     /**
-     * Use selection to request the service data and fill th UI.
+     * Use selection to request the service data and fill the UI.
+     *
+     * @param downloadConf Loaded download config, null if service
+     *      was chosen from an URL or the service list
      */
-    private void chooseSelectedService() {
+    private void chooseSelectedService(DownloadConfig downloadConf) {
         switch (dataBean.getSelectedService().getServiceType()) {
             case Atom:
                 Platform.runLater(() -> {
@@ -1143,6 +1553,9 @@ public class Controller {
         Platform.runLater(() -> {
             serviceTypeChooser.
                     getSelectionModel().select(0);
+            if (downloadConf != null) {
+                loadDownloadConfig(downloadConf);
+            }
             statusBarText.setText(I18n.getMsg("status.ready"));
         });
         return;
@@ -1237,10 +1650,10 @@ public class Controller {
         }
     }
 
-    private void chooseType(ItemModel data) {
-        ServiceType type = this.dataBean.getServiceType();
-        if (type == ServiceType.Atom) {
-            Atom.Item item = (Atom.Item) data.getItem();
+    private void chooseAtomType(ItemModel data, boolean datasetAvailable) {
+        Atom.Item item;
+        if (datasetAvailable) {
+            item = (Atom.Item) data.getItem();
             try {
                 item.load();
             } catch (URISyntaxException
@@ -1251,132 +1664,190 @@ public class Controller {
                         + e.getMessage(), item);
                 return;
             }
-            if (mapAtom != null) {
-                mapAtom.highlightSelectedPolygon(item.id);
-                Platform.runLater(() -> {
-                    mapAtom.repaint();
-                });
-            }
-            List<Atom.Field> fields = item.fields;
-            ObservableList<ItemModel> list =
-                    FXCollections.observableArrayList();
-            for (Atom.Field f : fields) {
-                AtomFieldModel afm = new AtomFieldModel(f);
-                list.add(afm);
-            }
-            this.atomVariationChooser.setItems(list);
-            WebEngine engine = this.valueAtomDescr.getEngine();
-            java.lang.reflect.Field f;
+        } else {
             try {
-                f = engine.getClass().getDeclaredField("page");
-                f.setAccessible(true);
-                com.sun.webkit.WebPage page =
-                        (com.sun.webkit.WebPage) f.get(engine);
-                page.setBackgroundColor(
-                        (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB()
-                );
-            } catch (NoSuchFieldException
-                    | SecurityException
-                    | IllegalArgumentException
-                    | IllegalAccessException e) {
-                // Displays the webview with white background...
+                item = new Atom.Item(new URL(
+                        this.downloadConfig.getServiceURL()));
+                item.description = "";
+            } catch (Exception e) {
+                return;
             }
-            engine.loadContent("<head> <style>"
-                    + ".description-content" + "{"
-                    + "font-family: Sans-Serif" + "}"
-                    + "</style> </head>"
-                    + "<div class=\"description-content\">"
-                    + item.description + "</div>");
+        }
+        if (mapAtom != null) {
+            mapAtom.highlightSelectedPolygon(item.id);
+            Platform.runLater(() -> {
+                mapAtom.repaint();
+            });
+        }
+        List<Atom.Field> fields = item.fields;
+        ObservableList<ItemModel> list =
+                FXCollections.observableArrayList();
+        for (Atom.Field f : fields) {
+            AtomFieldModel afm = new AtomFieldModel(f);
+            list.add(afm);
+        }
+        this.atomVariationChooser.setItems(list);
+        WebEngine engine = this.valueAtomDescr.getEngine();
+        java.lang.reflect.Field f;
+        try {
+            f = engine.getClass().getDeclaredField("page");
+            f.setAccessible(true);
+            com.sun.webkit.WebPage page =
+                    (com.sun.webkit.WebPage) f.get(engine);
+            page.setBackgroundColor(
+                    (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB()
+            );
+        } catch (NoSuchFieldException
+                | SecurityException
+                | IllegalArgumentException
+                | IllegalAccessException e) {
+            // Displays the webview with white background...
+        }
+        engine.loadContent("<head> <style>"
+                + ".description-content" + "{"
+                + "font-family: Sans-Serif" + "}"
+                + "</style> </head>"
+                + "<div class=\"description-content\">"
+                + item.description + "</div>");
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(false);
+        this.atomContainer.setVisible(true);
+    }
+
+    private void chooseWFSType(ItemModel data, boolean datasetAvailable) {
+        if (data instanceof FeatureModel
+            || (!datasetAvailable
+            && downloadConfig.getServiceType() == "WFS2_BASIC")) {
             this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(false);
-            this.atomContainer.setVisible(true);
-        } else if (type == ServiceType.WFSTwo) {
-            if (data instanceof FeatureModel) {
-                this.simpleWFSContainer.setVisible(false);
-                this.basicWFSContainer.setVisible(true);
-                this.mapNodeWFS.setVisible(true);
-                this.atomContainer.setVisible(false);
-                this.basicWFSX1Y1.setVisible(true);
-                this.basicWFSX2Y2.setVisible(true);
-                this.referenceSystemChooser.setVisible(true);
-                this.referenceSystemChooserLabel.setVisible(true);
-                WFSMeta.Feature feature = (WFSMeta.Feature) data.getItem();
-                mapWFS.setExtend(feature.bbox);
-                ArrayList<String> list = new ArrayList<String>();
-                list.add(feature.defaultCRS);
-                list.addAll(feature.otherCRSs);
-                ObservableList<CRSModel> crsList =
-                        FXCollections.observableArrayList();
-                for (String crsStr : list) {
-                    try {
-                        String newcrsStr = crsStr;
-                        String seperator = null;
-                        if (newcrsStr.contains("::")) {
-                            seperator = "::";
-                        } else if (newcrsStr.contains("/")) {
-                            seperator = "/";
-                        }
-                        if (seperator != null) {
-                            newcrsStr = "EPSG:"
-                                    + newcrsStr.substring(
-                                    newcrsStr.lastIndexOf(seperator)
-                                            + seperator.length(),
-                                    newcrsStr.length());
-                        }
-                        CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
-                        CRSModel crsm = new CRSModel(crs);
-                        crsm.setOldName(crsStr);
-                        crsList.add(crsm);
-                    } catch (FactoryException e) {
-                        log.log(Level.SEVERE, e.getMessage(), e);
-                    }
-                }
-                if (!crsList.isEmpty()) {
-                    this.referenceSystemChooser.setItems(crsList);
-                    CRSModel crsm = crsList.get(0);
-                    try {
-                        CoordinateReferenceSystem initCRS = CRS.decode(
-                                INITIAL_CRS_DISPLAY);
-                        CRSModel initCRSM = new CRSModel(initCRS);
-                        for (int i = 0; i < crsList.size(); i++) {
-                            if (crsList.get(i).equals(initCRSM)) {
-                                crsm = crsList.get(i);
-                                break;
-                            }
-                        }
-                    } catch (FactoryException e) {
-                        log.log(Level.SEVERE, e.getMessage(), e);
-                    }
-                    this.referenceSystemChooser.setValue(crsm);
-                }
-                List<String> outputFormats = feature.outputFormats;
-
-                outputFormats = this.dataBean.getWFSService()
-                        .findOperation("GetFeature").outputFormats;
-                if (outputFormats.isEmpty()) {
-                    outputFormats =
-                            this.dataBean.getWFSService().outputFormats;
-                }
-                ObservableList<String> formats =
-                        FXCollections.observableArrayList(outputFormats);
-                this.dataFormatChooser.setItems(formats);
-            } else if (data instanceof StoredQueryModel) {
-
-                List<String> outputFormats = this.dataBean.getWFSService()
-                        .findOperation("GetFeature").outputFormats;
-                if (outputFormats.isEmpty()) {
-                    outputFormats =
-                            this.dataBean.getWFSService().outputFormats;
-                }
-                factory.fillSimpleWFS(
-                        dataBean,
-                        this.simpleWFSContainer,
-                        (WFSMeta.StoredQuery) data.getItem(),
-                        outputFormats);
-                this.atomContainer.setVisible(false);
-                this.simpleWFSContainer.setVisible(true);
-                this.basicWFSContainer.setVisible(false);
+            this.basicWFSContainer.setVisible(true);
+            this.mapNodeWFS.setVisible(true);
+            this.atomContainer.setVisible(false);
+            this.basicWFSX1Y1.setVisible(true);
+            this.basicWFSX2Y2.setVisible(true);
+            this.referenceSystemChooser.setVisible(true);
+            this.referenceSystemChooserLabel.setVisible(true);
+            WFSMeta.Feature feature;
+            if (datasetAvailable) {
+                feature = (WFSMeta.Feature) data.getItem();
+            } else {
+                feature = new WFSMeta.Feature();
             }
+            mapWFS.setExtend(feature.bbox);
+            ArrayList<String> list = new ArrayList<String>();
+            list.add(feature.defaultCRS);
+            list.addAll(feature.otherCRSs);
+            ObservableList<CRSModel> crsList =
+                    FXCollections.observableArrayList();
+            for (String crsStr : list) {
+                try {
+                    String newcrsStr = crsStr;
+                    String seperator = null;
+                    if (newcrsStr.contains("::")) {
+                        seperator = "::";
+                    } else if (newcrsStr.contains("/")) {
+                        seperator = "/";
+                    }
+                    if (seperator != null) {
+                        newcrsStr = "EPSG:"
+                                + newcrsStr.substring(
+                                newcrsStr.lastIndexOf(seperator)
+                                        + seperator.length(),
+                                newcrsStr.length());
+                    }
+                    CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                    CRSModel crsm = new CRSModel(crs);
+                    crsm.setOldName(crsStr);
+                    crsList.add(crsm);
+                } catch (FactoryException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+            if (!crsList.isEmpty()) {
+                this.referenceSystemChooser.setItems(crsList);
+                CRSModel crsm = crsList.get(0);
+                try {
+                    CoordinateReferenceSystem initCRS = CRS.decode(
+                            INITIAL_CRS_DISPLAY);
+                    CRSModel initCRSM = new CRSModel(initCRS);
+                    for (int i = 0; i < crsList.size(); i++) {
+                        if (crsList.get(i).equals(initCRSM)) {
+                            crsm = crsList.get(i);
+                            break;
+                        }
+                    }
+                } catch (FactoryException e) {
+                    log.log(Level.SEVERE, e.getMessage(), e);
+                }
+                this.referenceSystemChooser.setValue(crsm);
+            }
+            List<String> outputFormats = feature.outputFormats;
+
+            outputFormats = this.dataBean.getWFSService()
+                    .findOperation("GetFeature").outputFormats;
+            if (outputFormats.isEmpty()) {
+                outputFormats =
+                        this.dataBean.getWFSService().outputFormats;
+            }
+            List<OutputFormatModel> formatModels
+                    = new ArrayList<OutputFormatModel>();
+            for (String s : outputFormats) {
+                OutputFormatModel m = new OutputFormatModel();
+                m.setItem(s);
+                m.setAvailable(true);
+                formatModels.add(m);
+            }
+            ObservableList<OutputFormatModel> formats =
+                    FXCollections.observableArrayList(formatModels);
+            this.dataFormatChooser.setItems(formats);
+        } else if (data instanceof StoredQueryModel
+                || (!datasetAvailable
+                && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))) {
+            List<String> outputFormats = this.dataBean.getWFSService()
+                    .findOperation("GetFeature").outputFormats;
+            if (outputFormats.isEmpty()) {
+                outputFormats =
+                        this.dataBean.getWFSService().outputFormats;
+            }
+            List<OutputFormatModel> formatModels =
+                new ArrayList<OutputFormatModel>();
+            for (String i : outputFormats) {
+                OutputFormatModel m = new OutputFormatModel();
+                m.setItem(i);
+                m.setAvailable(true);
+                formatModels.add(m);
+            }
+            WFSMeta.StoredQuery storedQuery;
+            if (datasetAvailable) {
+                storedQuery = (WFSMeta.StoredQuery) data.getItem();
+            } else {
+                storedQuery = new WFSMeta.StoredQuery();
+            }
+            factory.fillSimpleWFS(
+                    dataBean,
+                    this.simpleWFSContainer,
+                    storedQuery,
+                    formatModels);
+            this.atomContainer.setVisible(false);
+            this.simpleWFSContainer.setVisible(true);
+            this.basicWFSContainer.setVisible(false);
+        }
+    }
+
+    private void chooseType(ItemModel data) {
+        ServiceType type = this.dataBean.getServiceType();
+        boolean datasetAvailable = false;
+        if (data instanceof MiscItemModel) {
+            serviceTypeChooser.setStyle("-fx-border-color: red;");
+            setStatusTextUI(I18n.format("gui.dataset-not-available"));
+        } else {
+            serviceTypeChooser.setStyle("-fx-border-color: null;");
+            datasetAvailable = true;
+            setStatusTextUI(I18n.format("status.ready"));
+        }
+        if (type == ServiceType.Atom) {
+            chooseAtomType(data, datasetAvailable);
+        } else if (type == ServiceType.WFSTwo) {
+            chooseWFSType(data, datasetAvailable);
         }
     }
 

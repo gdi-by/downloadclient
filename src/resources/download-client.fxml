@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.*?>
 <?import javafx.embed.swing.*?>
@@ -17,6 +18,8 @@
         <MenuBar fx:id="menuBar">
             <menus>
                 <Menu text="%menu.file">
+                    <MenuItem text="%menu.load_config" onAction="#handleLoadConfig"
+                              fx:id="menuLoadConfig" />
                     <MenuItem text="%menu.quit" onAction="#handleCloseApp"
                               fx:id="menuQuit"/>
                 </Menu>
@@ -40,13 +43,20 @@
                               AnchorPane.rightAnchor="0.0"
                               AnchorPane.topAnchor="0.0">
                             <children>
+                                <Text fx:id="searchHeadlineText"
+                                      text="%gui.search_service">
+                                    <VBox.margin>
+                                        <Insets bottom="0.0" left="10.0" top="10.0" />
+                                    </VBox.margin>
+                                </Text>
                                 <HBox>
                                     <children>
                                         <TextField fx:id="searchField"
                                                    onKeyReleased="#handleSearch"
                                                    scaleShape="false"
                                                    HBox.hgrow="ALWAYS"
-                                                   VBox.vgrow="NEVER">
+                                                   VBox.vgrow="NEVER"
+                                                   promptText="%gui.search_prompt_text">
                                             <opaqueInsets>
                                                 <Insets bottom="10.0"
                                                         left="10.0" right="10.0"
@@ -61,13 +71,38 @@
                                                          wrapText="true"/>
                                             </tooltip>
                                         </TextField>
-                                        <ProgressIndicator
-                                                fx:id="progressSearch"
-                                                prefHeight="0.0"
-                                                prefWidth="23.0"
+                                        <Button fx:id="searchButton"
+                                                onMouseClicked="#handleSearchButtonClick"
+                                                managed="true"
+                                                visible="true"
+                                                prefWidth="16"
+                                                prefHeight="0"
                                                 HBox.hgrow="NEVER">
+                                            <graphic>
+                                                <ImageView preserveRatio="true" fitWidth="16">
+                                                    <image>
+                                                        <Image url="img/looking_glass.png" />
+                                                    </image>
+                                                </ImageView>
+                                            </graphic>
+                                            <tooltip>
+                                                <Tooltip text="%tooltip.search"
+                                                    wrapText="true" />
+                                            </tooltip>
                                             <HBox.margin>
                                                 <Insets left="5.0" right="5.0"/>
+                                            </HBox.margin>
+                                        </Button>
+
+                                        <ProgressIndicator
+                                                fx:id="progressSearch"
+                                                prefHeight="23"
+                                                prefWidth="23"
+                                                visible="false"
+                                                managed="false"
+                                                HBox.hgrow="NEVER">
+                                            <HBox.margin>
+                                                    <Insets left="10.5" right="10.4" bottom="1.5" top="0.0"/>
                                             </HBox.margin>
                                         </ProgressIndicator>
                                     </children>
