@@ -61,6 +61,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -83,8 +85,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -161,7 +165,11 @@ public class Controller {
     @FXML
     private TextField servicePW;
     @FXML
-    private Label statusBarText;
+    private Label logHistory;
+    @FXML
+    private TitledPane logHistoryParent;
+    @FXML
+    private ScrollPane logHistoryPanel;
     @FXML
     private ComboBox<ItemModel> serviceTypeChooser;
     @FXML
@@ -264,6 +272,27 @@ public class Controller {
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
+    }
+
+    /**
+     * Initializes gui elements.
+     */
+    @FXML
+    protected void initialize() {
+        logHistoryParent.expandedProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue o, Object oldVal,
+                    Object newVal) {
+                boolean val = (boolean) newVal;
+                if (val) {
+                    logHistoryParent.getTooltip().setText(
+                            I18n.format("tooltip.log_history_expanded"));
+                } else {
+                    logHistoryParent.getTooltip().setText(
+                            I18n.format("tooltip.log_history_hidden"));
+                }
+            }
+        });
     }
 
     /**
@@ -721,7 +750,7 @@ public class Controller {
     @FXML
     protected void handleSearch(KeyEvent event) {
         if (!catalogReachable) {
-            statusBarText.setText(I18n.getMsg("status.catalog-not-available"));
+            setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
@@ -777,7 +806,7 @@ public class Controller {
             };
             Thread th = new Thread(task);
             if (catalogReachable) {
-                statusBarText.setText(I18n.getMsg("status.calling-service"));
+                setStatusTextUI(I18n.getMsg("status.calling-service"));
             }
             th.setDaemon(true);
             th.start();
@@ -1057,14 +1086,14 @@ public class Controller {
 
         String format = this.dataBean.getAttributeValue("outputformat");
         if (format == null || format.isEmpty()) {
-            statusBarText.setText(I18n.getMsg("gui.process.no.format"));
+            setStatusTextUI(I18n.getMsg("gui.process.no.format"));
             return steps;
         }
 
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
-            statusBarText.setText(I18n.getMsg("gui.process.format.not.found"));
+            setStatusTextUI(I18n.getMsg("gui.process.format.not.found"));
             return steps;
         }
 
@@ -1078,7 +1107,7 @@ public class Controller {
             String name = psc.getName();
 
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
-                statusBarText.setText(
+                setStatusTextUI(
                         I18n.format("gui.process.not.compatible", name));
                 continue;
             }
@@ -1294,7 +1323,7 @@ public class Controller {
         }
 
         if (!failed.equals("")) {
-            statusBarText.setText(
+            setStatusTextUI(
                     I18n.format("status.validation-fail", failed));
             return false;
         }
@@ -1340,7 +1369,7 @@ public class Controller {
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
             } catch (ConverterException ce) {
-                statusBarText.setText(ce.getMessage());
+                setStatusTextUI(ce.getMessage());
             }
         }
     }
@@ -1556,7 +1585,7 @@ public class Controller {
             if (downloadConf != null) {
                 loadDownloadConfig(downloadConf);
             }
-            statusBarText.setText(I18n.getMsg("status.ready"));
+            setStatusTextUI(I18n.getMsg("status.ready"));
         });
         return;
 
@@ -1910,7 +1939,7 @@ public class Controller {
                 mapAtom.resizeSwingContent(newVal.doubleValue());
             });
         } else {
-            statusBarText.setText(I18n.format("status.wms-not-available"));
+            setStatusTextUI(I18n.format("status.wms-not-available"));
         }
         this.atomContainer.setVisible(false);
         this.progressSearch.setVisible(false);
@@ -1937,12 +1966,26 @@ public class Controller {
 
     /**
      * Set the text of the status bar in UI thread.
+     * Adds current message to log history.
      *
      * @param msg the text to set.
      */
     public void setStatusTextUI(String msg) {
+        String logText;
+        String regexAtom = I18n.format("atom.bytes.downloaded", "[\\d|\\.]+");
+        String regexWfs = I18n.format("file.download.bytes", "[\\d|\\.]+");
+        //Filter atom/wfs download messages
+        if (!logHistoryParent.getText().matches(regexAtom)
+           && !logHistoryParent.getText().matches(regexWfs)) {
+            logText = logHistoryParent.getText() + "\n"
+                    + logHistory.getText();
+        } else {
+            logText = logHistory.getText();
+        }
+
         Platform.runLater(() -> {
-            statusBarText.setText(msg);
+            logHistoryParent.setText(msg);
+            logHistory.setText(logText);
         });
     }
 
@@ -1963,7 +2006,7 @@ public class Controller {
 
                     if (polygonName != null && polygonID != null) {
                         if (polygonName.equals("#@#")) {
-                            statusBarText.setText(I18n.format(
+                            setStatusTextUI(I18n.format(
                                     "status.polygon-intersect",
                                     polygonID));
                             return;
@@ -2009,7 +2052,7 @@ public class Controller {
 
         @Override
         public void run() {
-            statusBarText.setText(getMessage());
+            setStatusTextUI(getMessage());
         }
 
         @Override

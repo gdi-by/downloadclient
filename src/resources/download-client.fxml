@@ -697,14 +697,29 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-        <HBox prefHeight="25.0" prefWidth="693.0"
+        <HBox prefHeight="25.0" prefWidth="3840.0"
               style="-fx-background-color: gainsboro;">
             <children>
-                <Label fx:id="statusBarText" text="%status.ready">
+                <TitledPane fx:id="logHistoryParent"
+                            text="%status.ready"
+                            wrapText = "false"
+                            expanded="false"
+                            prefWidth="3840.0"
+                            prefHeight="150.0">
+                    <tooltip>
+                        <Tooltip text="%tooltip.log_history_hidden"
+                                 wrapText="true"/>
+                    </tooltip>
                     <HBox.margin>
-                        <Insets bottom="5.0" left="15.0" top="5.0"/>
+                        <Insets bottom="5.0" left="0.0" top="5.0" right="0.0"/>
                     </HBox.margin>
-                </Label>
+                    <content>
+                        <ScrollPane fx:id="logHistoryPanel" minHeight="150.0">
+                            <Label fx:id="logHistory" text="">
+                            </Label>
+                        </ScrollPane>
+                    </content>
+                </TitledPane>
             </children>
         </HBox>
     </children>
