@@ -49,6 +49,8 @@ public class Config {
 
     private ProcessingConfiguration processingConfig;
 
+    private ProxyConfiguration proxyConfig;
+
     private Config() {
     }
 
@@ -90,6 +92,13 @@ public class Config {
      */
     public ProcessingConfiguration getProcessingConfig() {
         return processingConfig;
+    }
+
+    /**
+     * @return the proxy config
+     */
+    public ProxyConfiguration getProxyConfig() {
+        return proxyConfig;
     }
 
     private static ServiceSetting loadServiceSettings(File file)
@@ -158,8 +167,8 @@ public class Config {
 
         File proxy = new File(dir, ProxyConfiguration.PROXY_CONFIG_FILE);
         if (proxy.isFile() && proxy.canRead()) {
-            ProxyConfiguration proxyConfig = ProxyConfiguration.read(proxy);
-            proxyConfig.apply();
+            Holder.INSTANCE.proxyConfig = ProxyConfiguration.read(proxy);
+            Holder.INSTANCE.proxyConfig.apply();
         } else {
             log.info("No Proxy config found, starting without proxy.");
         }
