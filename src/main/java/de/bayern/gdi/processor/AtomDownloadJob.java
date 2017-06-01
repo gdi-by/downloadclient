@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
@@ -97,6 +98,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
             throw new JobExecutionException(
                 I18n.format("atom.bad.download", docURL.toString()), ioe);
         } finally {
+            Controller.logToAppLog("Atom download request:\n" + docURL);
             HTTP.closeGraceful(client);
         }
     }

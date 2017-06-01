@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.services;
 
+import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.XML;
@@ -132,6 +133,8 @@ public class CatalogService {
         Document xml = XML.getDocument(this.catalogURL,
                     this.userName,
                     this.password);
+        Controller.logToAppLog("Catalog service request\n"
+                + this.catalogURL.toString());
         if (xml != null) {
             String getProviderExpr = "//ows:ServiceIdentification/ows:Title";
             Node providerNameNode = (Node) XML.xpath(xml,

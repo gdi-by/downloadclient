@@ -52,13 +52,21 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
+import java.util.logging.Formatter;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -131,8 +139,14 @@ public class Controller {
     private static final int BBOX_Y1_INDEX = 1;
     private static final int BBOX_X2_INDEX = 2;
     private static final int BBOX_Y2_INDEX = 3;
+    private static final int MAX_APP_LOG_BYTES = 8096;
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
+    //Application log
+    private static final Logger APP_LOG = Logger.getLogger("Application Log");
+    private FileHandler appLogFileHandler;
+    private AppLogFormatter appLogFormatter;
+
     private static final String UNAVAILABLE_PREFIX = "N/A:";
     private CoordinateReferenceSystem atomCRS;
     // DataBean
@@ -272,6 +286,22 @@ public class Controller {
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
+        Platform.runLater(() -> {
+            try {
+                APP_LOG.setUseParentHandlers(false);
+                //Open file in append mode
+                appLogFileHandler = new FileHandler(
+                        System.getProperty("user.dir")
+                        + "/application_log.txt", MAX_APP_LOG_BYTES, 1, true);
+                appLogFormatter = new AppLogFormatter();
+                appLogFileHandler.setFormatter(appLogFormatter);
+                APP_LOG.addHandler(appLogFileHandler);
+            } catch (IOException ioex) {
+                log.log(Level.SEVERE, "Could not open application log file",
+                        ioex);
+            }
+        });
+
     }
 
     /**
@@ -279,6 +309,7 @@ public class Controller {
      */
     @FXML
     protected void initialize() {
+        
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue o, Object oldVal,
@@ -293,6 +324,15 @@ public class Controller {
                 }
             }
         });
+    }
+
+    /**
+     * Logs a message to the application log.
+     *
+     * @param msg Message to log
+     */
+    public static void logToAppLog(String msg) {
+        APP_LOG.info(msg);
     }
 
     /**
@@ -2068,6 +2108,28 @@ public class Controller {
         public void receivedMessage(ProcessorEvent pe) {
             setMessage(pe.getMessage());
             Platform.runLater(this);
+        }
+    }
+
+    /**
+     * Application log formatting.
+     */
+    private class AppLogFormatter extends Formatter {
+        /**
+         * Formats log record.
+         *
+         * @return Formatted log entry
+         */
+        @Override
+        public String format(LogRecord record) {
+            LocalDateTime time = Instant.ofEpochMilli(record.getMillis())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+            return time.format(DateTimeFormatter
+                            .ofPattern("E, dd.MM.yyyy - kk:mm:ss"))
+                            + " "
+                            + record.getMessage()
+                            + System.lineSeparator();
         }
     }
 }

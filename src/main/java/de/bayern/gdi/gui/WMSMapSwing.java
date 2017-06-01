@@ -144,6 +144,7 @@ public class WMSMapSwing extends Parent {
     private CoordinateReferenceSystem displayCRS;
     private CoordinateReferenceSystem oldDisplayCRS;
     private CoordinateReferenceSystem mapCRS;
+    private WMSLayer displayLayer;
 
     private static final double TEN_PERCENT = 0.1D;
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
@@ -347,6 +348,8 @@ public class WMSMapSwing extends Parent {
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
+            Controller.logToAppLog("GetCapabilities Request:\n"
+                    + this.wms.getCapabilities().getRequest());
             baseLayer = null;
             boolean layerFound = false;
             for (Layer outerLayer : layers) {
@@ -470,7 +473,7 @@ public class WMSMapSwing extends Parent {
         }
         wmsLayer.setBoundingBoxes(targetEnv);
 
-        WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
+        displayLayer = new WMSLayer(this.wms, wmsLayer);
         this.mapContent.addLayer(displayLayer);
         setMapCRS(this
                 .mapContent
@@ -1029,6 +1032,13 @@ public class WMSMapSwing extends Parent {
                 swingNode.setContent(panel);
                 setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
                         INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
+                if (displayLayer != null
+                        && displayLayer.getLastGetMap() != null) {
+                    Controller.logToAppLog("GetMap Request:\n"
+                            + displayLayer.getLastGetMap().toString());
+                    System.out.println(displayLayer.getLastGetMap().toString());
+                }
+
             }
         });
     }
