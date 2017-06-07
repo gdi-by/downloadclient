@@ -293,10 +293,6 @@ public class Controller {
         try {
             APP_LOG.setUseParentHandlers(false);
             //Open file in append mode
-            log.log(Level.INFO, "Request logfile: "
-                    + System.getProperty("java.io.tmpdir")
-                    + "/downloadclient"
-                    + "/downloadclient_requests.txt");
             File logPath = new File(System.getProperty("java.io.tmpdir")
                     + "/downloadclient");
             logPath.mkdirs();
