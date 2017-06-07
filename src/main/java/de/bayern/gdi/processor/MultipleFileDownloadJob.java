@@ -17,7 +17,6 @@
  */
 package de.bayern.gdi.processor;
 
-import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
@@ -104,7 +103,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         try {
             FileResponseHandler frh
-                = new FileResponseHandler(dlf.file, wrapFactory);
+                = new FileResponseHandler(dlf.file, wrapFactory,
+                httpget);
             client.execute(httpget, frh);
 
             return RemoteFileState.SUCCESS;
@@ -113,8 +113,6 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         } catch (IOException ioe) {
             return RemoteFileState.RETRY;
         } finally {
-            Controller.logToAppLog("Files download:" + System.lineSeparator()
-                    + dlf.url.toString());
             HTTP.closeGraceful(client);
             this.totalCount += this.currentCount;
         }

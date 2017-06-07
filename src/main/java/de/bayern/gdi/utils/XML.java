@@ -168,7 +168,8 @@ public class XML {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
             HttpGet request = HTTP.getGetRequest(url);
-            DocumentResponseHandler handler = new DocumentResponseHandler();
+            DocumentResponseHandler handler
+                    = new DocumentResponseHandler(request);
             handler.setNamespaceAware(nameSpaceAware);
             return client.execute(request, handler);
         } finally {
@@ -230,9 +231,10 @@ public class XML {
             throws URISyntaxException, IOException {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
-            DocumentResponseHandler handler = new DocumentResponseHandler();
-            handler.setNamespaceAware(nameSpaceAware);
             HttpPost request = HTTP.getPostRequest(url);
+            DocumentResponseHandler handler =
+                    new DocumentResponseHandler(request);
+            handler.setNamespaceAware(nameSpaceAware);
             InputStream inputStream =
                     new ByteArrayInputStream(postXML.getBytes());
             InputStreamEntity inputStreamEntity = new InputStreamEntity(

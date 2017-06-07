@@ -121,6 +121,7 @@ public class WMSMapSwing extends Parent {
             = Logger.getLogger(WMSMapSwing.class.getName());
 
     private WebMapServer wms;
+    private WMSLayer wmslayer;
     private VBox vBox;
     private MapContent mapContent;
     private String title;
@@ -348,8 +349,6 @@ public class WMSMapSwing extends Parent {
             this.vBox = new VBox();
             this.wms = new WebMapServer(mapURL);
             List<Layer> layers = this.wms.getCapabilities().getLayerList();
-            Controller.logToAppLog("GetCapabilities Request:\n"
-                    + this.wms.getCapabilities().getRequest());
             baseLayer = null;
             boolean layerFound = false;
             for (Layer outerLayer : layers) {
@@ -474,6 +473,7 @@ public class WMSMapSwing extends Parent {
         wmsLayer.setBoundingBoxes(targetEnv);
 
         displayLayer = new WMSLayer(this.wms, wmsLayer);
+        this.wmslayer = displayLayer;
         this.mapContent.addLayer(displayLayer);
         setMapCRS(this
                 .mapContent
@@ -1032,13 +1032,6 @@ public class WMSMapSwing extends Parent {
                 swingNode.setContent(panel);
                 setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
                         INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
-                if (displayLayer != null
-                        && displayLayer.getLastGetMap() != null) {
-                    Controller.logToAppLog("GetMap Request:\n"
-                            + displayLayer.getLastGetMap().toString());
-                    System.out.println(displayLayer.getLastGetMap().toString());
-                }
-
             }
         });
     }
@@ -1050,6 +1043,8 @@ public class WMSMapSwing extends Parent {
         Task task = new Task() {
             protected Integer call() {
                 mapPane.repaint();
+                Controller.logToAppLog("GetMap request:\n"
+                        + wmslayer.getLastGetMap().getFinalURL().toString());
                 return 0;
             }
         };

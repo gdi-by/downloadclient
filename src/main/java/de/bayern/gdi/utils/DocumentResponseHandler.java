@@ -27,9 +27,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.ResponseHandler;
 
 import org.w3c.dom.Document;
+
+import de.bayern.gdi.gui.Controller;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -41,6 +44,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     private WrapInputStreamFactory wrapFactory;
     private Boolean namespaceAware;
+    private HttpRequestBase request;
 
     private static Unauthorized unauthorized;
 
@@ -65,8 +69,11 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     /**
      * Constructor.
+     *
+     * @param request Request
      */
-    public DocumentResponseHandler() {
+    public DocumentResponseHandler(HttpRequestBase request) {
+        this.request = request;
     }
 
     /**
@@ -95,6 +102,9 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
     public Document handleResponse(HttpResponse response)
         throws ClientProtocolException, IOException {
         int status = response.getStatusLine().getStatusCode();
+        Controller.logToAppLog("XML Request:\n" + status + " "
+                + request.toString());
+
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
             if (status == HttpStatus.SC_UNAUTHORIZED) {
