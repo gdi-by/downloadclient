@@ -21,6 +21,7 @@ package de.bayern.gdi.gui;
 
 import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.HTTP;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -59,6 +60,9 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.HTTPClient;
@@ -1043,14 +1047,40 @@ public class WMSMapSwing extends Parent {
         Task task = new Task() {
             protected Integer call() {
                 mapPane.repaint();
-                Controller.logToAppLog("GetMap request:\n"
-                        + wmslayer.getLastGetMap().getFinalURL().toString());
+                String getMapUrl = wmslayer.getLastGetMap().getFinalURL()
+                        .toString();
+
+                Controller.logToAppLog(checkGetMap(getMapUrl)
+                        + " " + getMapUrl);
                 return 0;
             }
         };
         Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
+    }
+
+    /**
+     * Checks status code of a getMap request, using a head request.
+     * Workaround to get geotools getMap request status codes.
+     * @param requestURL getMap URL
+     * @return Status string containing status code, reason phrase and method
+     */
+    private String checkGetMap(String requestURL) {
+        String result = "";
+        CloseableHttpClient client = null;
+        try {
+            client = HTTP.getClient(new URL(requestURL),
+                    null, null);
+            HttpHead head = new HttpHead(requestURL);
+            CloseableHttpResponse resp = client.execute(head);
+            result += resp.getStatusLine().getStatusCode() + " "
+                    + resp.getStatusLine().getReasonPhrase() + " "
+                    + "GET";
+        } finally {
+            HTTP.closeGraceful(client);
+            return result;
+        }
     }
 
     /**

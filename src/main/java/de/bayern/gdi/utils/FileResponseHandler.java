@@ -94,7 +94,8 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
     public Boolean handleResponse(HttpResponse response)
         throws ClientProtocolException, IOException {
         int status = response.getStatusLine().getStatusCode();
-        Controller.logToAppLog("File request:\n" + status + " "
+        String reason = response.getStatusLine().getReasonPhrase();
+        Controller.logToAppLog(status + " " + reason + " "
                 + request.toString());
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {

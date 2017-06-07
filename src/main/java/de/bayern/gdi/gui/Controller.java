@@ -293,9 +293,17 @@ public class Controller {
         try {
             APP_LOG.setUseParentHandlers(false);
             //Open file in append mode
-            appLogFileHandler = new FileHandler(
-                    System.getProperty("user.dir")
-                    + "/application_log.txt", MAX_APP_LOG_BYTES, 1, true);
+            log.log(Level.INFO, "Request logfile: "
+                    + System.getProperty("java.io.tmpdir")
+                    + "/downloadclient"
+                    + "/downloadclient_requests.txt");
+            File logPath = new File(System.getProperty("java.io.tmpdir")
+                    + "/downloadclient");
+            logPath.mkdirs();
+
+            appLogFileHandler = new FileHandler(logPath.getAbsolutePath()
+                    + "/downloadclient_requests.txt",
+                    MAX_APP_LOG_BYTES, 1, true);
             appLogFormatter = new AppLogFormatter();
             appLogFileHandler.setFormatter(appLogFormatter);
             APP_LOG.addHandler(appLogFileHandler);

@@ -102,7 +102,8 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
     public Document handleResponse(HttpResponse response)
         throws ClientProtocolException, IOException {
         int status = response.getStatusLine().getStatusCode();
-        Controller.logToAppLog("XML Request:\n" + status + " "
+        String reason = response.getStatusLine().getReasonPhrase();
+        Controller.logToAppLog(status + " " + reason + " "
                 + request.toString());
 
         if (status < HttpStatus.SC_OK
