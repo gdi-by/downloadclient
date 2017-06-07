@@ -144,8 +144,9 @@ public class Controller {
             = Logger.getLogger(Controller.class.getName());
     //Application log
     private static final Logger APP_LOG = Logger.getLogger("Application Log");
-    private FileHandler appLogFileHandler;
-    private AppLogFormatter appLogFormatter;
+    private static boolean appLogInit = false;
+    private static FileHandler appLogFileHandler;
+    private static AppLogFormatter appLogFormatter;
 
     private static final String UNAVAILABLE_PREFIX = "N/A:";
     private CoordinateReferenceSystem atomCRS;
@@ -286,22 +287,23 @@ public class Controller {
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
-        Platform.runLater(() -> {
-            try {
-                APP_LOG.setUseParentHandlers(false);
-                //Open file in append mode
-                appLogFileHandler = new FileHandler(
-                        System.getProperty("user.dir")
-                        + "/application_log.txt", MAX_APP_LOG_BYTES, 1, true);
-                appLogFormatter = new AppLogFormatter();
-                appLogFileHandler.setFormatter(appLogFormatter);
-                APP_LOG.addHandler(appLogFileHandler);
-            } catch (IOException ioex) {
-                log.log(Level.SEVERE, "Could not open application log file",
-                        ioex);
-            }
-        });
+    }
 
+    private static void initAppLog() {
+        try {
+            APP_LOG.setUseParentHandlers(false);
+            //Open file in append mode
+            appLogFileHandler = new FileHandler(
+                    System.getProperty("user.dir")
+                    + "/application_log.txt", MAX_APP_LOG_BYTES, 1, true);
+            appLogFormatter = new AppLogFormatter();
+            appLogFileHandler.setFormatter(appLogFormatter);
+            APP_LOG.addHandler(appLogFileHandler);
+            appLogInit = true;
+        } catch (IOException ioex) {
+            log.log(Level.SEVERE, "Could not open application log file",
+                    ioex);
+        }
     }
 
     /**
@@ -309,7 +311,6 @@ public class Controller {
      */
     @FXML
     protected void initialize() {
-        
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue o, Object oldVal,
@@ -332,7 +333,12 @@ public class Controller {
      * @param msg Message to log
      */
     public static void logToAppLog(String msg) {
-        APP_LOG.info(msg);
+        Platform.runLater(() -> {
+            if (!appLogInit) {
+                initAppLog();
+            }
+            APP_LOG.info(msg);
+        });
     }
 
     /**
@@ -2114,7 +2120,7 @@ public class Controller {
     /**
      * Application log formatting.
      */
-    private class AppLogFormatter extends Formatter {
+    private static class AppLogFormatter extends Formatter {
         /**
          * Formats log record.
          *

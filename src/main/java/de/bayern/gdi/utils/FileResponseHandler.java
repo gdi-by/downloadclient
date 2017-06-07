@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.gui.Controller;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import org.apache.http.HttpStatus;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpRequestBase;
 
 /**
  * File handler for HttpClient.
@@ -63,18 +66,22 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
 
     private File file;
 
+    private HttpRequestBase request;
+
     private WrapInputStreamFactory wrapFactory;
 
     public FileResponseHandler() {
     }
 
-    public FileResponseHandler(File file) {
-        this(file, null);
+    public FileResponseHandler(File file, HttpRequestBase request) {
+        this(file, null, request);
     }
 
-    public FileResponseHandler(File file, WrapInputStreamFactory wrapFactory) {
+    public FileResponseHandler(File file, WrapInputStreamFactory wrapFactory,
+            HttpRequestBase request) {
         this.file = file;
         this.wrapFactory = wrapFactory;
+        this.request = request;
     }
 
     private InputStream wrap(InputStream in) {
@@ -87,6 +94,8 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
     public Boolean handleResponse(HttpResponse response)
         throws ClientProtocolException, IOException {
         int status = response.getStatusLine().getStatusCode();
+        Controller.logToAppLog("File request:\n" + status + " "
+                + request.toString());
         if (status < HttpStatus.SC_OK
             || status >= HttpStatus.SC_MULTIPLE_CHOICES) {
             if (status == HttpStatus.SC_UNAUTHORIZED) {

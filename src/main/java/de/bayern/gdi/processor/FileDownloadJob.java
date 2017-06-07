@@ -24,7 +24,6 @@ import java.net.URL;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
@@ -64,9 +63,6 @@ public class FileDownloadJob extends AbstractDownloadJob {
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
 
-        FileResponseHandler responseHandler
-            = new FileResponseHandler(this.file, wrapFactory);
-
         CloseableHttpClient httpclient = getClient(url);
 
         String msg = I18n.format("download.file", url, this.file);
@@ -74,6 +70,9 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
         try {
             HttpGet httpget = getGetRequest(url);
+            FileResponseHandler responseHandler
+                    = new FileResponseHandler(this.file, wrapFactory, httpget);
+
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
             JobExecutionException jee =
@@ -82,8 +81,6 @@ public class FileDownloadJob extends AbstractDownloadJob {
             broadcastException(jee);
             throw jee;
         } finally {
-            Controller.logToAppLog("File download:" + System.lineSeparator()
-                    + url.toString());
             HTTP.closeGraceful(httpclient);
         }
         broadcastMessage(I18n.getMsg("file.download.finished"));
