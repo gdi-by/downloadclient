@@ -99,6 +99,8 @@ import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
 import org.geotools.swing.event.MapMouseEvent;
+import org.geotools.swing.event.MapPaneEvent;
+import org.geotools.swing.event.MapPaneListener;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.InfoToolHelper;
 import org.geotools.swing.tool.InfoToolResult;
@@ -982,6 +984,27 @@ public class WMSMapSwing extends Parent {
                         mapPane.requestFocusInWindow();
                     }
                 });
+
+                //Add listener to log getMap requests after rendering
+                mapPane.addMapPaneListener(new MapPaneListener() {
+                    @Override
+                    public void onDisplayAreaChanged(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onNewMapContent(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onRenderingStarted(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onRenderingStopped(MapPaneEvent ev) {
+                        String getMapUrl = wmslayer.getLastGetMap()
+                                .getFinalURL().toString();
+                        Controller.logToAppLog(checkGetMap(getMapUrl)
+                                + " " + getMapUrl);
+                    }
+
+                });
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
@@ -1047,11 +1070,6 @@ public class WMSMapSwing extends Parent {
         Task task = new Task() {
             protected Integer call() {
                 mapPane.repaint();
-                String getMapUrl = wmslayer.getLastGetMap().getFinalURL()
-                        .toString();
-
-                Controller.logToAppLog(checkGetMap(getMapUrl)
-                        + " " + getMapUrl);
                 return 0;
             }
         };
