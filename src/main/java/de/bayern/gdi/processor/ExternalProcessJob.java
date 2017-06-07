@@ -25,8 +25,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import de.bayern.gdi.model.ProxyConfiguration;
+import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
@@ -204,8 +207,16 @@ public class ExternalProcessJob implements Job {
             }
         }
         List<String> cmd = commandList();
-
         ProcessBuilder builder = new ProcessBuilder(cmd);
+        if (Config.getInstance().getProxyConfig() != null) {
+            ProxyConfiguration pConf = Config.getInstance().getProxyConfig();
+            Map<String, String> env = builder.environment();
+
+            env.put("http_proxy", pConf.getHttpProxyString());
+            env.put("https_proxy", pConf.getHttpsProxyString());
+            env.put("no_proxy", pConf.getHttpNonProxyHosts());
+        }
+
         if (this.fileTracker != null
         && this.fileTracker.getDirectory() != null) {
             builder.directory(this.fileTracker.getDirectory());

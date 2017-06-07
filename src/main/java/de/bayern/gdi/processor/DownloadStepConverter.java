@@ -225,9 +225,11 @@ public class DownloadStepConverter {
         String queryType = findQueryType(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
-        sb.append(base)
-          .append('?')
-          .append("service=wfs&")
+        sb.append(base);
+        if (!base.endsWith("?")) {
+            sb.append("?");
+        }
+        sb.append("service=wfs&")
           .append("request=GetFeature&")
           .append("version=").append(version);
 

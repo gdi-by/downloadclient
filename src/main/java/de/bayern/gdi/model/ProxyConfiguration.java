@@ -123,6 +123,19 @@ public class ProxyConfiguration {
     }
 
     /**
+     * Returns the proxy host and port as string(host:port) if both are
+     * defined, else the proxyhost.
+     * @return Proxystring
+     */
+    public String getHttpProxyString() {
+        if (!httpProxyPort.equals("") && httpProxyPort != null) {
+            return httpProxyHost + ":" + httpProxyPort;
+        } else {
+            return httpProxyHost;
+        }
+    }
+
+    /**
      * @return the httpProxyUser
      */
     public String getHttpProxyUser() {
@@ -190,6 +203,18 @@ public class ProxyConfiguration {
      */
     public void setHttpsProxyPort(Integer httpsProxyPort) {
         this.httpsProxyPort = httpsProxyPort;
+    }
+    /**
+     * Returns the https proxy host and port as string(host:port) if both are
+     * defined, else the proxyhost.
+     * @return Proxystring
+     */
+    public String getHttpsProxyString() {
+        if (!httpsProxyPort.equals("") && httpsProxyPort != null) {
+            return httpsProxyHost + ":" + httpsProxyPort;
+        } else {
+            return httpsProxyHost;
+        }
     }
 
     /**
