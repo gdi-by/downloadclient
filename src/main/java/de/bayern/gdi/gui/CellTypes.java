@@ -18,6 +18,8 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.model.ProcessingStepConfiguration;
+
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
 
@@ -90,6 +92,33 @@ public class CellTypes {
 
             }
             setText(item == null ? "" : item.getItem());
+        }
+    }
+
+   /**
+    * Cell class, changing its font color and weight
+    * depending whether the processing step configuration
+    * is compatible to the given output format.
+    */
+    public static class ProcessCfgCell
+            extends ListCell<ProcessingStepConfiguration> {
+        @Override
+        protected void updateItem(
+                ProcessingStepConfiguration item,
+                boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null) {
+                return;
+            }
+            if (!item.isCompatible()) {
+               setTextFill(Color.RED);
+                setStyle("-fx-font-weight: bold;");
+            } else {
+                setTextFill(Color.BLACK);
+                setStyle("-fx-font-weight: normal;");
+            }
+
+            setText(item == null ? "" : item.toString());
         }
     }
 }

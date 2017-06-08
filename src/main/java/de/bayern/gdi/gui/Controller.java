@@ -1048,6 +1048,7 @@ public class Controller {
     @FXML
     protected void handleAddChainItem(ActionEvent event) {
         factory.addChainAttribute(this.dataBean, chainContainer);
+        validateChainContainerItems();
     }
 
     /**
@@ -2049,6 +2050,67 @@ public class Controller {
             logHistoryParent.setText(msg);
             logHistory.setText(logText);
         });
+    }
+
+    /**
+     * Validates a single processing chain item
+     * and marks it according to result.
+     *
+     * @param box Item to validate
+     * @return True if item is valid, else false
+     */
+    private boolean validateChainContainerItem(ComboBox box) {
+        String format = this.dataBean.getAttributeValue("outputformat");
+        MIMETypes mtypes = Config.getInstance().getMimeTypes();
+        MIMEType mtype = mtypes.findByName(format);
+
+        ProcessingStepConfiguration cfg =
+                (ProcessingStepConfiguration) box.getValue();
+
+        if (mtype == null) {
+            box.setStyle("-fx-border-color: red;");
+            //TODO: Log
+            return false;
+        }
+
+        if (cfg == null) {
+            box.setStyle("-fx-border-color: red;");
+            //TODO: Log
+            return false;
+        }
+
+        if (cfg.isCompatibleWithFormat(mtype.getType())) {
+            System.out.println(cfg.getFormatType() + " compatible");
+            box.setStyle("-fx-border-color: null;");
+        } else {
+            System.out.println(cfg.getFormatType() + " incompatible");
+            box.setStyle("-fx-border-color: red;");
+        }
+        return false;
+    }
+
+    /**
+     * Validates all items in processing chain container.
+     */
+    private void validateChainContainerItems() {
+        System.out.println("Validate " + this.dataBean.
+                getAttributeValue("outputformat"));
+        //If there's no outputformat selected, return
+        if (this.dataBean.getAttributeValue("outputformat")
+                == null) {
+            return;
+        }
+        for (Node o : chainContainer.getChildren()) {
+            if (o instanceof VBox) {
+                VBox v = (VBox) o;
+                HBox hbox = (HBox) v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox
+                        && !validateChainContainerItem((ComboBox) cBox)) {
+                    System.out.println("invalid");
+                }
+            }
+        }
     }
 
     /**

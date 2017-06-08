@@ -51,6 +51,8 @@ public class ProcessingStepConfiguration {
     @XmlElement(name = "Parameter")
     private List<ConfigurationParameter> parameters;
 
+    private boolean compatible;
+
     public ProcessingStepConfiguration() {
         parameters = new ArrayList<>();
     }
@@ -60,6 +62,23 @@ public class ProcessingStepConfiguration {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Set compatible value.
+     * @param compatible New value
+     */
+    public void setCompatible(boolean compatible) {
+        this.compatible = compatible;
+    }
+
+    /**
+     * Return compatible value.
+     * @return compatible value. True if step is compatible to format,
+     * else false.
+     */
+    public boolean isCompatible() {
+        return this.compatible;
     }
 
     /**
