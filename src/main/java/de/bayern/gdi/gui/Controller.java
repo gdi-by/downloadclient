@@ -298,7 +298,7 @@ public class Controller {
             logPath.mkdirs();
 
             appLogFileHandler = new FileHandler(logPath.getAbsolutePath()
-                    + "/downloadclient_requests.txt",
+                    + "/downloadclient_app_log.txt",
                     MAX_APP_LOG_BYTES, 1, true);
             appLogFormatter = new AppLogFormatter();
             appLogFileHandler.setFormatter(appLogFormatter);
@@ -337,12 +337,19 @@ public class Controller {
      * @param msg Message to log
      */
     public static void logToAppLog(String msg) {
-        Platform.runLater(() -> {
+        try {
+            Platform.runLater(() -> {
+                if (!appLogInit) {
+                    initAppLog();
+                }
+                APP_LOG.info(msg);
+            });
+        } catch (Exception e) {
             if (!appLogInit) {
                 initAppLog();
             }
             APP_LOG.info(msg);
-        });
+        }
     }
 
     /**
@@ -1137,6 +1144,7 @@ public class Controller {
         String format = this.dataBean.getAttributeValue("outputformat");
         if (format == null || format.isEmpty()) {
             setStatusTextUI(I18n.getMsg("gui.process.no.format"));
+            logToAppLog(I18n.getMsg("gui.process.no.format"));
             return steps;
         }
 
@@ -1144,6 +1152,7 @@ public class Controller {
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
             setStatusTextUI(I18n.getMsg("gui.process.format.not.found"));
+            logToAppLog(I18n.getMsg("gui.process.format.not.found"));
             return steps;
         }
 
@@ -1159,6 +1168,8 @@ public class Controller {
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
                 setStatusTextUI(
                         I18n.format("gui.process.not.compatible", name));
+                        logToAppLog(I18n.format("gui.process.not.compatible",
+                                name));
                 continue;
             }
 
@@ -2022,8 +2033,9 @@ public class Controller {
      */
     public void setStatusTextUI(String msg) {
         String logText;
-        String regexAtom = I18n.format("atom.bytes.downloaded", "[\\d|\\.]+");
-        String regexWfs = I18n.format("file.download.bytes", "[\\d|\\.]+");
+        String regexAtom = I18n.format("atom.bytes.downloaded",
+                 "[\\d|\\.|\\,]+");
+        String regexWfs = I18n.format("file.download.bytes", "[\\d|\\.|\\,]+");
         //Filter atom/wfs download messages
         if (!logHistoryParent.getText().matches(regexAtom)
            && !logHistoryParent.getText().matches(regexWfs)) {
