@@ -63,9 +63,6 @@ public class FileDownloadJob extends AbstractDownloadJob {
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
 
-        FileResponseHandler responseHandler
-            = new FileResponseHandler(this.file, wrapFactory);
-
         CloseableHttpClient httpclient = getClient(url);
 
         String msg = I18n.format("download.file", url, this.file);
@@ -73,6 +70,9 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
         try {
             HttpGet httpget = getGetRequest(url);
+            FileResponseHandler responseHandler
+                    = new FileResponseHandler(this.file, wrapFactory, httpget);
+
             httpclient.execute(httpget, responseHandler);
         } catch (IOException ioe) {
             JobExecutionException jee =

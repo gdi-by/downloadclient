@@ -52,15 +52,25 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
+import java.util.logging.Formatter;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -83,8 +93,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -127,8 +139,15 @@ public class Controller {
     private static final int BBOX_Y1_INDEX = 1;
     private static final int BBOX_X2_INDEX = 2;
     private static final int BBOX_Y2_INDEX = 3;
+    private static final int MAX_APP_LOG_BYTES = 8096;
     private static final Logger log
             = Logger.getLogger(Controller.class.getName());
+    //Application log
+    private static final Logger APP_LOG = Logger.getLogger("Application Log");
+    private static boolean appLogInit = false;
+    private static FileHandler appLogFileHandler;
+    private static AppLogFormatter appLogFormatter;
+
     private static final String UNAVAILABLE_PREFIX = "N/A:";
     private CoordinateReferenceSystem atomCRS;
     // DataBean
@@ -161,7 +180,11 @@ public class Controller {
     @FXML
     private TextField servicePW;
     @FXML
-    private Label statusBarText;
+    private Label logHistory;
+    @FXML
+    private TitledPane logHistoryParent;
+    @FXML
+    private ScrollPane logHistoryPanel;
     @FXML
     private ComboBox<ItemModel> serviceTypeChooser;
     @FXML
@@ -264,6 +287,69 @@ public class Controller {
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
+    }
+
+    private static void initAppLog() {
+        try {
+            APP_LOG.setUseParentHandlers(false);
+            //Open file in append mode
+            File logPath = new File(System.getProperty("java.io.tmpdir")
+                    + "/downloadclient");
+            logPath.mkdirs();
+
+            appLogFileHandler = new FileHandler(logPath.getAbsolutePath()
+                    + "/downloadclient_app_log.txt",
+                    MAX_APP_LOG_BYTES, 1, true);
+            appLogFormatter = new AppLogFormatter();
+            appLogFileHandler.setFormatter(appLogFormatter);
+            APP_LOG.addHandler(appLogFileHandler);
+            appLogInit = true;
+        } catch (IOException ioex) {
+            log.log(Level.SEVERE, "Could not open application log file",
+                    ioex);
+        }
+    }
+
+    /**
+     * Initializes gui elements.
+     */
+    @FXML
+    protected void initialize() {
+        logHistoryParent.expandedProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue o, Object oldVal,
+                    Object newVal) {
+                boolean val = (boolean) newVal;
+                if (val) {
+                    logHistoryParent.getTooltip().setText(
+                            I18n.format("tooltip.log_history_expanded"));
+                } else {
+                    logHistoryParent.getTooltip().setText(
+                            I18n.format("tooltip.log_history_hidden"));
+                }
+            }
+        });
+    }
+
+    /**
+     * Logs a message to the application log.
+     *
+     * @param msg Message to log
+     */
+    public static void logToAppLog(String msg) {
+        try {
+            Platform.runLater(() -> {
+                if (!appLogInit) {
+                    initAppLog();
+                }
+                APP_LOG.info(msg);
+            });
+        } catch (Exception e) {
+            if (!appLogInit) {
+                initAppLog();
+            }
+            APP_LOG.info(msg);
+        }
     }
 
     /**
@@ -721,7 +807,7 @@ public class Controller {
     @FXML
     protected void handleSearch(KeyEvent event) {
         if (!catalogReachable) {
-            statusBarText.setText(I18n.getMsg("status.catalog-not-available"));
+            setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
         }
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
@@ -777,7 +863,7 @@ public class Controller {
             };
             Thread th = new Thread(task);
             if (catalogReachable) {
-                statusBarText.setText(I18n.getMsg("status.calling-service"));
+                setStatusTextUI(I18n.getMsg("status.calling-service"));
             }
             th.setDaemon(true);
             th.start();
@@ -1057,14 +1143,16 @@ public class Controller {
 
         String format = this.dataBean.getAttributeValue("outputformat");
         if (format == null || format.isEmpty()) {
-            statusBarText.setText(I18n.getMsg("gui.process.no.format"));
+            setStatusTextUI(I18n.getMsg("gui.process.no.format"));
+            logToAppLog(I18n.getMsg("gui.process.no.format"));
             return steps;
         }
 
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
-            statusBarText.setText(I18n.getMsg("gui.process.format.not.found"));
+            setStatusTextUI(I18n.getMsg("gui.process.format.not.found"));
+            logToAppLog(I18n.getMsg("gui.process.format.not.found"));
             return steps;
         }
 
@@ -1078,8 +1166,10 @@ public class Controller {
             String name = psc.getName();
 
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
-                statusBarText.setText(
+                setStatusTextUI(
                         I18n.format("gui.process.not.compatible", name));
+                        logToAppLog(I18n.format("gui.process.not.compatible",
+                                name));
                 continue;
             }
 
@@ -1294,7 +1384,7 @@ public class Controller {
         }
 
         if (!failed.equals("")) {
-            statusBarText.setText(
+            setStatusTextUI(
                     I18n.format("status.validation-fail", failed));
             return false;
         }
@@ -1340,7 +1430,7 @@ public class Controller {
                 Processor p = Processor.getInstance();
                 p.addJob(jl);
             } catch (ConverterException ce) {
-                statusBarText.setText(ce.getMessage());
+                setStatusTextUI(ce.getMessage());
             }
         }
     }
@@ -1556,7 +1646,7 @@ public class Controller {
             if (downloadConf != null) {
                 loadDownloadConfig(downloadConf);
             }
-            statusBarText.setText(I18n.getMsg("status.ready"));
+            setStatusTextUI(I18n.getMsg("status.ready"));
         });
         return;
 
@@ -1910,7 +2000,7 @@ public class Controller {
                 mapAtom.resizeSwingContent(newVal.doubleValue());
             });
         } else {
-            statusBarText.setText(I18n.format("status.wms-not-available"));
+            setStatusTextUI(I18n.format("status.wms-not-available"));
         }
         this.atomContainer.setVisible(false);
         this.progressSearch.setVisible(false);
@@ -1937,12 +2027,27 @@ public class Controller {
 
     /**
      * Set the text of the status bar in UI thread.
+     * Adds current message to log history.
      *
      * @param msg the text to set.
      */
     public void setStatusTextUI(String msg) {
+        String logText;
+        String regexAtom = I18n.format("atom.bytes.downloaded",
+                 "[\\d|\\.|\\,]+");
+        String regexWfs = I18n.format("file.download.bytes", "[\\d|\\.|\\,]+");
+        //Filter atom/wfs download messages
+        if (!logHistoryParent.getText().matches(regexAtom)
+           && !logHistoryParent.getText().matches(regexWfs)) {
+            logText = logHistoryParent.getText() + "\n"
+                    + logHistory.getText();
+        } else {
+            logText = logHistory.getText();
+        }
+
         Platform.runLater(() -> {
-            statusBarText.setText(msg);
+            logHistoryParent.setText(msg);
+            logHistory.setText(logText);
         });
     }
 
@@ -1963,7 +2068,7 @@ public class Controller {
 
                     if (polygonName != null && polygonID != null) {
                         if (polygonName.equals("#@#")) {
-                            statusBarText.setText(I18n.format(
+                            setStatusTextUI(I18n.format(
                                     "status.polygon-intersect",
                                     polygonID));
                             return;
@@ -2009,7 +2114,7 @@ public class Controller {
 
         @Override
         public void run() {
-            statusBarText.setText(getMessage());
+            setStatusTextUI(getMessage());
         }
 
         @Override
@@ -2025,6 +2130,28 @@ public class Controller {
         public void receivedMessage(ProcessorEvent pe) {
             setMessage(pe.getMessage());
             Platform.runLater(this);
+        }
+    }
+
+    /**
+     * Application log formatting.
+     */
+    private static class AppLogFormatter extends Formatter {
+        /**
+         * Formats log record.
+         *
+         * @return Formatted log entry
+         */
+        @Override
+        public String format(LogRecord record) {
+            LocalDateTime time = Instant.ofEpochMilli(record.getMillis())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+            return time.format(DateTimeFormatter
+                            .ofPattern("E, dd.MM.yyyy - kk:mm:ss"))
+                            + " "
+                            + record.getMessage()
+                            + System.lineSeparator();
         }
     }
 }

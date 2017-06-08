@@ -84,7 +84,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
         try {
             DocumentResponseHandler responseHandler
-                = new DocumentResponseHandler();
+                = new DocumentResponseHandler(httpget);
             responseHandler.setNamespaceAware(true);
 
             Document document = client.execute(httpget, responseHandler);
