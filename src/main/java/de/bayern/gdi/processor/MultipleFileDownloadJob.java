@@ -128,9 +128,13 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         int failed = 0;
         int numFiles = files.size();
 
+        broadcastMessage(I18n.format("file.download.start"));
         for (;;) {
             for (int i = 0; i < files.size();) {
                 DLFile file = files.get(i);
+                broadcastMessage(I18n.format(
+                        "download.file", file.url,
+                        file.file.getAbsolutePath()));
                 RemoteFileState rfs = downloadFile(file);
                 if (RemoteFileState.SUCCESS == rfs) {
                     files.remove(i);
