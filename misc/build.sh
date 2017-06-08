@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Actually exit on error
+set -e
+
 #Assuming we're still in the "misc" dir
 cd ..
 
