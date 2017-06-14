@@ -111,7 +111,7 @@ public class CellTypes {
                 return;
             }
             if (!item.isCompatible()) {
-               setTextFill(Color.RED);
+                setTextFill(Color.RED);
                 setStyle("-fx-font-weight: bold;");
             } else {
                 setTextFill(Color.BLACK);

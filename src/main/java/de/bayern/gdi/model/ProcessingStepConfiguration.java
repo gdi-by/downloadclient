@@ -55,6 +55,7 @@ public class ProcessingStepConfiguration {
 
     public ProcessingStepConfiguration() {
         parameters = new ArrayList<>();
+        compatible = true;
     }
 
     /**
