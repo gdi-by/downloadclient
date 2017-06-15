@@ -34,7 +34,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -58,7 +57,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         URL url;
         /** The number of tries yet. */
         int tries;
-        /** HTTP post parameters*/
+        /** HTTP post parameters.*/
         HttpEntity postParams;
 
         DLFile(File file, URL url) {
@@ -116,7 +115,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             httppost = new HttpPost(dlf.url.toString());
             httppost.setEntity(dlf.postParams);
         } else {
-            httpget= getGetRequest(dlf.url);
+            httpget = getGetRequest(dlf.url);
         }
 
         WrapInputStreamFactory wrapFactory

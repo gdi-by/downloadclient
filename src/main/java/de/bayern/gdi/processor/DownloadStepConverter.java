@@ -23,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -351,7 +350,7 @@ public class DownloadStepConverter {
                     this.user, this.password,
                     ent,
                     this.logger);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.log(e.getMessage());
             }
         } else {
@@ -419,16 +418,18 @@ public class DownloadStepConverter {
             ArrayList<NameValuePair> postparams) throws ConverterException {
         URL url = null;
         HttpEntity ent = null;
-        if ( postparams == null) {
+        if (postparams == null) {
             url = newURL(hitsURL(wfsURL));
         } else {
-            try{
+            try {
                 url = newURL(wfsURL);
                 ArrayList<NameValuePair> clone =
                         (ArrayList<NameValuePair>) postparams.clone();
                 clone.add(new BasicNameValuePair("resultType", "hits"));
                 ent = new UrlEncodedFormEntity(clone, "UTF8");
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                log.log(Level.INFO, e.getMessage());
+            }
         }
         Document hitsDoc = null;
         try {
@@ -475,7 +476,8 @@ public class DownloadStepConverter {
         if (wfs2) {
             params.add(new BasicNameValuePair("count", String.valueOf(count)));
         } else {
-            params.add(new BasicNameValuePair("maxFeatures",String.valueOf(count)));
+            params.add(new BasicNameValuePair("maxFeatures",
+                    String.valueOf(count)));
         }
         return params;
     }
@@ -584,10 +586,13 @@ public class DownloadStepConverter {
                 try {
                     URL wfs = new URL(wfsURL);
                     clone.addAll(pagedFeaturePostParams(ofs, fpp, wfs2));
-                    HttpEntity pagedEnt = new UrlEncodedFormEntity(clone, "UTF-8");
+                    HttpEntity pagedEnt =
+                            new UrlEncodedFormEntity(clone, "UTF-8");
                     fdj.add(file, wfs, pagedEnt);
 
-                } catch(Exception e) {}
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, e.getMessage());
+                }
             }
             if (isGML) {
                 gcj.add(file);

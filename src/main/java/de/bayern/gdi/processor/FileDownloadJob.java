@@ -88,14 +88,16 @@ public class FileDownloadJob extends AbstractDownloadJob {
             if (postParams == null) {
                 HttpGet httpget = getGetRequest(url);
                 FileResponseHandler responseHandler
-                        = new FileResponseHandler(this.file, wrapFactory, httpget);
+                        = new FileResponseHandler(
+                                this.file, wrapFactory, httpget);
 
                 httpclient.execute(httpget, responseHandler);
             } else {
                 HttpPost httppost = new HttpPost(url.toString());
                 httppost.setEntity(postParams);
                 FileResponseHandler responseHandler
-                        = new FileResponseHandler(this.file, wrapFactory, httppost);
+                        = new FileResponseHandler(
+                                this.file, wrapFactory, httppost);
 
                 httpclient.execute(httppost, responseHandler);
 

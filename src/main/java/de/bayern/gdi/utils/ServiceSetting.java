@@ -53,6 +53,8 @@ public class ServiceSetting {
     private List<Service> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
+    private Map<String, String> generalSettings;
+
     private static final String NAME =
             "ServiceSetting";
 
@@ -152,6 +154,15 @@ public class ServiceSetting {
         return this.wms.get("layer");
     }
 
+    /**
+     * Returns string value of a general settings item.
+     * @param name Name of the setting
+     * @return String value
+     */
+    public String getGeneralSetting(String name) {
+        return generalSettings.get(name);
+    }
+
     private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
@@ -161,6 +172,7 @@ public class ServiceSetting {
                 "layer",
                 "name",
                 "source");
+        this.generalSettings = parseNodeForElements(xmlDocument, "general");
     }
 
     /**
@@ -170,6 +182,27 @@ public class ServiceSetting {
     public static String getName() {
         return NAME;
     }
+
+    /**Parse Node by name, save all elements to map.*/
+    private Map<String, String> parseNodeForElements(Document doc,
+            String nodeName) throws IOException {
+        Node parent = doc.getElementsByTagName(nodeName).item(0);
+        if (parent == null) {
+            throw new IOException("Node " + nodeName + " not found");
+        }
+
+        Map<String, String> elements = new HashMap<String, String>();
+
+        NodeList childs = parent.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++) {
+            Node node = childs.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                elements.put(node.getNodeName(), node.getTextContent());
+            }
+        }
+        return elements;
+    }
+
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
