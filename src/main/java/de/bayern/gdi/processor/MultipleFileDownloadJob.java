@@ -30,9 +30,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 /** Abstract class to do multiple file downloads. */
 public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
@@ -54,10 +58,18 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         URL url;
         /** The number of tries yet. */
         int tries;
+        /** HTTP post parameters*/
+        HttpEntity postParams;
 
         DLFile(File file, URL url) {
+            this(file, url, null);
+        }
+
+        DLFile(File file, URL url,
+                HttpEntity postParams) {
             this.file = file;
             this.url = url;
+            this.postParams = postParams;
         }
     }
 
@@ -95,17 +107,37 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         log.log(Level.INFO, msg);
         this.currentCount = 0;
 
-        CloseableHttpClient client = getClient(dlf.url);
-        HttpGet httpget = getGetRequest(dlf.url);
+
+        boolean usePost = (dlf.postParams != null) ? true : false;
+
+        HttpGet httpget = null;
+        HttpPost httppost = null;
+        if (usePost) {
+            httppost = new HttpPost(dlf.url.toString());
+            httppost.setEntity(dlf.postParams);
+        } else {
+            httpget= getGetRequest(dlf.url);
+        }
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(this);
 
+        CloseableHttpClient client = null;
         try {
-            FileResponseHandler frh
-                = new FileResponseHandler(dlf.file, wrapFactory,
-                httpget);
-            client.execute(httpget, frh);
+            if (usePost) {
+                client = HttpClients.createDefault();
+                FileResponseHandler frh
+                    = new FileResponseHandler(dlf.file, wrapFactory,
+                    httppost);
+                client.execute(httppost, frh);
+
+            } else {
+                client = getClient(dlf.url);
+                FileResponseHandler frh
+                    = new FileResponseHandler(dlf.file, wrapFactory,
+                    httpget);
+                client.execute(httpget, frh);
+            }
 
             return RemoteFileState.SUCCESS;
         } catch (ClientProtocolException cpe) {

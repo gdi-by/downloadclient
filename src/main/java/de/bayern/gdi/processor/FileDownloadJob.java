@@ -21,7 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import de.bayern.gdi.utils.CountingInputStream;
@@ -36,19 +38,33 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     private String urlString;
     private File file;
+    private HttpEntity postParams;
 
     public FileDownloadJob() {
     }
 
     public FileDownloadJob(
-        String urlString,
-        File   file,
-        String user,
-        String password,
-        Log    logger) {
+            String urlString,
+            File   file,
+            String user,
+            String password,
+            Log    logger) {
         super(user, password, logger);
         this.urlString = urlString;
         this.file = file;
+    }
+
+    public FileDownloadJob(
+            String urlString,
+            File   file,
+            String user,
+            String password,
+            HttpEntity postParams,
+            Log    logger) {
+        super(user, password, logger);
+        this.urlString = urlString;
+        this.file = file;
+        this.postParams = postParams;
     }
 
     @Override
@@ -69,11 +85,21 @@ public class FileDownloadJob extends AbstractDownloadJob {
         broadcastMessage(msg);
 
         try {
-            HttpGet httpget = getGetRequest(url);
-            FileResponseHandler responseHandler
-                    = new FileResponseHandler(this.file, wrapFactory, httpget);
+            if (postParams == null) {
+                HttpGet httpget = getGetRequest(url);
+                FileResponseHandler responseHandler
+                        = new FileResponseHandler(this.file, wrapFactory, httpget);
 
-            httpclient.execute(httpget, responseHandler);
+                httpclient.execute(httpget, responseHandler);
+            } else {
+                HttpPost httppost = new HttpPost(url.toString());
+                httppost.setEntity(postParams);
+                FileResponseHandler responseHandler
+                        = new FileResponseHandler(this.file, wrapFactory, httppost);
+
+                httpclient.execute(httppost, responseHandler);
+
+            }
         } catch (IOException ioe) {
             JobExecutionException jee =
                 new JobExecutionException(

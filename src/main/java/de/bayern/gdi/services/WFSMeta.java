@@ -39,6 +39,8 @@ public class WFSMeta {
         public String name;
         /** get. */
         public String get;
+        /** post. */
+        public String post;
         /** output formats. */
         public List<String> outputFormats;
         /** constraints. */
@@ -59,8 +61,11 @@ public class WFSMeta {
 
         @Override
         public String toString() {
+            String postString = (post != null)
+                    ? " post: " + post + " " : "";
             return "operation: { name: " + name + " "
                 + " get: " + get + " "
+                + postString
                 + " constraints: " + constraints() + " "
                 + " output formats: " + outputFormats() + " }";
         }
