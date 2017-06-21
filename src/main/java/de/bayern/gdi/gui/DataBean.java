@@ -28,7 +28,7 @@ import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.ServiceSetting;
+import de.bayern.gdi.utils.ServiceSettings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public class DataBean extends Observable {
     public DataBean() throws IOException {
         this.namePwMap = new HashMap<>();
 
-        ServiceSetting serviceSetting = Config.getInstance().getServices();
+        ServiceSettings serviceSetting = Config.getInstance().getServices();
 
         this.staticServices = serviceSetting.getServices();
 

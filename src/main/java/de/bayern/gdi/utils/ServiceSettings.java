@@ -21,8 +21,6 @@ package de.bayern.gdi.utils;
 import de.bayern.gdi.services.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,53 +29,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class ServiceSetting {
+public class ServiceSettings {
 
     private static final Logger log
-        = Logger.getLogger(ServiceSetting.class.getName());
-
-    /** Name of the config file. */
-    public static final String SERVICE_SETTING_FILE =
-            "serviceSetting.xml";
+        = Logger.getLogger(ServiceSettings.class.getName());
 
     private List<Service> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
-    private Map<String, String> generalSettings;
 
     private static final String NAME =
             "ServiceSetting";
 
-    public ServiceSetting()
-            throws SAXException, ParserConfigurationException, IOException {
-        this(SERVICE_SETTING_FILE);
-    }
-
-    /**
-     * Constructor.
-     * @param filePath Path the the serviceSettings.xml
-     */
-    public ServiceSetting(String filePath)
-        throws SAXException, ParserConfigurationException, IOException {
-        this(XML.getDocument(getFileStream(filePath)));
-    }
-
-    public ServiceSetting(File file)
-        throws SAXException, ParserConfigurationException, IOException {
-        this(XML.getDocument(file));
-    }
-
-    public ServiceSetting(Document doc) throws IOException {
+    public ServiceSettings(Document doc) throws IOException {
         parseDocument(doc);
     }
 
@@ -154,14 +126,6 @@ public class ServiceSetting {
         return this.wms.get("layer");
     }
 
-    /**
-     * Returns string value of a general settings item.
-     * @param name Name of the setting
-     * @return String value
-     */
-    public String getGeneralSetting(String name) {
-        return generalSettings.get(name);
-    }
 
     private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
@@ -172,7 +136,6 @@ public class ServiceSetting {
                 "layer",
                 "name",
                 "source");
-        this.generalSettings = parseNodeForElements(xmlDocument, "general");
     }
 
     /**
@@ -316,10 +279,5 @@ public class ServiceSetting {
                     + "broken");
         }
         return servicesMap;
-    }
-
-    private static InputStream getFileStream(String fileName) {
-        InputStream stream = Misc.getResource(fileName);
-        return stream;
     }
 }

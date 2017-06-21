@@ -42,7 +42,7 @@ import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.ServiceSetting;
+import de.bayern.gdi.utils.ServiceSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -1956,7 +1956,7 @@ public class Controller {
         this.dataBean = dataBean;
         this.serviceList.setItems(this.dataBean.getServicesAsList());
 
-        ServiceSetting serviceSetting = Config.getInstance().getServices();
+        ServiceSettings serviceSetting = Config.getInstance().getServices();
         catalogReachable = dataBean.getCatalogService() != null
                 && ServiceChecker.isReachable(
                 dataBean.getCatalogService().getUrl());

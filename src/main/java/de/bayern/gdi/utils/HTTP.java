@@ -47,7 +47,7 @@ public final class HTTP {
 
     private static int timeout;
     private static final int DEFAULT_TIMEOUT = 10000;
-    private static final int MS_TO_S = 1000;
+    private static final int S_TO_MS = 1000;
 
     private static final Logger log
         = Logger.getLogger(HTTP.class.getName());
@@ -66,9 +66,11 @@ public final class HTTP {
         URL url, String user, String password
     ) {
         try {
-            ServiceSetting set = new ServiceSetting();
-            timeout = Integer.parseInt(set.getGeneralSetting("requestTimeout"));
-            timeout *= MS_TO_S;
+            ApplicationSettings set = Config.getInstance()
+                    .getApplicationSettings();
+            timeout = Integer.parseInt(
+                    set.getApplicationSetting("requestTimeout_s"));
+            timeout *= S_TO_MS;
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage());
             timeout = DEFAULT_TIMEOUT;
