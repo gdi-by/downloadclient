@@ -769,6 +769,7 @@ public class Controller {
                                 serviceURL.getScene()
                                         .setCursor(Cursor.DEFAULT);
                                 serviceURL.setDisable(false);
+                                validateChainContainerItems();
                             }
                         }
                     };
@@ -1038,6 +1039,7 @@ public class Controller {
                         ? source.getValue().toString()
                         : "",
                 "");
+        validateChainContainerItems();
     }
 
     /**
@@ -1047,7 +1049,9 @@ public class Controller {
      */
     @FXML
     protected void handleAddChainItem(ActionEvent event) {
-        factory.addChainAttribute(this.dataBean, chainContainer);
+        factory.addChainAttribute(this.dataBean, chainContainer,
+                ()->validateChainContainerItems());
+        validateChainContainerItems();
     }
 
     /**
@@ -1125,6 +1129,7 @@ public class Controller {
             this.dataBean.addAttribute("VARIATION", "", "");
             this.dataBean.addAttribute("outputformat", "", "");
         }
+        validateChainContainerItems();
     }
 
     private ArrayList<ProcessingStep> extractProcessingSteps() {
@@ -1451,6 +1456,7 @@ public class Controller {
         this.basicWFSX2Y2.setVisible(false);
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
+        resetProcessingChainContainer();
     }
 
     /**
@@ -2049,6 +2055,109 @@ public class Controller {
             logHistoryParent.setText(msg);
             logHistory.setText(logText);
         });
+    }
+
+    /**
+     * Resets all marks at the processing chain container, items are kept.
+     */
+    private void resetProcessingChainContainer() {
+        for (Node o : chainContainer.getChildren()) {
+            if (o instanceof VBox) {
+                VBox v = (VBox) o;
+                HBox hbox = (HBox) v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox) {
+                    cBox.setStyle("-fx-border-color: null");
+                    ComboBox box = (ComboBox) cBox;
+                    ObservableList<ProcessingStepConfiguration> confs =
+                        (ObservableList<ProcessingStepConfiguration>)
+                        box.getItems();
+                    for (ProcessingStepConfiguration cfgI : confs) {
+                        cfgI.setCompatible(true);
+                        confs.set(confs.indexOf(cfgI), cfgI);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Validates the chain items of a ComboBox
+     * and marks the box according to the chosen item.
+     *
+     * @param box Item to validate
+     * @return True if chosen item is valid, else false
+     */
+    private boolean validateChainContainer(ComboBox box) {
+        String format = this.dataBean.getAttributeValue("outputformat");
+        MIMETypes mtypes = Config.getInstance().getMimeTypes();
+        MIMEType mtype = mtypes.findByName(format);
+
+        ProcessingStepConfiguration cfg =
+                (ProcessingStepConfiguration) box.getValue();
+        ObservableList<ProcessingStepConfiguration> items =
+                (ObservableList<ProcessingStepConfiguration>) box.getItems();
+
+        if (mtype == null) {
+            box.setStyle("-fx-border-color: red;");
+            for (ProcessingStepConfiguration cfgI : items) {
+                cfgI.setCompatible(false);
+                //Workaround to force cell update
+                items.set(items.indexOf(cfgI), cfgI);
+            }
+            setStatusTextUI(I18n.format("gui.process.format.not.found"));
+            return false;
+        }
+
+        //Mark items that are incompatible
+        for (ProcessingStepConfiguration cfgI : items) {
+            cfgI.setCompatible(cfgI.isCompatibleWithFormat(mtype.getType()));
+            items.set(items.indexOf(cfgI), cfgI);
+        }
+
+        if (cfg == null) {
+            box.setStyle("-fx-border-color: null;");
+            return true;
+        }
+
+        if (cfg.isCompatible()) {
+            box.setStyle("-fx-border-color: null;");
+        } else {
+            box.setStyle("-fx-border-color: red;");
+            setStatusTextUI(I18n.format("gui.process.not.compatible",
+                    box.getValue()));
+        }
+        return cfg.isCompatible();
+    }
+
+    /**
+     * Validates all items in processing chain container.
+     */
+    private void validateChainContainerItems() {
+        //If there's no outputformat selected, return
+        if (this.dataBean.getAttributeValue("outputformat")
+                == null) {
+            resetProcessingChainContainer();
+            return;
+        }
+
+        boolean allValid = true;
+        for (Node o : chainContainer.getChildren()) {
+            if (o instanceof VBox) {
+                VBox v = (VBox) o;
+                HBox hbox = (HBox) v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox) {
+                    if (!validateChainContainer((ComboBox) cBox)) {
+                        allValid = false;
+                    }
+                }
+            }
+        }
+        //If all chain items were ready, set status to ready
+        if (allValid) {
+            setStatusTextUI(I18n.format("status.ready"));
+        }
     }
 
     /**
