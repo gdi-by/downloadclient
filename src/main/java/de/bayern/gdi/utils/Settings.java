@@ -37,7 +37,7 @@ public class Settings {
 
     /** Name of the config file. */
     public static final String SETTINGS_FILE =
-            "serviceSetting.xml";
+            "settings.xml";
 
     private static final String NAME =
             "Settings";
