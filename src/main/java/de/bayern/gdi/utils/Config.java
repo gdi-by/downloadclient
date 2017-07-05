@@ -185,7 +185,7 @@ public class Config {
             Holder.INSTANCE.settings = loadSettings(services);
         } else {
             Holder.INSTANCE.settings = loadSettings(null);
-            log.info("ServiceSettings config not found, using fallback...");
+            log.info("Settings config not found, using fallback...");
         }
 
         File procConfig = new File(
