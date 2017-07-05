@@ -21,8 +21,6 @@ package de.bayern.gdi.utils;
 import de.bayern.gdi.services.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,51 +29,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class ServiceSetting {
+public class ServiceSettings {
 
     private static final Logger log
-        = Logger.getLogger(ServiceSetting.class.getName());
-
-    /** Name of the config file. */
-    public static final String SERVICE_SETTING_FILE =
-            "serviceSetting.xml";
+        = Logger.getLogger(ServiceSettings.class.getName());
 
     private List<Service> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
+
     private static final String NAME =
             "ServiceSetting";
 
-    public ServiceSetting()
-            throws SAXException, ParserConfigurationException, IOException {
-        this(SERVICE_SETTING_FILE);
-    }
-
-    /**
-     * Constructor.
-     * @param filePath Path the the serviceSettings.xml
-     */
-    public ServiceSetting(String filePath)
-        throws SAXException, ParserConfigurationException, IOException {
-        this(XML.getDocument(getFileStream(filePath)));
-    }
-
-    public ServiceSetting(File file)
-        throws SAXException, ParserConfigurationException, IOException {
-        this(XML.getDocument(file));
-    }
-
-    public ServiceSetting(Document doc) throws IOException {
+    public ServiceSettings(Document doc) throws IOException {
         parseDocument(doc);
     }
 
@@ -152,6 +126,7 @@ public class ServiceSetting {
         return this.wms.get("layer");
     }
 
+
     private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
@@ -170,6 +145,27 @@ public class ServiceSetting {
     public static String getName() {
         return NAME;
     }
+
+    /**Parse Node by name, save all elements to map.*/
+    private Map<String, String> parseNodeForElements(Document doc,
+            String nodeName) throws IOException {
+        Node parent = doc.getElementsByTagName(nodeName).item(0);
+        if (parent == null) {
+            throw new IOException("Node " + nodeName + " not found");
+        }
+
+        Map<String, String> elements = new HashMap<String, String>();
+
+        NodeList childs = parent.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++) {
+            Node node = childs.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                elements.put(node.getNodeName(), node.getTextContent());
+            }
+        }
+        return elements;
+    }
+
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
@@ -283,10 +279,5 @@ public class ServiceSetting {
                     + "broken");
         }
         return servicesMap;
-    }
-
-    private static InputStream getFileStream(String fileName) {
-        InputStream stream = Misc.getResource(fileName);
-        return stream;
     }
 }

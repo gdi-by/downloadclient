@@ -21,6 +21,7 @@ package de.bayern.gdi.gui;
 
 import com.vividsolutions.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.HTTP;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -59,6 +60,9 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.ows.CRSEnvelope;
 import org.geotools.data.ows.HTTPClient;
@@ -95,6 +99,8 @@ import org.geotools.swing.action.ResetAction;
 import org.geotools.swing.action.ZoomInAction;
 import org.geotools.swing.action.ZoomOutAction;
 import org.geotools.swing.event.MapMouseEvent;
+import org.geotools.swing.event.MapPaneEvent;
+import org.geotools.swing.event.MapPaneListener;
 import org.geotools.swing.locale.LocaleUtils;
 import org.geotools.swing.tool.InfoToolHelper;
 import org.geotools.swing.tool.InfoToolResult;
@@ -121,6 +127,7 @@ public class WMSMapSwing extends Parent {
             = Logger.getLogger(WMSMapSwing.class.getName());
 
     private WebMapServer wms;
+    private WMSLayer wmslayer;
     private VBox vBox;
     private MapContent mapContent;
     private String title;
@@ -144,6 +151,7 @@ public class WMSMapSwing extends Parent {
     private CoordinateReferenceSystem displayCRS;
     private CoordinateReferenceSystem oldDisplayCRS;
     private CoordinateReferenceSystem mapCRS;
+    private WMSLayer displayLayer;
 
     private static final double TEN_PERCENT = 0.1D;
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
@@ -470,7 +478,8 @@ public class WMSMapSwing extends Parent {
         }
         wmsLayer.setBoundingBoxes(targetEnv);
 
-        WMSLayer displayLayer = new WMSLayer(this.wms, wmsLayer);
+        displayLayer = new WMSLayer(this.wms, wmsLayer);
+        this.wmslayer = displayLayer;
         this.mapContent.addLayer(displayLayer);
         setMapCRS(this
                 .mapContent
@@ -975,6 +984,27 @@ public class WMSMapSwing extends Parent {
                         mapPane.requestFocusInWindow();
                     }
                 });
+
+                //Add listener to log getMap requests after rendering
+                mapPane.addMapPaneListener(new MapPaneListener() {
+                    @Override
+                    public void onDisplayAreaChanged(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onNewMapContent(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onRenderingStarted(MapPaneEvent ev) { }
+
+                    @Override
+                    public void onRenderingStopped(MapPaneEvent ev) {
+                        String getMapUrl = wmslayer.getLastGetMap()
+                                .getFinalURL().toString();
+                        Controller.logToAppLog(checkGetMap(getMapUrl)
+                                + " " + getMapUrl);
+                    }
+
+                });
                 JToolBar toolBar = new JToolBar();
                 toolBar.setOrientation(JToolBar.HORIZONTAL);
                 toolBar.setFloatable(false);
@@ -1046,6 +1076,29 @@ public class WMSMapSwing extends Parent {
         Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
+    }
+
+    /**
+     * Checks status code of a getMap request, using a head request.
+     * Workaround to get geotools getMap request status codes.
+     * @param requestURL getMap URL
+     * @return Status string containing status code, reason phrase and method
+     */
+    private String checkGetMap(String requestURL) {
+        String result = "";
+        CloseableHttpClient client = null;
+        try {
+            client = HTTP.getClient(new URL(requestURL),
+                    null, null);
+            HttpHead head = new HttpHead(requestURL);
+            CloseableHttpResponse resp = client.execute(head);
+            result += resp.getStatusLine().getStatusCode() + " "
+                    + resp.getStatusLine().getReasonPhrase() + " "
+                    + "GET";
+        } finally {
+            HTTP.closeGraceful(client);
+            return result;
+        }
     }
 
     /**

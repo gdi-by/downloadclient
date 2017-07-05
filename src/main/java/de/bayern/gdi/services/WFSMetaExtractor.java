@@ -92,6 +92,9 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATION_GET
         = "ows:DCP/ows:HTTP/ows:Get/@xlink:href";
 
+    private static final String XPATH_OPERATION_POST
+        = "ows:DCP/ows:HTTP/ows:Post/@xlink:href";
+
     private static final String XPATH_OPERATIONS_VERSIONS
         = "//ows:OperationsMetadata"
         + "/ows:Parameter[@name='version']"
@@ -287,6 +290,11 @@ public class WFSMetaExtractor {
             operation.name = node.getAttribute("name");
             operation.get = XML.xpathString(
                 node, XPATH_OPERATION_GET, NAMESPACES);
+            String post = XML.xpathString(
+                node, XPATH_OPERATION_POST, NAMESPACES);
+            if (post != null) {
+                operation.post = post;
+            }
 
             NodeList outs = (NodeList)XML.xpath(
                 node, XPATH_OPERATION_OUT_FORMATS,

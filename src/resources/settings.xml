@@ -14,4 +14,7 @@
 		</service>
 	</wms>
 	<services></services>
+    <application>
+        <requestTimeout_s>35</requestTimeout_s>
+    </application>
 </settings>

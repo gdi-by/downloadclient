@@ -29,6 +29,10 @@ import java.util.logging.Logger;
 
 import javax.xml.xpath.XPathConstants;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
 
 import de.bayern.gdi.model.DownloadStep;
@@ -262,6 +266,55 @@ public class DownloadStepConverter {
         return sb.toString();
     }
 
+    private static ArrayList<NameValuePair>
+        createWFSPostParams(
+        DownloadStep dls,
+        Set<String>  usedVars,
+        WFSMeta      meta) {
+
+        String url = dls.getServiceURL();
+        String base = baseURL(url);
+
+        String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
+        String dataset = dls.getDataset();
+        String queryType = findQueryType(dls.getServiceType());
+
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("service", "wfs"));
+        params.add(new BasicNameValuePair("request", "GetFeature"));
+        params.add(new BasicNameValuePair("version", version));
+
+        if (queryType.equals("STOREDQUERY_ID")) {
+            params.add(new BasicNameValuePair("STOREDQUERY_ID",
+                    dataset));
+        } else {
+            params.add(new BasicNameValuePair("typeNames",
+                dataset));
+        }
+
+        int idx = dataset.indexOf(':');
+        if (idx >= 0) {
+            String prefix = dataset.substring(0, idx);
+            String ns = meta.namespaces.getNamespaceURI(prefix);
+            params.add(new BasicNameValuePair("namespaces", "xmlns("
+                + prefix + ','
+                + ns + ')'));
+        }
+
+        if (dls.getParameters().size() > 0) {
+            for (Parameter p: dls.getParameters()) {
+                if (p.getValue().isEmpty()
+                || usedVars.contains(p.getKey())) {
+                    continue;
+                }
+                params.add(new BasicNameValuePair(
+                        p.getKey(),
+                        p.getValue()));
+            }
+        }
+        return params;
+    }
+
     private void unpagedWFSDownload(
         JobList      jl,
         File         workingDir,
@@ -269,7 +322,17 @@ public class DownloadStepConverter {
         WFSMeta      meta
     ) throws ConverterException {
 
-        String url = wfsURL(dls, usedVars, meta);
+        boolean usePost = false;
+        WFSMeta.Operation getFeature = meta.findOperation("GetFeature");
+        if (getFeature.post != null) {
+            usePost = true;
+        }
+
+        String url = usePost ? getFeature.post : wfsURL(dls, usedVars, meta);
+        ArrayList<NameValuePair> params = null;
+        if (usePost) {
+            params = createWFSPostParams(dls, usedVars, meta);
+        }
         log.log(Level.INFO, "url: " + url);
 
         String ext = extension();
@@ -277,10 +340,25 @@ public class DownloadStepConverter {
         File gml = new File(workingDir, "download." + ext);
         log.info("Download to file \"" + gml + "\"");
 
-        FileDownloadJob fdj = new FileDownloadJob(
-            url, gml,
-            this.user, this.password,
-            this.logger);
+        FileDownloadJob fdj = null;
+        if (usePost) {
+            try {
+                HttpEntity ent =
+                new UrlEncodedFormEntity(params, "UTF-8");
+                fdj = new FileDownloadJob(
+                    url, gml,
+                    this.user, this.password,
+                    ent,
+                    this.logger);
+            } catch (Exception e) {
+                logger.log(e.getMessage());
+            }
+        } else {
+            fdj = new FileDownloadJob(
+                url, gml,
+                this.user, this.password,
+                this.logger);
+        }
 
         jl.addJob(fdj);
         if (ext.equals("gml")) {
@@ -336,11 +414,26 @@ public class DownloadStepConverter {
     private static final String XPATH_NUMBER_MATCHED
         = "/wfs:FeatureCollection/@numberMatched";
 
-    private int numFeatures(String wfsURL) throws ConverterException {
-        URL url = newURL(hitsURL(wfsURL));
+    private int numFeatures(String wfsURL,
+            ArrayList<NameValuePair> postparams) throws ConverterException {
+        URL url = null;
+        HttpEntity ent = null;
+        if (postparams == null) {
+            url = newURL(hitsURL(wfsURL));
+        } else {
+            try {
+                url = newURL(wfsURL);
+                ArrayList<NameValuePair> clone =
+                        (ArrayList<NameValuePair>) postparams.clone();
+                clone.add(new BasicNameValuePair("resultType", "hits"));
+                ent = new UrlEncodedFormEntity(clone, "UTF8");
+            } catch (Exception e) {
+                log.log(Level.INFO, e.getMessage());
+            }
+        }
         Document hitsDoc = null;
         try {
-            hitsDoc = XML.getDocument(url, user, password);
+            hitsDoc = XML.getDocument(url, user, password, ent);
         } catch (URISyntaxException | IOException e) {
             throw new ConverterException(e.getMessage());
         }
@@ -350,7 +443,6 @@ public class DownloadStepConverter {
         }
 
         checkServiceException(hitsDoc);
-
         String numberMatchedString = (String)XML.xpath(
             hitsDoc, XPATH_NUMBER_MATCHED,
             XPathConstants.STRING,
@@ -374,6 +466,20 @@ public class DownloadStepConverter {
             .append("&startIndex=").append(ofs)
             .append(wfs2 ? "&count=" : "&maxFeatures=").append(count);
         return newURL(sb.toString());
+    }
+
+    private ArrayList<BasicNameValuePair> pagedFeaturePostParams(
+            int ofs, int count, boolean wfs2) {
+        ArrayList<BasicNameValuePair> params =
+                new ArrayList<BasicNameValuePair>();
+        params.add(new BasicNameValuePair("startIndex", String.valueOf(ofs)));
+        if (wfs2) {
+            params.add(new BasicNameValuePair("count", String.valueOf(count)));
+        } else {
+            params.add(new BasicNameValuePair("maxFeatures",
+                    String.valueOf(count)));
+        }
+        return params;
     }
 
     private String extension() {
@@ -424,11 +530,29 @@ public class DownloadStepConverter {
             return;
         }
 
-        String wfsURL = wfsURL(dls, usedVars, meta);
-        int numFeatures = numFeatures(wfsURL);
+        boolean usePost = false;
+        String wfsURL;
+        ArrayList<NameValuePair> params = null;
+        HttpEntity ent = null;
+        int numFeatures;
+        if (getFeatureOp.post != null) {
+            usePost = true;
+            wfsURL = getFeatureOp.post;
+            params = createWFSPostParams(dls, usedVars, meta);
+            numFeatures = numFeatures(wfsURL, params);
+        } else {
+            wfsURL = wfsURL(dls, usedVars, meta);
+            numFeatures = numFeatures(wfsURL(dls, usedVars, meta), null);
+
+        }
 
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
+            try {
+                ent = new UrlEncodedFormEntity(params, "UTF-8");
+            } catch (Exception e) {
+                logger.log(e.getMessage());
+            }
             unpagedWFSDownload(jl, workingDir, usedVars, meta);
             return;
         }
@@ -454,7 +578,22 @@ public class DownloadStepConverter {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
             log.info("download to file: " + file);
-            fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
+            if (!usePost) {
+                fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
+            } else {
+                ArrayList<BasicNameValuePair> clone =
+                        (ArrayList<BasicNameValuePair>) params.clone();
+                try {
+                    URL wfs = new URL(wfsURL);
+                    clone.addAll(pagedFeaturePostParams(ofs, fpp, wfs2));
+                    HttpEntity pagedEnt =
+                            new UrlEncodedFormEntity(clone, "UTF-8");
+                    fdj.add(file, wfs, pagedEnt);
+
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, e.getMessage());
+                }
+            }
             if (isGML) {
                 gcj.add(file);
             }

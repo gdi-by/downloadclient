@@ -52,6 +52,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathVariableResolver;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
@@ -147,7 +148,6 @@ public class XML {
             throws URISyntaxException, IOException {
         return getDocument(url, null, null, nameSpaceaware);
     }
-
     /**
      * Gets an XML Document from a remote location.
      *
@@ -165,12 +165,43 @@ public class XML {
             String password,
             boolean nameSpaceAware)
             throws URISyntaxException, IOException {
+        return getDocument(url, userName, password, nameSpaceAware, null);
+    }
+    /**
+     * Gets an XML Document from a remote location.
+     *
+     * @param url            the URL
+     * @param userName       the Username {NULL if none needed}
+     * @param password       the Password {NULLL if none needed}
+     * @param nameSpaceAware if namespace aware or not
+     * @param postparams Post parameters, null if get shall be used
+     * @return an XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
+     */
+    public static Document getDocument(
+            URL url,
+            String userName,
+            String password,
+            boolean nameSpaceAware,
+            HttpEntity postparams)
+            throws URISyntaxException, IOException {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
-            HttpGet request = HTTP.getGetRequest(url);
-            DocumentResponseHandler handler = new DocumentResponseHandler();
-            handler.setNamespaceAware(nameSpaceAware);
-            return client.execute(request, handler);
+            if (postparams == null) {
+                HttpGet request = HTTP.getGetRequest(url);
+                DocumentResponseHandler handler
+                        = new DocumentResponseHandler(request);
+                handler.setNamespaceAware(nameSpaceAware);
+                return client.execute(request, handler);
+            } else {
+                HttpPost postreq = new HttpPost(url.toString());
+                postreq.setEntity(postparams);
+                DocumentResponseHandler handler
+                        = new DocumentResponseHandler(postreq);
+                handler.setNamespaceAware(nameSpaceAware);
+                return client.execute(postreq, handler);
+            }
         } finally {
             HTTP.closeGraceful(client);
         }
@@ -194,6 +225,25 @@ public class XML {
         return getDocument(url, userName, password, true);
     }
 
+    /**
+     * Gets an XML Document from a remote location.
+     *
+     * @param url      the URL
+     * @param userName the Username {NULL if none needed}
+     * @param password the Password {NULLL if none needed}
+     * @param postparams Post params if needed
+     * @return an XML Document
+     * @throws URISyntaxException if the url is wrong
+     * @throws IOException if something in io is wrong
+     */
+    public static Document getDocument(
+            URL url,
+            String userName,
+            String password,
+            HttpEntity postparams)
+            throws URISyntaxException, IOException {
+        return getDocument(url, userName, password, true, postparams);
+    }
     /**
      * Builds an XML Document from a String.
      *
@@ -230,9 +280,10 @@ public class XML {
             throws URISyntaxException, IOException {
         CloseableHttpClient client = HTTP.getClient(url, userName, password);
         try {
-            DocumentResponseHandler handler = new DocumentResponseHandler();
-            handler.setNamespaceAware(nameSpaceAware);
             HttpPost request = HTTP.getPostRequest(url);
+            DocumentResponseHandler handler =
+                    new DocumentResponseHandler(request);
+            handler.setNamespaceAware(nameSpaceAware);
             InputStream inputStream =
                     new ByteArrayInputStream(postXML.getBytes());
             InputStreamEntity inputStreamEntity = new InputStreamEntity(
