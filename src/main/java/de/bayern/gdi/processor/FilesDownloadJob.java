@@ -22,6 +22,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+
 import de.bayern.gdi.utils.Log;
 
 /** Download a list of URLs to given files. */
@@ -48,6 +50,15 @@ public class FilesDownloadJob extends MultipleFileDownloadJob {
      */
     public void add(File file, URL url) {
         this.files.add(new DLFile(file, url));
+    }
+
+    /** Downloads an URL to a file using post.
+     * @param file The file.
+     * @param url The URL.
+     * @param postParams Post params
+     */
+    public void add(File file, URL url, HttpEntity postParams) {
+        this.files.add(new DLFile(file, url, postParams));
     }
 
     @Override

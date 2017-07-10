@@ -41,6 +41,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -49,6 +51,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.util.Callback;
 
 /**
  * @author Raimund Renkert (raimund.renkert@intevation.de)
@@ -201,10 +204,32 @@ public class UIFactory {
      * @param container The container
      */
     public void addChainAttribute(DataBean dataBean, VBox container) {
+        addChainAttribute(dataBean, container, null);
+    }
+
+    /**
+     * Add new post process chain item.
+     *
+     * @param dataBean The databean
+     * @param container The container
+     * @param onChange A function called if the ComboBox value changed
+     */
+    public void addChainAttribute(DataBean dataBean, VBox container,
+            Runnable onChange) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();
         ComboBox box = new ComboBox();
+
+        box.setCellFactory(new Callback <ListView<ProcessingStepConfiguration>,
+                ListCell<ProcessingStepConfiguration>>() {
+            @Override
+            public ListCell<ProcessingStepConfiguration> call(
+                    ListView<ProcessingStepConfiguration> list) {
+                return new CellTypes.ProcessCfgCell();
+            }
+        });
+
         ProcessingConfiguration config =
             Config.getInstance().getProcessingConfig();
         List<ProcessingStepConfiguration> steps = config.getProcessingSteps();
@@ -218,6 +243,9 @@ public class UIFactory {
                     (ProcessingStepConfiguration)box.getValue(),
                     dynroot,
                     config);
+                if (onChange != null) {
+                    onChange.run();
+                }
             }
         });
         Button remove = new Button(I18n.getMsg("gui.remove"));

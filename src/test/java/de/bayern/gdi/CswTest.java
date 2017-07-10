@@ -18,6 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.services.CatalogService;
+import de.bayern.gdi.utils.Config;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -54,8 +55,9 @@ public class CswTest extends TestCase {
 
     @Before
     @Override
-    public void setUp() {
+    public void setUp() throws IOException {
         initJadler();
+        Config.initialize(null);
     }
 
     @After

@@ -43,7 +43,7 @@ public class Config {
 
     private boolean initialized;
 
-    private ServiceSetting services;
+    private Settings settings;
 
     private MIMETypes mimeTypes;
 
@@ -74,10 +74,17 @@ public class Config {
     }
 
     /**
+     * @return The application Settings
+     */
+    public ApplicationSettings getApplicationSettings() {
+        return settings.getApplicationSettings();
+    }
+
+    /**
      * @return the services
      */
-    public ServiceSetting getServices() {
-        return services;
+    public ServiceSettings getServices() {
+        return settings.getServiceSettings();
     }
 
     /**
@@ -101,18 +108,18 @@ public class Config {
         return proxyConfig;
     }
 
-    private static ServiceSetting loadServiceSettings(File file)
+    private static Settings loadSettings(File file)
         throws IOException {
         try {
             if (file != null && file.isFile() && file.canRead()) {
-                return new ServiceSetting(file);
+                return new Settings(file);
             }
-            return new ServiceSetting();
+            return new Settings();
         } catch (SAXException
                 | ParserConfigurationException
                 | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
-            throwConfigFailureException(ServiceSetting.getName());
+            throwConfigFailureException(Settings.getName());
         }
         // Not reached.
         return null;
@@ -127,7 +134,7 @@ public class Config {
         synchronized (Holder.INSTANCE) {
             log.info("No config directory given, starting with standard "
                     + "values...");
-            Holder.INSTANCE.services = loadServiceSettings(null);
+            Holder.INSTANCE.settings = loadSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
@@ -173,12 +180,12 @@ public class Config {
             log.info("No Proxy config found, starting without proxy.");
         }
 
-        File services = new File(dir, ServiceSetting.SERVICE_SETTING_FILE);
+        File services = new File(dir, Settings.SETTINGS_FILE);
         if (services.isFile() && services.canRead()) {
-            Holder.INSTANCE.services = loadServiceSettings(services);
+            Holder.INSTANCE.settings = loadSettings(services);
         } else {
-            Holder.INSTANCE.services = loadServiceSettings(null);
-            log.info("ServiceSettings config not found, using fallback...");
+            Holder.INSTANCE.settings = loadSettings(null);
+            log.info("Settings config not found, using fallback...");
         }
 
         File procConfig = new File(

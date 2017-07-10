@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Actually exit on error
+set -e
+
 #Assuming we're still in the "misc" dir
 cd ..
 
@@ -20,7 +23,7 @@ mkdir build/config
 
 echo ''
 echo 'Copying config from resources to config folder'
-cp src/resources/serviceSetting.xml build/config
+cp src/resources/settings.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
 cp src/resources/de/bayern/gdi/model/proxy.xml.sample build/config

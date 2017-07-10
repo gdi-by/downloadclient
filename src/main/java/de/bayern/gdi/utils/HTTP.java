@@ -45,7 +45,9 @@ import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 /** Helper for HTTP. */
 public final class HTTP {
 
-    private static final int TIMEOUT = 10 * 1000; //s * ms
+    private static int timeout;
+    private static final int DEFAULT_TIMEOUT = 10000;
+    private static final int S_TO_MS = 1000;
 
     private static final Logger log
         = Logger.getLogger(HTTP.class.getName());
@@ -63,13 +65,23 @@ public final class HTTP {
     public static CloseableHttpClient getClient(
         URL url, String user, String password
     ) {
+        try {
+            ApplicationSettings set = Config.getInstance()
+                    .getApplicationSettings();
+            timeout = Integer.parseInt(
+                    set.getApplicationSetting("requestTimeout_s"));
+            timeout *= S_TO_MS;
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage());
+            timeout = DEFAULT_TIMEOUT;
+        }
         // Use JVM proxy settings.
         SystemDefaultRoutePlanner routePlanner
             = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
 
         RequestConfig requestConfig = RequestConfig.
                 custom().
-                setSocketTimeout(TIMEOUT).build();
+                setSocketTimeout(timeout).build();
         HttpClientBuilder builder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig);
         builder.setRetryHandler(new StandardHttpRequestRetryHandler(1, true));
