@@ -405,8 +405,8 @@ private static String createWFSPostParams(
             if (bboxArr.length == FIVE) {
                 xmlStart += " <fes:Filter> <fes:BBOX> "
                         //TODO: Example def does not work:
-                        + "<fes:ValueReference>bvv:geometry"
-                        + "</fes:ValueReference> "
+                        //+ "<fes:ValueReference>bvv:geometry"
+                        //+ "</fes:ValueReference> "
                         + "<gml:Envelope srsName=\"" + bboxArr[FOUR] + "\">"
                         + "<gml:lowerCorner>" + bboxArr[0] + " "
                         + bboxArr[1] + "</gml:lowerCorner>"
