@@ -196,6 +196,7 @@ public class XML {
                 return client.execute(request, handler);
             } else {
                 HttpPost postreq = new HttpPost(url.toString());
+                postreq.setHeader("Content-Type", "application/xml");
                 postreq.setEntity(postparams);
                 DocumentResponseHandler handler
                         = new DocumentResponseHandler(postreq);

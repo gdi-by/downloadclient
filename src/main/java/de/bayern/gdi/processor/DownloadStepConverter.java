@@ -31,7 +31,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
 
@@ -52,6 +52,10 @@ public class DownloadStepConverter {
 
     private static final Logger log
         = Logger.getLogger(FileDownloadJob.class.getName());
+
+    private static final int THREE = 3;
+    private static final int FOUR = 4;
+    private static final int FIVE = 5;
 
     private static final String[][] SERVICE2TYPE = {
         {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
@@ -265,40 +269,69 @@ public class DownloadStepConverter {
 
         return sb.toString();
     }
+private static String createWFSPostParams(
+        DownloadStep dls,
+        Set<String> usedVars,
+        WFSMeta meta) {
+    return createWFSPostParams(dls, usedVars, meta, false, -1, -1, false);
+}
+private static String createWFSPostParams(
+        DownloadStep dls,
+        Set<String> usedVars,
+        WFSMeta meta,
+        int ofs,
+        int count,
+        boolean wfs2) {
+    return createWFSPostParams(dls, usedVars, meta, false, ofs, count, wfs2);
+}
 
-    private static ArrayList<NameValuePair>
-        createWFSPostParams(
+private static String createWFSPostParams(
+        DownloadStep dls,
+        Set<String> usedVars,
+        WFSMeta meta,
+        boolean hits) {
+    return createWFSPostParams(dls, usedVars, meta, hits, -1, -1, false);
+}
+
+private static String createWFSPostParams(
         DownloadStep dls,
         Set<String>  usedVars,
-        WFSMeta      meta) {
+        WFSMeta      meta,
+        boolean      hits,
+        int          ofs,
+        int          count,
+        boolean      wfs2) {
 
         String url = dls.getServiceURL();
         String base = baseURL(url);
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
         String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
+        String outputFormat = "";
+        String srsName = "";
+        String typenames = "";
+        String namespaces = "";
+        String storedQueryId = "";
+        String bbox = "";
 
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("service", "wfs"));
-        params.add(new BasicNameValuePair("request", "GetFeature"));
-        params.add(new BasicNameValuePair("version", version));
 
+        boolean storedQuery = false;
         if (queryType.equals("STOREDQUERY_ID")) {
-            params.add(new BasicNameValuePair("STOREDQUERY_ID",
-                    dataset));
+            storedQueryId = dataset;
+            storedQuery = true;
         } else {
-            params.add(new BasicNameValuePair("typeNames",
-                dataset));
+            storedQuery = false;
+            typenames = dataset;
         }
 
         int idx = dataset.indexOf(':');
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
             String ns = meta.namespaces.getNamespaceURI(prefix);
-            params.add(new BasicNameValuePair("namespaces", "xmlns("
-                + prefix + ','
-                + ns + ')'));
+            namespaces = ns;
         }
 
         if (dls.getParameters().size() > 0) {
@@ -307,12 +340,83 @@ public class DownloadStepConverter {
                 || usedVars.contains(p.getKey())) {
                     continue;
                 }
-                params.add(new BasicNameValuePair(
-                        p.getKey(),
-                        p.getValue()));
+                switch (p.getKey()) {
+                    case "outputformat":
+                        outputFormat = p.getValue();
+                        break;
+                    case "srsName":
+                        srsName = p.getValue();
+                        break;
+                    case "bbox":
+                        bbox = p.getValue();
+                        break;
+                    default:
+                        params.add(new BasicNameValuePair(
+                                p.getKey(),
+                                p.getValue()));
+                        break;
+                }
             }
         }
-        return params;
+
+        String xmlStart = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        String xmlEnd = "";
+
+        xmlStart += "<wfs:GetFeature "
+                + " service=\"WFS\" "
+                + " version=\"" + version + "\" "
+                + " outputFormat=\"" + outputFormat + "\" ";
+        if (hits) {
+            xmlStart += "resultType=\"hits\" ";
+        }
+        if (ofs != -1) {
+            xmlStart += "startIndex=\"" + String.valueOf(ofs) + "\" ";
+            if (wfs2) {
+                xmlStart += "count=\"" + String.valueOf(count) + "\" ";
+            } else {
+                xmlStart += "maxFeatures=\"" + String.valueOf(count) + "\" ";
+            }
+        }
+        xmlStart += "xmlns:wfs=\"http://www.opengis.net/wfs/2.0\" "
+                + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" "
+                + "xmlns:fes=\"http://www.opengis.net/fes/2.0\" "
+                + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"http://www.opengis.net/wfs/2.0 "
+                + "http://schemas.opengis.net/wfs/2.0/wfs.xsd "
+                + "http://www.opengis.net/gml/3.2 "
+                + "http://schemas.opengis.net/gml/3.2.1/gml.xsd\" "
+                + ">";
+        xmlEnd = "</wfs:GetFeature>" + xmlEnd;
+
+        if (storedQuery) {
+            xmlStart += "<wfs:StoredQuery id =\"" + storedQueryId + "\">";
+            xmlEnd = "</wfs:StoredQuery>" + xmlEnd;
+            for (NameValuePair p: params) {
+                xmlStart += "<wfs:Parameter name=\"" + p.getName() + "\">"
+                         + p.getValue()
+                         + "</wfs:Parameter>";
+            }
+        } else {
+            xmlStart += "<wfs:Query typeNames=\"" + typenames
+                     + "\" xmlns:bvv=\"" + namespaces
+                     + "\" srsName=\"" + srsName + "\">";
+            xmlEnd = "</wfs:Query>" + xmlEnd;
+            String[] bboxArr = bbox.split(",");
+            if (bboxArr.length == FIVE) {
+                xmlStart += " <fes:Filter> <fes:BBOX> "
+                        //TODO: Example def does not work:
+                        + "<fes:ValueReference>bvv:geometry"
+                        + "</fes:ValueReference> "
+                        + "<gml:Envelope srsName=\"" + bboxArr[FOUR] + "\">"
+                        + "<gml:lowerCorner>" + bboxArr[0] + " "
+                        + bboxArr[1] + "</gml:lowerCorner>"
+                        + "<gml:upperCorner>" + bboxArr[2] + " "
+                        + bboxArr[THREE] + "</gml:upperCorner>"
+                        + "</gml:Envelope> </fes:BBOX> </fes:Filter>";
+            }
+        }
+        xmlString = xmlStart + xmlEnd;
+        return xmlString;
     }
 
     private void unpagedWFSDownload(
@@ -329,7 +433,7 @@ public class DownloadStepConverter {
         }
 
         String url = usePost ? getFeature.post : wfsURL(dls, usedVars, meta);
-        ArrayList<NameValuePair> params = null;
+        String params = null;
         if (usePost) {
             params = createWFSPostParams(dls, usedVars, meta);
         }
@@ -344,7 +448,7 @@ public class DownloadStepConverter {
         if (usePost) {
             try {
                 HttpEntity ent =
-                new UrlEncodedFormEntity(params, "UTF-8");
+                new StringEntity(params);
                 fdj = new FileDownloadJob(
                     url, gml,
                     this.user, this.password,
@@ -415,7 +519,7 @@ public class DownloadStepConverter {
         = "/wfs:FeatureCollection/@numberMatched";
 
     private int numFeatures(String wfsURL,
-            ArrayList<NameValuePair> postparams) throws ConverterException {
+            String postparams) throws ConverterException {
         URL url = null;
         HttpEntity ent = null;
         if (postparams == null) {
@@ -423,10 +527,7 @@ public class DownloadStepConverter {
         } else {
             try {
                 url = newURL(wfsURL);
-                ArrayList<NameValuePair> clone =
-                        (ArrayList<NameValuePair>) postparams.clone();
-                clone.add(new BasicNameValuePair("resultType", "hits"));
-                ent = new UrlEncodedFormEntity(clone, "UTF8");
+                ent = new StringEntity(postparams);
             } catch (Exception e) {
                 log.log(Level.INFO, e.getMessage());
             }
@@ -532,13 +633,13 @@ public class DownloadStepConverter {
 
         boolean usePost = false;
         String wfsURL;
-        ArrayList<NameValuePair> params = null;
+        String params = null;
         HttpEntity ent = null;
         int numFeatures;
         if (getFeatureOp.post != null) {
             usePost = true;
             wfsURL = getFeatureOp.post;
-            params = createWFSPostParams(dls, usedVars, meta);
+            params = createWFSPostParams(dls, usedVars, meta, true);
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
@@ -549,7 +650,7 @@ public class DownloadStepConverter {
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
             try {
-                ent = new UrlEncodedFormEntity(params, "UTF-8");
+                ent = new StringEntity(params);
             } catch (Exception e) {
                 logger.log(e.getMessage());
             }
@@ -581,13 +682,12 @@ public class DownloadStepConverter {
             if (!usePost) {
                 fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             } else {
-                ArrayList<BasicNameValuePair> clone =
-                        (ArrayList<BasicNameValuePair>) params.clone();
                 try {
                     URL wfs = new URL(wfsURL);
-                    clone.addAll(pagedFeaturePostParams(ofs, fpp, wfs2));
+                    String pagedParams = createWFSPostParams(
+                            dls, usedVars, meta, ofs, fpp, wfs2);
                     HttpEntity pagedEnt =
-                            new UrlEncodedFormEntity(clone, "UTF-8");
+                            new StringEntity(pagedParams, "UTF-8");
                     fdj.add(file, wfs, pagedEnt);
 
                 } catch (Exception e) {
