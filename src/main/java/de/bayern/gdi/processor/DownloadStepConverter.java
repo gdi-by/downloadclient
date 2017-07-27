@@ -269,31 +269,32 @@ public class DownloadStepConverter {
 
         return sb.toString();
     }
-private static String createWFSPostParams(
+    private static String createWFSPostParams(
         DownloadStep dls,
         Set<String> usedVars,
         WFSMeta meta) {
-    return createWFSPostParams(dls, usedVars, meta, false, -1, -1, false);
-}
-private static String createWFSPostParams(
+        return createWFSPostParams(dls, usedVars, meta, false, -1, -1, false);
+    }
+    private static String createWFSPostParams(
         DownloadStep dls,
         Set<String> usedVars,
         WFSMeta meta,
         int ofs,
         int count,
         boolean wfs2) {
-    return createWFSPostParams(dls, usedVars, meta, false, ofs, count, wfs2);
-}
+        return createWFSPostParams(dls, usedVars, meta,
+                false, ofs, count, wfs2);
+    }
 
-private static String createWFSPostParams(
+    private static String createWFSPostParams(
         DownloadStep dls,
         Set<String> usedVars,
         WFSMeta meta,
         boolean hits) {
-    return createWFSPostParams(dls, usedVars, meta, hits, -1, -1, false);
-}
+        return createWFSPostParams(dls, usedVars, meta, hits, -1, -1, false);
+    }
 
-private static String createWFSPostParams(
+    private static String createWFSPostParams(
         DownloadStep dls,
         Set<String>  usedVars,
         WFSMeta      meta,
@@ -404,9 +405,6 @@ private static String createWFSPostParams(
             String[] bboxArr = bbox.split(",");
             if (bboxArr.length == FIVE) {
                 xmlStart += " <fes:Filter> <fes:BBOX> "
-                        //TODO: Example def does not work:
-                        //+ "<fes:ValueReference>bvv:geometry"
-                        //+ "</fes:ValueReference> "
                         + "<gml:Envelope srsName=\"" + bboxArr[FOUR] + "\">"
                         + "<gml:lowerCorner>" + bboxArr[0] + " "
                         + bboxArr[1] + "</gml:lowerCorner>"
