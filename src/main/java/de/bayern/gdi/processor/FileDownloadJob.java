@@ -94,6 +94,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
                 httpclient.execute(httpget, responseHandler);
             } else {
                 HttpPost httppost = new HttpPost(url.toString());
+                httppost.setHeader("Content-Type", "application/xml");
                 httppost.setEntity(postParams);
                 FileResponseHandler responseHandler
                         = new FileResponseHandler(
