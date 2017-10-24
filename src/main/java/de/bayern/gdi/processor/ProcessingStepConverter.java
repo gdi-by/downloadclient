@@ -119,10 +119,9 @@ public class ProcessingStepConverter {
                 }
                 String[] parts = StringUtils.splitCommandLine(value);
 
+                ArrayList<Arg> row = new ArrayList<>();
+
                 for (String part: parts) {
-
-                    ArrayList<Arg> row = new ArrayList<>();
-
                     String[] atoms = StringUtils.split(
                         part, ConfigurationParameter.VARS_RE, true);
 
@@ -148,9 +147,8 @@ public class ProcessingStepConverter {
                         usedVars.add(var);
                         row.add(new Arg(val));
                     } // for all atoms
-
-                    params.addAll(row);
                 }
+                params.addAll(row);
             } // for all config parameters.
 
             ExternalProcessJob epj = new ExternalProcessJob(
