@@ -813,7 +813,7 @@ public class Controller {
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
         dataBean.resetCatalogLists();
-        if ("".equals(currentText) || currentText == null) {
+        if (currentText == null || currentText.isEmpty()) {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
 
