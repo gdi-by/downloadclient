@@ -30,7 +30,7 @@ import java.util.Date;
  */
 public class Log {
 
-    private static final SimpleDateFormat DF_FORMAT
+    private final SimpleDateFormat dateFormat
         = new SimpleDateFormat("yyyy-MM-dd-HH-mm:ss");
 
     private File file;
@@ -62,7 +62,7 @@ public class Log {
     public synchronized void log(String msg) {
         if (this.out != null) {
             Date now = new Date();
-            out.format("%s: %s", DF_FORMAT.format(now), msg);
+            out.format("%s: %s", dateFormat.format(now), msg);
             out.println();
         }
     }

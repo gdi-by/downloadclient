@@ -31,8 +31,7 @@ import java.util.logging.Logger;
 /** Misc helper functions. */
 public final class Misc {
 
-    private static final SimpleDateFormat DF_FORMAT
-        = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static final String DF_PATTERN = "yyyyMMddHHmmss";
 
     /** Number of tries before giving up searching for collisions. */
     private static final int MAX_TRIES = 5000;
@@ -73,12 +72,14 @@ public final class Misc {
 
         Date now = new Date();
 
-        String dir = prefix + DF_FORMAT.format(now);
+        SimpleDateFormat formatter = new SimpleDateFormat(DF_PATTERN);
+
+        String dir = prefix + formatter.format(now);
         File path = new File(parent, dir);
         int count = 0;
         while (count < MAX_TRIES && path.exists()) {
             ++count;
-            dir = prefix + DF_FORMAT.format(now) + "-" + count;
+            dir = prefix + formatter.format(now) + "-" + count;
             path = new File(parent, dir);
         }
 
@@ -103,13 +104,15 @@ public final class Misc {
     ) {
         Date now = new Date();
 
-        String f = prefix + DF_FORMAT.format(now) + "." + ext;
+        SimpleDateFormat formatter = new SimpleDateFormat(DF_PATTERN);
+
+        String f = prefix + formatter.format(now) + "." + ext;
         File path = new File(parent, f);
         int count = 0;
         while (count < MAX_TRIES
         && (path.exists() || (tmpFiles != null && tmpFiles.contains(path)))) {
             ++count;
-            f = prefix + DF_FORMAT.format(now) + "-" + count + "." + ext;
+            f = prefix + formatter.format(now) + "-" + count + "." + ext;
             path = new File(parent, f);
         }
 
