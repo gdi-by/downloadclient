@@ -224,7 +224,7 @@ public class ServiceChecker {
                 String downloadURLStr = (String) XML.xpath(entryDoc,
                         downloadURLExpr,
                         XPathConstants.STRING);
-                if (describedBy == null) {
+                if (downloadURLStr == null) {
                     return false;
                 }
                 URL downloadURL = HTTP.buildAbsoluteURL(url, downloadURLStr);
