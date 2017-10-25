@@ -354,11 +354,11 @@ public class CatalogService {
                     applicationprofileExpr,
                     XPathConstants.STRING, context);
             applicationProfile = applicationProfile.toLowerCase();
+
             if (applicationProfile.equals("wfs-url")
-                    || applicationProfile.equals("feed-url")) {
-                return onLineserviceURL;
-            } else if (applicationProfile.equals("dienste-url")
-                    || applicationProfile.equals("download")) {
+            || applicationProfile.equals("feed-url")
+            || applicationProfile.equals("dienste-url")
+            || applicationProfile.equals("download")) {
                 return onLineserviceURL;
             }
         }
