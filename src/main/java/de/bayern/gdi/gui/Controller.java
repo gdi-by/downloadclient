@@ -1730,6 +1730,7 @@ public class Controller {
                     Platform.runLater(() -> {
                         mapAtom.repaint();
                     });
+                    break;
                 default:
             }
         }

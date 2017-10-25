@@ -39,7 +39,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -183,8 +182,6 @@ public class WMSMapSwing extends Parent {
     private static final Float OUTLINE_WIDTH = 0.3f;
     private static final Float FILL_TRANSPARACY = 0.4f;
     private static final Float STROKY_TRANSPARACY = 0.8f;
-    private String selectedPolygonName;
-    private String selectedPolygonID;
     private GeometryDescriptor geomDesc;
     private String geometryAttributeName;
     private String source;
@@ -234,7 +231,6 @@ public class WMSMapSwing extends Parent {
     private static void initGeotoolsLocale() {
         LocaleUtils.setLocale(I18n.getLocale());
         //the next line for testing needs an additional import java.util.Locale;
-        //LocaleUtils.setLocale(Locale.ITALIAN);
     }
 
     /**
@@ -387,8 +383,6 @@ public class WMSMapSwing extends Parent {
             this.mapContent.setTitle(this.title);
             this.mapNode = new SwingNode();
             this.mapNode.setManaged(false);
-            //this.add(this.layerLabel);
-            //this.add(this.wmsLayers);
             this.add(this.mapNode);
             this.getChildren().add(vBox);
             displayMap(baseLayer);
@@ -695,7 +689,6 @@ public class WMSMapSwing extends Parent {
                 private Point end;
                 private DirectPosition2D mapStartPos;
                 private DirectPosition2D mapEndPos;
-                private WeakHashMap<Layer, InfoToolHelper> helperTable;
 
 
                 @Override
@@ -735,8 +728,6 @@ public class WMSMapSwing extends Parent {
                     } else {
                         DirectPosition2D pos = ev.getWorldPos();
                         MapContent content = mapPane.getMapContent();
-                        final int nlayers = content.layers().size();
-                        helperTable = new WeakHashMap<>();
                         for (org.geotools.map.Layer layer : content.layers()) {
                             if (layer.isSelected()) {
                                 InfoToolHelper helper = null;
@@ -785,7 +776,6 @@ public class WMSMapSwing extends Parent {
                                                             "name");
                                             String id = (String)
                                                     featureData.get("id");
-                                            //highlightSelectedPolygon(id);
                                             setNameAndId(name, id);
                                         } else if (numFeatures > 1) {
                                             //Yup, this is dirty.
@@ -1262,7 +1252,6 @@ public class WMSMapSwing extends Parent {
                     && !x2.toString().equals("")
                     && !y1.toString().equals("")
                     && !y2.toString().equals("")) {
-                //System.out.println("TextFields not empty");
                 Double x1Coordinate = Double.parseDouble(
                         x1.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
