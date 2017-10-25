@@ -118,7 +118,7 @@ public class CellTypes {
                 setStyle("-fx-font-weight: normal;");
             }
 
-            setText(item == null ? "" : item.toString());
+            setText(item.toString());
         }
     }
 }
