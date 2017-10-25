@@ -46,7 +46,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     /** Number to re-tries for a failed download. */
     protected static final int MAX_TRIES = 5;
     /** Pause after failed downloads. */
-    protected static final long FAIL_SLEEP = 30 * 1000;
+    protected static final long FAIL_SLEEP = 30L * 1000L;
 
     /** Stores a file location to down from and to. */
     protected static class DLFile {
