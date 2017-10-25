@@ -817,15 +817,16 @@ public class Controller {
             this.serviceList.setItems(this.dataBean.getServicesAsList());
         }
 
-        String searchValue = currentText.toUpperCase();
+        String searchValue = currentText == null
+            ? ""
+            : currentText.toUpperCase();
+
         ObservableList<ServiceModel> subentries
                 = FXCollections.observableArrayList();
         ObservableList<ServiceModel> all = this.dataBean.getServicesAsList();
         for (ServiceModel entry : all) {
-            boolean match = true;
-            if (!entry.getName().toUpperCase().contains(searchValue)) {
-                match = false;
-            }
+            boolean match
+                = entry.getName().toUpperCase().contains(searchValue);
             if (match) {
                 subentries.add(entry);
             }
