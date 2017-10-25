@@ -78,11 +78,6 @@ public class WFSMetaExtractor {
     private static final String XPATH_FEATURETYPES
         = "//wfs:FeatureTypeList/wfs:FeatureType";
 
-    private static final String XPATH_CORNERS
-        = "//*[substring(local-name(),"
-        + "string-length(local-name()) - string-length('Corner') +1)"
-        + "= 'Corner']/text()";
-
     private static final String XPATH_CONER_UPPER
             = "ows:WGS84BoundingBox/ows:UpperCorner";
 
@@ -146,21 +141,17 @@ public class WFSMetaExtractor {
             return null;
         }
 
-        double minX = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
-
         String[] upperCornerSplit = upperCorner.split("\\s+");
         String[] lowerCornerSplit = lowerCorner.split("\\s+");
         if (upperCornerSplit.length != lowerCornerSplit.length) {
             return null;
         }
 
-        minY = StringUtils.toDouble(lowerCornerSplit[0])[0];
-        minX = StringUtils.toDouble(lowerCornerSplit[1])[0];
-        maxY = StringUtils.toDouble(upperCornerSplit[0])[0];
-        maxX = StringUtils.toDouble(upperCornerSplit[1])[0];
+        double
+            minY = StringUtils.toDouble(lowerCornerSplit[0])[0],
+            minX = StringUtils.toDouble(lowerCornerSplit[1])[0],
+            maxY = StringUtils.toDouble(upperCornerSplit[0])[0],
+            maxX = StringUtils.toDouble(upperCornerSplit[1])[0];
 
         return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
@@ -193,7 +184,7 @@ public class WFSMetaExtractor {
         String  url,
         String  request,
         WFSMeta meta
-    ) throws IOException {
+    ) {
         String post = "";
         int idx = url.lastIndexOf('?');
         if (idx >= 0) {
