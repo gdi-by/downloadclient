@@ -1552,7 +1552,6 @@ public class Controller {
                             dataBean.getSelectedService().getPassword());
                 } catch (IllegalArgumentException
                         | URISyntaxException
-                        | SAXException
                         | ParserConfigurationException
                         | IOException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);

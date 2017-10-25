@@ -340,8 +340,7 @@ public class Atom {
     private static Document getDocument(URL url,
                                         String username,
                                         String password)
-            throws ParserConfigurationException, IOException,
-                URISyntaxException {
+            throws IOException, URISyntaxException {
         Document doc = null;
         if (ServiceChecker.simpleRestricted(url)) {
             if (username == null && password == null) {
@@ -367,14 +366,13 @@ public class Atom {
      * @param userName username
      * @param password password
      * @throws URISyntaxException if the url is wrong
-     * @throws SAXException if the xml is wrong
      * @throws ParserConfigurationException if the config is wrong
      * @throws IOException if something in io is wrong
      */
     public Atom(String serviceURL, String userName, String password)
             throws URISyntaxException,
             ParserConfigurationException, IOException,
-            IllegalArgumentException, SAXException {
+            IllegalArgumentException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
