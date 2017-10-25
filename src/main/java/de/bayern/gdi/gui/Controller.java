@@ -670,7 +670,7 @@ public class Controller {
             handleChainCheckbox(new ActionEvent());
 
             for (DownloadConfig.ProcessingStep iStep : steps) {
-                factory.addChainAttribute(this.dataBean, chainContainer,
+                factory.addChainAttribute(chainContainer,
                         iStep.name, iStep.params);
             }
         } else {

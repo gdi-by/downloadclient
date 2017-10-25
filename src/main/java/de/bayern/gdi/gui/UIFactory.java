@@ -265,12 +265,11 @@ public class UIFactory {
      * Add new post process chain item with pre-selected process name
      * and parameters.
      *
-     * @param dataBean The databean
      * @param container The container
      * @param processName The process' name
      * @param params The parameters
      */
-    public void addChainAttribute(DataBean dataBean, VBox container,
+    public void addChainAttribute(VBox container,
             String processName, HashMap<String, String> params) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
