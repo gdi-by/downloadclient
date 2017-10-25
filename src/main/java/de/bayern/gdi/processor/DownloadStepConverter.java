@@ -302,8 +302,6 @@ public class DownloadStepConverter {
         int          count,
         boolean      wfs2) {
 
-        String url = dls.getServiceURL();
-
         String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
@@ -419,8 +417,7 @@ public class DownloadStepConverter {
         File         workingDir,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) throws ConverterException {
-
+    ) {
         boolean usePost = false;
         WFSMeta.Operation getFeature = meta.findOperation("GetFeature");
         if (getFeature.post != null) {
@@ -640,8 +637,7 @@ public class DownloadStepConverter {
 
         log.info("total number of features: " + numFeatures);
 
-        FilesDownloadJob fdj = new FilesDownloadJob(
-            this.user, this.password, this.logger);
+        FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob(logger);
 
         String ext = extension();
