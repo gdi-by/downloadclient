@@ -146,26 +146,6 @@ public class ServiceSettings {
         return NAME;
     }
 
-    /**Parse Node by name, save all elements to map.*/
-    private Map<String, String> parseNodeForElements(Document doc,
-            String nodeName) throws IOException {
-        Node parent = doc.getElementsByTagName(nodeName).item(0);
-        if (parent == null) {
-            throw new IOException("Node " + nodeName + " not found");
-        }
-
-        Map<String, String> elements = new HashMap<>();
-
-        NodeList childs = parent.getChildNodes();
-        for (int i = 0; i < childs.getLength(); i++) {
-            Node node = childs.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                elements.put(node.getNodeName(), node.getTextContent());
-            }
-        }
-        return elements;
-    }
-
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
