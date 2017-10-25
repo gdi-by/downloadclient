@@ -25,17 +25,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.web.WebView;
 
-import java.util.Optional;
-import java.util.logging.Logger;
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class WebViewWindow extends Dialog {
 
     private WebView webView;
-    private static final Logger log
-            = Logger.getLogger(WebViewWindow.class.getName());
 
     public WebViewWindow(WebView wv, String title) {
         super();
@@ -64,7 +59,7 @@ public class WebViewWindow extends Dialog {
                 ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(confirm);
         getDialogPane().setContent(webView);
-        Optional<ButtonType> res = showAndWait();
+        showAndWait();
     }
 
 }

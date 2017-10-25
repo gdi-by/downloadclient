@@ -230,7 +230,6 @@ public class WMSMapSwing extends Parent {
      */
     private static void initGeotoolsLocale() {
         LocaleUtils.setLocale(I18n.getLocale());
-        //the next line for testing needs an additional import java.util.Locale;
     }
 
     /**

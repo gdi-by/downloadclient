@@ -214,8 +214,7 @@ public class DownloadStepConverter {
         DownloadStep dls,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) throws ConverterException {
-
+    ) {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String vendor = vendorSpecific(url);
@@ -304,8 +303,6 @@ public class DownloadStepConverter {
         boolean      wfs2) {
 
         String url = dls.getServiceURL();
-        String base = baseURL(url);
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
         String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
         String dataset = dls.getDataset();
@@ -413,7 +410,7 @@ public class DownloadStepConverter {
                         + "</gml:Envelope> </fes:BBOX> </fes:Filter>";
             }
         }
-        xmlString = xmlStart + xmlEnd;
+        String xmlString = xmlStart + xmlEnd;
         return xmlString;
     }
 
@@ -567,19 +564,6 @@ public class DownloadStepConverter {
         return newURL(sb.toString());
     }
 
-    private ArrayList<BasicNameValuePair> pagedFeaturePostParams(
-            int ofs, int count, boolean wfs2) {
-        ArrayList<BasicNameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("startIndex", String.valueOf(ofs)));
-        if (wfs2) {
-            params.add(new BasicNameValuePair("count", String.valueOf(count)));
-        } else {
-            params.add(new BasicNameValuePair("maxFeatures",
-                    String.valueOf(count)));
-        }
-        return params;
-    }
-
     private String extension() {
         String mimeType = dls.findParameter("outputformat");
         return  Config.getInstance().getMimeTypes()
@@ -631,7 +615,6 @@ public class DownloadStepConverter {
         boolean usePost = false;
         String wfsURL;
         String params = null;
-        HttpEntity ent = null;
         int numFeatures;
         if (getFeatureOp.post != null) {
             usePost = true;
@@ -647,7 +630,7 @@ public class DownloadStepConverter {
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
             try {
-                ent = new StringEntity(params);
+                new StringEntity(params);
             } catch (Exception e) {
                 logger.log(e.getMessage());
             }

@@ -20,7 +20,6 @@ package de.bayern.gdi.gui;
 
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Unauthorized;
-import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.NamedArg;
 import javafx.scene.control.Alert;
@@ -61,6 +60,6 @@ public class WarningPopup extends Alert implements Unauthorized {
         ButtonType confirm = new ButtonType(I18n.getMsg("gui.ok"),
                 ButtonBar.ButtonData.CANCEL_CLOSE);
         getButtonTypes().setAll(confirm);
-        Optional<ButtonType> res = showAndWait();
+        showAndWait();
     }
 }
