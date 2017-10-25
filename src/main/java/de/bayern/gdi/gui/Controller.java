@@ -422,7 +422,7 @@ public class Controller {
                 ButtonData.CANCEL_CLOSE);
         closeDialog.getButtonTypes().setAll(confirm, cancel);
         Optional<ButtonType> res = closeDialog.showAndWait();
-        if (res.get() == confirm) {
+        if (res.isPresent() && res.get() == confirm) {
             Stage stage = (Stage) buttonClose.getScene().getWindow();
             stage.fireEvent(new WindowEvent(
                     stage,
