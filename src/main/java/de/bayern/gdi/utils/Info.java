@@ -175,30 +175,26 @@ public class Info {
     private String parseXPathInPom(String xPath) throws URISyntaxException,
     IOException {
         Path pom = getPomPath();
-        if (pom != null) {
-            InputStream is = Files.newInputStream(pom);
-            try {
-                Document doc = DocumentBuilderFactory.newInstance()
-                        .newDocumentBuilder().parse(is);
-                doc.getDocumentElement().normalize();
-                String v = (String) XPathFactory.newInstance()
-                        .newXPath().compile(xPath)
-                        .evaluate(doc, XPathConstants.STRING);
-                if (v != null) {
-                    v = v.trim();
-                    if (!v.isEmpty()) {
-                        return v;
-                    }
-                }
-            } catch (ParserConfigurationException
-                    | XPathExpressionException
-                    | SAXException e) {
-                log.log(Level.SEVERE,
-                        "Parsing of " + xPath + " in Pom failed: "
-                                + e.getMessage(), e);
-            }
+        if (pom == null) {
+            return "";
         }
-        return "";
+        try (InputStream is = Files.newInputStream(pom)) {
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder().parse(is);
+            doc.getDocumentElement().normalize();
+            String v = (String) XPathFactory.newInstance()
+                    .newXPath().compile(xPath)
+                    .evaluate(doc, XPathConstants.STRING);
+
+            return v != null ? v.trim() : "";
+        } catch (ParserConfigurationException
+                | XPathExpressionException
+                | SAXException e) {
+            log.log(Level.SEVERE,
+                    "Parsing of " + xPath + " in Pom failed: "
+                            + e.getMessage(), e);
+            return "";
+        }
     }
 
     private String getTagFromProperties(String tag) {
