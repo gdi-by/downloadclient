@@ -2132,16 +2132,15 @@ public class Controller {
 
         boolean allValid = true;
         for (Node o : chainContainer.getChildren()) {
-            if (!(o instanceof VBox)) {
-                continue;
-            }
-            VBox v = (VBox) o;
-            HBox hbox = (HBox) v.getChildren().get(0);
-            Node cBox = hbox.getChildren().get(0);
-            if (cBox instanceof ComboBox
-            && !validateChainContainer((ComboBox)cBox)) {
-                allValid = false;
-                break;
+            if (o instanceof VBox) {
+                VBox v = (VBox)o;
+                HBox hbox = (HBox)v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox
+                && !validateChainContainer((ComboBox)cBox)) {
+                    allValid = false;
+                    break;
+                }
             }
         }
         //If all chain items were ready, set status to ready
