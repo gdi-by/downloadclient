@@ -135,6 +135,7 @@ public class Processor implements Runnable {
                         wait(WAIT_TIME);
                     }
                 } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
                     break;
                 }
                 if (this.done) {

@@ -194,6 +194,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             try {
                 Thread.sleep(FAIL_SLEEP);
             } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
                 break;
             }
         }

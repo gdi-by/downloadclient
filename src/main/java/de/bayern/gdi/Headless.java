@@ -124,6 +124,7 @@ public class Headless implements ProcessorListener {
         try {
             thread.join();
         } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
             return 1;
         }
 

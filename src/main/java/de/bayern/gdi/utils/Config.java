@@ -68,6 +68,7 @@ public class Config {
                     Holder.INSTANCE.wait(FIVEHUNDRED);
                 }
             } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
             }
             return Holder.INSTANCE;
         }
