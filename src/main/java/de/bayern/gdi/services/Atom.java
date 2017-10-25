@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,9 +48,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -572,42 +568,6 @@ public class Atom {
 
     private static final Pattern CRS_CODE
             = Pattern.compile("[0-9]{2,}");
-
-    // XXX: This should be coded more defensively!
-    private static CoordinateReferenceSystem decodeCRS(String term)
-    throws FactoryException {
-        Matcher m = CRS_RE.matcher(term);
-        if (m.find()) {
-            String authority = null;
-            String code = null;
-            if (m.group(TWO) != null && m.group(TWO).equals("EPSG")) {
-                authority = m.group(TWO);
-                Matcher c = CRS_CODE.matcher(m.group(THREE));
-                if (c.find()) {
-                    code = m.group(THREE);
-                } else {
-                    code = m.group(FOUR);
-                }
-            } else {
-                if (m.group(ONE) != null) {
-                    authority = m.group(ONE);
-                    Matcher c = CRS_CODE.matcher(m.group(THREE));
-                    if (c.find()) {
-                        code = m.group(THREE);
-                    } else {
-                        code = m.group(TWO);
-                    }
-                } else {
-                    authority = m.group(ZERO).substring(0,
-                            m.group(ZERO).lastIndexOf(":"));
-                    code = m.group(ZERO).substring(authority.length() + 1,
-                            m.group(ZERO).length());
-                }
-            }
-            return CRS.decode(authority + ":" + code);
-        }
-        throw new FactoryException("Cannot parse '" + term + "'");
-    }
 
     private static String convertPolygonToWKT(String text) {
         String[] sep = text.split(" ");
