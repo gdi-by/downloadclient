@@ -1085,20 +1085,21 @@ public class WMSMapSwing extends Parent {
      * @return Status string containing status code, reason phrase and method
      */
     private String checkGetMap(String requestURL) {
-        String result = "";
         CloseableHttpClient client = null;
         try {
             client = HTTP.getClient(new URL(requestURL),
                     null, null);
             HttpHead head = new HttpHead(requestURL);
             CloseableHttpResponse resp = client.execute(head);
-            result += resp.getStatusLine().getStatusCode() + " "
-                    + resp.getStatusLine().getReasonPhrase() + " "
-                    + "GET";
+            return resp.getStatusLine().getStatusCode() + " "
+                + resp.getStatusLine().getReasonPhrase() + " "
+                + "GET";
+        } catch (IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
         } finally {
             HTTP.closeGraceful(client);
-            return result;
         }
+        return "";
     }
 
     /**

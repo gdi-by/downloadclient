@@ -210,7 +210,9 @@ public class ProxyConfiguration {
      * @return Proxystring
      */
     public String getHttpsProxyString() {
-        if (!httpsProxyPort.equals("") && httpsProxyPort != null) {
+        if (httpsProxyHost != null
+        && !httpsProxyHost.isEmpty()
+        && httpsProxyPort != null) {
             return httpsProxyHost + ":" + httpsProxyPort;
         } else {
             return httpsProxyHost;

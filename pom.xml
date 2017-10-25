@@ -215,6 +215,11 @@
     </dependencies>
     <repositories>
         <repository>
+            <id>mvnrepository</id>
+            <name>MVN Repository</name>
+            <url>https://mvnrepository.com/</url>
+        </repository>
+        <repository>
             <id>boundless</id>
             <name>Boundless Maven Repository</name>
             <url>http://repo.boundlessgeo.com/main</url>
@@ -238,11 +243,6 @@
             <id>mygrid-repository</id>
             <name>myGrid Repository</name>
             <url>http://www.mygrid.org.uk/maven/repository</url>
-        </repository>
-        <repository>
-            <id>mvnrepository</id>
-            <name>MVN Repository</name>
-            <url>https://mvnrepository.com/</url>
         </repository>
     </repositories>
 </project>
