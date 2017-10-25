@@ -1292,20 +1292,10 @@ public class Controller {
                                     getSelectionModel().
                                     getSelectedItem().
                                     getCRS());
-                } else {
-                    envelope = mapWFS.calculateBBox(basicX1,
-                            basicX2,
-                            basicY1,
-                            basicY2,
-                            referenceSystemChooser.
-                                    getSelectionModel().
-                                    getSelectedItem().
-                                    getCRS());
                 }
                 break;
             default:
                 break;
-
         }
         if (envelope != null) {
             bbox += envelope.getX() + ",";
