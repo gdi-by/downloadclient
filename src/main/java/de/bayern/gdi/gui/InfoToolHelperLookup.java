@@ -21,7 +21,7 @@ package de.bayern.gdi.gui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
+
 import org.geotools.map.Layer;
 import org.geotools.swing.tool.InfoToolHelper;
 
@@ -30,8 +30,6 @@ import org.geotools.swing.tool.InfoToolHelper;
  */
 
 class InfoToolHelperLookup {
-    private static final Logger log
-            = Logger.getLogger(InfoToolHelperLookup.class.getName());
 
     private static List<InfoToolHelper> cachedInstances;
 

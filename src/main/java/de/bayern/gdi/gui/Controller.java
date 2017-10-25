@@ -148,7 +148,6 @@ public class Controller {
     private static FileHandler appLogFileHandler;
     private static AppLogFormatter appLogFormatter;
 
-    private static final String UNAVAILABLE_PREFIX = "N/A:";
     private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
@@ -665,7 +664,7 @@ public class Controller {
         }
         ArrayList<DownloadConfig.ProcessingStep> steps =
                 downloadConfig.getProcessingSteps();
-        factory.removeAllChainAttributes(this.dataBean, chainContainer);
+        factory.removeAllChainAttributes(chainContainer);
         if (steps != null) {
             chkChain.setSelected(true);
             handleChainCheckbox(new ActionEvent());
@@ -1049,7 +1048,7 @@ public class Controller {
      */
     @FXML
     protected void handleAddChainItem(ActionEvent event) {
-        factory.addChainAttribute(this.dataBean, chainContainer,
+        factory.addChainAttribute(chainContainer,
                 ()->validateChainContainerItems());
         validateChainContainerItems();
     }
@@ -1459,7 +1458,7 @@ public class Controller {
         if (chkChain.isSelected()) {
             processStepContainter.setVisible(true);
         } else {
-            factory.removeAllChainAttributes(this.dataBean, chainContainer);
+            factory.removeAllChainAttributes(chainContainer);
             processStepContainter.setVisible(false);
         }
     }
@@ -1866,10 +1865,10 @@ public class Controller {
                 }
                 this.referenceSystemChooser.setValue(crsm);
             }
-            List<String> outputFormats = feature.outputFormats;
+            List<String> outputFormats = this
+                .dataBean.getWFSService()
+                .findOperation("GetFeature").outputFormats;
 
-            outputFormats = this.dataBean.getWFSService()
-                    .findOperation("GetFeature").outputFormats;
             if (outputFormats.isEmpty()) {
                 outputFormats =
                         this.dataBean.getWFSService().outputFormats;
@@ -1908,7 +1907,6 @@ public class Controller {
                 storedQuery = new WFSMeta.StoredQuery();
             }
             factory.fillSimpleWFS(
-                    dataBean,
                     this.simpleWFSContainer,
                     storedQuery,
                     formatModels);

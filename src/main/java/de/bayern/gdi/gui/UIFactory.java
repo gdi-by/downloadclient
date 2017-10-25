@@ -82,26 +82,23 @@ public class UIFactory {
     /**
      * Creates a stack pane with content based on the selected service.
      *
-     * @param dataBean The data
      * @param type The selected service type
      * @param container The container node
      * @param outputFormats the Outputformats of the selected service
      *
      */
     public void fillSimpleWFS(
-        DataBean dataBean,
         VBox container,
         WFSMeta.StoredQuery type,
         List <OutputFormatModel> outputFormats
     ) {
-        createSimpleWFS(dataBean,
-                type,
-                container,
-                outputFormats);
+        createSimpleWFS(
+            type,
+            container,
+            outputFormats);
     }
 
     private void createSimpleWFS(
-        DataBean dataBean,
         WFSMeta.StoredQuery type,
         VBox container,
         List <OutputFormatModel> outputFormats
@@ -200,22 +197,19 @@ public class UIFactory {
     /**
      * Add new post process chain item.
      *
-     * @param dataBean The databean
      * @param container The container
      */
-    public void addChainAttribute(DataBean dataBean, VBox container) {
-        addChainAttribute(dataBean, container, null);
+    public void addChainAttribute(VBox container) {
+        addChainAttribute(container, null);
     }
 
     /**
      * Add new post process chain item.
      *
-     * @param dataBean The databean
      * @param container The container
      * @param onChange A function called if the ComboBox value changed
      */
-    public void addChainAttribute(DataBean dataBean, VBox container,
-            Runnable onChange) {
+    public void addChainAttribute(VBox container, Runnable onChange) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();
@@ -340,10 +334,9 @@ public class UIFactory {
 
     /**
      * removes all Processing attributes.
-     * @param dataBean the databean
      * @param container the container they should be removed from
      */
-    public void removeAllChainAttributes(DataBean dataBean, VBox container) {
+    public void removeAllChainAttributes(VBox container) {
         Collection<Node> nodeColl = new ArrayList<>();
         for (Node node : container.getChildren()) {
             if (node.getId().equals("process_parameter")) {

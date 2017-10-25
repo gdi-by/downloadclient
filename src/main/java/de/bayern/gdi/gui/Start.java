@@ -132,11 +132,5 @@ public class Start extends Application {
                 System.out.println(element.toString());
             }
         }
-
-        // session scope /application scope Beans initialisieren!
-        // muss von Controller zu Controller weitergegeben werden
-        // Ersten Controller aufrufen
-//        Controller c = new Controller(dataBean);
-//        c.show();
     }
 }

@@ -182,9 +182,6 @@ public class AutoCompleteComboBoxListener<T> {
                 && comboBox.getEditor().getText() != null
                 && comboBox.getEditor().getText().trim().length() > 0) {
             // press enter key programmatically to have this entry added
-            // KeyEvent ke = new KeyEvent(comboBox, KeyCode.ENTER.toString(),
-            // KeyCode.ENTER.getName(), KeyCode.ENTER.impl_getCode(), false,
-            // false, false, false, KeyEvent.KEY_RELEASED);
             KeyEvent ke = new KeyEvent(KeyEvent.KEY_RELEASED,
                     KeyCode.ENTER.toString(),
                     KeyCode.ENTER.toString(),
