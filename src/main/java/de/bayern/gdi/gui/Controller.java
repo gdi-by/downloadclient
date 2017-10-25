@@ -897,14 +897,13 @@ public class Controller {
             });
             return false;
         }
-        if (dataBean.getSelectedService() != null) {
-            if (dataBean.getSelectedService().equals(service)) {
-                Platform.runLater(() -> {
-                    setStatusTextUI(
-                            I18n.format("status.ready"));
-                });
-                return true;
-            }
+        if (dataBean.getSelectedService() != null
+        &&  dataBean.getSelectedService().equals(service)) {
+            Platform.runLater(() -> {
+                setStatusTextUI(
+                        I18n.format("status.ready"));
+            });
+            return true;
         }
         dataBean.setSelectedService(service);
         Platform.runLater(() -> {
@@ -2133,15 +2132,16 @@ public class Controller {
 
         boolean allValid = true;
         for (Node o : chainContainer.getChildren()) {
-            if (o instanceof VBox) {
-                VBox v = (VBox) o;
-                HBox hbox = (HBox) v.getChildren().get(0);
-                Node cBox = hbox.getChildren().get(0);
-                if (cBox instanceof ComboBox) {
-                    if (!validateChainContainer((ComboBox) cBox)) {
-                        allValid = false;
-                    }
-                }
+            if (!(o instanceof VBox)) {
+                continue;
+            }
+            VBox v = (VBox) o;
+            HBox hbox = (HBox) v.getChildren().get(0);
+            Node cBox = hbox.getChildren().get(0);
+            if (cBox instanceof ComboBox
+            && !validateChainContainer((ComboBox)cBox)) {
+                allValid = false;
+                break;
             }
         }
         //If all chain items were ready, set status to ready
@@ -2157,39 +2157,38 @@ public class Controller {
             EventHandler<Event> {
         @Override
         public void handle(Event event) {
-            if (mapAtom != null) {
-                if (event instanceof PolygonClickedEvent) {
-                    PolygonClickedEvent pce = (PolygonClickedEvent) event;
-                    WMSMapSwing.PolygonInfos polygonInfos =
-                            pce.getPolygonInfos();
-                    String polygonName = polygonInfos.getName();
-                    String polygonID = polygonInfos.getID();
+            if (mapAtom != null && event instanceof PolygonClickedEvent) {
 
-                    if (polygonName != null && polygonID != null) {
-                        if (polygonName.equals("#@#")) {
-                            setStatusTextUI(I18n.format(
-                                    "status.polygon-intersect",
-                                    polygonID));
-                            return;
-                        }
+                PolygonClickedEvent pce = (PolygonClickedEvent) event;
+                WMSMapSwing.PolygonInfos polygonInfos =
+                        pce.getPolygonInfos();
+                String polygonName = polygonInfos.getName();
+                String polygonID = polygonInfos.getID();
 
-                        ObservableList<ItemModel> items =
-                                serviceTypeChooser.getItems();
-                        int i = 0;
-                        for (i = 0; i < items.size(); i++) {
-                            AtomItemModel item = (AtomItemModel) items.get(i);
-                            Atom.Item aitem = (Atom.Item) item.getItem();
-                            if (aitem.id.equals(polygonID)) {
-                                break;
-                            }
+                if (polygonName != null && polygonID != null) {
+                    if (polygonName.equals("#@#")) {
+                        setStatusTextUI(I18n.format(
+                                "status.polygon-intersect",
+                                polygonID));
+                        return;
+                    }
+
+                    ObservableList<ItemModel> items =
+                            serviceTypeChooser.getItems();
+                    int i = 0;
+                    for (i = 0; i < items.size(); i++) {
+                        AtomItemModel item = (AtomItemModel) items.get(i);
+                        Atom.Item aitem = (Atom.Item) item.getItem();
+                        if (aitem.id.equals(polygonID)) {
+                            break;
                         }
-                        Atom.Item oldItem = (Atom.Item) serviceTypeChooser
-                                .getSelectionModel()
-                                .getSelectedItem().getItem();
-                        if (i < items.size() && !oldItem.id.equals(polygonID)) {
-                            serviceTypeChooser.setValue(items.get(i));
-                            chooseType(serviceTypeChooser.getValue());
-                        }
+                    }
+                    Atom.Item oldItem = (Atom.Item) serviceTypeChooser
+                            .getSelectionModel()
+                            .getSelectedItem().getItem();
+                    if (i < items.size() && !oldItem.id.equals(polygonID)) {
+                        serviceTypeChooser.setValue(items.get(i));
+                        chooseType(serviceTypeChooser.getValue());
                     }
                 }
             }
