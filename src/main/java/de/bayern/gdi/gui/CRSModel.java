@@ -62,6 +62,9 @@ public class CRSModel {
      */
     @Override
     public boolean equals(Object o) {
+        if (!(o instanceof CRSModel)) {
+            return false;
+        }
         CRSModel c = (CRSModel)o;
         return c.getCRS().toString().equals(this.getCRS().toString());
     }
