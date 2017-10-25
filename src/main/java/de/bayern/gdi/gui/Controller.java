@@ -1875,8 +1875,7 @@ public class Controller {
                 outputFormats =
                         this.dataBean.getWFSService().outputFormats;
             }
-            List<OutputFormatModel> formatModels
-                    = new ArrayList<OutputFormatModel>();
+            List<OutputFormatModel> formatModels = new ArrayList<>();
             for (String s : outputFormats) {
                 OutputFormatModel m = new OutputFormatModel();
                 m.setItem(s);
