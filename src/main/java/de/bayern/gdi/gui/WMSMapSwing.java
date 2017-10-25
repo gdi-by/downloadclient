@@ -887,7 +887,9 @@ public class WMSMapSwing extends Parent {
                         }
                     }
                 }
-                ((FeatureLayer) layer).setStyle(style);
+                if (layer instanceof FeatureLayer) {
+                    ((FeatureLayer) layer).setStyle(style);
+                }
             }
         }
     }
