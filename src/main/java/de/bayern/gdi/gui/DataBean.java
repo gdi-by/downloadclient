@@ -177,9 +177,7 @@ public class DataBean extends Observable {
             ServiceModel sm = new ServiceModel(entry);
             allModels.add(sm);
         }
-        ObservableList<ServiceModel> serviceNames =
-                FXCollections.observableArrayList(allModels);
-        return serviceNames;
+        return FXCollections.observableArrayList(allModels);
     }
 
     /**
@@ -260,12 +258,7 @@ public class DataBean extends Observable {
      * @return true if webservice ist set; false if not set
      */
     public boolean isWebServiceSet() {
-        if (this.atomService == null
-            && this.wfsService == null) {
-            return false;
-        }
-        return true;
-
+        return this.atomService != null || this.wfsService != null;
     }
 
     /**
