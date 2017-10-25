@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.xpath.XPathConstants;
@@ -58,10 +59,11 @@ public class ServiceSettings {
      * @return catalogue URL as String
      */
     public String getCatalogue() {
-        for (String value: this.getCatalogues().values()) {
-            return value;
-        }
-        return null;
+        Optional<String> v = this.getCatalogues()
+            .values()
+            .stream()
+            .findFirst();
+        return v.isPresent() ? v.get() : null;
     }
 
     /**
