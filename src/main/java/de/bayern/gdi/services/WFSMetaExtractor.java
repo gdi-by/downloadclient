@@ -147,11 +147,10 @@ public class WFSMetaExtractor {
             return null;
         }
 
-        double
-            minY = StringUtils.toDouble(lowerCornerSplit[0])[0],
-            minX = StringUtils.toDouble(lowerCornerSplit[1])[0],
-            maxY = StringUtils.toDouble(upperCornerSplit[0])[0],
-            maxX = StringUtils.toDouble(upperCornerSplit[1])[0];
+        double minY = StringUtils.toDouble(lowerCornerSplit[0])[0];
+        double minX = StringUtils.toDouble(lowerCornerSplit[1])[0];
+        double maxY = StringUtils.toDouble(upperCornerSplit[0])[0];
+        double maxX = StringUtils.toDouble(upperCornerSplit[1])[0];
 
         return new ReferencedEnvelope(minX, maxX, minY, maxY, WGS84);
     }
