@@ -60,8 +60,10 @@ public class CRSModel {
      * @param crsModel crsModel
      * @return true if equal; false if not
      */
-    public boolean equals(CRSModel crsModel) {
-        return this.hashCode() == crsModel.hashCode();
+    @Override
+    public boolean equals(Object o) {
+        CRSModel c = (CRSModel)o;
+        return c.getCRS().toString().equals(this.getCRS().toString());
     }
 
     /**
