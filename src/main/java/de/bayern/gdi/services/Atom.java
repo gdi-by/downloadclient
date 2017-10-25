@@ -232,7 +232,7 @@ public class Atom {
                 entryDoc = XML.getDocument(this.describedBy);
             }
             format = getFormat(entryDoc, entryDocUrl);
-            fields = getFieldForEntry(entryDoc, entryDocUrl);
+            fields = getFieldForEntry(entryDoc);
         }
 
         private String getFormat(Document entryDoc,
@@ -262,8 +262,7 @@ public class Atom {
             return itemformat;
         }
 
-        private ArrayList<Field> getFieldForEntry(Document entryDoc,
-                                                  URL entryDocUrl) {
+        private ArrayList<Field> getFieldForEntry(Document entryDoc) {
             ArrayList<Field> attrFields = new ArrayList<>();
             //Predefined in ATOM Service
             String getCategories = "//entry";
@@ -341,7 +340,7 @@ public class Atom {
     private static Document getDocument(URL url,
                                         String username,
                                         String password)
-            throws SAXException, ParserConfigurationException, IOException,
+            throws ParserConfigurationException, IOException,
                 URISyntaxException {
         Document doc = null;
         if (ServiceChecker.simpleRestricted(url)) {
