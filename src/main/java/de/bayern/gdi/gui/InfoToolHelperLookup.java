@@ -19,7 +19,6 @@
 package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
@@ -66,14 +65,13 @@ class InfoToolHelperLookup {
      */
     private static void loadProviders() {
         if (cachedInstances == null) {
-            cachedInstances = new ArrayList<InfoToolHelper>();
+            cachedInstances = new ArrayList<>();
 
             ServiceLoader<InfoToolHelper> loader =
                     ServiceLoader.load(InfoToolHelper.class);
 
-            Iterator<InfoToolHelper> iter = loader.iterator();
-            while (iter.hasNext()) {
-                cachedInstances.add(iter.next());
+            for (InfoToolHelper helper: loader) {
+                cachedInstances.add(helper);
             }
         }
     }
