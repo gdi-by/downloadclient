@@ -94,7 +94,7 @@ public class Processor implements Runnable {
     /** quit the main loop og this processor. */
     public synchronized void quit() {
         this.done = true;
-        notify();
+        notifyAll();
     }
 
     /** Adds a job at the end of the queue.
@@ -102,7 +102,7 @@ public class Processor implements Runnable {
      */
     public synchronized void addJob(Job job) {
         this.jobs.add(job);
-        notify();
+        notifyAll();
     }
 
     /** Broadcasts an exception to all listeners.
