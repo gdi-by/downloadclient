@@ -38,15 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -71,7 +66,6 @@ public class Atom {
     private ArrayList<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
-    private static final String EPSG = "EPSG";
     private static final int ZERO = 0;
     private static final int ONE = 1;
     private static final int TWO = 2;
@@ -268,23 +262,6 @@ public class Atom {
             return itemformat;
         }
 
-        private static String getMimeType(URL url, String userName,
-                                           String password) {
-            CloseableHttpClient httpCl =
-                    HTTP.getClient(url, userName, password);
-            try {
-                HttpHead getRequest = HTTP.getHeadRequest(url);
-                CloseableHttpResponse execute = httpCl.execute(getRequest);
-                Header firstHeader =
-                        execute.getFirstHeader("Content-Type");
-                return firstHeader.getValue();
-            } catch (URISyntaxException
-                    | IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
-            return "";
-        }
-
         private ArrayList<Field> getFieldForEntry(Document entryDoc,
                                                   URL entryDocUrl) {
             ArrayList<Field> attrFields = new ArrayList<>();
@@ -408,7 +385,6 @@ public class Atom {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        //System.out.println(this.serviceURL);
         this.nscontext = new NamespaceContextMap(
                 null, "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
@@ -561,13 +537,6 @@ public class Atom {
             items.add(it);
         }
     }
-
-    private static final Pattern CRS_RE
-        = Pattern.compile("(/([^/]+)/([^/]+)/([^/]+)$)"
-            + "|(EPSG:[0-9]*)");
-
-    private static final Pattern CRS_CODE
-            = Pattern.compile("[0-9]{2,}");
 
     private static String convertPolygonToWKT(String text) {
         String[] sep = text.split(" ");

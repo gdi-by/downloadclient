@@ -408,8 +408,7 @@ public class DownloadStepConverter {
                         + "</gml:Envelope> </fes:BBOX> </fes:Filter>";
             }
         }
-        String xmlString = xmlStart + xmlEnd;
-        return xmlString;
+        return xmlStart + xmlEnd;
     }
 
     private void unpagedWFSDownload(
