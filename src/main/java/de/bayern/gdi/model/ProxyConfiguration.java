@@ -128,11 +128,10 @@ public class ProxyConfiguration {
      * @return Proxystring
      */
     public String getHttpProxyString() {
-        if (!httpProxyPort.equals("") && httpProxyPort != null) {
-            return httpProxyHost + ":" + httpProxyPort;
-        } else {
-            return httpProxyHost;
-        }
+        return ((httpProxyHost != null && !httpProxyHost.isEmpty())
+            && httpProxyPort != null)
+            ? httpProxyHost + ":" + httpProxyPort
+            : httpProxyHost;
     }
 
     /**
