@@ -84,5 +84,5 @@ public abstract class WebService implements ServiceSchema {
      */
     public String getDescription(String typeName) {
         return null;
-    };
+    }
 }

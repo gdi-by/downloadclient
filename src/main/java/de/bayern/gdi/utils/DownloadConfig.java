@@ -49,12 +49,12 @@ public class DownloadConfig {
    /**
     * Exception, thrown if no service URL is found in the config file.
     */
-    public class NoServiceURLException extends Exception { };
+    public class NoServiceURLException extends Exception { }
 
    /**
     * Default Constructor.
     */
-    public DownloadConfig() { };
+    public DownloadConfig() { }
 
     /**
     * Constructor.

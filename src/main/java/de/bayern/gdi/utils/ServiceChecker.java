@@ -303,13 +303,9 @@ public class ServiceChecker {
             // Removing statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN
             // because special MS "Standards"
             // (https://en.wikipedia.org/wiki/HTTP_403)
-            if (retcode == HttpStatus.SC_OK
-                || retcode == HttpStatus.SC_UNAUTHORIZED) {
-                return true;
-            }
-            return false;
+            return retcode == HttpStatus.SC_OK
+                || retcode == HttpStatus.SC_UNAUTHORIZED;
         } catch (IOException e) {
-            //log.log(Level.SEVERE, e.getMessage(), e);
             return false;
         }
     }
