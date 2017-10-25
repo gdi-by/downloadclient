@@ -831,7 +831,7 @@ public class Controller {
                 subentries.add(entry);
             }
         }
-        if (currentText.length() > 2) {
+        if (currentText != null && currentText.length() > 2) {
             Task task = new Task() {
                 @Override
                 protected Integer call() throws Exception {
