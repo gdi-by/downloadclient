@@ -327,12 +327,11 @@ public class Atom {
      * @inheritDoc
      * @param serviceURL the url of the service
      * @throws URISyntaxException if the url is wrong
-     * @throws SAXException if the xml is wrong
      * @throws ParserConfigurationException if the config is wrong
      * @throws IOException if something in io is wrong
      */
     public Atom(String serviceURL)
-            throws URISyntaxException, SAXException,
+            throws URISyntaxException,
             ParserConfigurationException, IOException {
         this(serviceURL, null, null);
     }
@@ -371,8 +370,7 @@ public class Atom {
      */
     public Atom(String serviceURL, String userName, String password)
             throws URISyntaxException,
-            ParserConfigurationException, IOException,
-            IllegalArgumentException {
+            ParserConfigurationException, IOException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
