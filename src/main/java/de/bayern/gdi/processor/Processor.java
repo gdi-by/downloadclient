@@ -52,12 +52,12 @@ public class Processor implements Runnable {
     private List<ProcessorListener> listeners;
 
     public Processor() {
-        this.jobs = new ArrayDeque<Job>();
-        this.listeners = new CopyOnWriteArrayList<ProcessorListener>();
+        this.jobs = new ArrayDeque<>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     public Processor(Collection<Job> jobs) {
-        this.jobs = new ArrayDeque<Job>(jobs);
+        this.jobs = new ArrayDeque<>(jobs);
     }
 
     /** Returns a singleton processor started as a separate thread.

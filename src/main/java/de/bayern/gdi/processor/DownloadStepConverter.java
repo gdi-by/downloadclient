@@ -317,7 +317,7 @@ public class DownloadStepConverter {
         String storedQueryId = "";
         String bbox = "";
 
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params = new ArrayList<>();
 
         boolean storedQuery = false;
         if (queryType.equals("STOREDQUERY_ID")) {
@@ -569,8 +569,7 @@ public class DownloadStepConverter {
 
     private ArrayList<BasicNameValuePair> pagedFeaturePostParams(
             int ofs, int count, boolean wfs2) {
-        ArrayList<BasicNameValuePair> params =
-                new ArrayList<BasicNameValuePair>();
+        ArrayList<BasicNameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("startIndex", String.valueOf(ofs)));
         if (wfs2) {
             params.add(new BasicNameValuePair("count", String.valueOf(count)));

@@ -60,7 +60,7 @@ public class ProcessingStepConverter {
     throws ConverterException {
 
         ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
-        if (steps == null || steps.size() == 0) {
+        if (steps == null || steps.isEmpty()) {
             return;
         }
 

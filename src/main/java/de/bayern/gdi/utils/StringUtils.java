@@ -123,7 +123,7 @@ public class StringUtils {
 
         State state = State.NORMAL;
         StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean lastTokenHasBeenQuoted = false;
 

@@ -281,8 +281,7 @@ public class UIFactory {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();
-        ComboBox<ProcessingStepConfiguration> box =
-                new ComboBox<ProcessingStepConfiguration>();
+        ComboBox<ProcessingStepConfiguration> box = new ComboBox<>();
         ProcessingConfiguration config =
             Config.getInstance().getProcessingConfig();
         List<ProcessingStepConfiguration> steps = config.getProcessingSteps();

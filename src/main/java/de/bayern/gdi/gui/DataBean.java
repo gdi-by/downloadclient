@@ -92,9 +92,9 @@ public class DataBean extends Observable {
 
         this.staticServices = serviceSetting.getServices();
 
-        this.attributes = new ArrayList<Attribute>();
+        this.attributes = new ArrayList<>();
 
-        this.catalogServices = new ArrayList<Service>();
+        this.catalogServices = new ArrayList<>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
             try {
                 this.catalogService =
@@ -292,7 +292,7 @@ public class DataBean extends Observable {
      */
     public void addAttribute(String key, String value, String type) {
         if (this.attributes == null) {
-            this.attributes = new ArrayList<Attribute>();
+            this.attributes = new ArrayList<>();
         }
         for (Attribute attr: this.attributes) {
             if (attr.name.equals(key)) {

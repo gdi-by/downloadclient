@@ -152,7 +152,7 @@ public class ExternalProcessJob implements Job {
         int n = this.arguments != null
             ? this.arguments.length
             : 0;
-        List<String> list = new ArrayList<String>(n + 1);
+        List<String> list = new ArrayList<>(n + 1);
         list.add(command);
         if (n > 0) {
             Set<File> tmpNames = new HashSet<>();

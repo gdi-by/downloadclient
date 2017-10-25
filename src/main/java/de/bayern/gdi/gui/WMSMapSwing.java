@@ -736,8 +736,7 @@ public class WMSMapSwing extends Parent {
                         DirectPosition2D pos = ev.getWorldPos();
                         MapContent content = mapPane.getMapContent();
                         final int nlayers = content.layers().size();
-                        helperTable = new WeakHashMap<Layer,
-                                InfoToolHelper>();
+                        helperTable = new WeakHashMap<>();
                         for (org.geotools.map.Layer layer : content.layers()) {
                             if (layer.isSelected()) {
                                 InfoToolHelper helper = null;

@@ -133,8 +133,8 @@ public final class NamespaceContextMap implements
 
     private static Map<String, String> toMap(
             String... mappingPairs) {
-        Map<String, String> prefixMappings = new HashMap<String, String>(
-                mappingPairs.length / 2);
+        Map<String, String> prefixMappings
+            = new HashMap<>(mappingPairs.length / 2);
         for (int i = 0; i < mappingPairs.length; i++) {
             prefixMappings
                     .put(mappingPairs[i], mappingPairs[++i]);
@@ -144,8 +144,7 @@ public final class NamespaceContextMap implements
 
     private Map<String, String> createPrefixMap(
             Map<String, String> prefixMappings) {
-        Map<String, String> prefMap = new HashMap<String, String>(
-                prefixMappings);
+        Map<String, String> prefMap = new HashMap<>(prefixMappings);
         addConstant(prefMap, XMLConstants.XML_NS_PREFIX,
                 XMLConstants.XML_NS_URI);
         addConstant(prefMap, XMLConstants.XMLNS_ATTRIBUTE,
@@ -164,7 +163,7 @@ public final class NamespaceContextMap implements
 
     private Map<String, Set<String>> createNamespaceMap(
         Map<String, String> prefMap) {
-        Map<String, Set<String>> namespMap = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> namespMap = new HashMap<>();
         return updateNamespaceMap(prefMap, namespMap);
     }
 
@@ -177,7 +176,7 @@ public final class NamespaceContextMap implements
             String nsURI = entry.getValue();
             Set<String> prefixes = namespMap.get(nsURI);
             if (prefixes == null) {
-                prefixes = new HashSet<String>();
+                prefixes = new HashSet<>();
                 namespMap.put(nsURI, prefixes);
             }
             prefixes.add(entry.getKey());

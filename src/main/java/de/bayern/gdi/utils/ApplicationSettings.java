@@ -55,7 +55,7 @@ public class ApplicationSettings {
             throw new IOException("Node " + nodeName + " not found");
         }
 
-        Map<String, String> elements = new HashMap<String, String>();
+        Map<String, String> elements = new HashMap<>();
 
         NodeList childs = parent.getChildNodes();
         for (int i = 0; i < childs.getLength(); i++) {

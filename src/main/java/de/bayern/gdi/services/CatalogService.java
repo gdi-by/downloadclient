@@ -193,7 +193,7 @@ public class CatalogService {
      */
     public List<Service> getServicesByFilter(String filter)
         throws URISyntaxException, IOException {
-        List<Service> services = new ArrayList<Service>();
+        List<Service> services = new ArrayList<>();
         if (filter.length() > MIN_SEARCHLENGTH && this.getRecordsURL != null) {
             String search = loadXMLFilter(filter);
             Document xml = XML.getDocument(this.getRecordsURL,
@@ -266,7 +266,7 @@ public class CatalogService {
      */
     public List<Service> parseServices(NodeList servicesNL)
             throws MalformedURLException {
-        List<Service> services = new ArrayList<Service>();
+        List<Service> services = new ArrayList<>();
         for (int i = 0; i < servicesNL.getLength(); i++) {
             Node serviceN = servicesNL.item(i);
             String nameExpr =

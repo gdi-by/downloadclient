@@ -154,7 +154,7 @@ public class ServiceSettings {
             throw new IOException("Node " + nodeName + " not found");
         }
 
-        Map<String, String> elements = new HashMap<String, String>();
+        Map<String, String> elements = new HashMap<>();
 
         NodeList childs = parent.getChildNodes();
         for (int i = 0; i < childs.getLength(); i++) {
@@ -171,7 +171,7 @@ public class ServiceSettings {
 
     private Map<String, String> parseSchema(Document xmlDocument, String
             nodeName, String... names) throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         HashMap<String, String> vars = new HashMap<>();
         vars.put("NODE", nodeName);
@@ -190,7 +190,7 @@ public class ServiceSettings {
     }
 
     private List<Service> parseService(Document xmlDocument) {
-        List<Service> servicesList = new ArrayList<Service>();
+        List<Service> servicesList = new ArrayList<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
         Node servicesNode = servicesNL.item(0);
@@ -240,7 +240,7 @@ public class ServiceSettings {
     private Map<String, String> parseNameURLScheme(Document xmlDocument,
                                                    String nodeName)
             throws IOException {
-        Map<String, String> servicesMap = new HashMap<String, String>();
+        Map<String, String> servicesMap = new HashMap<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName(nodeName);
         Node servicesNode = servicesNL.item(0);

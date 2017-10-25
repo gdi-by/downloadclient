@@ -95,7 +95,7 @@ public class DownloadConfig {
         }
 
         //Read parameters
-        parameters = new HashMap<String, String>();
+        parameters = new HashMap<>();
         NodeList paramNodes = configDoc.getElementsByTagName("Parameter");
 
         for (int i = 0; i < paramNodes.getLength(); i++) {
@@ -115,7 +115,7 @@ public class DownloadConfig {
         if (stepNodes.getLength() == 0) {
             procSteps = null;
         } else {
-            procSteps = new ArrayList<ProcessingStep>();
+            procSteps = new ArrayList<>();
             //Verarbeitungsschritt-Nodes
             for (int i = 0; i < stepNodes.getLength(); i++) {
                 ProcessingStep newStep = new ProcessingStep();
@@ -266,7 +266,7 @@ public class DownloadConfig {
         public HashMap<String, String> params;
 
         public ProcessingStep() {
-            params = new HashMap<String, String>();
+            params = new HashMap<>();
         }
     }
 }

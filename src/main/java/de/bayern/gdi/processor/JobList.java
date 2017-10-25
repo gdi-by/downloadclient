@@ -34,7 +34,7 @@ public class JobList implements Job {
     private List<Job> jobs;
 
     public JobList() {
-        jobs = new ArrayList<Job>();
+        jobs = new ArrayList<>();
     }
 
     /**

@@ -1692,8 +1692,8 @@ public class Controller {
                             dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
                             FXCollections.observableArrayList();
-                    List<WMSMapSwing.FeaturePolygon> polygonList = new
-                            ArrayList<WMSMapSwing.FeaturePolygon>();
+                    List<WMSMapSwing.FeaturePolygon> polygonList
+                        = new ArrayList<>();
                     //Polygons are always epsg:4326
                     // (http://www.georss.org/gml.html)
                     try {
@@ -1820,7 +1820,7 @@ public class Controller {
                 feature = new WFSMeta.Feature();
             }
             mapWFS.setExtend(feature.bbox);
-            ArrayList<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             list.add(feature.defaultCRS);
             list.addAll(feature.otherCRSs);
             ObservableList<CRSModel> crsList =
@@ -1896,7 +1896,7 @@ public class Controller {
                         this.dataBean.getWFSService().outputFormats;
             }
             List<OutputFormatModel> formatModels =
-                new ArrayList<OutputFormatModel>();
+                new ArrayList<>();
             for (String i : outputFormats) {
                 OutputFormatModel m = new OutputFormatModel();
                 m.setItem(i);
