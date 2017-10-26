@@ -28,7 +28,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -597,29 +596,26 @@ public class WMSMapSwing extends Parent {
 
     private void changeLabels(CoordinateReferenceSystem targetCRS) {
         if (coordinateY1Label != null
-                && coordinateX1Label != null
-                && coordinateY2Label != null
-                && coordinateX2Label != null) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    String axis1 = targetCRS
-                            .getCoordinateSystem().getAxis(1).getName()
-                            .getCode();
-                    String axis0 = targetCRS
-                            .getCoordinateSystem().getAxis(0).getName()
-                            .getCode();
-                    axis0 = axis0.replace(" ", "");
-                    axis0 = "gui." + axis0.toLowerCase();
-                    axis1 = axis1.replace(" ", "");
-                    axis1 = "gui." + axis1.toLowerCase();
-                    axis0 = I18n.getMsg(axis0);
-                    axis1 = I18n.getMsg(axis1);
-                    coordinateY1Label.setText(axis1);
-                    coordinateY2Label.setText(axis1);
-                    coordinateX1Label.setText(axis0);
-                    coordinateX2Label.setText(axis0);
-                }
+        && coordinateX1Label != null
+        && coordinateY2Label != null
+        && coordinateX2Label != null) {
+            Platform.runLater(() -> {
+                String axis1 = targetCRS
+                        .getCoordinateSystem().getAxis(1).getName()
+                        .getCode();
+                String axis0 = targetCRS
+                        .getCoordinateSystem().getAxis(0).getName()
+                        .getCode();
+                axis0 = axis0.replace(" ", "");
+                axis0 = "gui." + axis0.toLowerCase();
+                axis1 = axis1.replace(" ", "");
+                axis1 = "gui." + axis1.toLowerCase();
+                axis0 = I18n.getMsg(axis0);
+                axis1 = I18n.getMsg(axis1);
+                coordinateY1Label.setText(axis1);
+                coordinateY2Label.setText(axis1);
+                coordinateX1Label.setText(axis0);
+                coordinateX2Label.setText(axis0);
             });
         }
     }
@@ -847,12 +843,7 @@ public class WMSMapSwing extends Parent {
      */
     private void setNameAndId(String name, String id) {
         PolygonInfos polyInf = new PolygonInfos(name, id);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                fireEvent(new PolygonClickedEvent(polyInf));
-            }
-        });
+        Platform.runLater(() -> fireEvent(new PolygonClickedEvent(polyInf)));
     }
 
     /**
@@ -940,116 +931,109 @@ public class WMSMapSwing extends Parent {
     }
 
     private void createSwingContent(final SwingNode swingNode) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("[]");
-                stringBuilder.append("[min!]");
-                JPanel panel = new JPanel(new MigLayout(
-                        "wrap 1, insets 0",
-                        "[grow]",
-                        stringBuilder.toString()));
+        SwingUtilities.invokeLater(() -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("[]");
+            stringBuilder.append("[min!]");
+            JPanel panel = new JPanel(new MigLayout(
+                    "wrap 1, insets 0",
+                    "[grow]",
+                    stringBuilder.toString()));
 
-                mapPane = new ExtJMapPane(mapContent);
-                mapPane.setMinimumSize(new Dimension(mapWidth,
-                        mapHeight));
-                mapPane.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        mapPane.setBorder(
-                                BorderFactory.createLineBorder(Color.BLACK));
-                    }
-
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        mapPane.setBorder(
-                                BorderFactory.createLineBorder(
-                                        Color.LIGHT_GRAY));
-                    }
-                });
-                mapPane.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        mapPane.requestFocusInWindow();
-                    }
-                });
-
-                //Add listener to log getMap requests after rendering
-                mapPane.addMapPaneListener(new MapPaneListener() {
-                    @Override
-                    public void onDisplayAreaChanged(MapPaneEvent ev) { }
-
-                    @Override
-                    public void onNewMapContent(MapPaneEvent ev) { }
-
-                    @Override
-                    public void onRenderingStarted(MapPaneEvent ev) { }
-
-                    @Override
-                    public void onRenderingStopped(MapPaneEvent ev) {
-                        String getMapUrl = wmslayer.getLastGetMap()
-                                .getFinalURL().toString();
-                        Controller.logToAppLog(checkGetMap(getMapUrl)
-                                + " " + getMapUrl);
-                    }
-
-                });
-                JToolBar toolBar = new JToolBar();
-                toolBar.setOrientation(JToolBar.HORIZONTAL);
-                toolBar.setFloatable(false);
-                JButton btn;
-                JToggleButton tbtn;
-                ButtonGroup cursorToolGrp = new ButtonGroup();
-                ActionListener deleteGraphics = new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        mapPane.deleteGraphics();
-                    }
-                };
-                bboxAction = new CursorAction(mapPane);
-                tbtn = new JToggleButton(bboxAction);
-                tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
-                tbtn.addActionListener(deleteGraphics);
-                toolBar.add(tbtn);
-                cursorToolGrp.add(tbtn);
-                tbtn = new JToggleButton(new ZoomInAction(mapPane));
-                tbtn.addActionListener(deleteGraphics);
-                tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
-                toolBar.add(tbtn);
-                cursorToolGrp.add(tbtn);
-                tbtn = new JToggleButton(new ZoomOutAction(mapPane));
-                tbtn.addActionListener(deleteGraphics);
-                tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
-                toolBar.add(tbtn);
-                cursorToolGrp.add(tbtn);
-                toolBar.addSeparator();
-                tbtn = new JToggleButton(new PanAction(mapPane));
-                tbtn.addActionListener(deleteGraphics);
-                tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
-                toolBar.add(tbtn);
-                cursorToolGrp.add(tbtn);
-                toolBar.addSeparator();
-                tbtn = new JToggleButton(new InfoAction(mapPane));
-                tbtn.addActionListener(deleteGraphics);
-                tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
-                toolBar.add(tbtn);
-                cursorToolGrp.add(tbtn);
-                toolBar.addSeparator();
-                btn = new JButton(new ResetAction(mapPane));
-                btn.addActionListener(deleteGraphics);
-                btn.setName(TOOLBAR_RESET_BUTTON_NAME);
-                toolBar.add(btn);
-                panel.add(toolBar, "grow");
-                panel.add(mapPane, "grow");
-                if (source != null) {
-                    JLabel sourceLabel = new JLabel(source);
-                    mapHeight += SOURCE_LABEL_HEIGHT;
-                    panel.add(sourceLabel, "grow");
+            mapPane = new ExtJMapPane(mapContent);
+            mapPane.setMinimumSize(new Dimension(mapWidth,
+                    mapHeight));
+            mapPane.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    mapPane.setBorder(
+                            BorderFactory.createLineBorder(Color.BLACK));
                 }
-                swingNode.setContent(panel);
-                setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
-                        INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    mapPane.setBorder(
+                            BorderFactory.createLineBorder(
+                                    Color.LIGHT_GRAY));
+                }
+            });
+            mapPane.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    mapPane.requestFocusInWindow();
+                }
+            });
+
+            //Add listener to log getMap requests after rendering
+            mapPane.addMapPaneListener(new MapPaneListener() {
+                @Override
+                public void onDisplayAreaChanged(MapPaneEvent ev) { }
+
+                @Override
+                public void onNewMapContent(MapPaneEvent ev) { }
+
+                @Override
+                public void onRenderingStarted(MapPaneEvent ev) { }
+
+                @Override
+                public void onRenderingStopped(MapPaneEvent ev) {
+                    String getMapUrl = wmslayer.getLastGetMap()
+                            .getFinalURL().toString();
+                    Controller.logToAppLog(checkGetMap(getMapUrl)
+                            + " " + getMapUrl);
+                }
+
+            });
+            JToolBar toolBar = new JToolBar();
+            toolBar.setOrientation(JToolBar.HORIZONTAL);
+            toolBar.setFloatable(false);
+            JButton btn;
+            JToggleButton tbtn;
+            ButtonGroup cursorToolGrp = new ButtonGroup();
+            ActionListener deleteGraphics = e -> mapPane.deleteGraphics();
+            bboxAction = new CursorAction(mapPane);
+            tbtn = new JToggleButton(bboxAction);
+            tbtn.setName(TOOLBAR_POINTER_BUTTON_NAME);
+            tbtn.addActionListener(deleteGraphics);
+            toolBar.add(tbtn);
+            cursorToolGrp.add(tbtn);
+            tbtn = new JToggleButton(new ZoomInAction(mapPane));
+            tbtn.addActionListener(deleteGraphics);
+            tbtn.setName(TOOLBAR_ZOOMIN_BUTTON_NAME);
+            toolBar.add(tbtn);
+            cursorToolGrp.add(tbtn);
+            tbtn = new JToggleButton(new ZoomOutAction(mapPane));
+            tbtn.addActionListener(deleteGraphics);
+            tbtn.setName(TOOLBAR_ZOOMOUT_BUTTON_NAME);
+            toolBar.add(tbtn);
+            cursorToolGrp.add(tbtn);
+            toolBar.addSeparator();
+            tbtn = new JToggleButton(new PanAction(mapPane));
+            tbtn.addActionListener(deleteGraphics);
+            tbtn.setName(TOOLBAR_PAN_BUTTON_NAME);
+            toolBar.add(tbtn);
+            cursorToolGrp.add(tbtn);
+            toolBar.addSeparator();
+            tbtn = new JToggleButton(new InfoAction(mapPane));
+            tbtn.addActionListener(deleteGraphics);
+            tbtn.setName(TOOLBAR_INFO_BUTTON_NAME);
+            toolBar.add(tbtn);
+            cursorToolGrp.add(tbtn);
+            toolBar.addSeparator();
+            btn = new JButton(new ResetAction(mapPane));
+            btn.addActionListener(deleteGraphics);
+            btn.setName(TOOLBAR_RESET_BUTTON_NAME);
+            toolBar.add(btn);
+            panel.add(toolBar, "grow");
+            panel.add(mapPane, "grow");
+            if (source != null) {
+                JLabel sourceLabel = new JLabel(source);
+                mapHeight += SOURCE_LABEL_HEIGHT;
+                panel.add(sourceLabel, "grow");
             }
+            swingNode.setContent(panel);
+            setExtend(INITIAL_EXTEND_X1, INITIAL_EXTEND_X2,
+                    INITIAL_EXTEND_Y1, INITIAL_EXTEND_Y2, INITIAL_CRS);
         });
     }
 
@@ -1280,9 +1264,7 @@ public class WMSMapSwing extends Parent {
         this.mapContent.layers().stream()
                 .filter(layer -> layer.getTitle() != null)
                 .filter(layer -> layer.getTitle().equals(POLYGON_LAYER_TITLE))
-                .forEach(layer -> {
-                    mapContent.removeLayer(layer);
-                });
+                .forEach(layer -> mapContent.removeLayer(layer));
         this.polygonFeatureCollection = null;
         this.geomDesc = null;
         this.geometryAttributeName = null;

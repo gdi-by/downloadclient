@@ -46,9 +46,7 @@ public class WarningPopup extends Alert implements Unauthorized {
      * Displays Poput Windows when the creds are wrong.
      */
     public void unauthorized() {
-        Platform.runLater(() -> {
-            popup(I18n.getMsg("gui.wrong.user.and.pw"));
-        });
+        Platform.runLater(() -> popup(I18n.getMsg("gui.wrong.user.and.pw")));
     }
     /**
      * Opens the Popup-Window with the given text.
