@@ -20,6 +20,7 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
@@ -526,6 +528,12 @@ public class DownloadStepConverter {
         Document hitsDoc = null;
         try {
             hitsDoc = XML.getDocument(url, user, password, ent);
+        } catch (SocketTimeoutException | ConnectTimeoutException te) {
+            throw new ConverterException(
+                I18n.format(
+                    "file.download.failed_reason",
+                    I18n.getMsg("file.download.failed.timeout")),
+                te);
         } catch (URISyntaxException | IOException e) {
             throw new ConverterException(e.getMessage());
         }

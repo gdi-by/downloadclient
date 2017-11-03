@@ -1412,20 +1412,28 @@ public class Controller {
             if (selectedDir == null) {
                 return;
             }
-            this.dataBean.setProcessingSteps(extractProcessingSteps());
+            setStatusTextUI(
+                I18n.format("status.download.started"));
 
+            this.dataBean.setProcessingSteps(extractProcessingSteps());
             String savePath = selectedDir.getPath();
-            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-            try {
-                DownloadStepConverter dsc = new DownloadStepConverter(
-                        dataBean.getSelectedService().getUsername(),
-                        dataBean.getSelectedService().getPassword());
-                JobList jl = dsc.convert(ds);
-                Processor p = Processor.getInstance();
-                p.addJob(jl);
-            } catch (ConverterException ce) {
-                setStatusTextUI(ce.getMessage());
-            }
+            Runnable convertTask = () -> {
+                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+                try {
+                    this.buttonDownload.setDisable(true);
+                    DownloadStepConverter dsc = new DownloadStepConverter(
+                            dataBean.getSelectedService().getUsername(),
+                            dataBean.getSelectedService().getPassword());
+                    JobList jl = dsc.convert(ds);
+                    Processor p = Processor.getInstance();
+                    p.addJob(jl);
+                } catch (ConverterException ce) {
+                    setStatusTextUI(ce.getMessage());
+                } finally {
+                    this.buttonDownload.setDisable(false);
+                }
+            };
+            new Thread(convertTask).start();
         }
     }
 
