@@ -1659,9 +1659,9 @@ public class Controller {
                 case WFSTwo:
                     ReferencedEnvelope extendWFS = null;
                     List<WFSMeta.Feature> features =
-                            dataBean.getWFSService().features;
+                            dataBean.getWFSService().getFeatures();
                     List<WFSMeta.StoredQuery> queries =
-                            dataBean.getWFSService().storedQueries;
+                            dataBean.getWFSService().getStoredQueries();
                     ObservableList<ItemModel> types =
                             FXCollections.observableArrayList();
                     if (!dataBean.getWFSService().isSimple()) {
@@ -1875,7 +1875,7 @@ public class Controller {
 
             if (outputFormats.isEmpty()) {
                 outputFormats =
-                        this.dataBean.getWFSService().outputFormats;
+                        this.dataBean.getWFSService().getOutputFormats();
             }
             List<OutputFormatModel> formatModels = new ArrayList<>();
             for (String s : outputFormats) {
@@ -1894,7 +1894,7 @@ public class Controller {
                     .findOperation("GetFeature").getOutputFormats();
             if (outputFormats.isEmpty()) {
                 outputFormats =
-                        this.dataBean.getWFSService().outputFormats;
+                        this.dataBean.getWFSService().getOutputFormats();
             }
             List<OutputFormatModel> formatModels =
                 new ArrayList<>();

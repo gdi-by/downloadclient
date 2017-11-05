@@ -132,7 +132,7 @@ public class UIFactory {
             | IllegalAccessException e) {
             // Displays the webview with white background...
         }
-        engine.loadContent(type.abstractDescription);
+        engine.loadContent(type.getAbstractDescription());
 
         container.getChildren().add(descriptionHead);
         container.getChildren().add(description);
@@ -141,7 +141,7 @@ public class UIFactory {
         container.setMargin(description,
             new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
 
-        for (Field entry : type.parameters) {
+        for (Field entry : type.getParameters()) {
             HBox attributeItem = createAttributeItem(entry);
             container.getChildren().add(attributeItem);
         }

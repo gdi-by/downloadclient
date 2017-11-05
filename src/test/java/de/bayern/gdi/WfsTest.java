@@ -102,11 +102,11 @@ public class WfsTest extends TestCase {
     private void checkFeatureTypes(WFSMeta wfsMeta) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.title);
+        sb.append(wfsMeta.getTitle());
         sb.append(" - ");
         sb.append("FeatureType parsing failed.");
 
-        for (Feature feature : wfsMeta.features) {
+        for (Feature feature : wfsMeta.getFeatures()) {
             String name = feature.getName();
             boolean condition = name == null || name.isEmpty();
             assertFalse(sb.toString(), condition);
@@ -117,7 +117,7 @@ public class WfsTest extends TestCase {
     private void checkFeaturesPerPage(WFSMeta wfsMeta) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.title);
+        sb.append(wfsMeta.getTitle());
         sb.append(" - ");
         sb.append("FeaturesPerPage parsing failed.");
 

@@ -253,7 +253,7 @@ public class DownloadStepConverter {
         int idx = dataset.indexOf(':');
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
-            String ns = meta.namespaces.getNamespaceURI(prefix);
+            String ns = meta.getNamespaces().getNamespaceURI(prefix);
             sb.append("&namespaces=xmlns(")
                 .append(StringUtils.urlEncode(prefix)).append(',')
                 .append(StringUtils.urlEncode(ns)).append(')');
@@ -328,7 +328,7 @@ public class DownloadStepConverter {
         int idx = dataset.indexOf(':');
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
-            String ns = meta.namespaces.getNamespaceURI(prefix);
+            String ns = meta.getNamespaces().getNamespaceURI(prefix);
             namespaces = ns;
         }
 

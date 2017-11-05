@@ -363,7 +363,7 @@ public class DataBean extends Observable {
         ServiceType type = getServiceType();
         String serviceURL = type == ServiceType.Atom
             ? getAtomService().getURL()
-            : getWFSService().url;
+            : getWFSService().getURL();
 
         ArrayList<Attribute> attrs = getAttributes();
         ArrayList<Parameter> parameters = new ArrayList<>(attrs.size());
