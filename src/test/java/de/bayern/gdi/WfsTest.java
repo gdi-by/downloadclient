@@ -107,8 +107,8 @@ public class WfsTest extends TestCase {
         sb.append("FeatureType parsing failed.");
 
         for (Feature feature : wfsMeta.features) {
-            boolean condition =
-                    feature.name == null || feature.name.isEmpty();
+            String name = feature.getName();
+            boolean condition = name == null || name.isEmpty();
             assertFalse(sb.toString(), condition);
         }
     }
