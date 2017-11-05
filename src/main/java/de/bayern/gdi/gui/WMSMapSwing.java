@@ -148,7 +148,6 @@ public class WMSMapSwing extends Parent {
     private CoordinateReferenceSystem displayCRS;
     private CoordinateReferenceSystem oldDisplayCRS;
     private CoordinateReferenceSystem mapCRS;
-    private WMSLayer displayLayer;
 
     private static final double TEN_PERCENT = 0.1D;
     private static final String POLYGON_LAYER_TITLE = "PolygonLayer";
@@ -459,9 +458,8 @@ public class WMSMapSwing extends Parent {
         }
         wmsLayer.setBoundingBoxes(targetEnv);
 
-        displayLayer = new WMSLayer(this.wms, wmsLayer);
-        this.wmslayer = displayLayer;
-        this.mapContent.addLayer(displayLayer);
+        this.wmslayer = new WMSLayer(this.wms, wmsLayer);
+        this.mapContent.addLayer(this.wmslayer);
         setMapCRS(this
                 .mapContent
                 .getViewport()
