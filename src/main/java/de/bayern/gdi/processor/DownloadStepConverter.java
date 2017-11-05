@@ -332,7 +332,7 @@ public class DownloadStepConverter {
             namespaces = ns;
         }
 
-        if (dls.getParameters().size() > 0) {
+        if (!dls.getParameters().isEmpty()) {
             for (Parameter p: dls.getParameters()) {
                 if (p.getValue().isEmpty()
                 || usedVars.contains(p.getKey())) {

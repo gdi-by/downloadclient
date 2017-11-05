@@ -245,7 +245,7 @@ public class DownloadConfig {
         try {
             NodeList nodes = parent.getElementsByTagName(tagName).item(0)
                     .getChildNodes();
-            Node valueNode = (Node) nodes.item(0);
+            Node valueNode = nodes.item(0);
             return valueNode.getNodeValue();
         } catch (Exception e) {
             return null;

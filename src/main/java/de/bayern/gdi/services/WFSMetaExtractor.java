@@ -294,7 +294,7 @@ public class WFSMetaExtractor {
             }
 
             NodeList constraints =
-                (NodeList)node.getElementsByTagNameNS(OWS, "Constraint");
+                node.getElementsByTagNameNS(OWS, "Constraint");
 
             for (int j = 0, m = constraints.getLength(); j < m; j++) {
                 Element c = (Element)constraints.item(j);

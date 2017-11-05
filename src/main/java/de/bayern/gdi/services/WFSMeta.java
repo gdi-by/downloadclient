@@ -368,7 +368,7 @@ public class WFSMeta {
      * @return The highest version.
      */
     public Version highestVersion(Version def) {
-        return versions.size() > 0
+        return !versions.isEmpty()
             ? versions.get(versions.size() - 1)
             : def;
     }

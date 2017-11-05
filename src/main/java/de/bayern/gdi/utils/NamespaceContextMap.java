@@ -76,10 +76,9 @@ public final class NamespaceContextMap implements
             String prefix = node.getPrefix();
             String ns = node.getNamespaceURI();
 
-            if (prefix != null && ns != null) {
-                if (!prefixMap.containsKey(prefix)) {
-                    prefixMap.put(prefix, ns);
-                }
+            if (prefix != null && ns != null
+            && !prefixMap.containsKey(prefix)) {
+                prefixMap.put(prefix, ns);
             }
 
             NodeList children = node.getChildNodes();
