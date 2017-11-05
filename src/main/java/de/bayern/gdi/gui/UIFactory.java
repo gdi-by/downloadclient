@@ -172,15 +172,15 @@ public class UIFactory {
         root.setPrefHeight(PREF_HEIGHT);
         root.setMaxHeight(PREF_HEIGHT);
         Label label = new Label();
-        label.setText(field.name);
+        label.setText(field.getName());
         label.setMinWidth(LABEL_MIN_WIDTH);
         TextField textField = new TextField();
-        textField.setUserData(field.name);
+        textField.setUserData(field.getName());
         textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
         //TODO - Save the type w/o the replace
-        type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
+        type.setText(field.getType().replace("xsd:", "").replace("xs:", ""));
         type.setMinWidth(LABEL_MIN_WIDTH);
         root.setMargin(label,
             new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
