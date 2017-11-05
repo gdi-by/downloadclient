@@ -1667,11 +1667,11 @@ public class Controller {
                     if (!dataBean.getWFSService().isSimple()) {
                         for (WFSMeta.Feature f : features) {
                             types.add(new FeatureModel(f));
-                            if (f.bbox != null) {
+                            if (f.getBBox() != null) {
                                 if (extendWFS == null) {
-                                    extendWFS = f.bbox;
+                                    extendWFS = f.getBBox();
                                 } else {
-                                    extendWFS.expandToInclude(f.bbox);
+                                    extendWFS.expandToInclude(f.getBBox());
                                 }
                             }
                         }
@@ -1821,10 +1821,10 @@ public class Controller {
             } else {
                 feature = new WFSMeta.Feature();
             }
-            mapWFS.setExtend(feature.bbox);
+            mapWFS.setExtend(feature.getBBox());
             ArrayList<String> list = new ArrayList<>();
-            list.add(feature.defaultCRS);
-            list.addAll(feature.otherCRSs);
+            list.add(feature.getDefaultCRS());
+            list.addAll(feature.getOtherCRSs());
             ObservableList<CRSModel> crsList =
                     FXCollections.observableArrayList();
             for (String crsStr : list) {

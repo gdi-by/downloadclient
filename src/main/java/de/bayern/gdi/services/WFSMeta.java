@@ -96,19 +96,39 @@ public class WFSMeta {
     /** feature. */
     public static class Feature {
         /** name. */
-        public String name;
+        protected String name;
         /** title. */
-        public String title;
+        protected String title;
         /** abstract. */
-        public String abstractDescription;
+        protected String abstractDescription;
         /** default CRS. */
-        public String defaultCRS;
+        protected String defaultCRS;
         /** other CRSs. */
-        public List<String> otherCRSs;
+        protected List<String> otherCRSs;
         /** outputFormats. */
-        public List<String> outputFormats;
+        protected List<String> outputFormats;
         /** bbox. */
-        public ReferencedEnvelope bbox;
+        protected ReferencedEnvelope bbox;
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getDefaultCRS() {
+            return this.defaultCRS;
+        }
+
+        public List<String> getOtherCRSs() {
+            return this.otherCRSs;
+        }
+
+        public ReferencedEnvelope getBBox() {
+            return this.bbox;
+        }
 
         public Feature() {
             this.otherCRSs = new ArrayList<>();
