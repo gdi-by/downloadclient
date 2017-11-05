@@ -303,7 +303,7 @@ public class Atom {
                     URL targetURL = HTTP.buildAbsoluteURL(
                             entryDocUrl, targetURLStr);
                     itemformat = targetURL.getFile().substring(
-                            targetURL.getFile().lastIndexOf(".") + 1,
+                            targetURL.getFile().lastIndexOf('.') + 1,
                             targetURL.getFile().length());
                 } catch (URISyntaxException | MalformedURLException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
@@ -335,7 +335,7 @@ public class Atom {
                         XPathConstants.STRING,
                         this.context);
                 if (type.isEmpty()) {
-                    type = entryId.substring(entryId.lastIndexOf(".") + 1,
+                    type = entryId.substring(entryId.lastIndexOf('.') + 1,
                             entryId.length());
                 }
                 String crs = (String) XML.xpath(entryNode,

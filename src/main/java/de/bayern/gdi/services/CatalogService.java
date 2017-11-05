@@ -241,7 +241,7 @@ public class CatalogService {
     }
 
     private String getVersionOfType(String type) {
-        String versionNumber = type.substring(type.lastIndexOf(" ") + 1);
+        String versionNumber = type.substring(type.lastIndexOf(' ') + 1);
         if ("2.0".equals(versionNumber)) {
             versionNumber = "2.0.0";
         } else if ("1.0".equals(versionNumber)) {

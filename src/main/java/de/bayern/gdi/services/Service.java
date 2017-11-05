@@ -246,7 +246,7 @@ public class Service extends Object {
             return url;
         } else {
             if (urlStr.endsWith("?")) {
-                urlStr = urlStr.substring(0, urlStr.lastIndexOf("?"));
+                urlStr = urlStr.substring(0, urlStr.lastIndexOf('?'));
             }
             return new URL(urlStr + URL_TRY_APPENDIX);
         }

@@ -1078,7 +1078,7 @@ public class WMSMapSwing extends Parent {
                     .getIdentifiers()
                     .toArray()[0]
                     .toString();
-            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(":") + 1,
+            epsgCode = epsgCode.substring(epsgCode.lastIndexOf(':') + 1,
                     epsgCode.length());
             polygonFeatureType = DataUtilities.createType(
                     "Dataset",
