@@ -45,8 +45,10 @@ import java.util.logging.Logger;
 public class Info {
 
     private static Info instance;
-    private static String version;
-    private static String name;
+
+    private String version;
+    private String name;
+
     private static final String MAVEN_PACKAGE = "de.bayern.gdi";
     private static final String MAVEN_ARTIFACT = "downloadclient";
     private static final String COMMENT = "Geodateninfrastruktur Bayern";
@@ -77,7 +79,7 @@ public class Info {
         if (instance == null) {
             instance = new Info();
         }
-        return version;
+        return instance.version;
     }
 
     /**
@@ -88,7 +90,7 @@ public class Info {
         if (instance == null) {
             instance = new Info();
         }
-        return name;
+        return instance.name;
     }
 
     /**
