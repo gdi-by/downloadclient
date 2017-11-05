@@ -1125,9 +1125,9 @@ public class Controller {
         validateChainContainerItems();
     }
 
-    private ArrayList<ProcessingStep> extractProcessingSteps() {
+    private List<ProcessingStep> extractProcessingSteps() {
 
-        ArrayList<ProcessingStep> steps = new ArrayList<>();
+        List<ProcessingStep> steps = new ArrayList<>();
         if (!this.chkChain.isSelected()) {
             return steps;
         }

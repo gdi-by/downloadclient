@@ -346,7 +346,7 @@ public class DataBean extends Observable {
     /**
      * @param processingSteps the processingSteps to set
      */
-    public void setProcessingSteps(ArrayList<ProcessingStep> processingSteps) {
+    public void setProcessingSteps(List<ProcessingStep> processingSteps) {
         this.processingSteps = processingSteps;
     }
 
