@@ -534,7 +534,8 @@ public class Controller {
                 boolean variantAvailable = false;
                 for (ItemModel i: atomVariationChooser.getItems()) {
                     Atom.Field field = (Atom.Field) i.getItem();
-                    if (field.type.equals(downloadConfig.getAtomVariation())) {
+                    if (field.getType()
+                            .equals(downloadConfig.getAtomVariation())) {
                         variantAvailable = true;
                         atomVariationChooser.getSelectionModel().select(i);
                     }
@@ -603,8 +604,7 @@ public class Controller {
                         HBox hb = (HBox) node;
                         Node n1 = hb.getChildren().get(0);
                         Node n2 = hb.getChildren().get(1);
-                        if (n1 instanceof Label
-                            && n2 instanceof TextField) {
+                        if (n1 instanceof Label && n2 instanceof TextField) {
                             Label paramLabel = (Label) n1;
                             TextField paramBox = (TextField) n2;
                             String targetValue = parameters.get(paramLabel
@@ -1104,24 +1104,22 @@ public class Controller {
             if (variationAvailable) {
                 selaf = (Atom.Field) selim.getItem();
             } else {
-                selaf = new Atom.Field();
-                selaf.format = "";
-                selaf.crs = "";
+                selaf = new Atom.Field("", "");
             }
-            this.dataBean.addAttribute("VARIATION", selaf.type, "");
-            if (selaf.format.isEmpty()) {
+            this.dataBean.addAttribute("VARIATION", selaf.getType(), "");
+            if (selaf.getFormat().isEmpty()) {
                 this.valueAtomFormat.setVisible(false);
             } else {
-                this.valueAtomFormat.setText(selaf.format);
+                this.valueAtomFormat.setText(selaf.getFormat());
                 this.valueAtomFormat.setVisible(true);
             }
-            if (selaf.crs.isEmpty()) {
+            if (selaf.getCRS().isEmpty()) {
                 this.valueAtomRefsys.setVisible(false);
             } else {
                 this.valueAtomRefsys.setVisible(true);
-                this.valueAtomRefsys.setText(selaf.crs);
+                this.valueAtomRefsys.setText(selaf.getCRS());
             }
-            this.dataBean.addAttribute("outputformat", selaf.format, "");
+            this.dataBean.addAttribute("outputformat", selaf.getFormat(), "");
         } else {
             this.dataBean.addAttribute("VARIATION", "", "");
             this.dataBean.addAttribute("outputformat", "", "");

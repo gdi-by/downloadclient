@@ -46,5 +46,4 @@ public class AtomItemModel implements ItemModel {
     public String toString() {
         return this.item.getTitle();
     }
-
 }

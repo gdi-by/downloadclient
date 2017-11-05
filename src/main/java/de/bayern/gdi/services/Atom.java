@@ -83,25 +83,50 @@ public class Atom {
         /**
          * name.
          */
-        public String name;
+        private String name;
         /**
          * type.
          */
-        public String type;
+        private String type;
         /**
          * description.
          */
-        public String description;
+        private String description;
         /**
          * crs.
          */
-        public String crs;
+        private String crs;
         /**
          * format.
          */
-        public String format;
+        private String format;
 
         public Field() {
+        }
+
+        public String getCRS() {
+            return this.crs;
+        }
+
+        public Field(String format, String crs) {
+            this.format = format;
+            this.crs = crs;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getType() {
+            return this.type;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+
+        public String getFormat() {
+            return this.format;
         }
 
         /**
