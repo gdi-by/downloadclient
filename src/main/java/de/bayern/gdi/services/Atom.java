@@ -126,60 +126,80 @@ public class Atom {
     }
 
     /** feature. */
-    public static class Item {
+    public static final class Item {
         /**
          * title.
          */
-        public String title;
+        private String title;
         /**
          * id.
          */
-        public String id;
+        private String id;
         /**
          * default description.
          */
-        public String description;
+        private String description;
         /**
          * default CRS.
          */
-        public String defaultCRS;
+        private String defaultCRS;
         /**
          * other CRSs.
          */
-        public List<String> otherCRSs;
+        private List<String> otherCRSs;
         /**
          * fields.
          */
-        public List<Field> fields;
+        private List<Field> fields;
 
         /**
          * describedBy.
          */
-        public String describedBy;
+        private String describedBy;
 
         /**
          * bounding Polygon.
          */
-        public Polygon polygon;
+        private Polygon polygon;
 
         /**
          * mimetype.
          */
-        public String format;
+        private String format;
 
         /**
          * username.
          */
-        public String username;
+        private String username;
 
         /**
          * password.
          */
-        public String password;
+        private String password;
 
         private NamespaceContext context;
 
         private URL baseURL;
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getID() {
+            return this.id;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+
+        public List<Field> getFields() {
+            return this.fields;
+        }
+
+        public Polygon getPolygon() {
+            return this.polygon;
+        }
 
         public Item(URL url) {
             this.baseURL = url;
@@ -191,6 +211,11 @@ public class Atom {
                     "georss", "http://www.georss.org/georss",
                     "inspire_dls",
                     "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
+        }
+
+        public Item(URL url, String description) {
+            this(url);
+            this.description = description;
         }
 
         @Override

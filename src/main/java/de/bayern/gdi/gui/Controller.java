@@ -1706,13 +1706,14 @@ public class Controller {
                             opts.add(new AtomItemModel(i));
                             WMSMapSwing.FeaturePolygon polygon =
                                     new WMSMapSwing.FeaturePolygon(
-                                            i.polygon,
-                                            i.title,
-                                            i.id,
+                                            i.getPolygon(),
+                                            i.getTitle(),
+                                            i.getID(),
                                             this.atomCRS);
                             polygonList.add(polygon);
                             all = all == null
-                                    ? i.polygon : all.union(i.polygon);
+                                ? i.getPolygon()
+                                : all.union(i.getPolygon());
                         }
                         if (mapAtom != null) {
                             if (all != null) {
@@ -1756,20 +1757,20 @@ public class Controller {
             }
         } else {
             try {
-                item = new Atom.Item(new URL(
-                        this.downloadConfig.getServiceURL()));
-                item.description = "";
+                item = new Atom.Item(
+                    new URL(this.downloadConfig.getServiceURL()),
+                    "");
             } catch (Exception e) {
                 return;
             }
         }
         if (mapAtom != null) {
-            mapAtom.highlightSelectedPolygon(item.id);
+            mapAtom.highlightSelectedPolygon(item.getID());
             Platform.runLater(() ->
                 mapAtom.repaint()
             );
         }
-        List<Atom.Field> fields = item.fields;
+        List<Atom.Field> fields = item.getFields();
         ObservableList<ItemModel> list =
                 FXCollections.observableArrayList();
         for (Atom.Field f : fields) {
@@ -1798,7 +1799,7 @@ public class Controller {
                 + "font-family: Sans-Serif" + "}"
                 + "</style> </head>"
                 + "<div class=\"description-content\">"
-                + item.description + "</div>");
+                + item.getDescription() + "</div>");
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.atomContainer.setVisible(true);
@@ -2181,14 +2182,15 @@ public class Controller {
                     for (i = 0; i < items.size(); i++) {
                         AtomItemModel item = (AtomItemModel) items.get(i);
                         Atom.Item aitem = (Atom.Item) item.getItem();
-                        if (aitem.id.equals(polygonID)) {
+                        if (aitem.getID().equals(polygonID)) {
                             break;
                         }
                     }
                     Atom.Item oldItem = (Atom.Item) serviceTypeChooser
                             .getSelectionModel()
                             .getSelectedItem().getItem();
-                    if (i < items.size() && !oldItem.id.equals(polygonID)) {
+                    if (i < items.size()
+                    && !oldItem.getID().equals(polygonID)) {
                         serviceTypeChooser.setValue(items.get(i));
                         chooseType(serviceTypeChooser.getValue());
                     }

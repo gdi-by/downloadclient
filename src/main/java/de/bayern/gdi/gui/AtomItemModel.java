@@ -39,12 +39,12 @@ public class AtomItemModel implements ItemModel {
     }
 
     public String getDataset() {
-        return item.id;
+        return item.getID();
     }
 
     @Override
     public String toString() {
-        return this.item.title;
+        return this.item.getTitle();
     }
 
 }
