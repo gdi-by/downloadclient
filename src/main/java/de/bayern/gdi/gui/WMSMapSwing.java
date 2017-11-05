@@ -1238,8 +1238,7 @@ public class WMSMapSwing extends Parent {
                         y1Coordinate,
                         y2Coordinate,
                         crs);
-                Envelope2D env2D = new Envelope2D(env);
-                return env2D;
+                return new Envelope2D(env);
             }
         }
         return null;

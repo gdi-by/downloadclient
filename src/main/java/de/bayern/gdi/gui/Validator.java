@@ -100,9 +100,7 @@ public class Validator {
             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
             for (String namespace: JAVASPACES) {
                 try {
-                    Class<?> aClass =
-                            systemClassLoader.loadClass(namespace + className);
-                    return aClass;
+                    return systemClassLoader.loadClass(namespace + className);
                 } catch (ClassNotFoundException e) {
 
                 }

@@ -84,8 +84,7 @@ public class Settings {
     }
 
     private static InputStream getFileStream(String fileName) {
-        InputStream stream = Misc.getResource(fileName);
-        return stream;
+        return Misc.getResource(fileName);
     }
 
     /**

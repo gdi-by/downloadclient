@@ -393,12 +393,10 @@ public class CatalogService {
                             + "/gmd:CI_OnlineResource"
                             + "/gmd:linkage"
                             + "/gmd:URL";
-            String operationsURL = (String) XML.xpath(
+            return (String)XML.xpath(
                     firstNode,
                     operationsURLExpr,
                     XPathConstants.STRING, context);
-            return operationsURL;
-
         }
         return null;
     }
