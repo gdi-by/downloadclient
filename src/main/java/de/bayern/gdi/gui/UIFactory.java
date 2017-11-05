@@ -19,8 +19,8 @@ package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.InputElement;
@@ -270,7 +270,7 @@ public class UIFactory {
      * @param params The parameters
      */
     public void addChainAttribute(VBox container,
-            String processName, HashMap<String, String> params) {
+            String processName, Map<String, String> params) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();

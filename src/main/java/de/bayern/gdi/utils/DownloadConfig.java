@@ -20,6 +20,7 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -254,16 +255,33 @@ public class DownloadConfig {
     /**
       * Class, serving as a simple model for processing chain steps.
       */
-    public class ProcessingStep {
+    public static final class ProcessingStep {
        /**
         * The name of the processing step.
         */
-        public String name;
+        private String name;
 
        /**
         * Name and value of all given parameters for this step.
         */
-        public HashMap<String, String> params;
+        private HashMap<String, String> params;
+
+        /**
+         * Returns the map of the parameters used by
+         * this processing step.
+         * @return the map with the parameters otf this step.
+         */
+        public Map<String, String> getParams() {
+            return this.params;
+        }
+
+        /**
+         * Returns the name of this processing step.
+         * @return the name of the processing step.
+         */
+        public String getName() {
+            return name;
+        }
 
         public ProcessingStep() {
             params = new HashMap<>();

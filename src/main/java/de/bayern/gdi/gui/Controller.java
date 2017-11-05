@@ -671,7 +671,7 @@ public class Controller {
 
             for (DownloadConfig.ProcessingStep iStep : steps) {
                 factory.addChainAttribute(chainContainer,
-                        iStep.name, iStep.params);
+                        iStep.getName(), iStep.getParams());
             }
         } else {
             chkChain.setSelected(false);
