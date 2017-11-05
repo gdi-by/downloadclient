@@ -63,7 +63,7 @@ public class Atom {
     private Document mainDoc;
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
-    private ArrayList<Item> items;
+    private List<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
     private static final int ZERO = 0;
@@ -648,7 +648,7 @@ public class Atom {
      * Items of the services.
      * @return the Items of the service
      */
-    public ArrayList<Item> getItems() {
+    public List<Item> getItems() {
         return this.items;
     }
 
