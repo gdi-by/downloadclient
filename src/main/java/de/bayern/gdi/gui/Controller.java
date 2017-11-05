@@ -625,7 +625,7 @@ public class Controller {
                                     return new CellTypes.StringCell();
                                 }
                             });
-                            cb.setOnAction((event) -> {
+                            cb.setOnAction(event -> {
                                 if (cb.getValue().isAvailable()) {
                                     cb.setStyle("-fx-border-color: null;");
                                 } else {
@@ -711,79 +711,77 @@ public class Controller {
         serviceURL.getScene().setCursor(Cursor.WAIT);
         serviceURL.setDisable(true);
         resetGui();
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    ServiceModel serviceModel =
-                            (ServiceModel) serviceList.getSelectionModel()
-                                    .getSelectedItems().get(0);
-                    Service service = null;
-                    if (serviceModel != null
-                        && serviceModel.getUrl().toString().equals(
-                            serviceURL.getText())
-                            ) {
-                        if (ServiceChecker.isReachable(serviceModel
-                                    .getItem().getServiceURL())) {
-                            service = serviceModel.getItem();
-                            service.setPassword(servicePW.getText());
-                            service.setUsername(serviceUser.getText());
-                        }
-                    } else {
-                        URL sURL = new URL(serviceURL.getText());
-                        if (ServiceChecker.isReachable(sURL)) {
-                            service = new Service(
-                                    sURL,
-                                    "",
-                                    true,
-                                    serviceUser.getText(),
-                                    servicePW.getText());
-                        }
+        new Thread(() -> {
+            try {
+                ServiceModel serviceModel =
+                        (ServiceModel) serviceList.getSelectionModel()
+                                .getSelectedItems().get(0);
+                Service service = null;
+                if (serviceModel != null
+                    && serviceModel.getUrl().toString().equals(
+                        serviceURL.getText())
+                        ) {
+                    if (ServiceChecker.isReachable(serviceModel
+                                .getItem().getServiceURL())) {
+                        service = serviceModel.getItem();
+                        service.setPassword(servicePW.getText());
+                        service.setUsername(serviceUser.getText());
                     }
-                    if (service == null) {
-                        setStatusTextUI(
-                            I18n.format("status.service-timeout"));
-                        dataBean.setSelectedService(null);
-                        serviceSelection.setDisable(false);
-                        serviceURL.setDisable(false);
-                        serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                        return;
+                } else {
+                    URL sURL = new URL(serviceURL.getText());
+                    if (ServiceChecker.isReachable(sURL)) {
+                        service = new Service(
+                                sURL,
+                                "",
+                                true,
+                                serviceUser.getText(),
+                                servicePW.getText());
                     }
-                    serviceSelection.setDisable(true);
-                    serviceURL.getScene().setCursor(Cursor.WAIT);
-                    setStatusTextUI(
-                            I18n.format("status.checking-auth"));
-                    serviceURL.setDisable(true);
-                    Service finalService = service;
-                    Task task = new Task() {
-                        protected Integer call() {
-                            try {
-                                boolean serviceSelected = selectService(
-                                        finalService);
-                                if (serviceSelected) {
-                                    chooseSelectedService(downloadConf);
-                                }
-                                return 0;
-                            } finally {
-                                serviceSelection.setDisable(false);
-                                serviceURL.getScene()
-                                        .setCursor(Cursor.DEFAULT);
-                                serviceURL.setDisable(false);
-                                validateChainContainerItems();
-                            }
-                        }
-                    };
-                    Thread th = new Thread(task);
-                    th.setDaemon(true);
-                    th.start();
-                } catch (MalformedURLException e) {
-                    setStatusTextUI(
-                            I18n.format("status.no-url"));
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                    serviceSelection.setDisable(false);
-                    serviceURL.getScene()
-                            .setCursor(Cursor.DEFAULT);
-                    serviceURL.setDisable(false);
                 }
+                if (service == null) {
+                    setStatusTextUI(
+                        I18n.format("status.service-timeout"));
+                    dataBean.setSelectedService(null);
+                    serviceSelection.setDisable(false);
+                    serviceURL.setDisable(false);
+                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
+                    return;
+                }
+                serviceSelection.setDisable(true);
+                serviceURL.getScene().setCursor(Cursor.WAIT);
+                setStatusTextUI(
+                        I18n.format("status.checking-auth"));
+                serviceURL.setDisable(true);
+                Service finalService = service;
+                Task task = new Task() {
+                    protected Integer call() {
+                        try {
+                            boolean serviceSelected = selectService(
+                                    finalService);
+                            if (serviceSelected) {
+                                chooseSelectedService(downloadConf);
+                            }
+                            return 0;
+                        } finally {
+                            serviceSelection.setDisable(false);
+                            serviceURL.getScene()
+                                    .setCursor(Cursor.DEFAULT);
+                            serviceURL.setDisable(false);
+                            validateChainContainerItems();
+                        }
+                    }
+                };
+                Thread th = new Thread(task);
+                th.setDaemon(true);
+                th.start();
+            } catch (MalformedURLException e) {
+                setStatusTextUI(
+                        I18n.format("status.no-url"));
+                log.log(Level.SEVERE, e.getMessage(), e);
+                serviceSelection.setDisable(false);
+                serviceURL.getScene()
+                        .setCursor(Cursor.DEFAULT);
+                serviceURL.setDisable(false);
             }
         }).start();
     }
@@ -883,25 +881,25 @@ public class Controller {
                 service.load();
             } catch (IOException e) {
                 log.log(Level.SEVERE, e.getMessage(), e);
-                Platform.runLater(() -> {
+                Platform.runLater(() ->
                     setStatusTextUI(
-                            I18n.format("status.service.broken"));
-                });
+                            I18n.format("status.service.broken"))
+                );
                 return false;
             }
         } else {
-            Platform.runLater(() -> {
+            Platform.runLater(() ->
                 setStatusTextUI(
-                        I18n.format("status.service-not-available"));
-            });
+                        I18n.format("status.service-not-available"))
+            );
             return false;
         }
         if (dataBean.getSelectedService() != null
         &&  dataBean.getSelectedService().equals(service)) {
-            Platform.runLater(() -> {
+            Platform.runLater(() ->
                 setStatusTextUI(
-                        I18n.format("status.ready"));
-            });
+                        I18n.format("status.ready"))
+            );
             return true;
         }
         dataBean.setSelectedService(service);
@@ -935,17 +933,17 @@ public class Controller {
         }
         //Check if this thing could be loaded
         if (dataBean.getSelectedService().getServiceType() == null) {
-            Platform.runLater(() -> {
+            Platform.runLater(() ->
                 setStatusTextUI(
-                        I18n.format("status.service.broken"));
-            });
+                        I18n.format("status.service.broken"))
+            );
             return false;
         }
 
-        Platform.runLater(() -> {
+        Platform.runLater(() ->
             setStatusTextUI(
-                    I18n.format("status.ready"));
-        });
+                    I18n.format("status.ready"))
+        );
         return true;
     }
 
@@ -1049,7 +1047,7 @@ public class Controller {
     @FXML
     protected void handleAddChainItem(ActionEvent event) {
         factory.addChainAttribute(chainContainer,
-                ()->validateChainContainerItems());
+                this::validateChainContainerItems);
         validateChainContainerItems();
     }
 
@@ -1438,9 +1436,9 @@ public class Controller {
     }
 
     private void resetGui() {
-        Platform.runLater(() -> {
-            this.serviceTypeChooser.getItems().retainAll();
-        });
+        Platform.runLater(() ->
+            this.serviceTypeChooser.getItems().retainAll()
+        );
         this.serviceTypeChooser.setStyle("-fx-border-color: null;");
         this.dataBean.reset();
         this.mapAtom.reset();
@@ -1547,10 +1545,10 @@ public class Controller {
     private void chooseSelectedService(DownloadConfig downloadConf) {
         switch (dataBean.getSelectedService().getServiceType()) {
             case Atom:
-                Platform.runLater(() -> {
+                Platform.runLater(() ->
                     setStatusTextUI(
-                            I18n.getMsg("status.type.atom"));
-                });
+                            I18n.getMsg("status.type.atom"))
+                );
                 Atom atom = null;
                 try {
                     atom = new Atom(
@@ -1563,11 +1561,11 @@ public class Controller {
                         | ParserConfigurationException
                         | IOException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(() -> {
+                    Platform.runLater(() ->
                         setStatusTextUI(
                                 I18n.getMsg("status.service.broken")
-                        );
-                    });
+                        )
+                    );
                     resetGui();
                     return;
                 } finally {
@@ -1575,10 +1573,10 @@ public class Controller {
                 }
                 break;
             case WFSOne:
-                Platform.runLater(() -> {
+                Platform.runLater(() ->
                     setStatusTextUI(
-                            I18n.getMsg("status.type.wfsone"));
-                });
+                            I18n.getMsg("status.type.wfsone"))
+                );
                 WFSMetaExtractor wfsOne =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -1591,20 +1589,20 @@ public class Controller {
                 } catch (IOException
                         | URISyntaxException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(() -> {
+                    Platform.runLater(() ->
                         setStatusTextUI(
                                 I18n.getMsg("status.service.broken")
-                        );
-                    });
+                        )
+                    );
                 } finally {
                     dataBean.setWFSService(metaOne);
                 }
                 break;
             case WFSTwo:
-                Platform.runLater(() -> {
+                Platform.runLater(() ->
                     setStatusTextUI(
-                            I18n.getMsg("status.type.wfstwo"));
-                });
+                            I18n.getMsg("status.type.wfstwo"))
+                );
                 WFSMetaExtractor extractor =
                         new WFSMetaExtractor(
                                 dataBean.getSelectedService()
@@ -1617,10 +1615,10 @@ public class Controller {
                 } catch (IOException
                         | URISyntaxException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(() -> {
+                    Platform.runLater(() ->
                         setStatusTextUI(
-                                I18n.getMsg("status.service.broken"));
-                    });
+                                I18n.getMsg("status.service.broken"))
+                    );
 
                 } finally {
                     dataBean.setWFSService(meta);
@@ -1630,15 +1628,13 @@ public class Controller {
                 log.log(Level.WARNING,
                         "Could not determine URL",
                         dataBean.getSelectedService());
-                Platform.runLater(() -> {
-                    setStatusTextUI(I18n.getMsg("status.no-url"));
-                });
+                Platform.runLater(() ->
+                    setStatusTextUI(I18n.getMsg("status.no-url"))
+                );
                 break;
         }
         if (dataBean.isWebServiceSet()) {
-            Platform.runLater(() -> {
-                setServiceTypes();
-            });
+            Platform.runLater(this::setServiceTypes);
         } else {
             return;
         }
@@ -1734,9 +1730,9 @@ public class Controller {
                         serviceTypeChooser.setValue(opts.get(0));
                         chooseType(serviceTypeChooser.getValue());
                     }
-                    Platform.runLater(() -> {
-                        mapAtom.repaint();
-                    });
+                    Platform.runLater(() ->
+                        mapAtom.repaint()
+                    );
                     break;
                 default:
             }
@@ -1768,9 +1764,9 @@ public class Controller {
         }
         if (mapAtom != null) {
             mapAtom.highlightSelectedPolygon(item.id);
-            Platform.runLater(() -> {
-                mapAtom.repaint();
-            });
+            Platform.runLater(() ->
+                mapAtom.repaint()
+            );
         }
         List<Atom.Field> fields = item.fields;
         ObservableList<ItemModel> list =
