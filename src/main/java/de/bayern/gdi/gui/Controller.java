@@ -1307,7 +1307,7 @@ public class Controller {
 
     private boolean validateInput() {
         String failed = "";
-        ArrayList<DataBean.Attribute> attributes
+        List<DataBean.Attribute> attributes
                 = this.dataBean.getAttributes();
 
         Validator validator = Validator.getInstance();

@@ -24,6 +24,7 @@ import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,8 +166,8 @@ public class DownloadStepConverter {
     }
 
     private static String encodeParameters(
-        ArrayList<Parameter> parameters,
-        Set<String>          usedVars
+        List<Parameter> parameters,
+        Set<String>     usedVars
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {

@@ -50,8 +50,8 @@ public class DataBean extends Observable {
     private ItemModel dataType;
     private Atom atomService;
     private WFSMeta wfsService;
-    private ArrayList<Attribute> attributes;
-    private ArrayList<ProcessingStep> processingSteps;
+    private List<Attribute> attributes;
+    private List<ProcessingStep> processingSteps;
     private Service selectedService;
 
     private CatalogService catalogService;
@@ -289,7 +289,7 @@ public class DataBean extends Observable {
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public ArrayList<Attribute> getAttributes() {
+    public List<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -297,7 +297,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(ArrayList<Attribute> attributes) {
+    public void setAttributes(List<Attribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -339,7 +339,7 @@ public class DataBean extends Observable {
     /**
      * @return the processingSteps
      */
-    public ArrayList<ProcessingStep> getProcessingSteps() {
+    public List<ProcessingStep> getProcessingSteps() {
         return processingSteps;
     }
 
@@ -365,7 +365,7 @@ public class DataBean extends Observable {
             ? getAtomService().getURL()
             : getWFSService().getURL();
 
-        ArrayList<Attribute> attrs = getAttributes();
+        List<Attribute> attrs = getAttributes();
         ArrayList<Parameter> parameters = new ArrayList<>(attrs.size());
         for (Attribute attr: attrs) {
             Parameter param = new Parameter(attr.name, attr.value);

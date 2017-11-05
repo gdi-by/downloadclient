@@ -347,7 +347,7 @@ public class Atom {
                         String temp = entryDescription.substring(
                                 entryDescription.lastIndexOf("EPSG:"),
                                 entryDescription.length());
-                        String epsgNum = new String();
+                        String epsgNum = "";
                         for (int j = "EPSG:".length();
                             j < temp.length() - 1;
                             j++) {

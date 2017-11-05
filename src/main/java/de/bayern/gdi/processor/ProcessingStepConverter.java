@@ -59,7 +59,7 @@ public class ProcessingStepConverter {
     public void convert(DownloadStep dls, FileTracker fileTracker, Log logger)
     throws ConverterException {
 
-        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
+        List<ProcessingStep> steps = dls.getProcessingSteps();
         if (steps == null || steps.isEmpty()) {
             return;
         }
