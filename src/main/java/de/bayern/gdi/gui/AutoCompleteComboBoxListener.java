@@ -165,7 +165,6 @@ public class AutoCompleteComboBoxListener<T> {
         }
 
         String s = comboBox.getEditor().getText();
-        System.out.println("Found? " + found);
         if (!found && affect) {
             comboBox.getSelectionModel().clearSelection();
             comboBox.getEditor().setText(s);
