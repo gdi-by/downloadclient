@@ -1316,12 +1316,13 @@ public class Controller {
 
         Validator validator = Validator.getInstance();
         for (DataBean.Attribute attribute : attributes) {
-            if (!attribute.type.equals("")) {
-                if (!validator.isValid(attribute.type, attribute.value)) {
-                    if (failed.equals("")) {
-                        failed = attribute.name;
+            if (!attribute.getType().isEmpty()) {
+                if (!validator.isValid(
+                            attribute.getType(), attribute.getValue())) {
+                    if (failed.isEmpty()) {
+                        failed = attribute.getName();
                     } else {
-                        failed = failed + ", " + attribute.name;
+                        failed += ", " + attribute.getName();
                     }
                 }
             }

@@ -59,15 +59,39 @@ public class DataBean extends Observable {
     /**
      * Attribute representation.
      */
-    public static class Attribute {
+    public static final class Attribute {
         /** name. */
-        public String name;
+        private String name;
 
         /** value. */
-        public String value;
+        private String value;
 
         /** type. */
-        public String type;
+        private String type;
+
+        /**
+         * Returns the name of the attribute.
+         * @return the name of the attribute
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * Returns the value of the attribute.
+         * @return the value of the attribute
+         */
+        public String getValue() {
+            return this.value;
+        }
+
+        /**
+         * Returns the type of the attribute.
+         * @return the type of the attribute.
+         */
+        public String getType() {
+            return this.type;
+        }
 
         /**
          * Constructor.
