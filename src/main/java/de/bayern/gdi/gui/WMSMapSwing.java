@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.Node;
@@ -239,16 +238,6 @@ public class WMSMapSwing extends Parent {
     public void add(Node n) {
         this.vBox.getChildren().remove(n);
         this.vBox.getChildren().add(n);
-    }
-
-    /**
-     * gets the children of this node.
-     *
-     * @return the children of the node
-     */
-    @Override
-    public ObservableList getChildren() {
-        return super.getChildren();
     }
 
     /**
