@@ -119,7 +119,7 @@ public class Headless implements ProcessorListener {
             processor.addJob(jobs);
         }
 
-        processor.addJob(Processor.QUIT);
+        processor.addJob(Processor.QUIT_JOB);
 
         try {
             thread.join();

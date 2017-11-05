@@ -38,7 +38,7 @@ public class Processor implements Runnable {
     /** Add this job to shutdown the processor after
      *  finishing all previous jobs.
      */
-    public static final Job QUIT = new Job() {
+    public static final Job QUIT_JOB = new Job() {
         @Override
         public void run(Processor p) throws JobExecutionException {
         }
@@ -143,7 +143,7 @@ public class Processor implements Runnable {
                 }
                 job = this.jobs.poll();
             }
-            if (job == QUIT) {
+            if (job == QUIT_JOB) {
                 break;
             }
             try {
