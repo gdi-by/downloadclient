@@ -60,20 +60,18 @@ public class Validator {
      * @return true if it works; false if not
      */
     public boolean isValid(String className, String value) {
-        if (value != null) {
-            if (!value.equals("")) {
-                try {
-                    Class<?> aClass = classByName(className);
-                    if (aClass != null) {
-                        return isCastableTo(aClass, value);
-                    } else {
-                        //https://github.com/gdi-by/downloadclient-test/
-                        // issues/24#issuecomment-233619602
-                        return true;
-                    }
-                } catch (ClassNotFoundException ex) {
-                    return false;
+        if (value != null && !value.isEmpty()) {
+            try {
+                Class<?> aClass = classByName(className);
+                if (aClass != null) {
+                    return isCastableTo(aClass, value);
+                } else {
+                    //https://github.com/gdi-by/downloadclient-test/
+                    // issues/24#issuecomment-233619602
+                    return true;
                 }
+            } catch (ClassNotFoundException ex) {
+                return false;
             }
         }
         return true;

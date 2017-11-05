@@ -298,10 +298,10 @@ public class CatalogService {
 
             String serviceURL = getServiceURL(serviceN);
 
-            if (serviceTypeVersion.equals("")) {
+            if (serviceTypeVersion.isEmpty()) {
                 serviceTypeVersion = "ATOM";
             }
-            if (!serviceName.equals("") && serviceURL != null) {
+            if (!serviceName.isEmpty() && serviceURL != null) {
                 serviceURL = makeCapabiltiesURL(serviceURL,
                         serviceTypeVersion);
                 Service service = new Service(new URL(serviceURL),

@@ -1376,7 +1376,7 @@ public class Controller {
             failed = failed.substring(0, failed.length() - 2);
         }
 
-        if (!failed.equals("")) {
+        if (!failed.isEmpty()) {
             setStatusTextUI(
                     I18n.format("status.validation-fail", failed));
             return false;

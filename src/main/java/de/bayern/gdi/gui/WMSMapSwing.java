@@ -422,13 +422,13 @@ public class WMSMapSwing extends Parent {
                 && this.coordinateX2TextField != null
                 && this.coordinateY2TextField != null) {
             if (!this.coordinateX1TextField.getText()
-                    .toString().equals("")
+                    .toString().isEmpty()
                     && !this.coordinateY1TextField.getText()
-                    .toString().equals("")
+                    .toString().isEmpty()
                     && !this.coordinateX2TextField.getText()
-                    .toString().equals("")
+                    .toString().isEmpty()
                     && !this.coordinateY2TextField.getText().
-                    toString().equals("")) {
+                    toString().isEmpty()) {
                 Double x1Coordinate = Double.parseDouble(
                         this.coordinateX1TextField.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
@@ -1231,10 +1231,10 @@ public class WMSMapSwing extends Parent {
                 && x2 != null
                 && y1 != null
                 && y2 != null) {
-            if (!x1.getText().toString().equals("")
-                    && !x2.toString().equals("")
-                    && !y1.toString().equals("")
-                    && !y2.toString().equals("")) {
+            if (!x1.getText().toString().isEmpty()
+                    && !x2.toString().isEmpty()
+                    && !y1.toString().isEmpty()
+                    && !y2.toString().isEmpty()) {
                 Double x1Coordinate = Double.parseDouble(
                         x1.getText().toString());
                 Double x2Coordinate = Double.parseDouble(
