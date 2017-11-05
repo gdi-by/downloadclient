@@ -177,17 +177,16 @@ public class ServiceSettings {
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
         Node servicesNode = servicesNL.item(0);
         NodeList serviceNL = servicesNode.getChildNodes();
-        Node serviceNode, serviceValueNode;
 
         for (int i = 0; i < serviceNL.getLength(); i++) {
-            serviceNode = serviceNL.item(i);
+            Node serviceNode = serviceNL.item(i);
             if (serviceNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
                 boolean restricted = false;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
-                    serviceValueNode = serviceValueNL.item(k);
+                    Node serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
@@ -230,16 +229,15 @@ public class ServiceSettings {
             throw new IOException(nodeName + " Node not found - Config broken");
         }
         NodeList serviceNL = servicesNode.getChildNodes();
-        Node serviceNode, serviceValueNode;
 
         for (int i = 0; i < serviceNL.getLength(); i++) {
-            serviceNode = serviceNL.item(i);
+            Node serviceNode = serviceNL.item(i);
             if (serviceNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
-                    serviceValueNode = serviceValueNL.item(k);
+                    Node serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
