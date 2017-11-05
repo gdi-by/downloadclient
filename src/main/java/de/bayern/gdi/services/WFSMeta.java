@@ -36,15 +36,27 @@ public class WFSMeta {
     /** operation. */
     public static class Operation {
         /** name. */
-        public String name;
+        protected String name;
         /** get. */
-        public String get;
+        protected String get;
         /** post. */
-        public String post;
+        protected String post;
         /** output formats. */
-        public List<String> outputFormats;
+        protected List<String> outputFormats;
         /** constraints. */
-        public List<Constraint> constraints;
+        protected List<Constraint> constraints;
+
+        public String getGET() {
+            return this.get;
+        }
+
+        public String getPOST() {
+            return this.post;
+        }
+
+        public List<String> getOutputFormats() {
+            return this.outputFormats;
+        }
 
         public Operation() {
             this.outputFormats = new ArrayList<>();

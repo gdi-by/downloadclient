@@ -1871,7 +1871,7 @@ public class Controller {
             }
             List<String> outputFormats = this
                 .dataBean.getWFSService()
-                .findOperation("GetFeature").outputFormats;
+                .findOperation("GetFeature").getOutputFormats();
 
             if (outputFormats.isEmpty()) {
                 outputFormats =
@@ -1891,7 +1891,7 @@ public class Controller {
                 || (!datasetAvailable
                 && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))) {
             List<String> outputFormats = this.dataBean.getWFSService()
-                    .findOperation("GetFeature").outputFormats;
+                    .findOperation("GetFeature").getOutputFormats();
             if (outputFormats.isEmpty()) {
                 outputFormats =
                         this.dataBean.getWFSService().outputFormats;

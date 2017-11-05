@@ -220,7 +220,7 @@ public class DownloadStepConverter {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String vendor = vendorSpecific(url);
-        String getFeaturesURL = meta.findOperation("GetFeature").get;
+        String getFeaturesURL = meta.findOperation("GetFeature").getGET();
         if (getFeaturesURL.startsWith("/")) {
             base += getFeaturesURL;
         } else {
@@ -421,11 +421,13 @@ public class DownloadStepConverter {
     ) {
         boolean usePost = false;
         WFSMeta.Operation getFeature = meta.findOperation("GetFeature");
-        if (getFeature.post != null) {
+        if (getFeature.getPOST() != null) {
             usePost = true;
         }
 
-        String url = usePost ? getFeature.post : wfsURL(dls, usedVars, meta);
+        String url = usePost
+            ? getFeature.getPOST()
+            : wfsURL(dls, usedVars, meta);
         String params = null;
         if (usePost) {
             params = createWFSPostParams(dls, usedVars, meta);
@@ -620,9 +622,9 @@ public class DownloadStepConverter {
         String wfsURL;
         String params = null;
         int numFeatures;
-        if (getFeatureOp.post != null) {
+        if (getFeatureOp.getPOST() != null) {
             usePost = true;
-            wfsURL = getFeatureOp.post;
+            wfsURL = getFeatureOp.getPOST();
             params = createWFSPostParams(dls, usedVars, meta, true);
             numFeatures = numFeatures(wfsURL, params);
         } else {
