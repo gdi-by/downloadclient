@@ -145,10 +145,7 @@ public class Controller {
     //Application log
     private static final Logger APP_LOG = Logger.getLogger("Application Log");
     private static boolean appLogInit = false;
-    private static FileHandler appLogFileHandler;
-    private static AppLogFormatter appLogFormatter;
 
-    private CoordinateReferenceSystem atomCRS;
     // DataBean
     private DataBean dataBean;
     private Stage primaryStage;
@@ -296,10 +293,11 @@ public class Controller {
                     + "/downloadclient");
             logPath.mkdirs();
 
-            appLogFileHandler = new FileHandler(logPath.getAbsolutePath()
+            FileHandler appLogFileHandler = new FileHandler(
+                    logPath.getAbsolutePath()
                     + "/downloadclient_app_log.txt",
                     MAX_APP_LOG_BYTES, 1, true);
-            appLogFormatter = new AppLogFormatter();
+            AppLogFormatter appLogFormatter = new AppLogFormatter();
             appLogFileHandler.setFormatter(appLogFormatter);
             APP_LOG.addHandler(appLogFileHandler);
             appLogInit = true;
@@ -1698,7 +1696,8 @@ public class Controller {
                     // (http://www.georss.org/gml.html)
                     try {
                         ReferencedEnvelope extendATOM = null;
-                        atomCRS = CRS.decode(ATOM_CRS_STRING);
+                        CoordinateReferenceSystem
+                            atomCRS = CRS.decode(ATOM_CRS_STRING);
                         Geometry all = null;
                         for (Atom.Item i : items) {
                             opts.add(new AtomItemModel(i));
@@ -1707,7 +1706,7 @@ public class Controller {
                                             i.getPolygon(),
                                             i.getTitle(),
                                             i.getID(),
-                                            this.atomCRS);
+                                            atomCRS);
                             polygonList.add(polygon);
                             all = all == null
                                 ? i.getPolygon()
