@@ -320,7 +320,6 @@ public class ProxyConfiguration {
             BufferedInputStream bis = new BufferedInputStream(fis);
             return (ProxyConfiguration)um.unmarshal(bis);
         } catch (JAXBException je) {
-            je.printStackTrace();
             throw new IOException(je.getMessage(), je);
         }
     }
