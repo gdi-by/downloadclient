@@ -287,4 +287,20 @@ parts:
         }
         return join(use, sep);
     }
+
+    /**
+     * Checks if two strings are equal or both null.
+     * @param a The first string.
+     * @param b The second strinh.
+     * @return true if both strings are equal or both null.
+     */
+    public static boolean nullOrEquals(String a, String b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
+    }
 }

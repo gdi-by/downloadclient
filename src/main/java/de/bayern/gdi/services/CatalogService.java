@@ -307,7 +307,7 @@ public class CatalogService {
                 Service service = new Service(new URL(serviceURL),
                         serviceName,
                         restricted,
-                        Service.guessServiceType(serviceTypeVersion));
+                        ServiceType.guess(serviceTypeVersion));
                 services.add(service);
             }
         }
