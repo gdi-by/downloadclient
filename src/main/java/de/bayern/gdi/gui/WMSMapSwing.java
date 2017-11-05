@@ -194,20 +194,20 @@ public class WMSMapSwing extends Parent {
         /**
          * the polygon.
          **/
-        public Polygon polygon;
+        private Polygon polygon;
         /**
          * name of the polygon.
          **/
-        public String name;
+        private String name;
         /**
          * id of the polygon.
          **/
-        public String id;
+        private String id;
 
         /**
          * crs of the polygon.
          */
-        public CoordinateReferenceSystem crs;
+        private CoordinateReferenceSystem crs;
 
         /**
          * Constructor.
