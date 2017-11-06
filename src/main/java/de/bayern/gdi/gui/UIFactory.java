@@ -203,6 +203,30 @@ public class UIFactory {
         addChainAttribute(container, null);
     }
 
+    private static void addRemoveButton(
+        final VBox container,
+        final VBox root,
+        VBox dynroot,
+        HBox subroot,
+        ComboBox box) {
+
+        Button remove = new Button(I18n.getMsg("gui.remove"));
+        remove.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                ObservableList<Node> items = container.getChildren();
+                items.remove(root);
+            }
+        });
+        subroot.getChildren().addAll(box, remove);
+        subroot.setMargin(box, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_20));
+        subroot.setMargin(remove, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
+        Separator sep = new Separator();
+        root.getChildren().addAll(subroot, dynroot, sep);
+        root.setId("process_parameter");
+    }
+
     /**
      * Add new post process chain item.
      *
@@ -242,22 +266,7 @@ public class UIFactory {
                 }
             }
         });
-        Button remove = new Button(I18n.getMsg("gui.remove"));
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                ObservableList<Node> items = container.getChildren();
-                items.remove(root);
-            }
-        });
-        subroot.getChildren().addAll(box, remove);
-        subroot.setMargin(box, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_20));
-        subroot.setMargin(remove, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
-        Separator sep = new Separator();
-        root.getChildren().addAll(subroot, dynroot, sep);
-        root.setId("process_parameter");
-
+        addRemoveButton(container, root, dynroot, subroot, box);
         container.getChildren().add(root);
     }
 
@@ -290,21 +299,7 @@ public class UIFactory {
                     config);
             }
         });
-        Button remove = new Button(I18n.getMsg("gui.remove"));
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                ObservableList<Node> items = container.getChildren();
-                items.remove(root);
-            }
-        });
-        subroot.getChildren().addAll(box, remove);
-        subroot.setMargin(box, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_20));
-        subroot.setMargin(remove, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
-        Separator sep = new Separator();
-        root.getChildren().addAll(subroot, dynroot, sep);
-        root.setId("process_parameter");
+        addRemoveButton(container, root, dynroot, subroot, box);
 
         for (ProcessingStepConfiguration cfg : box.getItems()) {
             if (cfg.getName().equals(processName)) {
