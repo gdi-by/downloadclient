@@ -58,8 +58,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.FileHandler;
@@ -596,7 +596,7 @@ public class Controller {
             case "WFS2_SIMPLE":
                 ObservableList<Node> children
                          = simpleWFSContainer.getChildren();
-                HashMap<String, String> parameters = downloadConfig.getParams();
+                Map<String, String> parameters = downloadConfig.getParams();
                 for (Node node: children) {
                     if (node instanceof HBox) {
                         HBox hb = (HBox) node;
@@ -660,7 +660,7 @@ public class Controller {
                 setStatusTextUI(I18n.format("status.config.invalid-xml"));
                 break;
         }
-        ArrayList<DownloadConfig.ProcessingStep> steps =
+        List<DownloadConfig.ProcessingStep> steps =
                 downloadConfig.getProcessingSteps();
         factory.removeAllChainAttributes(chainContainer);
         if (steps != null) {

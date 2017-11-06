@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,8 +45,8 @@ public class DownloadConfig {
     private String downloadPath;
     private String serviceType;
     private String serviceURL;
-    private HashMap<String, String> parameters = null;
-    private ArrayList<ProcessingStep> procSteps = null;
+    private Map<String, String> parameters;
+    private List<ProcessingStep> procSteps;
 
    /**
     * Exception, thrown if no service URL is found in the config file.
@@ -194,7 +195,7 @@ public class DownloadConfig {
     *
     * @return The params
     */
-    public HashMap<String, String> getParams() {
+    public Map<String, String> getParams() {
         return parameters;
     }
 
@@ -203,7 +204,7 @@ public class DownloadConfig {
     *
     * @return The processing step list
     */
-    public ArrayList<ProcessingStep> getProcessingSteps() {
+    public List<ProcessingStep> getProcessingSteps() {
         return procSteps;
     }
 
