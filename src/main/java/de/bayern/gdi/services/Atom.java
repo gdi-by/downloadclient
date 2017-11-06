@@ -344,24 +344,23 @@ public class Atom {
                         "category/@label",
                         XPathConstants.STRING,
                         this.context);
-                if (crs.isEmpty()) {
-                    if (entryDescription.contains("EPSG:")) {
-                        String temp = entryDescription.substring(
-                                entryDescription.lastIndexOf("EPSG:"),
-                                entryDescription.length());
-                        String epsgNum = "";
-                        for (int j = "EPSG:".length();
-                            j < temp.length() - 1;
-                            j++) {
-                            String isNum = temp.substring(j, j + 1);
-                            if (Misc.isInteger(isNum)) {
-                                epsgNum += isNum;
-                            } else {
-                                break;
-                            }
+                if (crs.isEmpty() && entryDescription.contains("EPSG:")) {
+
+                    String temp = entryDescription.substring(
+                        entryDescription.lastIndexOf("EPSG:"),
+                        entryDescription.length());
+
+                    StringBuilder epsgNum = new StringBuilder("EPSG:");
+                    for (int j = "EPSG:".length();
+                        j < temp.length() - 1;
+                        j++) {
+                        String isNum = temp.substring(j, j + 1);
+                        if (!Misc.isInteger(isNum)) {
+                            break;
                         }
-                        crs = "EPSG:" + epsgNum;
+                        epsgNum.append(isNum);
                     }
+                    crs = epsgNum.toString();
                 }
                 Field field = new Field(ATTRIBUTENAME,
                         entryId,
