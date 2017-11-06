@@ -20,6 +20,10 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 ### Build
 
     $ mvn clean compile
+    
+### Anwendung ausführen
+
+    $ mvn clean compile exec:java
 
 ### Bundle
 
