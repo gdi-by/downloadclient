@@ -186,8 +186,10 @@ public class XML {
             boolean nameSpaceAware,
             HttpEntity postparams)
             throws URISyntaxException, IOException {
-        CloseableHttpClient client = HTTP.getClient(url, userName, password);
-        try {
+        try (
+            CloseableHttpClient client =
+                HTTP.getClient(url, userName, password);
+        ) {
             if (postparams == null) {
                 HttpGet request = HTTP.getGetRequest(url);
                 DocumentResponseHandler handler
@@ -203,8 +205,6 @@ public class XML {
                 handler.setNamespaceAware(nameSpaceAware);
                 return client.execute(postreq, handler);
             }
-        } finally {
-            HTTP.closeGraceful(client);
         }
     }
 
@@ -279,8 +279,10 @@ public class XML {
             String postXML,
             boolean nameSpaceAware)
             throws URISyntaxException, IOException {
-        CloseableHttpClient client = HTTP.getClient(url, userName, password);
-        try {
+        try (
+            CloseableHttpClient client =
+                HTTP.getClient(url, userName, password);
+        ) {
             HttpPost request = HTTP.getPostRequest(url);
             DocumentResponseHandler handler =
                     new DocumentResponseHandler(request);
@@ -292,8 +294,6 @@ public class XML {
             request.setHeader("Content-type", "text/xml;charset=utf-8");
             request.setEntity(inputStreamEntity);
             return client.execute(request, handler);
-        } finally {
-            HTTP.closeGraceful(client);
         }
     }
 
