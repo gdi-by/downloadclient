@@ -191,19 +191,17 @@ public class Service extends Object {
                 //Checking for validity before?!
                 if (this.serviceType == null) {
                     checkServiceType();
-                    if (this.serviceType == null) {
-                        if (!checkURLOptionsAndSetType()) {
-                            return;
-                        }
+                    if (this.serviceType == null
+                    && !checkURLOptionsAndSetType()) {
+                        return;
                     }
                 }
             } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
                 this.restricted = true;
                 checkServiceType();
-                if (serviceType == null) {
-                    if (!checkURLOptionsAndSetType()) {
-                        return;
-                    }
+                if (serviceType == null
+                && !checkURLOptionsAndSetType()) {
+                    return;
                 }
             } else {
                 return;
@@ -217,20 +215,20 @@ public class Service extends Object {
     private boolean checkURLOptionsAndSetType() {
         try {
             URL newURL = guessURL(this.serviceURL);
-            if (!newURL.equals(this.serviceURL)) {
-                if (ServiceChecker.isReachable(newURL)) {
-                    ServiceType st;
-                    if (ServiceChecker.isRestricted(newURL)) {
-                        st = ServiceChecker.checkService(newURL, this
-                                .username, this.password);
-                    } else {
-                        st = ServiceChecker.checkService(newURL);
-                    }
-                    if (st != null) {
-                        this.serviceURL = newURL;
-                        this.serviceType = st;
-                        return true;
-                    }
+            if (!newURL.equals(this.serviceURL)
+            && ServiceChecker.isReachable(newURL)) {
+
+                ServiceType st;
+                if (ServiceChecker.isRestricted(newURL)) {
+                    st = ServiceChecker.checkService(newURL, this
+                            .username, this.password);
+                } else {
+                    st = ServiceChecker.checkService(newURL);
+                }
+                if (st != null) {
+                    this.serviceURL = newURL;
+                    this.serviceType = st;
+                    return true;
                 }
             }
         } catch (Exception e) {
@@ -242,26 +240,25 @@ public class Service extends Object {
     private static URL guessURL(URL url) throws MalformedURLException {
         String urlStr = url.toString();
         if (urlStr.toLowerCase().contains(WFS_URL_EXPR)
-                && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
+        && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
             return url;
-        } else {
-            if (urlStr.endsWith("?")) {
-                urlStr = urlStr.substring(0, urlStr.lastIndexOf('?'));
-            }
-            return new URL(urlStr + URL_TRY_APPENDIX);
         }
+        if (urlStr.endsWith("?")) {
+            urlStr = urlStr.substring(0, urlStr.lastIndexOf('?'));
+        }
+        return new URL(urlStr + URL_TRY_APPENDIX);
     }
 
     private void checkServiceType() {
         if (this.isRestricted()) {
-            if (this.username != null && this.password != null) {
-                if (!this.username.isEmpty()
-                        && !this.password.isEmpty()) {
-                    this.serviceType = ServiceChecker.checkService(
-                            this.serviceURL,
-                            this.username,
-                            this.password);
-                }
+            if (this.username != null
+            && this.password != null
+            && !this.username.isEmpty()
+            && !this.password.isEmpty()) {
+                this.serviceType = ServiceChecker.checkService(
+                    this.serviceURL,
+                    this.username,
+                    this.password);
             }
         } else {
             this.serviceType = ServiceChecker.checkService(this.serviceURL,
