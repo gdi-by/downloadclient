@@ -38,4 +38,4 @@ Um `build.sh` auszuführen benötigen Sie `xmlstartlet`, `wget` und `bash`.
 
 ## Lizenz
 
-Der Download-Client ist als Freie Software unter der Apache License 2.0 veröffentlicht (Details s. LICENSE-Datei).
+Der Download-Client ist als Freie Software unter der Apache License 2.0 veröffentlicht (Details s. [LICENSE](LICENSE)-Datei).
