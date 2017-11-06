@@ -80,8 +80,8 @@ public class Headless implements ProcessorListener {
                 if (file.isFile() && file.canRead()) {
                     files.add(file);
                 } else {
-                    log.log(
-                        Level.WARNING, "'" + arg + "' is not a readable file.");
+                    log.log(Level.WARNING,
+                        () -> "'" + arg + "' is not a readable file.");
                 }
             }
         }
@@ -101,7 +101,7 @@ public class Headless implements ProcessorListener {
                     "Cannot load file: " + file, ioe);
                 continue;
             }
-            log.info("Download steps: " + dls);
+            log.info(() -> "Download steps: " + dls);
             JobList jobs;
 
             DownloadStepConverter dsc =

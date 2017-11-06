@@ -53,8 +53,8 @@ public class FileTracker {
     public boolean scan() {
         File[] files = this.directory.listFiles();
         if (files == null) {
-            log.log(
-                Level.SEVERE, "Cannot read files from '" + directory + "'.");
+            log.log(Level.SEVERE,
+                () -> "Cannot read files from '" + directory + "'.");
             return false;
         }
 

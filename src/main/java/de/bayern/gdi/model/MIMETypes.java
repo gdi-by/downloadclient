@@ -174,7 +174,7 @@ public class MIMETypes {
             in = Misc.getResource(MIME_TYPES_FILE_RES);
             if (in == null) {
                 log.log(Level.SEVERE,
-                    MIME_TYPES_FILE + " not found");
+                    () -> MIME_TYPES_FILE + " not found");
                 return new MIMETypes();
             }
             return read(in);

@@ -180,7 +180,7 @@ public class ProcessingConfiguration {
             in = Misc.getResource(PROCESSING_CONFIG_FILE_RES);
             if (in == null) {
                 log.log(Level.SEVERE,
-                    PROCESSING_CONFIG_FILE + " not found");
+                    () -> PROCESSING_CONFIG_FILE + " not found");
                 return new ProcessingConfiguration();
             }
             return read(in);
