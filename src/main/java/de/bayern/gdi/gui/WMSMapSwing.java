@@ -340,20 +340,17 @@ public class WMSMapSwing extends Parent {
             baseLayer = null;
             boolean layerFound = false;
             for (Layer outerLayer : layers) {
-                if (outerLayer.getName() != null) {
-                    if (outerLayer.getName().toLowerCase().equals(layer
-                            .toLowerCase())) {
-                        baseLayer = outerLayer;
-                        // we actually need to set both by hand, else the
-                        // request will fail
-                        baseLayer.setTitle(layer);
-                        baseLayer.setName(layer);
-                        layerFound = true;
-                    }
+                String oname = outerLayer.getName();
+                if (oname != null && oname.equalsIgnoreCase(layer)) {
+                    baseLayer = outerLayer;
+                    // we actually need to set both by hand, else the
+                    // request will fail
+                    baseLayer.setTitle(layer);
+                    baseLayer.setName(layer);
+                    layerFound = true;
                 }
                 for (Layer wmsLayer : outerLayer.getChildren()) {
-                    if (wmsLayer.getName().toLowerCase().equals(
-                            layer.toLowerCase())) {
+                    if (wmsLayer.getName().equalsIgnoreCase(layer)) {
                         baseLayer = wmsLayer.getParent();
                         baseLayer.setTitle(layer);
                         baseLayer.setName(layer);
@@ -841,16 +838,14 @@ public class WMSMapSwing extends Parent {
         for (SimpleFeature simpleFeature : polygonFeatureCollection) {
             String featureID = (String) simpleFeature.getAttribute("id");
             if (featureID.equals(polygonID)) {
-                Style style;
-
-                style = createSelectedStyle(simpleFeature.getIdentifier());
+                Style style =
+                    createSelectedStyle(simpleFeature.getIdentifier());
                 org.geotools.map.Layer layer = null;
                 for (org.geotools.map.Layer layers : mapPane.getMapContent()
                         .layers()) {
-                    if (layers.getTitle() != null) {
-                        if (layers.getTitle().equals(POLYGON_LAYER_TITLE)) {
-                            layer = layers;
-                        }
+                    String t = layers.getTitle();
+                    if (t != null && t.equals(POLYGON_LAYER_TITLE)) {
+                        layer = layers;
                     }
                 }
                 if (layer instanceof FeatureLayer) {
@@ -1116,10 +1111,9 @@ public class WMSMapSwing extends Parent {
             polygonLayer.setTitle(POLYGON_LAYER_TITLE);
             List<org.geotools.map.Layer> layers = mapContent.layers();
             for (org.geotools.map.Layer layer : layers) {
-                if (layer.getTitle() != null) {
-                    if (layer.getTitle().equals(POLYGON_LAYER_TITLE)) {
-                        mapContent.removeLayer(layer);
-                    }
+                String t = layer.getTitle();
+                if (t != null && t.equals(POLYGON_LAYER_TITLE)) {
+                    mapContent.removeLayer(layer);
                 }
             }
             mapContent.addLayer(polygonLayer);
@@ -1215,29 +1209,28 @@ public class WMSMapSwing extends Parent {
                                            TextField y2,
                                            CoordinateReferenceSystem crs) {
         if (x1 != null
-                && x2 != null
-                && y1 != null
-                && y2 != null) {
-            if (!x1.getText().toString().isEmpty()
-                    && !x2.toString().isEmpty()
-                    && !y1.toString().isEmpty()
-                    && !y2.toString().isEmpty()) {
-                Double x1Coordinate = Double.parseDouble(
-                        x1.getText().toString());
-                Double x2Coordinate = Double.parseDouble(
-                        x2.getText().toString());
-                Double y1Coordinate = Double.parseDouble(
-                        y1.getText().toString());
-                Double y2Coordinate = Double.parseDouble(
-                        y2.getText().toString());
-                Envelope env = new ReferencedEnvelope(
-                        x1Coordinate,
-                        x2Coordinate,
-                        y1Coordinate,
-                        y2Coordinate,
-                        crs);
-                return new Envelope2D(env);
-            }
+        && x2 != null
+        && y1 != null
+        && y2 != null
+        && !x1.getText().toString().isEmpty()
+        && !x2.toString().isEmpty()
+        && !y1.toString().isEmpty()
+        && !y2.toString().isEmpty()) {
+            Double x1Coordinate = Double.parseDouble(
+                    x1.getText().toString());
+            Double x2Coordinate = Double.parseDouble(
+                    x2.getText().toString());
+            Double y1Coordinate = Double.parseDouble(
+                    y1.getText().toString());
+            Double y2Coordinate = Double.parseDouble(
+                    y2.getText().toString());
+            Envelope env = new ReferencedEnvelope(
+                    x1Coordinate,
+                    x2Coordinate,
+                    y1Coordinate,
+                    y2Coordinate,
+                    crs);
+            return new Envelope2D(env);
         }
         return null;
     }
