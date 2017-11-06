@@ -80,6 +80,17 @@ public class ServiceChecker {
         return null;
     }
 
+    private static final String []VARIANTS = {
+        "WFS_Capabilities",
+        "WFS_CAPABILITIES",
+        "wfs_capabilities",
+        "wfs:wfs_capabilities",
+        "WFS:wfs_capabilities",
+        "wfs:WFS_CAPABILITIES",
+        "WFS:WFS_CAPABILITIES",
+        "wfs:WFS_Capabilities"
+    };
+
     /**
      * checks the service type.
      *
@@ -124,30 +135,16 @@ public class ServiceChecker {
         //stuff...
         final String wfs = "http://www.opengis.net/wfs/2.0";
         NodeList nl = doc.getElementsByTagNameNS(wfs, "WFS_Capabilities");
+
         if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("WFS_Capabilities");
+            for (String variant: VARIANTS) {
+                nl = doc.getElementsByTagName(variant);
+                if (nl.getLength() != 0) {
+                    break;
+                }
+            }
         }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("WFS_CAPABILITIES");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("wfs_capabilities");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("wfs:wfs_capabilities");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("WFS:wfs_capabilities");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("wfs:WFS_CAPABILITIES");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("WFS:WFS_CAPABILITIES");
-        }
-        if (nl.getLength() == 0) {
-            nl = doc.getElementsByTagName("wfs:WFS_Capabilities");
-        }
+
         if (nl.getLength() != 0) {
             NamedNodeMap nnm = nl.item(0).getAttributes();
             if (nnm.getNamedItem("version") != null) {
