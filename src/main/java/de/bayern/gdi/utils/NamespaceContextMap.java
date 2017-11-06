@@ -134,9 +134,9 @@ public final class NamespaceContextMap implements
             String... mappingPairs) {
         Map<String, String> prefixMappings
             = new HashMap<>(mappingPairs.length / 2);
-        for (int i = 0; i < mappingPairs.length; i++) {
+        for (int i = 0; i < mappingPairs.length; i += 2) {
             prefixMappings
-                    .put(mappingPairs[i], mappingPairs[++i]);
+                    .put(mappingPairs[i], mappingPairs[i + 1]);
         }
         return prefixMappings;
     }
