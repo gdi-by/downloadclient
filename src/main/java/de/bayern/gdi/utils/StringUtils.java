@@ -99,7 +99,7 @@ public class StringUtils {
     }
 
     /** States for the command line splitting. */
-    private static enum State {
+    private enum State {
         NORMAL,
         IN_QUOTE,
         IN_DOUBLE_QUOTE
