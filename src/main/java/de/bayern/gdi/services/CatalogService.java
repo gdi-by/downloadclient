@@ -369,8 +369,8 @@ public class CatalogService {
                     operationMetadataNode,
                     operationsNameExpr,
                     XPathConstants.STRING, context);
-            if (applicationProfile.toLowerCase().
-                    equals("getcapabilities")) {
+
+            if (applicationProfile.equalsIgnoreCase("getcapabilities")) {
                 String operationsURLExpr =
                         "srv:SV_OperationMetadata"
                                 + "/srv:connectPoint"
