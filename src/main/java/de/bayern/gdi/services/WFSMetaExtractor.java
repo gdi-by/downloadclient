@@ -39,11 +39,23 @@ public class WFSMetaExtractor {
 
     private static final CoordinateReferenceSystem WGS84;
 
+    /** A RuntimeException wrapper around FactoryException. */
+    public static final class RuntimeFactoryException
+        extends RuntimeException {
+        /**
+         * Constructs a new RuntimeException wrapping a FactoryException.
+         * @cause the cause.
+         */
+        public RuntimeFactoryException(Throwable cause) {
+            super(cause);
+        }
+    }
+
     static {
         try {
             WGS84 = CRS.decode("EPSG:4326");
         } catch (FactoryException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeFactoryException(e);
         }
     }
 
