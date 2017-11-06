@@ -245,21 +245,23 @@ public class Atom {
 
         @Override
         public String toString() {
-            String str = "title: " + title + "\n";
-            str += "id: " + id + "\n";
-            str += "description: " + description + "\n";
-            str += "described by: " + describedBy + "\n";
-            str += "format: " + format + "\n";
-            str += "CRS: " + defaultCRS + "\n";
-            str += "Other CRS:\n";
+            StringBuilder sb = new StringBuilder()
+                .append("title: ").append(title).append('\n')
+                .append("id: ").append(id).append('\n')
+                .append("description: ").append(description).append('\n')
+                .append("descrined by: ").append(describedBy).append('\n')
+                .append("format: ").append(format).append('\n')
+                .append("CRS: ").append(defaultCRS).append('\n')
+                .append("Other CRS:\n");
             for (String crs: otherCRSs) {
-                str += "\t" + crs;
+                sb.append('\t').append(crs);
             }
-            str += "Other Fields:\n";
+            sb.append("Other Fields:\n");
             for (Field f: fields) {
-                str += "\t" + f.name + ": " + f.type + "\n";
+                sb.append('\t')
+                  .append(f.name).append(": ").append(f.type).append('\n');
             }
-            return str;
+            return sb.toString();
         }
 
         /**
