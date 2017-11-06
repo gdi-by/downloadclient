@@ -1,5 +1,10 @@
 # GDI-BY DownloadClient 
-[![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)](https://travis-ci.org/gdi-by/downloadclient)
+[![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)][travis]
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license]
+
+[travis]:  https://travis-ci.org/gdi-by/downloadclient
+[license]: https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)
+
 
 Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
