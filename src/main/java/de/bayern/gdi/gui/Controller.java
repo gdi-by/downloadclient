@@ -1270,7 +1270,6 @@ public class Controller {
     }
 
     private void extractBoundingBox() {
-        String bbox = "";
         Envelope2D envelope = null;
         switch (this.dataBean.getServiceType()) {
             case Atom:
@@ -1289,20 +1288,22 @@ public class Controller {
             default:
                 break;
         }
-        if (envelope != null) {
-            bbox += envelope.getX() + ",";
-            bbox += envelope.getY() + ",";
-            bbox += (envelope.getX() + envelope.getWidth()) + ",";
-            bbox += (envelope.getY() + envelope.getHeight());
-
-            CRSModel model = referenceSystemChooser.getValue();
-            if (model != null) {
-                bbox += "," + model.getOldName();
-            }
-            this.dataBean.addAttribute("bbox", bbox, "");
-        } else {
+        if (envelope == null) {
             // Raise an error?
+            return;
         }
+
+        StringBuilder bbox = new StringBuilder();
+        bbox.append(envelope.getX()).append(',')
+            .append(envelope.getY()).append(',')
+            .append(envelope.getX() + envelope.getWidth()).append(',')
+            .append(envelope.getY() + envelope.getHeight());
+
+        CRSModel model = referenceSystemChooser.getValue();
+        if (model != null) {
+            bbox.append(',').append(model.getOldName());
+        }
+        this.dataBean.addAttribute("bbox", bbox.toString(), "");
     }
 
     private boolean validateInput() {
