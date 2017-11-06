@@ -148,7 +148,11 @@ public class ExternalProcessJob implements Job {
         this.logger      = logger;
     }
 
-    private List<String> commandList() {
+    /**
+     * Returns the list of the command and the arguments to be executed.
+     * @return the command and its arguments.
+     */
+    public List<String> commandList() {
         int n = this.arguments != null
             ? this.arguments.length
             : 0;
