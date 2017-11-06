@@ -128,6 +128,7 @@ public class ServiceChecker {
                 | IOException e) {
             log.log(Level.SEVERE, "Could not get Document of URL: "
                     + serviceURL.toString(), e);
+            return null;
         }
 
 
