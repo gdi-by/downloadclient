@@ -67,6 +67,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.util.logging.Formatter;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -1307,78 +1308,71 @@ public class Controller {
     }
 
     private boolean validateInput() {
-        String failed = "";
-        List<DataBean.Attribute> attributes
-                = this.dataBean.getAttributes();
+        final StringBuilder failed = new StringBuilder();
+
+        Consumer<String> fail = s -> {
+            if (failed.length() != 0) {
+                failed.append(", ");
+            }
+            failed.append(s);
+        };
 
         Validator validator = Validator.getInstance();
-        for (DataBean.Attribute attribute : attributes) {
-            if (!attribute.getType().isEmpty()) {
-                if (!validator.isValid(
-                            attribute.getType(), attribute.getValue())) {
-                    if (failed.isEmpty()) {
-                        failed = attribute.getName();
-                    } else {
-                        failed += ", " + attribute.getName();
-                    }
-                }
+        for (DataBean.Attribute attr: this.dataBean.getAttributes()) {
+            if (!attr.getType().isEmpty()
+            && !validator.isValid(attr.getType(), attr.getValue())) {
+                fail.accept(attr.getName());
             }
         }
 
-        if (serviceTypeChooser.isVisible()
-                && downloadConfig != null
-                && serviceTypeChooser.getValue() instanceof MiscItemModel) {
-            failed += I18n.format("gui.dataset") + ", ";
-        }
+        if (downloadConfig != null) {
+            if (serviceTypeChooser.isVisible()
+            && serviceTypeChooser.getValue() instanceof MiscItemModel) {
+                fail.accept(I18n.format("gui.dataset"));
+            }
 
-        if (atomContainer.isVisible()
-                && downloadConfig != null
-                && atomVariationChooser.getValue() instanceof MiscItemModel) {
-            failed += I18n.format("gui.variants") + ", ";
-        }
+            if (atomContainer.isVisible()
+            && atomVariationChooser.getValue() instanceof MiscItemModel) {
+                fail.accept(I18n.format("gui.variants"));
+            }
 
-        if (referenceSystemChooser.isVisible()
-                && downloadConfig != null
-                && !referenceSystemChooser.getValue().isAvailable()) {
-            failed += I18n.format("gui.reference-system") + ", ";
-        }
+            if (referenceSystemChooser.isVisible()
+            && !referenceSystemChooser.getValue().isAvailable()) {
+                fail.accept(I18n.format("gui.reference-system"));
+            }
 
-        if (basicWFSContainer.isVisible()
-                &&  dataFormatChooser.isVisible()
-                && downloadConfig != null
-                && !dataFormatChooser.getValue().isAvailable()) {
-            failed += I18n.format("gui.data-format") + ", ";
-        }
+            if (basicWFSContainer.isVisible()
+            &&  dataFormatChooser.isVisible()
+            && !dataFormatChooser.getValue().isAvailable()) {
+                fail.accept(I18n.format("gui.data-format"));
+            }
 
-        if (simpleWFSContainer.isVisible()
-                && downloadConfig != null) {
-            ObservableList<Node> children
+            if (simpleWFSContainer.isVisible()) {
+                ObservableList<Node> children
                     = simpleWFSContainer.getChildren();
-            for (Node node: children) {
-                if (node instanceof HBox) {
-                    HBox hb = (HBox) node;
-                    Node n2 = hb.getChildren().get(1);
-                    if (n2 instanceof ComboBox) {
-                        ComboBox<OutputFormatModel> cb
-                                = (ComboBox<OutputFormatModel>) n2;
-                        if (!cb.getValue().isAvailable()) {
-                            failed += I18n.format("gui.data-format");
+                for (Node node: children) {
+                    if (node instanceof HBox) {
+                        HBox hb = (HBox)node;
+                        Node n2 = hb.getChildren().get(1);
+                        if (n2 instanceof ComboBox) {
+                            ComboBox<OutputFormatModel> cb
+                                    = (ComboBox<OutputFormatModel>) n2;
+                            if (!cb.getValue().isAvailable()) {
+                                fail.accept(I18n.format("gui.data-format"));
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
 
-        if (failed.endsWith(", ")) {
-            failed = failed.substring(0, failed.length() - 2);
+        if (failed.length() == 0) {
+            return true;
         }
-
-        if (!failed.isEmpty()) {
-            setStatusTextUI(
-                    I18n.format("status.validation-fail", failed));
-            return false;
-        }
-        return true;
+        setStatusTextUI(
+            I18n.format("status.validation-fail", failed.toString()));
+        return false;
     }
 
     /**
