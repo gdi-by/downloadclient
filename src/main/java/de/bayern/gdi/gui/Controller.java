@@ -1234,9 +1234,7 @@ public class Controller {
                                 l2 = (Label) hn;
                             }
                         }
-                        if (tf != null
-                                && (l1 != null
-                                || l2 != null)) {
+                        if (tf != null && (l1 != null || l2 != null)) {
                             name = tf.getUserData().toString();
                             value = tf.getText();
                             if (l2 != null && l1.getText().equals(name)) {
@@ -1245,17 +1243,12 @@ public class Controller {
                                 type = l1.getText();
                             }
                         }
-                        if (cb != null
-                                && (l1 != null
-                                || l2 != null)) {
-                            if (cb.getId().equals(
-                                    UIFactory.getDataFormatID())
-                                    ) {
-                                name = "outputformat";
-                                value = cb.getSelectionModel()
-                                        .getSelectedItem().toString();
-                                type = "";
-                            }
+                        if (cb != null && (l1 != null || l2 != null)
+                        && cb.getId().equals(UIFactory.getDataFormatID())) {
+                            name = "outputformat";
+                            value = cb.getSelectionModel()
+                                    .getSelectedItem().toString();
+                            type = "";
                         }
                         if (!name.isEmpty() && !value.isEmpty()) {
                             this.dataBean.addAttribute(
@@ -1264,7 +1257,6 @@ public class Controller {
                                     type);
                         }
                     }
-
                 }
             }
         }
