@@ -49,6 +49,10 @@ import org.junit.Test;
 
 import org.testfx.framework.junit.ApplicationTest;
 
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 /**
  * Unit tests, using TestFX to test controller functions
  * @author Alexander Woestmann (awoestmann@intevation.de)
@@ -61,6 +65,8 @@ public class ControllerTest extends ApplicationTest {
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 768;
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
+
+    private static final int TEN = 10;
     private static final int WAIT_TIMEOUT = 250;
 
     private static Logger log = Logger.getLogger(
@@ -101,23 +107,29 @@ public class ControllerTest extends ApplicationTest {
         primaryStage.show();
     }
 
+
     @Test
     public void processingChainValidationTest() throws Exception {
         TitledPane n = (TitledPane) scene.lookup("#logHistoryParent");
         //wait for the App to load
-        while (n.getText() != I18n.getMsg("status.ready")) {
-            Thread.sleep(WAIT_TIMEOUT);
-        }
+        await()
+            .atMost(TEN, SECONDS)
+            .pollInterval(WAIT_TIMEOUT, MILLISECONDS)
+            .until(() -> n.getText().equals(I18n.getMsg("status.ready")));
+
         TextField serviceURL = (TextField) scene.lookup("#serviceURL");
         serviceURL.setText(
                 "https://gdiserv.bayern.de/srv66381/services/"
                 + "benachteiligtegebiete-wfs?service=wfs&acceptversions=2.0.0"
                 + "&request=GetCapabilities");
         clickOn("#serviceSelection");
+
         //Wait for the service to load
-        while (n.getText() != I18n.getMsg("status.ready")) {
-            Thread.sleep(WAIT_TIMEOUT);
-        }
+        await()
+            .atMost(TEN, SECONDS)
+            .pollInterval(WAIT_TIMEOUT, MILLISECONDS)
+            .until(() -> n.getText().equals(I18n.getMsg("status.ready")));
+
         clickOn("#chkChain");
         clickOn("#addChainItem");
         Assert.assertTrue(n.getText().equals(
