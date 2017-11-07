@@ -173,11 +173,8 @@ public final class NamespaceContextMap implements
         for (Map.Entry<String, String> entry : prefMap
                 .entrySet()) {
             String nsURI = entry.getValue();
-            Set<String> prefixes = namespMap.get(nsURI);
-            if (prefixes == null) {
-                prefixes = new HashSet<>();
-                namespMap.put(nsURI, prefixes);
-            }
+            Set<String> prefixes =
+                namespMap.computeIfAbsent(nsURI, k -> new HashSet<>());
             prefixes.add(entry.getKey());
         }
         for (Map.Entry<String, Set<String>> entry : namespMap
