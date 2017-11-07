@@ -429,6 +429,49 @@ public class Controller {
         }
     }
 
+    /**
+     * Opens up a file dialog to choose a config file to load.
+     * @throws Exception Exception
+     * @return The chosen file
+     */
+    protected File openConfigFileOpenDialog() throws Exception {
+        FileChooser fileChooser = new FileChooser();
+        File initialDir = new File(System.getProperty("user.dir"));
+        fileChooser.setInitialDirectory(initialDir);
+        fileChooser.setTitle(I18n.getMsg("menu.load_config"));
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
+            new FileChooser.ExtensionFilter("All Files", "*.*"));
+        return fileChooser.showOpenDialog(primaryStage);
+    }
+
+    /**
+     * Loads config from a given file object.
+     * @param file File object holding the config file.
+     */
+    public void loadConfigFromFile(File file) {
+        File configFile = file;
+
+        if (configFile != null) {
+            resetGui();
+            try {
+                this.downloadConfig = new DownloadConfig(configFile);
+                serviceURL.setText(this.downloadConfig.getServiceURL());
+                doSelectService(downloadConfig);
+            } catch (IOException
+                        | ParserConfigurationException
+                        | SAXException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+                setStatusTextUI(
+                        I18n.format("status.config.invalid-xml"));
+                return;
+            } catch (DownloadConfig.NoServiceURLException urlEx) {
+                setStatusTextUI(
+                        I18n.format("status.config.no-url-provided"));
+            }
+        }
+    }
+
    /**
     * Handle click at load config menu items.
     * Opens a file chooser dialog and loads a download config from a XML file.
@@ -437,14 +480,13 @@ public class Controller {
     */
     @FXML
     protected void handleLoadConfig(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        File initialDir = new File(System.getProperty("user.dir"));
-        fileChooser.setInitialDirectory(initialDir);
-        fileChooser.setTitle(I18n.getMsg("menu.load_config"));
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-            new FileChooser.ExtensionFilter("All Files", "*.*"));
-        File configFile = fileChooser.showOpenDialog(primaryStage);
+        File configFile = null;
+        try {
+            configFile = openConfigFileOpenDialog();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return;
+        }
 
         if (configFile != null) {
             resetGui();
@@ -2067,6 +2109,10 @@ public class Controller {
      */
     private boolean validateChainContainer(ComboBox box) {
         String format = this.dataBean.getAttributeValue("outputformat");
+        if (format == null) {
+            box.setStyle("-fx-border-color: red;");
+            setStatusTextUI(I18n.format("gui.process.no.format"));
+        }
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
 
@@ -2075,7 +2121,7 @@ public class Controller {
         ObservableList<ProcessingStepConfiguration> items =
                 (ObservableList<ProcessingStepConfiguration>) box.getItems();
 
-        if (mtype == null) {
+        if (format != null && mtype == null) {
             box.setStyle("-fx-border-color: red;");
             for (ProcessingStepConfiguration cfgI : items) {
                 cfgI.setCompatible(false);
@@ -2088,8 +2134,17 @@ public class Controller {
 
         //Mark items that are incompatible
         for (ProcessingStepConfiguration cfgI : items) {
-            cfgI.setCompatible(cfgI.isCompatibleWithFormat(mtype.getType()));
+            if (format != null) {
+                cfgI.setCompatible(
+                        cfgI.isCompatibleWithFormat(mtype.getType()));
+            } else {
+                cfgI.setCompatible(false);
+            }
             items.set(items.indexOf(cfgI), cfgI);
+        }
+
+        if (format == null) {
+            return false;
         }
 
         if (cfg == null) {
@@ -2112,11 +2167,11 @@ public class Controller {
      */
     private void validateChainContainerItems() {
         //If there's no outputformat selected, return
-        if (this.dataBean.getAttributeValue("outputformat")
-                == null) {
-            resetProcessingChainContainer();
-            return;
-        }
+        //if (this.dataBean.getAttributeValue("outputformat")
+        //        == null) {
+        //    resetProcessingChainContainer();
+        //    return;
+        //}
 
         boolean allValid = true;
         for (Node o : chainContainer.getChildren()) {

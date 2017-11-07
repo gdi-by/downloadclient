@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DownloadSchritt>
+    <ServiceTyp>WFS2_BASIC</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs?service=wfs&amp;acceptversions=2.0.0&amp;request=GetCapabilities</URL>
+    <DownloadPfad>/local-vol1/awoestmann/downloadclient/src/test/resources/controllerTest</DownloadPfad>
+    <Dataset>bvv:gmd_ex</Dataset>
+    <Verarbeitungskette/>
+    <Parameters>
+        <Parameter>
+            <Name>srsName</Name>
+            <Wert>urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>bbox</Name>
+            <Wert>49.25165,10.9861,49.59061,11.38694,urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+    </Parameters>
+</DownloadSchritt>
