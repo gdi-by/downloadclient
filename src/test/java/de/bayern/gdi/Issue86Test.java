@@ -57,7 +57,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * Unit tests, using TestFX to test controller functions
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
-public class ControllerTest extends ApplicationTest {
+public class Issue86Test extends ApplicationTest {
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
@@ -70,7 +70,7 @@ public class ControllerTest extends ApplicationTest {
     private static final int WAIT_TIMEOUT = 250;
 
     private static Logger log = Logger.getLogger(
-            ControllerTest.class.getName());
+            Issue86Test.class.getName());
 
     private static Controller controller;
 
