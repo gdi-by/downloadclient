@@ -2166,12 +2166,6 @@ public class Controller {
      * Validates all items in processing chain container.
      */
     private void validateChainContainerItems() {
-        //If there's no outputformat selected, return
-        //if (this.dataBean.getAttributeValue("outputformat")
-        //        == null) {
-        //    resetProcessingChainContainer();
-        //    return;
-        //}
 
         boolean allValid = true;
         for (Node o : chainContainer.getChildren()) {
@@ -2182,7 +2176,6 @@ public class Controller {
                 if (cBox instanceof ComboBox
                 && !validateChainContainer((ComboBox)cBox)) {
                     allValid = false;
-                    break;
                 }
             }
         }
