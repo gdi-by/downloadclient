@@ -447,28 +447,27 @@ public class Controller {
 
     /**
      * Loads config from a given file object.
-     * @param file File object holding the config file.
+     * @param configFile File object holding the config file.
      */
-    public void loadConfigFromFile(File file) {
-        File configFile = file;
-
-        if (configFile != null) {
-            resetGui();
-            try {
-                this.downloadConfig = new DownloadConfig(configFile);
-                serviceURL.setText(this.downloadConfig.getServiceURL());
-                doSelectService(downloadConfig);
-            } catch (IOException
-                        | ParserConfigurationException
-                        | SAXException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                setStatusTextUI(
-                        I18n.format("status.config.invalid-xml"));
-                return;
-            } catch (DownloadConfig.NoServiceURLException urlEx) {
-                setStatusTextUI(
-                        I18n.format("status.config.no-url-provided"));
-            }
+    public void loadConfigFromFile(File configFile) {
+        if (configFile == null) {
+            return;
+        }
+        resetGui();
+        try {
+            this.downloadConfig = new DownloadConfig(configFile);
+            serviceURL.setText(this.downloadConfig.getServiceURL());
+            doSelectService(downloadConfig);
+        } catch (IOException
+                    | ParserConfigurationException
+                    | SAXException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            setStatusTextUI(
+                    I18n.format("status.config.invalid-xml"));
+            return;
+        } catch (DownloadConfig.NoServiceURLException urlEx) {
+            setStatusTextUI(
+                    I18n.format("status.config.no-url-provided"));
         }
     }
 
@@ -487,25 +486,7 @@ public class Controller {
             log.log(Level.SEVERE, e.getMessage(), e);
             return;
         }
-
-        if (configFile != null) {
-            resetGui();
-            try {
-                this.downloadConfig = new DownloadConfig(configFile);
-                serviceURL.setText(this.downloadConfig.getServiceURL());
-                doSelectService(downloadConfig);
-            } catch (IOException
-                        | ParserConfigurationException
-                        | SAXException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                setStatusTextUI(
-                        I18n.format("status.config.invalid-xml"));
-                return;
-            } catch (DownloadConfig.NoServiceURLException urlEx) {
-                setStatusTextUI(
-                        I18n.format("status.config.no-url-provided"));
-            }
-        }
+        loadConfigFromFile(configFile);
     }
 
     private void loadDownloadConfig(DownloadConfig conf) {
