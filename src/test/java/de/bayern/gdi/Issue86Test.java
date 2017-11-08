@@ -32,6 +32,10 @@ import de.bayern.gdi.utils.Unauthorized;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
+import java.io.IOException;
+
+import java.nio.charset.Charset;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,11 +57,23 @@ import static org.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import static net.jadler.Jadler.initJadler;
+import static net.jadler.Jadler.closeJadler;
+import static net.jadler.Jadler.onRequest;
+import static net.jadler.Jadler.port;
+
+import static org.hamcrest.Matchers.isOneOf;
+
+import org.apache.commons.io.IOUtils;
+
 /**
  * Unit tests, using TestFX to test controller functions
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
 public class Issue86Test extends ApplicationTest {
+
+    private static Logger log = Logger.getLogger(
+            Issue86Test.class.getName());
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
@@ -66,11 +82,15 @@ public class Issue86Test extends ApplicationTest {
     private static final int HEIGHT = 768;
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
 
-    private static final int TEN = 10;
-    private static final int WAIT_TIMEOUT = 250;
+    private static final int TIMEOUT_SECONDS = 15;
+    private static final int POLL_MILLISECONDS = 250;
 
-    private static Logger log = Logger.getLogger(
-            Issue86Test.class.getName());
+    public static final int HTTP_OKAY = 200;
+
+    private static final String QUERY_RESOURCE =
+        "/issues/issue86.xml";
+    private static final String QUERY_PATH =
+        "/issues/issue86";
 
     private static Controller controller;
 
@@ -80,6 +100,7 @@ public class Issue86Test extends ApplicationTest {
         System.setProperty("testfx.headless", "true");
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.text", "t2k");
+        initJadler();
     }
 
     /**
@@ -105,29 +126,61 @@ public class Issue86Test extends ApplicationTest {
         primaryStage.getIcons().add(image);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        String body = IOUtils.toString(
+            Issue86Test.class.getResourceAsStream(QUERY_RESOURCE), "UTF-8");
+
+        prepareResource(QUERY_PATH, body);
     }
 
+    @Override
+    public void stop() throws Exception {
+        closeJadler();
+        super.stop();
+    }
+
+    private static void prepareResource(String queryPath, String body)
+        throws IOException {
+
+        onRequest()
+            .havingMethod(isOneOf("GET", "HEAD", "POST"))
+            .havingPathEqualTo(queryPath)
+        .respond()
+            .withStatus(HTTP_OKAY)
+            .withBody(body)
+            .withEncoding(Charset.forName("UTF-8"))
+            .withContentType("application/xml; charset=UTF-8");
+    }
+
+    private static String buildGetCapabilitiesUrl(String queryPath, int port) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("http://localhost:");
+        sb.append(port);
+        sb.append(queryPath);
+        System.out.println("GetCapabilities-URL: " + sb.toString());
+        return sb.toString();
+    }
 
     @Test
     public void processingChainValidationTest() throws Exception {
+
         TitledPane n = (TitledPane) scene.lookup("#logHistoryParent");
         //wait for the App to load
         await()
-            .atMost(TEN, SECONDS)
-            .pollInterval(WAIT_TIMEOUT, MILLISECONDS)
+            .atMost(TIMEOUT_SECONDS, SECONDS)
+            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
             .until(() -> n.getText().equals(I18n.getMsg("status.ready")));
-
         TextField serviceURL = (TextField) scene.lookup("#serviceURL");
-        serviceURL.setText(
-                "https://gdiserv.bayern.de/srv66381/services/"
-                + "benachteiligtegebiete-wfs?service=wfs&acceptversions=2.0.0"
-                + "&request=GetCapabilities");
+
+        String urlText = buildGetCapabilitiesUrl(QUERY_PATH, port());
+
+        serviceURL.setText(urlText);
         clickOn("#serviceSelection");
 
         //Wait for the service to load
         await()
-            .atMost(TEN, SECONDS)
-            .pollInterval(WAIT_TIMEOUT, MILLISECONDS)
+            .atMost(TIMEOUT_SECONDS, SECONDS)
+            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
             .until(() -> n.getText().equals(I18n.getMsg("status.ready")));
 
         clickOn("#chkChain");
