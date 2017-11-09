@@ -48,6 +48,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -96,15 +98,23 @@ public class Issue86Test extends ApplicationTest {
 
     @BeforeClass
     public static void initTests() {
+        System.err.println("init tests ....");
         System.setProperty("testfx.robot", "glass");
         System.setProperty("testfx.headless", "true");
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.text", "t2k");
-        try {
-            initJadler();
-        } catch (IllegalStateException ise) {
-            System.out.println("Jadler is already initialized");
-        }
+    }
+
+    @Before
+    public void startJadler() {
+        System.err.println("Start jadler ...");
+        initJadler();
+    }
+
+    @After
+    public void stopJadler() {
+        System.err.println("Stop jadler ...");
+        closeJadler();
     }
 
     /**
@@ -113,8 +123,10 @@ public class Issue86Test extends ApplicationTest {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        log.log(Level.INFO, "Preparing app for controller tests");
+        System.err.println("start stage ...");
         Config.initialize(null);
+
+        log.log(Level.INFO, "Preparing app for controller tests");
         ClassLoader classLoader = Start.class.getClassLoader();
         URL url = classLoader.getResource("download-client.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
@@ -131,16 +143,6 @@ public class Issue86Test extends ApplicationTest {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        String body = IOUtils.toString(
-            Issue86Test.class.getResourceAsStream(QUERY_RESOURCE), "UTF-8");
-
-        prepareResource(QUERY_PATH, body);
-    }
-
-    @Override
-    public void stop() throws Exception {
-        closeJadler();
-        super.stop();
     }
 
     private static void prepareResource(String queryPath, String body)
@@ -167,6 +169,10 @@ public class Issue86Test extends ApplicationTest {
 
     @Test
     public void processingChainValidationTest() throws Exception {
+
+        String body = IOUtils.toString(
+            Issue86Test.class.getResourceAsStream(QUERY_RESOURCE), "UTF-8");
+        prepareResource(QUERY_PATH, body);
 
         TitledPane n = (TitledPane) scene.lookup("#logHistoryParent");
         //wait for the App to load
