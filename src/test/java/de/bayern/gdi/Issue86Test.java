@@ -69,7 +69,7 @@ import static org.hamcrest.Matchers.isOneOf;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Unit tests, using TestFX to test controller functions
+ * Unit tests, using TestFX to test controller functions.
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
 public class Issue86Test extends ApplicationTest {
@@ -87,6 +87,9 @@ public class Issue86Test extends ApplicationTest {
     private static final int TIMEOUT_SECONDS = 15;
     private static final int POLL_MILLISECONDS = 250;
 
+    /**
+     * Constant for HTTP_OKAY.
+     */
     public static final int HTTP_OKAY = 200;
 
     private static final String QUERY_RESOURCE =
@@ -96,6 +99,9 @@ public class Issue86Test extends ApplicationTest {
 
     private static Controller controller;
 
+    /**
+     * Initial phase.
+     */
     @BeforeClass
     public static void initTests() {
         System.err.println("init tests ....");
@@ -105,12 +111,18 @@ public class Issue86Test extends ApplicationTest {
         System.setProperty("prism.text", "t2k");
     }
 
+    /**
+     * Start jadler webserver.
+     */
     @Before
     public void startJadler() {
         System.err.println("Start jadler ...");
         initJadler();
     }
 
+    /**
+     * Stop jadler webserver.
+     */
     @After
     public void stopJadler() {
         System.err.println("Stop jadler ...");
@@ -167,6 +179,10 @@ public class Issue86Test extends ApplicationTest {
         return sb.toString();
     }
 
+    /**
+     * The processingChainValidationTest.
+     * @throws Exception if something went wrong.
+     */
     @Test
     public void processingChainValidationTest() throws Exception {
 
