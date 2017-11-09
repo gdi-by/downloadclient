@@ -41,7 +41,14 @@ import org.junit.Test;
  */
 public class WfsTest extends TestCase {
 
+    /**
+     * Constant for HTTP_OKAY.
+     */
     public static final int HTTP_OKAY = 200;
+
+    /**
+     * Constant for FEATURES_PER_PAGE.
+     */
     public static final int FEATURES_PER_PAGE = 1037;
 
     public WfsTest(String testName) {
@@ -59,18 +66,31 @@ public class WfsTest extends TestCase {
         Config.initialize(null);
     }
 
+    /**
+     *  The tearDown phase just closes all resources.
+     */
     @After
     @Override
     public void tearDown() {
         closeJadler();
     }
 
+    /**
+     *  Test virtuell GeoServer.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testGeoServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell GeoServer");
         run("/geoserver/wfs", "/wfs20/geoserver/geoserver-capabilities.xml");
     }
 
+    /**
+     *  Test virtuell XtraServer.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testXtraServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell XtraServer");
