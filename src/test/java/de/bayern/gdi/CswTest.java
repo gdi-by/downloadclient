@@ -44,8 +44,14 @@ public class CswTest extends TestCase {
 
     private static final int THREE = 3;
 
+    /**
+     * Constant for HTTP_OKAY.
+     */
     public static final int HTTP_OKAY = 200;
 
+    /**
+     * Constant for PATH_GETCAPABILITIES.
+     */
     public static final String
             PATH_GETCAPABILITIES = "/csw/csw-getcapabilities";
 
@@ -70,6 +76,11 @@ public class CswTest extends TestCase {
         closeJadler();
     }
 
+    /**
+     * Test for CSW client 1.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testCswClient1() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell search");
@@ -78,6 +89,11 @@ public class CswTest extends TestCase {
             "/csw202/csw-capabilities-1.xml");
     }
 
+    /**
+     * Test for CSW client 2.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testCswClient2() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell search");
