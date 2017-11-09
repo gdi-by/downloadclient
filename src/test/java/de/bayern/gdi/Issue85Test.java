@@ -37,14 +37,28 @@ import de.bayern.gdi.processor.ProcessingStepConverter;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.StringUtils;
 
+/**
+ * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
+ * Unit test for http://github.com/gdi-by/downloadclient/issues/85.
+ */
 public class Issue85Test extends TestCase {
 
+    /**
+     * Prepare setup for the test case.
+     *
+     */
     @Before
     @Override
     public void setUp() throws IOException {
         Config.initialize(null);
     }
 
+    /**
+     * The test.
+     *
+     *  @throws ConverterException If something went wrong.
+     *
+     */
     @Test
     public void testVarReplacement() throws ConverterException {
 
