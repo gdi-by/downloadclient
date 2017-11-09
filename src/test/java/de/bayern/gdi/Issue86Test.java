@@ -100,7 +100,11 @@ public class Issue86Test extends ApplicationTest {
         System.setProperty("testfx.headless", "true");
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.text", "t2k");
-        initJadler();
+        try {
+            initJadler();
+        } catch (IllegalStateException ise) {
+            System.out.println("Jadler is already initialized");
+        }
     }
 
     /**

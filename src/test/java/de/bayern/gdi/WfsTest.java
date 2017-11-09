@@ -51,7 +51,11 @@ public class WfsTest extends TestCase {
     @Before
     @Override
     public void setUp() throws IOException {
-        initJadler();
+        try {
+            initJadler();
+        } catch (IllegalStateException ise) {
+            System.out.println("Jadler is already initialized");
+        }
         Config.initialize(null);
     }
 
