@@ -45,6 +45,15 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 
     $ mvn clean package
 
+### Quelltext Analyse mittels `SonarQube Scanner for Maven` erstellen
+
+```
+mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar \
+    -Dsonar.host.url=https://sonarcloud.io \
+    -Dsonar.organization=<<organization>>\
+    -Dsonar.login=<<TOKEN>>
+```
+
 ## Release erstellen
 Um eine verteilbare Version des Downloadclienten zu erzeugen, führen Sie
 `build.sh` aus dem `misc`-Verzeichnis aus.
