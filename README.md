@@ -1,5 +1,5 @@
 # GDI-BY DownloadClient 
-[![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)][travis]
+[![Build Status](https://travis-ci.org/Intevation/downloadclient.svg?branch=master)][travis]
 [![Build status](https://ci.appveyor.com/api/projects/status/enidrbgie64k7ypg?svg=true)][appveyor]
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license]
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=de.bayern.gdi%3Adownloadclient)][sonarcube]
@@ -7,8 +7,8 @@
 [![Quality Gate](https://sonarcloud.io/api/badges/measure?key=de.bayern.gdi%3Adownloadclient&metric=bugs)][sonarcube]
 [![Quality Gate](https://sonarcloud.io/api/badges/measure?key=de.bayern.gdi%3Adownloadclient&metric=vulnerabilities)][sonarcube]
 
-[travis]:   https://travis-ci.org/gdi-by/downloadclient
-[appveyor]: https://ci.appveyor.com/project/BjoernSchilberg/downloadclient
+[travis]:   https://travis-ci.org/Intevation/downloadclient
+[appveyor]: https://ci.appveyor.com/project/intevation/downloadclient
 [license]:  https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)
 [sonarcube]: https://sonarcloud.io/dashboard?id=de.bayern.gdi%3Adownloadclient
 
