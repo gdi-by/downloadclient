@@ -1,4 +1,9 @@
 syntax: regexp
 target      # maven output
+^build
+\.classpath
+\.project
+\.settings
 TAGS        # tags table
 .*\.swp$    # swap files
+.*\.orig
