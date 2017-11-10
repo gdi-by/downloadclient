@@ -199,8 +199,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             }
         }
 
-        // TODO: i18n
-        String msg = "Bytes downloaded: " + this.totalCount;
+        String msg =
+            I18n.format("atom.bytes.downloaded.total", this.totalCount);
         log(msg);
         log.log(Level.INFO, msg);
 

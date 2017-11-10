@@ -201,10 +201,9 @@ public class ExternalProcessJob implements Job {
         if (this.fileTracker != null) {
             this.fileTracker.push();
             if (!this.fileTracker.scan()) {
-                // TODO: i18n
-                String msg =
-                    "Scanning dir '" + this.fileTracker.getDirectory()
-                    + "' failed.";
+                String msg = I18n.format(
+                    "external.process.scan.dir.failed",
+                    this.fileTracker.getDirectory());
                 JobExecutionException jee = new JobExecutionException(msg);
                 broadcastException(p, jee);
                 throw jee;

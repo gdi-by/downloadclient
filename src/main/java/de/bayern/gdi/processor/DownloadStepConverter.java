@@ -115,9 +115,8 @@ public class DownloadStepConverter {
 
         File dlLog = Misc.uniqueFile(path, "download-", "log", null);
         if (dlLog == null) {
-            // TODO: i18n
             throw new ConverterException(
-                "Cannot create unique download filename");
+                I18n.getMsg("dls.converter.no.unique.filename"));
         }
 
         this.logger = new Log(dlLog);
@@ -129,9 +128,8 @@ public class DownloadStepConverter {
 
         FileTracker fileTracker = new FileTracker(path);
         if (!fileTracker.scan()) {
-            // TODO: i18n
             throw new ConverterException(
-                "Inital scan of download file failed.");
+                I18n.getMsg("dls.converter.init.scan.failed"));
         }
 
         psc.convert(dls, fileTracker, logger);
@@ -541,8 +539,8 @@ public class DownloadStepConverter {
             throw new ConverterException(e.getMessage());
         }
         if (hitsDoc == null) {
-            // TODO: I18n
-            throw new ConverterException("cannot load hits document");
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.no.hits.doc"));
         }
 
         checkServiceException(hitsDoc);
@@ -558,8 +556,7 @@ public class DownloadStepConverter {
         try {
             return Integer.parseInt(numberMatchedString);
         } catch (NumberFormatException nfe) {
-            // TODO: I18n
-            throw new ConverterException(nfe.getMessage(), nfe);
+            throw new ConverterException(nfe.getLocalizedMessage(), nfe);
         }
     }
 
@@ -599,14 +596,14 @@ public class DownloadStepConverter {
         try {
             meta = extractor.parse();
         } catch (URISyntaxException | IOException ioe) {
-            // TODO: I18n
-            throw new ConverterException("Cannot load meta data", ioe);
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.no.meta.data"), ioe);
         }
 
         WFSMeta.Operation getFeatureOp = meta.findOperation("GetFeature");
         if (getFeatureOp == null) {
-            // TODO: I18n
-            throw new ConverterException("'GetFeature' not supported.");
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.getfeature.unsupported"));
         }
 
         Integer fpp = getFeatureOp.featuresPerPage();
