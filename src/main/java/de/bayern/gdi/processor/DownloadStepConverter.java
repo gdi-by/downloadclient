@@ -552,8 +552,8 @@ public class DownloadStepConverter {
             WFSMetaExtractor.NAMESPACES);
 
         if (numberMatchedString == null || numberMatchedString.isEmpty()) {
-            // TODO: I18n
-            throw new ConverterException("numberMatched not found");
+            throw new ConverterException(
+                I18n.getMsg("file.download.no.number"));
         }
         try {
             return Integer.parseInt(numberMatchedString);
