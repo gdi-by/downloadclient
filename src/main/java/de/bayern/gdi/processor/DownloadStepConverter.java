@@ -367,11 +367,11 @@ public class DownloadStepConverter {
             xmlStart += "resultType=\"hits\" ";
         }
         if (ofs != -1) {
-            xmlStart += "startIndex=\"" + String.valueOf(ofs) + "\" ";
+            xmlStart += "startIndex=\"" + ofs + "\" ";
             if (wfs2) {
-                xmlStart += "count=\"" + String.valueOf(count) + "\" ";
+                xmlStart += "count=\"" + count + "\" ";
             } else {
-                xmlStart += "maxFeatures=\"" + String.valueOf(count) + "\" ";
+                xmlStart += "maxFeatures=\"" + count + "\" ";
             }
         }
         xmlStart += "xmlns:wfs=\"http://www.opengis.net/wfs/2.0\" "
