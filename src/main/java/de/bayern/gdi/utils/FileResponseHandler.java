@@ -92,7 +92,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
 
     @Override
     public Boolean handleResponse(HttpResponse response)
-        throws ClientProtocolException, IOException {
+        throws IOException {
         int status = response.getStatusLine().getStatusCode();
         String reason = response.getStatusLine().getReasonPhrase();
         Controller.logToAppLog(status + " " + reason + " "
