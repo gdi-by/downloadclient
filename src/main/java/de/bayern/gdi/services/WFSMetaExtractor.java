@@ -64,6 +64,13 @@ public class WFSMetaExtractor {
     private static final String XLINK = "http://www.w3.org/1999/xlink";
     private static final String XSD = "http://www.w3.org/2001/XMLSchema";
 
+    private static final String OWS_ALLOWED_VALUE_TEXT
+        = "/ows:AllowedValues/ows:Value/text()";
+
+    private static final String DESCRIBE_STORED_QUERIES
+        = "DescribeStoredQueries";
+
+
     /** Common namespaces for WFS documents. */
     public static final NamespaceContext NAMESPACES =
         new NamespaceContextMap(
@@ -105,16 +112,16 @@ public class WFSMetaExtractor {
     private static final String XPATH_OPERATIONS_VERSIONS
         = "//ows:OperationsMetadata"
         + "/ows:Parameter[@name='version']"
-        + "/ows:AllowedValues/ows:Value/text()";
+        + OWS_ALLOWED_VALUE_TEXT;
 
     private static final String XPATH_OPERATION_OUT_FORMATS
         = "ows:Parameter[@name='outputFormat']"
-        + "/ows:AllowedValues/ows:Value/text()";
+        + OWS_ALLOWED_VALUE_TEXT;
 
     private static final String XPATH_OUT_FORMATS
         = "/wfs:WFS_Capabilities"
         + "/ows:OperationsMetadata/ows:Parameter[@name='outputFormat']"
-        + "/ows:AllowedValues/ows:Value/text()";
+        + OWS_ALLOWED_VALUE_TEXT;
 
     private static final String XPATH_FEATURE_OUT_FORMATS
         = "wfs:OutputFormats/wfs:Format/text()";
@@ -216,14 +223,14 @@ public class WFSMetaExtractor {
     private void parseDescribeStoredQueries(WFSMeta meta)
         throws IOException, URISyntaxException {
 
-        WFSMeta.Operation op = meta.findOperation("DescribeStoredQueries");
+        WFSMeta.Operation op = meta.findOperation(DESCRIBE_STORED_QUERIES);
         if (op == null) {
             return;
         }
 
         String urlString = op.get != null
-            ? url(op.get, "DescribeStoredQueries", meta)
-            : capURLString.replace("GetCapabilities", "DescribeStoredQueries");
+            ? url(op.get, DESCRIBE_STORED_QUERIES, meta)
+            : capURLString.replace("GetCapabilities", DESCRIBE_STORED_QUERIES);
 
         Document dsqDoc = getDocument(urlString);
         meta.namespaces.join(dsqDoc);
