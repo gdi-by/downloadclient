@@ -132,6 +132,8 @@ import org.apache.commons.io.IOUtils;
 public class Controller {
 
     private static final String USER_DIR = "user.dir";
+    private static final String STATUS_SERVICE_BROKEN = "status.service.broken";
+    private static final String STATUS_READY = "status.ready";
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
@@ -906,7 +908,7 @@ public class Controller {
                 log.log(Level.SEVERE, e.getMessage(), e);
                 Platform.runLater(() ->
                     setStatusTextUI(
-                            I18n.format("status.service.broken"))
+                            I18n.format(STATUS_SERVICE_BROKEN))
                 );
                 return false;
             }
@@ -921,7 +923,7 @@ public class Controller {
         &&  dataBean.getSelectedService().equals(service)) {
             Platform.runLater(() ->
                 setStatusTextUI(
-                        I18n.format("status.ready"))
+                        I18n.format(STATUS_READY))
             );
             return true;
         }
@@ -958,14 +960,14 @@ public class Controller {
         if (dataBean.getSelectedService().getServiceType() == null) {
             Platform.runLater(() ->
                 setStatusTextUI(
-                        I18n.format("status.service.broken"))
+                        I18n.format(STATUS_SERVICE_BROKEN))
             );
             return false;
         }
 
         Platform.runLater(() ->
             setStatusTextUI(
-                    I18n.format("status.ready"))
+                    I18n.format(STATUS_READY))
         );
         return true;
     }
@@ -1571,7 +1573,7 @@ public class Controller {
                     log.log(Level.SEVERE, e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
-                                I18n.getMsg("status.service.broken")
+                                I18n.getMsg(STATUS_SERVICE_BROKEN)
                         )
                     );
                     resetGui();
@@ -1599,7 +1601,7 @@ public class Controller {
                     log.log(Level.SEVERE, e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
-                                I18n.getMsg("status.service.broken")
+                                I18n.getMsg(STATUS_SERVICE_BROKEN)
                         )
                     );
                 } finally {
@@ -1625,7 +1627,7 @@ public class Controller {
                     log.log(Level.SEVERE, e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
-                                I18n.getMsg("status.service.broken"))
+                                I18n.getMsg(STATUS_SERVICE_BROKEN))
                     );
 
                 } finally {
@@ -1652,7 +1654,7 @@ public class Controller {
             if (downloadConf != null) {
                 loadDownloadConfig(downloadConf);
             }
-            setStatusTextUI(I18n.getMsg("status.ready"));
+            setStatusTextUI(I18n.getMsg(STATUS_READY));
         });
         return;
 
@@ -1939,7 +1941,7 @@ public class Controller {
         } else {
             serviceTypeChooser.setStyle("-fx-border-color: null;");
             datasetAvailable = true;
-            setStatusTextUI(I18n.format("status.ready"));
+            setStatusTextUI(I18n.format(STATUS_READY));
         }
         if (type == ServiceType.Atom) {
             chooseAtomType(data, datasetAvailable);
@@ -2163,7 +2165,7 @@ public class Controller {
         }
         //If all chain items were ready, set status to ready
         if (allValid) {
-            setStatusTextUI(I18n.format("status.ready"));
+            setStatusTextUI(I18n.format(STATUS_READY));
         }
     }
 
