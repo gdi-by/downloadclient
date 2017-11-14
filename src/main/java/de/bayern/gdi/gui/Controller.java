@@ -134,6 +134,7 @@ public class Controller {
     private static final String USER_DIR = "user.dir";
     private static final String STATUS_SERVICE_BROKEN = "status.service.broken";
     private static final String STATUS_READY = "status.ready";
+    private static final String OUTPUTFORMAT = "outputformat";
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
@@ -1057,7 +1058,7 @@ public class Controller {
             }
         }
         ComboBox source = (ComboBox) event.getSource();
-        dataBean.addAttribute("outputformat",
+        dataBean.addAttribute(OUTPUTFORMAT,
                 source.getValue() != null
                         ? source.getValue().toString()
                         : "",
@@ -1145,10 +1146,10 @@ public class Controller {
                 this.valueAtomRefsys.setVisible(true);
                 this.valueAtomRefsys.setText(selaf.getCRS());
             }
-            this.dataBean.addAttribute("outputformat", selaf.getFormat(), "");
+            this.dataBean.addAttribute(OUTPUTFORMAT, selaf.getFormat(), "");
         } else {
             this.dataBean.addAttribute("VARIATION", "", "");
-            this.dataBean.addAttribute("outputformat", "", "");
+            this.dataBean.addAttribute(OUTPUTFORMAT, "", "");
         }
         validateChainContainerItems();
     }
@@ -1167,7 +1168,7 @@ public class Controller {
             return steps;
         }
 
-        String format = this.dataBean.getAttributeValue("outputformat");
+        String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null || format.isEmpty()) {
             setStatusTextUI(I18n.getMsg("gui.process.no.format"));
             logToAppLog(I18n.getMsg("gui.process.no.format"));
@@ -1272,7 +1273,7 @@ public class Controller {
                         }
                         if (cb != null && (l1 != null || l2 != null)
                         && cb.getId().equals(UIFactory.getDataFormatID())) {
-                            name = "outputformat";
+                            name = OUTPUTFORMAT;
                             value = cb.getSelectionModel()
                                     .getSelectedItem().toString();
                             type = "";
@@ -2093,7 +2094,7 @@ public class Controller {
      * @return True if chosen item is valid, else false
      */
     private boolean validateChainContainer(ComboBox box) {
-        String format = this.dataBean.getAttributeValue("outputformat");
+        String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null) {
             box.setStyle("-fx-border-color: red;");
             setStatusTextUI(I18n.format("gui.process.no.format"));
