@@ -33,6 +33,8 @@ public class WFSMeta {
     private static final Logger log
         = Logger.getLogger(WFSMeta.class.getName());
 
+    private static final String TAB_NEWLINE = "\t}\n";
+
     /** operation. */
     public static class Operation {
         /** name. */
@@ -454,37 +456,37 @@ public class WFSMeta {
         for (Operation op: operations) {
             sb.append("\t\t").append(op).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tconstraints: {\n");
         for (Constraint c: constraints) {
             sb.append("\t\t").append(c).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tfeatures: {\n");
         for (Feature f: features) {
             sb.append("\t\t").append(f).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tstored queries: {\n");
         for (StoredQuery sq: storedQueries) {
             sb.append("\t\t").append(sq).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tversions: {\n");
         for (Version version: versions) {
             sb.append("\t\t").append(version).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\toutput formats: {\n");
         for (String outputFormat: outputFormats) {
             sb.append("\t\t").append(outputFormat).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tconstraints: {\n");
         for (Constraint constraint: constraints) {
             sb.append("\t\t").append(constraint).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("}");
         return sb.toString();
     }
