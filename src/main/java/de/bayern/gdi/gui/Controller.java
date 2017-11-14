@@ -131,6 +131,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class Controller {
 
+    private static final String USER_DIR = "user.dir";
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
@@ -436,7 +437,7 @@ public class Controller {
      */
     protected File openConfigFileOpenDialog() throws Exception {
         FileChooser fileChooser = new FileChooser();
-        File initialDir = new File(System.getProperty("user.dir"));
+        File initialDir = new File(System.getProperty(USER_DIR));
         fileChooser.setInitialDirectory(initialDir);
         fileChooser.setTitle(I18n.getMsg("menu.load_config"));
         fileChooser.getExtensionFilters().addAll(
@@ -1495,7 +1496,7 @@ public class Controller {
 
             if (downloadConfig == null) {
                 downloadDir = dirChooser.showDialog(getPrimaryStage());
-                initDir = new File(System.getProperty("user.dir"));
+                initDir = new File(System.getProperty(USER_DIR));
                 File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
                         null);
                 fileChooser.setInitialFileName(uniqueName.getName());
@@ -1503,7 +1504,7 @@ public class Controller {
                 File downloadInitDir
                         = new File(downloadConfig.getDownloadPath());
                 if (!downloadInitDir.exists()) {
-                    downloadInitDir = new File(System.getProperty("user.dir"));
+                    downloadInitDir = new File(System.getProperty(USER_DIR));
                 }
                 dirChooser.setInitialDirectory(downloadInitDir);
                 downloadDir = dirChooser.showDialog(getPrimaryStage());
