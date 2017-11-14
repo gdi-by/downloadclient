@@ -74,6 +74,7 @@ public class UIFactory {
     private static final int WEBVIEW_MIN_HEIGHT = 0;
     private static final int OUTPUTFORMAT_PREF_WIDTH = LABEL_MIN_WIDTH;
     private static final String DATAFORMAT_ID = "simpleDataformat";
+    private static final String PROCESS_VAR = "process_var";
 
     public static String getDataFormatID() {
         return DATAFORMAT_ID;
@@ -365,7 +366,7 @@ public class UIFactory {
                         && "ComboBox".equals(input.getType())) {
                         ComboBox inputEl = new ComboBox();
                         inputEl.setUserData(var.get(0));
-                        inputEl.setId("process_var");
+                        inputEl.setId(PROCESS_VAR);
                         List<Option> opts = input.getOptions();
                         inputEl.setItems(
                             FXCollections.observableArrayList(opts));
@@ -384,7 +385,7 @@ public class UIFactory {
                         && "TextField".equals(input.getType())) {
                         TextField inputEl = new TextField();
                         inputEl.setUserData(var.get(0));
-                        inputEl.setId("process_var");
+                        inputEl.setId(PROCESS_VAR);
                         root.getChildren().add(label);
                         root.getChildren().add(inputEl);
                         root.setPrefHeight(PREF_HEIGHT);
@@ -408,7 +409,7 @@ public class UIFactory {
                     label.setMinWidth(LABEL_MIN_WIDTH);
                     TextField textField = new TextField();
                     textField.setUserData(var);
-                    textField.setId("process_var");
+                    textField.setId(PROCESS_VAR);
                     textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
                     root.getChildren().addAll(label, textField);
                     root.setMargin(label, new Insets(MARGIN_5,

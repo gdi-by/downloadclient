@@ -60,12 +60,16 @@ public class DownloadStepConverter {
     private static final int FOUR = 4;
     private static final int FIVE = 5;
 
+    private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
+    private static final String DATASET = "DATASET";
+    private static final String GETFEATURE = "GetFeature";
+
     private static final String[][] SERVICE2TYPE = {
-        {"ATOM", "STOREDQUERY_ID"}, // XXX: NOT CORRECT!
-        {"WFS2_BASIC", "DATASET"},
-        {"WFS2_SIMPLE", "STOREDQUERY_ID"},
-        {"WFS1", "DATASET"},
-        {"WFS", "DATASET"}
+        {"ATOM", STOREDQUERY_ID}, // XXX: NOT CORRECT!
+        {"WFS2_BASIC", DATASET},
+        {"WFS2_SIMPLE", STOREDQUERY_ID},
+        {"WFS1", DATASET},
+        {"WFS", DATASET}
     };
 
     private String user;
@@ -219,7 +223,7 @@ public class DownloadStepConverter {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String vendor = vendorSpecific(url);
-        String getFeaturesURL = meta.findOperation("GetFeature").getGET();
+        String getFeaturesURL = meta.findOperation(GETFEATURE).getGET();
         if (getFeaturesURL.startsWith("/")) {
             base += getFeaturesURL;
         } else {
@@ -241,7 +245,7 @@ public class DownloadStepConverter {
           .append("request=GetFeature&")
           .append("version=").append(version);
 
-        if (queryType.equals("STOREDQUERY_ID")) {
+        if (queryType.equals(STOREDQUERY_ID)) {
             sb.append("&STOREDQUERY_ID=")
               .append(StringUtils.urlEncode(dataset));
         } else {
@@ -316,7 +320,7 @@ public class DownloadStepConverter {
         ArrayList<NameValuePair> params = new ArrayList<>();
 
         boolean storedQuery = false;
-        if (queryType.equals("STOREDQUERY_ID")) {
+        if (queryType.equals(STOREDQUERY_ID)) {
             storedQueryId = dataset;
             storedQuery = true;
         } else {
@@ -419,7 +423,7 @@ public class DownloadStepConverter {
         WFSMeta      meta
     ) {
         boolean usePost = false;
-        WFSMeta.Operation getFeature = meta.findOperation("GetFeature");
+        WFSMeta.Operation getFeature = meta.findOperation(GETFEATURE);
         if (getFeature.getPOST() != null) {
             usePost = true;
         }
@@ -600,7 +604,7 @@ public class DownloadStepConverter {
                 I18n.getMsg("dls.converter.no.meta.data"), ioe);
         }
 
-        WFSMeta.Operation getFeatureOp = meta.findOperation("GetFeature");
+        WFSMeta.Operation getFeatureOp = meta.findOperation(GETFEATURE);
         if (getFeatureOp == null) {
             throw new ConverterException(
                 I18n.getMsg("dls.converter.getfeature.unsupported"));
