@@ -137,8 +137,9 @@ public class Controller {
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
-    private static final String INITIAL_CRS_DISPLAY = "EPSG:4326";
-    private static final String ATOM_CRS_STRING = "EPSG:4326";
+    private static final String EPSG4326 = "EPSG:4326";
+    private static final String INITIAL_CRS_DISPLAY = EPSG4326;
+    private static final String ATOM_CRS_STRING = EPSG4326;
     private static final int BBOX_X1_INDEX = 0;
     private static final int BBOX_Y1_INDEX = 1;
     private static final int BBOX_X2_INDEX = 2;
@@ -1094,7 +1095,7 @@ public class Controller {
                 referenceSystemChooser.getValue() != null
                         ? referenceSystemChooser.
                         getValue().getOldName()
-                        : "EPSG:4326",
+                        : EPSG4326,
                 "");
         if (mapWFS != null && referenceSystemChooser.getValue() != null) {
             this.mapWFS.setDisplayCRS(
