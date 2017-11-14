@@ -135,8 +135,15 @@ public class Controller {
     private static final String STATUS_SERVICE_BROKEN = "status.service.broken";
     private static final String STATUS_READY = "status.ready";
     private static final String OUTPUTFORMAT = "outputformat";
-    private static final String FX_BORDER_COLOR_NUL = "-fx-border-color: null;";
+    private static final String FX_BORDER_COLOR_NULL
+            = "-fx-border-color: null;";
     private static final String FX_BORDER_COLOR_RED = "-fx-border-color: red;";
+    private static final String GUI_PROCESS_NO_FORMAT
+            = "gui.process.no.format";
+    private static final String GUI_PROCESS_FORMAT_NOT_FOUND
+            = "gui.process.format.not.found";
+    private static final String GUI_PROCESS_NOT_COMPATIBLE
+            = "gui.process.not.compatible";
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
@@ -656,7 +663,7 @@ public class Controller {
                             });
                             cb.setOnAction(event -> {
                                 if (cb.getValue().isAvailable()) {
-                                    cb.setStyle(FX_BORDER_COLOR_NUL);
+                                    cb.setStyle(FX_BORDER_COLOR_NULL);
                                 } else {
                                     cb.setStyle(FX_BORDER_COLOR_RED);
                                 }
@@ -679,7 +686,7 @@ public class Controller {
                                 cb.getSelectionModel().select(m);
                             }
                             if (cb.getValue().isAvailable()) {
-                                cb.setStyle(FX_BORDER_COLOR_NUL);
+                                cb.setStyle(FX_BORDER_COLOR_NULL);
                             } else {
                                 cb.setStyle(FX_BORDER_COLOR_RED);
                             }
@@ -1054,7 +1061,7 @@ public class Controller {
     protected void handleDataformatSelect(ActionEvent event) {
         if (dataFormatChooser.getValue() != null) {
             if (dataFormatChooser.getValue().isAvailable()) {
-                dataFormatChooser.setStyle(FX_BORDER_COLOR_NUL);
+                dataFormatChooser.setStyle(FX_BORDER_COLOR_NULL);
             } else {
                 dataFormatChooser.setStyle(FX_BORDER_COLOR_RED);
             }
@@ -1089,7 +1096,7 @@ public class Controller {
     protected void handleReferenceSystemSelect(ActionEvent event) {
         if (referenceSystemChooser.getValue() != null) {
             if (referenceSystemChooser.getValue().isAvailable()) {
-                referenceSystemChooser.setStyle(FX_BORDER_COLOR_NUL);
+                referenceSystemChooser.setStyle(FX_BORDER_COLOR_NULL);
             } else {
                 referenceSystemChooser.setStyle(FX_BORDER_COLOR_RED);
             }
@@ -1125,7 +1132,7 @@ public class Controller {
         if (selim instanceof MiscItemModel) {
             atomVariationChooser.setStyle(FX_BORDER_COLOR_RED);
         } else {
-            atomVariationChooser.setStyle(FX_BORDER_COLOR_NUL);
+            atomVariationChooser.setStyle(FX_BORDER_COLOR_NULL);
             variationAvailable = true;
         }
         if (selim != null) {
@@ -1172,16 +1179,16 @@ public class Controller {
 
         String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null || format.isEmpty()) {
-            setStatusTextUI(I18n.getMsg("gui.process.no.format"));
-            logToAppLog(I18n.getMsg("gui.process.no.format"));
+            setStatusTextUI(I18n.getMsg(GUI_PROCESS_NO_FORMAT));
+            logToAppLog(I18n.getMsg(GUI_PROCESS_NO_FORMAT));
             return steps;
         }
 
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
-            setStatusTextUI(I18n.getMsg("gui.process.format.not.found"));
-            logToAppLog(I18n.getMsg("gui.process.format.not.found"));
+            setStatusTextUI(I18n.getMsg(GUI_PROCESS_FORMAT_NOT_FOUND));
+            logToAppLog(I18n.getMsg(GUI_PROCESS_FORMAT_NOT_FOUND));
             return steps;
         }
 
@@ -1196,8 +1203,8 @@ public class Controller {
 
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
                 setStatusTextUI(
-                        I18n.format("gui.process.not.compatible", name));
-                        logToAppLog(I18n.format("gui.process.not.compatible",
+                        I18n.format(GUI_PROCESS_NOT_COMPATIBLE, name));
+                        logToAppLog(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
                                 name));
                 continue;
             }
@@ -1453,7 +1460,7 @@ public class Controller {
         Platform.runLater(() ->
             this.serviceTypeChooser.getItems().retainAll()
         );
-        this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NUL);
+        this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
         this.dataBean.reset();
         this.mapAtom.reset();
         this.mapWFS.reset();
@@ -1943,7 +1950,7 @@ public class Controller {
             serviceTypeChooser.setStyle(FX_BORDER_COLOR_RED);
             setStatusTextUI(I18n.format("gui.dataset-not-available"));
         } else {
-            serviceTypeChooser.setStyle(FX_BORDER_COLOR_NUL);
+            serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
             datasetAvailable = true;
             setStatusTextUI(I18n.format(STATUS_READY));
         }
@@ -2074,7 +2081,7 @@ public class Controller {
                 HBox hbox = (HBox) v.getChildren().get(0);
                 Node cBox = hbox.getChildren().get(0);
                 if (cBox instanceof ComboBox) {
-                    cBox.setStyle(FX_BORDER_COLOR_NUL);
+                    cBox.setStyle(FX_BORDER_COLOR_NULL);
                     ComboBox box = (ComboBox) cBox;
                     ObservableList<ProcessingStepConfiguration> confs =
                         (ObservableList<ProcessingStepConfiguration>)
@@ -2099,7 +2106,7 @@ public class Controller {
         String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null) {
             box.setStyle(FX_BORDER_COLOR_RED);
-            setStatusTextUI(I18n.format("gui.process.no.format"));
+            setStatusTextUI(I18n.format(GUI_PROCESS_NO_FORMAT));
         }
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
@@ -2116,7 +2123,7 @@ public class Controller {
                 //Workaround to force cell update
                 items.set(items.indexOf(cfgI), cfgI);
             }
-            setStatusTextUI(I18n.format("gui.process.format.not.found"));
+            setStatusTextUI(I18n.format(GUI_PROCESS_FORMAT_NOT_FOUND));
             return false;
         }
 
@@ -2136,15 +2143,15 @@ public class Controller {
         }
 
         if (cfg == null) {
-            box.setStyle(FX_BORDER_COLOR_NUL);
+            box.setStyle(FX_BORDER_COLOR_NULL);
             return true;
         }
 
         if (cfg.isCompatible()) {
-            box.setStyle(FX_BORDER_COLOR_NUL);
+            box.setStyle(FX_BORDER_COLOR_NULL);
         } else {
             box.setStyle(FX_BORDER_COLOR_RED);
-            setStatusTextUI(I18n.format("gui.process.not.compatible",
+            setStatusTextUI(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
                     box.getValue()));
         }
         return cfg.isCompatible();
