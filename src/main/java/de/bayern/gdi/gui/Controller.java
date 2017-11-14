@@ -59,6 +59,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -372,9 +373,10 @@ public class Controller {
     @FXML
     private void handleAboutAction(final ActionEvent event) {
         try {
-            displayHTMLFileAsPopup(I18n.getMsg("menu.about"),
-                    "about/about_" + I18n.getLocale().toLanguageTag()
-                            + ".html");
+            String path = "about/about_"
+                + Locale.getDefault().getLanguage()
+                + ".html";
+            displayHTMLFileAsPopup(I18n.getMsg("menu.about"), path);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -398,8 +400,9 @@ public class Controller {
 
     @FXML
     private void handleHelpAction(final ActionEvent event) {
-        String pathToFile = "help/help_" + I18n.getLocale().toLanguageTag()
-                + ".txt";
+        String pathToFile = "help/help_"
+            + Locale.getDefault().getLanguage()
+            + ".txt";
         try {
             openLinkFromFile(pathToFile);
         } catch (IOException e) {
