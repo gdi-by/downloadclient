@@ -29,6 +29,9 @@ import javafx.scene.paint.Color;
  */
 public final class CellTypes {
 
+    private static final String FX_BOLD = "-fx-font-weight: bold;";
+    private static final String FX_NORMAL = "-fx-font-weight: normal;";
+
     private CellTypes() {
     }
 
@@ -45,10 +48,10 @@ public final class CellTypes {
             setText(item == null ? "" : item.toString());
             if (item instanceof MiscItemModel) {
                 setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
+                setStyle(FX_BOLD);
             } else {
                 setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
+                setStyle(FX_NORMAL);
             }
         }
     }
@@ -65,10 +68,10 @@ public final class CellTypes {
             setText(item == null ? "" : item.toString());
             if (item != null && !item.isAvailable()) {
                 setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
+                setStyle(FX_BOLD);
             } else {
                 setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
+                setStyle(FX_NORMAL);
             }
         }
     }
@@ -87,11 +90,11 @@ public final class CellTypes {
             }
             if (!item.isAvailable()) {
                 setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
+                setStyle(FX_BOLD);
 
             } else {
                 setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
+                setStyle(FX_NORMAL);
 
             }
             setText(item.getItem());
@@ -115,10 +118,10 @@ public final class CellTypes {
             }
             if (!item.isCompatible()) {
                 setTextFill(Color.RED);
-                setStyle("-fx-font-weight: bold;");
+                setStyle(FX_BOLD);
             } else {
                 setTextFill(Color.BLACK);
-                setStyle("-fx-font-weight: normal;");
+                setStyle(FX_NORMAL);
             }
 
             setText(item.toString());

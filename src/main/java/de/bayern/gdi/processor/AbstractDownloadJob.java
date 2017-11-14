@@ -45,6 +45,9 @@ public abstract class AbstractDownloadJob
     public AbstractDownloadJob() {
     }
 
+    private static final String FILE_DOWNLOAD_BAD_URL
+            = "file.download.bad.url";
+
     public AbstractDownloadJob(String user, String password, Log logger) {
         this.user = user;
         this.password = password;
@@ -119,7 +122,7 @@ public abstract class AbstractDownloadJob
         try {
             return new URL(urlString);
         } catch (MalformedURLException mue) {
-            String msg = I18n.format("file.download.bad.url", urlString);
+            String msg = I18n.format(FILE_DOWNLOAD_BAD_URL, urlString);
             log(msg);
             throw new JobExecutionException(msg);
         }
@@ -150,7 +153,7 @@ public abstract class AbstractDownloadJob
         try {
             return HTTP.buildAbsoluteURL(base, rel);
         } catch (MalformedURLException | URISyntaxException e) {
-            String msg = I18n.format("file.download.bad.url", e.getMessage());
+            String msg = I18n.format(FILE_DOWNLOAD_BAD_URL, e.getMessage());
             log(msg);
             throw new JobExecutionException(msg);
         }
@@ -167,7 +170,7 @@ public abstract class AbstractDownloadJob
         try {
             return HTTP.getGetRequest(url);
         } catch (URISyntaxException use) {
-            String msg = I18n.format("file.download.bad.url", url);
+            String msg = I18n.format(FILE_DOWNLOAD_BAD_URL, url);
             log(msg);
             throw new JobExecutionException(msg);
         }
