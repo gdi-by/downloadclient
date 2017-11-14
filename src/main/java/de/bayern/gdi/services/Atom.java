@@ -66,6 +66,9 @@ public class Atom {
     private List<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
+    private static final String EPSG = "EPSG:";
+    private static final String LOCAL_NAME = "*[local-name()";
+    private static final String COULD_NOT_PARSE = "Could not Parse ";
     private static final int ZERO = 0;
     private static final int ONE = 1;
     private static final int TWO = 2;
@@ -344,14 +347,14 @@ public class Atom {
                         "category/@label",
                         XPathConstants.STRING,
                         this.context);
-                if (crs.isEmpty() && entryDescription.contains("EPSG:")) {
+                if (crs.isEmpty() && entryDescription.contains(EPSG)) {
 
                     String temp = entryDescription.substring(
-                        entryDescription.lastIndexOf("EPSG:"),
+                        entryDescription.lastIndexOf(EPSG),
                         entryDescription.length());
 
-                    StringBuilder epsgNum = new StringBuilder("EPSG:");
-                    for (int j = "EPSG:".length();
+                    StringBuilder epsgNum = new StringBuilder(EPSG);
+                    for (int j = EPSG.length();
                         j < temp.length() - 1;
                         j++) {
                         String isNum = temp.substring(j, j + 1);
@@ -470,7 +473,7 @@ public class Atom {
                     getEntryTitle,
                     XPathConstants.NODE,
                     this.nscontext);
-            String getEntryid = "*[local-name()"
+            String getEntryid = LOCAL_NAME
                     + "='spatial_dataset_identifier_code']";
             Node id = (Node) XML.xpath(entry,
                     getEntryid,
@@ -500,14 +503,14 @@ public class Atom {
                         XPathConstants.NODE,
                         this.nscontext);
             }
-            String borderPolygonExpr = "*[local-name()"
+            String borderPolygonExpr = LOCAL_NAME
                                        + "='polygon']";
             Node borderPolyGonN = (Node) XML.xpath(entry,
                     borderPolygonExpr,
                     XPathConstants.NODE,
                     this.nscontext);
             if (borderPolyGonN == null) {
-                borderPolygonExpr = "*[local-name()"
+                borderPolygonExpr = LOCAL_NAME
                         + "='box']";
                 borderPolyGonN = (Node) XML.xpath(entry,
                         borderPolygonExpr,
@@ -518,13 +521,13 @@ public class Atom {
             if (id != null) {
                 it.id = id.getTextContent();
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. ID not found");
             }
             if (title != null) {
                 it.title = titleN.getTextContent();
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. Title not found");
             }
             if (description != null) {
@@ -535,19 +538,19 @@ public class Atom {
             if (describedBy != null) {
                 it.describedBy = describedBy.getTextContent();
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. DescribedBy not found");
             }
             if (entry != null) {
                 it.otherCRSs = getCRS(entry);
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. Entry not found");
             }
             if (it.otherCRSs != null) {
                 it.defaultCRS = it.otherCRSs.get(0);
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. CRSs not found");
             }
             it.username = this.username;
@@ -577,7 +580,7 @@ public class Atom {
 
                 it.polygon = (Polygon) polygon;
             } else {
-                throw new ParserConfigurationException("Could not Parse "
+                throw new ParserConfigurationException(COULD_NOT_PARSE
                         + "Service. Bounding Box not Found");
             }
             items.add(it);

@@ -65,6 +65,18 @@ public class CatalogService {
     private String providerName;
     private NamespaceContext context;
     private URL getRecordsURL;
+    private static final String GMD_IDENTIFICATION_INFO
+            = "gmd:identificationInfo";
+    private static final String SRV_SV_SERVICE_IDENTIFICATION
+            = "/srv:SV_ServiceIdentification";
+    private static final String GCO_CHARACTER_STRING
+            = "/gco:CharacterString";
+    private static final String GMD_LINKAGE
+            = "/gmd:linkage";
+    private static final String GMD_URL
+            = "/gmd:URL";
+    private static final String SV_OPERATION_METADATA
+            = "srv:SV_OperationMetadata";
 
     /**
      * Constructor.
@@ -264,18 +276,18 @@ public class CatalogService {
         for (int i = 0; i < servicesNL.getLength(); i++) {
             Node serviceN = servicesNL.item(i);
             String nameExpr =
-                    "gmd:identificationInfo"
-                            + "/srv:SV_ServiceIdentification"
+                    GMD_IDENTIFICATION_INFO
+                            + SRV_SV_SERVICE_IDENTIFICATION
                             + "/gmd:citation"
                             + "/gmd:CI_Citation"
                             + "/gmd:title"
-                            + "/gco:CharacterString";
+                            + GCO_CHARACTER_STRING;
             String serviceName = (String) XML.xpath(serviceN,
                     nameExpr,
                     XPathConstants.STRING, context);
             String restrictionExpr =
-                    "gmd:identificationInfo"
-                            + "/srv:SV_ServiceIdentification"
+                    GMD_IDENTIFICATION_INFO
+                            + SRV_SV_SERVICE_IDENTIFICATION
                             + "/gmd:resourceConstraints"
                             + "/gmd:MD_SecurityConstraints"
                             + "/gmd:classification"
@@ -288,10 +300,10 @@ public class CatalogService {
                 restricted = true;
             }
             String serviceTypeVersionExpr =
-                    "gmd:identificationInfo"
-                            + "/srv:SV_ServiceIdentification"
+                    GMD_IDENTIFICATION_INFO
+                            + SRV_SV_SERVICE_IDENTIFICATION
                             + "/srv:serviceTypeVersion"
-                            + "/gco:CharacterString";
+                            + GCO_CHARACTER_STRING;
             String serviceTypeVersion = (String) XML.xpath(serviceN,
                     serviceTypeVersionExpr,
                     XPathConstants.STRING, context);
@@ -327,15 +339,15 @@ public class CatalogService {
             Node onlineN = onlineNL.item(j);
             String urlExpr =
                     "gmd:CI_OnlineResource"
-                            + "/gmd:linkage"
-                            + "/gmd:URL";
+                            + GMD_LINKAGE
+                            + GMD_URL;
             String onLineserviceURL = (String) XML.xpath(onlineN,
                     urlExpr,
                     XPathConstants.STRING, context);
             String applicationprofileExpr =
                     "gmd:CI_OnlineResource"
                             + "/gmd:applicationProfile"
-                            + "/gco:CharacterString";
+                            + GCO_CHARACTER_STRING;
             String applicationProfile = (String) XML.xpath(onlineN,
                     applicationprofileExpr,
                     XPathConstants.STRING, context);
@@ -349,8 +361,8 @@ public class CatalogService {
             }
         }
         String operationMetaDataExpr =
-                "gmd:identificationInfo"
-                        + "/srv:SV_ServiceIdentification"
+                GMD_IDENTIFICATION_INFO
+                        + SRV_SV_SERVICE_IDENTIFICATION
                         + "/srv:containsOperations";
         NodeList operationsMetadataNL = (NodeList) XML.xpath(serviceNode,
                 operationMetaDataExpr,
@@ -362,9 +374,9 @@ public class CatalogService {
                 firstNode = operationMetadataNode;
             }
             String operationsNameExpr =
-                    "srv:SV_OperationMetadata"
+                    SV_OPERATION_METADATA
                             + "/srv:operationName"
-                            + "/gco:CharacterString";
+                            + GCO_CHARACTER_STRING;
             String applicationProfile = (String) XML.xpath(
                     operationMetadataNode,
                     operationsNameExpr,
@@ -372,11 +384,11 @@ public class CatalogService {
 
             if (applicationProfile.equalsIgnoreCase("getcapabilities")) {
                 String operationsURLExpr =
-                        "srv:SV_OperationMetadata"
+                        SV_OPERATION_METADATA
                                 + "/srv:connectPoint"
                                 + "/gmd:CI_OnlineResource"
-                                + "/gmd:linkage"
-                                + "/gmd:URL";
+                                + GMD_LINKAGE
+                                + GMD_URL;
                 String operationsURL = (String) XML.xpath(
                         operationMetadataNode,
                         operationsURLExpr,
@@ -388,11 +400,11 @@ public class CatalogService {
         }
         if (firstNode != null) {
             String operationsURLExpr =
-                    "srv:SV_OperationMetadata"
+                    SV_OPERATION_METADATA
                             + "/srv:connectPoint"
                             + "/gmd:CI_OnlineResource"
-                            + "/gmd:linkage"
-                            + "/gmd:URL";
+                            + GMD_LINKAGE
+                            + GMD_URL;
             return (String)XML.xpath(
                     firstNode,
                     operationsURLExpr,
