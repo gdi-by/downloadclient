@@ -1349,10 +1349,9 @@ public class Controller {
             failed.append(s);
         };
 
-        Validator validator = Validator.getInstance();
         for (DataBean.Attribute attr: this.dataBean.getAttributes()) {
             if (!attr.getType().isEmpty()
-            && !validator.isValid(attr.getType(), attr.getValue())) {
+            && !Validator.isValid(attr.getType(), attr.getValue())) {
                 fail.accept(attr.getName());
             }
         }

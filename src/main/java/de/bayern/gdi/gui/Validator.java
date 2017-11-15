@@ -26,6 +26,11 @@ import java.lang.reflect.InvocationTargetException;
  */
 
 public class Validator {
+
+    private Validator() {
+        // ignore me!
+    }
+
     private static final String[] JAVASPACES = {
             "java.lang.",
             "java.util.",
@@ -33,24 +38,6 @@ public class Validator {
             "com.vividsolutions.jts.geom."
     };
 
-    /** Holds the instance. */
-    private static final class Holder {
-        static final Validator INSTANCE = new Validator();
-    }
-
-    private Validator() {
-    }
-
-    /**
-     * returns an instance of the class.
-     *
-     * @return the class
-     */
-    public static Validator getInstance() {
-        synchronized (Holder.INSTANCE) {
-            return Holder.INSTANCE;
-        }
-    }
 
     /**
      * Checks if the value can be casted to the class with the classname.
@@ -59,7 +46,7 @@ public class Validator {
      * @param className to classname
      * @return true if it works; false if not
      */
-    public boolean isValid(String className, String value) {
+    public static boolean isValid(String className, String value) {
         if (value != null && !value.isEmpty()) {
             try {
                 Class<?> aClass = classByName(className);
@@ -77,7 +64,7 @@ public class Validator {
         return true;
     }
 
-    private boolean isCastableTo(Class myClass, String value) {
+    private static boolean isCastableTo(Class myClass, String value) {
         boolean constructorTest = false;
         for (Constructor constructor : myClass.getConstructors()) {
             try {
@@ -92,7 +79,7 @@ public class Validator {
         return constructorTest;
     }
 
-    private Class classByName(String className) throws
+    private static Class classByName(String className) throws
             ClassNotFoundException {
         if (!className.contains(".")) {
             className = className.substring(0, 1).toUpperCase()
@@ -108,7 +95,4 @@ public class Validator {
         }
         return null;
     }
-
-
-
 }
