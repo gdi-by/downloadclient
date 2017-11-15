@@ -30,13 +30,12 @@ import java.util.ResourceBundle;
  */
 public final class I18n {
 
+    private I18n() {
+    }
+
     /** Inner class to implicit synchronize the instance access. */
     private static final class Holder {
         static final I18n INSTANCE = new I18n();
-    }
-
-    /** Avoiding more instances. */
-    private I18n() {
     }
 
     public static I18n getInstance() {

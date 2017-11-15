@@ -33,6 +33,9 @@ import javax.xml.parsers.ParserConfigurationException;
 /** Load configurations from specified directory. */
 public class Config {
 
+    private Config() {
+    }
+
     private static final Logger log
         = Logger.getLogger(Config.class.getName());
 
@@ -50,9 +53,6 @@ public class Config {
     private ProcessingConfiguration processingConfig;
 
     private ProxyConfiguration proxyConfig;
-
-    private Config() {
-    }
 
     private static final long FIVEHUNDRED = 500;
 
