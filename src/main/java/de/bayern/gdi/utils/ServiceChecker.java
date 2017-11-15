@@ -44,6 +44,9 @@ public class ServiceChecker {
     private static final Logger log
             = Logger.getLogger(ServiceChecker.class.getName());
 
+    private static final String COULD_NOT_GET_DOCUMENT_OF_URL
+            = "Could not get Document of URL: ";
+
     private ServiceChecker() {
     }
 
@@ -126,7 +129,7 @@ public class ServiceChecker {
             }
         } catch (URISyntaxException
                 | IOException e) {
-            log.log(Level.SEVERE, "Could not get Document of URL: "
+            log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                     + serviceURL.toString(), e);
             return null;
         }
@@ -191,7 +194,7 @@ public class ServiceChecker {
                 mainXML = XML.getDocument(url, false);
             } catch (URISyntaxException
                     | IOException e) {
-                log.log(Level.SEVERE, "Could not get Document of URL: "
+                log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                         + url.toString(), e);
                 return true;
             }
@@ -213,7 +216,7 @@ public class ServiceChecker {
                      entryDoc = XML.getDocument(entryURL, false);
                 } catch (URISyntaxException
                     | IOException e) {
-                    log.log(Level.SEVERE, "Could not get Document of URL: "
+                    log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                         + entryURL.toString(), e);
                     return true;
                 }
