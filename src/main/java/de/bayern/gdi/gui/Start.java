@@ -68,15 +68,23 @@ public class Start extends Application {
             log.log(Level.SEVERE, e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
-        return start;
+        return getInstance();
     }
 
     /**
      * Constructor.
      */
     public Start() {
-        start = this;
+        setInstance(this);
         LATCH.countDown();
+    }
+
+    private static synchronized void setInstance(Start s) {
+        Start.start = s;
+    }
+
+    private static synchronized Start getInstance() {
+        return Start.start;
     }
 
     /**
