@@ -74,14 +74,12 @@ public class Headless implements ProcessorListener {
         ArrayList<File> files = new ArrayList<>();
 
         for (String arg: args) {
-            if (!arg.startsWith("-")) {
-                File file = new File(arg);
-                if (file.isFile() && file.canRead()) {
-                    files.add(file);
-                } else {
-                    log.log(Level.WARNING,
-                        () -> "'" + arg + "' is not a readable file.");
-                }
+            File file = new File(arg);
+            if (file.isFile() && file.canRead()) {
+                files.add(file);
+            } else {
+                log.log(Level.WARNING,
+                    () -> "'" + arg + "' is not a readable file.");
             }
         }
 
