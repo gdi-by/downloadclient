@@ -88,13 +88,6 @@ public class Start extends Application {
     }
 
     /**
-     * print a String, if this was invoked.
-     */
-    public void printInvoking() {
-        System.out.println("You called a method on the application");
-    }
-
-    /**
      * starts the application.
      * @param primaryStage the stage
      */
@@ -111,8 +104,8 @@ public class Start extends Application {
             try {
                 dataBean = new DataBean();
             } catch (IOException e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
+                log.log(Level.SEVERE, e.getMessage(), e);
+                System.exit(1);
             }
             Controller controller = fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
@@ -133,12 +126,9 @@ public class Start extends Application {
                 }
             });
         } catch (IOException ioe) {
-            System.out.println("Could not find UI description file.");
-            System.out.println(ioe.getMessage());
-            System.out.println(ioe.getCause());
-            for (StackTraceElement element : ioe.getStackTrace()) {
-                System.out.println(element.toString());
-            }
+            log.log(Level.SEVERE, ioe,
+                () -> "Could not find UI description file: "
+                + ioe.getMessage());
         }
     }
 }
