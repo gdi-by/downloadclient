@@ -78,17 +78,17 @@ public class TestBase extends ApplicationTest {
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
 
     /**
-     * The Scene
+     * The Scene.
      */
     protected Scene scene;
 
     /**
-     * The controller
+     * The controller.
      */
     private Controller controller;
 
     /**
-     * The logger
+     * The logger.
      */
     private Logger log = Logger.getLogger(
             this.getClass().getName());
