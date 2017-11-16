@@ -33,6 +33,20 @@ class InfoToolHelperLookup {
 
     private static List<InfoToolHelper> cachedInstances;
 
+
+    /** A RuntimeException wrapper around Exception. */
+    public static final class InfoToolHelperException
+        extends RuntimeException {
+        /**
+         * Constructs a new RuntimeException wrapping an exception.
+         * @cause the cause.
+         */
+        public InfoToolHelperException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+
     private InfoToolHelperLookup() {
     }
 
@@ -51,7 +65,7 @@ class InfoToolHelperLookup {
                 }
 
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new InfoToolHelperException(ex);
             }
         }
 
