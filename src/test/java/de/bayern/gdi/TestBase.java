@@ -45,7 +45,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
-/*
+/**
+ * Base Class for JavaFXTests
  *
  * @author thomas
  */
@@ -103,6 +104,11 @@ public class TestBase extends ApplicationTest {
 
     }
 
+    /**
+     * Waits for Display of Status in TitlePane
+     * @param titlePane Pane to watch
+     * @param status Status to watch for
+     */
     protected void waitForStatus(TitledPane titlePane, String status) {
         await()
                 .atMost(TIMEOUT_SECONDS, SECONDS)
@@ -113,7 +119,13 @@ public class TestBase extends ApplicationTest {
                 );
     }
 
-
+    /**
+     * Gets Element from the scene
+     * @param element Selector for the element to look
+     * @param type Class of the Element
+     * @param <T> Generic returntype
+     * @return
+     */
     protected <T extends javafx.scene.control.Control> T getElementByName(
             String element, Class<T> type) {
         return type.cast(scene.lookup(element));
