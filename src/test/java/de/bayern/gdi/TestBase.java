@@ -46,18 +46,37 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
 /**
- * Base Class for JavaFXTests
+ * Base Class for JavaFXTests.
  *
  * @author thomas
  */
 public class TestBase extends ApplicationTest {
 
-
+    /**
+     * Width of the scene.
+     */
     protected static final int WIDTH = 1024;
+
+    /**
+     * Height of the scene.
+     */
     protected static final int HEIGHT = 768;
+
+    /**
+     * Timeout.
+     */
     protected static final int TIMEOUT_SECONDS = 15;
+
+    /**
+     * Polling time.
+     */
     protected static final int POLL_MILLISECONDS = 250;
+
+    /**
+     * Name of the Logo.
+     */
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
+
     protected Scene scene;
     private Controller controller;
     private Logger log = Logger.getLogger(
@@ -105,7 +124,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Waits for Display of Status in TitlePane
+     * Waits for Display of Status in TitlePane.
      * @param titlePane Pane to watch
      * @param status Status to watch for
      */
@@ -120,11 +139,11 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Gets Element from the scene
+     * Gets Element from the scene.
      * @param element Selector for the element to look
      * @param type Class of the Element
      * @param <T> Generic returntype
-     * @return
+     * @return Returns Element
      */
     protected <T extends javafx.scene.control.Control> T getElementByName(
             String element, Class<T> type) {
