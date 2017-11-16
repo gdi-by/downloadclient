@@ -35,6 +35,7 @@ import javafx.scene.input.KeyEvent;
 
 /**
  * Class to build a Autocomplete Combobox (Dropdown List).
+ *
  * @param <T>
  */
 public class AutoCompleteComboBoxListener<T> {
@@ -83,7 +84,8 @@ public class AutoCompleteComboBoxListener<T> {
             // will be recorded
             try {
                 sb.delete(ir.getStart(), sb.length());
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
 
             ObservableList<T> items = comboBox.getItems();
             for (int i = 0; i < items.size(); i++) {
@@ -91,13 +93,13 @@ public class AutoCompleteComboBoxListener<T> {
                         != null && comboBox.getEditor().getText()
                         != null && items.
                         get(i).toString().toLowerCase().startsWith(
-                            comboBox.getEditor().getText().toLowerCase()
-                        )
-                ) {
+                        comboBox.getEditor().getText().toLowerCase()
+                )
+                        ) {
                     try {
                         comboBox.getEditor().setText(sb.toString()
-                                + items.get(i).toString().substring(
-                                        sb.toString().length()
+                                        + items.get(i).toString().substring(
+                                sb.toString().length()
                                 )
                         );
                         comboBox.setValue(items.get(i));
@@ -116,12 +118,12 @@ public class AutoCompleteComboBoxListener<T> {
         // typed keys
         this.comboBox.getEditor().focusedProperty().addListener(
                 (observable, oldValue, newValue) -> {
-            if (!newValue) {
-                lastLength = 0;
-                sb.delete(0, sb.length());
-                selectClosestResultBasedOnTextFieldValue(false, false);
-            }
-        });
+                    if (!newValue) {
+                        lastLength = 0;
+                        sb.delete(0, sb.length());
+                        selectClosestResultBasedOnTextFieldValue(false, false);
+                    }
+                });
 
         this.comboBox.setOnMouseClicked(event ->
                 selectClosestResultBasedOnTextFieldValue(true, true));
@@ -130,28 +132,23 @@ public class AutoCompleteComboBoxListener<T> {
     /**
      * selects the item and scrolls to it when the popup is shown.
      *
-     * @param affect true if combobox is clicked to show popup so text and
-     *               caret position will be readjusted.
+     * @param affect  true if combobox is clicked to show popup so text and
+     *                caret position will be readjusted.
      * @param inFocus true if combobox has focus. If not, programmatically
      *                press enter key to add new entry to list.
-     *
      */
     private void selectClosestResultBasedOnTextFieldValue(boolean affect,
                                                           boolean inFocus) {
         ObservableList items = this.comboBox.getItems();
 
         boolean found = false;
-        String txt = this.comboBox.getEditor().getText();
+        String selectedText = this.comboBox.getEditor().getText();
 
-        if (txt != null) {
+        if (selectedText != null) {
             for (int i = 0; i < items.size(); i++) {
-                if (items.get(i) != null
-                && txt.equalsIgnoreCase(items.get(i).toString())) {
+                if (isItemTextEqualSelectedText(items, selectedText, i)) {
                     try {
-                        ListView lv =
-                            ((ComboBoxListViewSkin)this.comboBox.getSkin())
-                            .getListView();
-
+                        ListView lv = getListView();
                         lv.getSelectionModel().clearAndSelect(i);
                         lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
                         found = true;
@@ -189,6 +186,17 @@ public class AutoCompleteComboBoxListener<T> {
                     false);
             comboBox.fireEvent(ke);
         }
+    }
+
+    private boolean isItemTextEqualSelectedText(ObservableList item
+            , String selectedText, int i) {
+        return item.get(i) != null
+                && selectedText.equalsIgnoreCase(item.get(i).toString());
+    }
+
+    private ListView getListView() {
+        return ((ComboBoxListViewSkin) this.comboBox.getSkin())
+                .getListView();
     }
 
 }

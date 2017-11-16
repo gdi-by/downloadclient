@@ -68,6 +68,17 @@ public class App {
         Start.waitForStart();
     }
 
+    private static void initConfig(String dir) {
+        try {
+            Config.initialize(dir);
+        } catch (NullPointerException | IOException ex) {
+            // TODO: Remove the NPE above!
+            log.log(Level.SEVERE,
+                () -> "Loading config failed: " + ex.getMessage());
+            System.exit(1);
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -119,14 +130,7 @@ public class App {
                 usage(options, 0);
             }
 
-            try {
-                Config.initialize(line.getOptionValue("c"));
-            } catch (NullPointerException | IOException ex) {
-                // TODO: Remove the NPE above!
-                log.log(Level.SEVERE,
-                    () -> "Loading config failed: " + ex.getMessage());
-                System.exit(1);
-            }
+            initConfig(line.getOptionValue("c"));
 
             if (line.hasOption("h")) {
                 System.exit(Headless.main(
