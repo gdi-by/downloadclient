@@ -40,7 +40,9 @@ public final class CellTypes {
     * depending on its content.
     */
     public static class ItemCell extends ListCell<ItemModel> {
-        public ItemCell() { }
+        public ItemCell() {
+            // constructor
+        }
         @Override
         protected void updateItem(ItemModel item,
                 boolean empty) {
