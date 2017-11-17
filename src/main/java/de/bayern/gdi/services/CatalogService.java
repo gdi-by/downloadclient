@@ -225,7 +225,7 @@ public class CatalogService {
                 excpetion += "\tlocator: " + exceptionlocator + "\n";
                 excpetion += "\texceptiontext: " + exceptiontext + "\n";
                 log.log(Level.SEVERE, excpetion, xml);
-                return null;
+                return services;
             }
             String nodeListOfServicesExpr =
                     "//csw:SearchResults//gmd:MD_Metadata";
