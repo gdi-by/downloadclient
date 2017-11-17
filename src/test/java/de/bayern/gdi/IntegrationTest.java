@@ -19,6 +19,7 @@ package de.bayern.gdi;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -27,7 +28,12 @@ import static org.junit.Assert.assertTrue;
 public class IntegrationTest extends TestBase {
 
     /**
-     * The processingChainValidationTest.
+     * Number of steps.
+     */
+    private static final int TWO_ELEMENTS = 2;
+
+    /**
+     * Tests the initial state of the application.
      *
      * @throws Exception if something went wrong.
      */
@@ -42,5 +48,46 @@ public class IntegrationTest extends TestBase {
         assertTrue(isEmpty(LIST_OF_SERVICES));
     }
 
+    /**
+     * When no URL is chosen, the user should get feedback.
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void noURLChosen() throws Exception {
+        waitUntilReady();
+        clickOn(SERVICE_SELECTION);
+        assertTrue(titlePaneShows(NO_URL));
+    }
+
+    /**
+     * Select additional steps.
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void activateProcessingSteps() throws Exception {
+        addOneStep();
+        assertFalse(isEmpty(PROCESSINGSTEPS));
+        assertTrue(size(PROCESSINGSTEPS, TWO_ELEMENTS));
+    }
+
+    /**
+     * Adds one processing step.
+     */
+    private void addOneStep() {
+        waitUntilReady();
+        clickOn(ACTIVATE_FURTHER_PROCESSING);
+    }
+
+    /**
+     * Selects steps and adds one.
+     * @throws Exception if something went wrong.
+     */
+    @Test
+    public void addOneProcessingStep() throws Exception {
+        addOneStep();
+        clickOn(ADD_PROCESSING_STEP);
+        assertFalse(isEmpty(PROCESSINGSTEPS));
+        assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
+    }
 
 }

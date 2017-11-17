@@ -102,7 +102,7 @@ public class Issue86Test extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         clickOn(ACTIVATE_FURTHER_PROCESSING);
-        clickOn(PROCESS_ITEM);
+        clickOn(ADD_PROCESSING_STEP);
         Assert.assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
     }
 

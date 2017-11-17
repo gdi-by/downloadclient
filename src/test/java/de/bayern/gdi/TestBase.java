@@ -35,6 +35,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
@@ -59,6 +60,11 @@ public class TestBase extends ApplicationTest {
      */
     protected static final String URL =
             "#serviceURL";
+    /**
+     * Processing steps Containerelement.
+     */
+    static final String PROCESSINGSTEPS =
+            "#processStepContainter";
     /**
      * Ready state.
      */
@@ -90,15 +96,20 @@ public class TestBase extends ApplicationTest {
     static final String ACTIVATE_FURTHER_PROCESSING =
             "#chkChain";
     /**
-     * PROCESS_ITEM.
+     * ADD_PROCESSING_STEP.
      */
-    static final String PROCESS_ITEM =
+    static final String ADD_PROCESSING_STEP =
             "#addChainItem";
     /**
-     * NO_FORMAT CHOSEN.
+     * No format chosen.
      */
     static final String NO_FORMAT_CHOSEN =
             "gui.process.no.format";
+    /**
+     * No URL.
+     */
+    static final String NO_URL =
+            "status.no-url";
     /**
      * List of services.
      */
@@ -251,9 +262,34 @@ public class TestBase extends ApplicationTest {
                 ListView lv = getElementById(element, ListView.class);
                 result = lv.getItems().isEmpty();
                 break;
+            case PROCESSINGSTEPS:
+                HBox b = getElementById(element, HBox.class);
+                result = b.getChildren().isEmpty();
+                break;
             default:
                 TextField t = getElementById(element, TextField.class);
                 result = t.getText().isEmpty();
+        }
+        return result;
+    }
+
+    /**
+     * Tests, if a given field has n elements.
+     */
+    boolean size(String element, int number) {
+        boolean result;
+        switch (element) {
+            case LIST_OF_SERVICES:
+                ListView lv = getElementById(element, ListView.class);
+                result = lv.getItems().size() == number;
+                break;
+            case PROCESSINGSTEPS:
+                HBox b = getElementById(element, HBox.class);
+                result = b.getChildren().size() == number;
+                break;
+            default:
+                TextField t = getElementById(element, TextField.class);
+                result = t.getText().length() == number;
         }
         return result;
     }
@@ -266,7 +302,7 @@ public class TestBase extends ApplicationTest {
      * @param <T>     Generic returntype
      * @return Returns Element
      */
-    private <T extends javafx.scene.control.Control> T getElementById(
+    private <T extends javafx.scene.layout.Region> T getElementById(
             String element, Class<T> type) {
         return type.cast(scene.lookup(element));
     }
