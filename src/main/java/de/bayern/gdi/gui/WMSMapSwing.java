@@ -786,6 +786,17 @@ public class WMSMapSwing extends Parent {
             };
             mapPane.setCursorTool(tool);
         }
+
+        /**
+         * sets name and id of the selected polygon.
+         * @param name name
+         * @param id id
+         */
+        private void setNameAndId(String name, String id) {
+            PolygonInfos polyInf = new PolygonInfos(name, id);
+            Platform.runLater(
+                () -> fireEvent(new PolygonClickedEvent(polyInf)));
+        }
     }
 
     /**
@@ -820,16 +831,6 @@ public class WMSMapSwing extends Parent {
         public String getID() {
             return this.id;
         }
-    }
-
-    /**
-     * sets name and id of the selected polygon.
-     * @param name name
-     * @param id id
-     */
-    private void setNameAndId(String name, String id) {
-        PolygonInfos polyInf = new PolygonInfos(name, id);
-        Platform.runLater(() -> fireEvent(new PolygonClickedEvent(polyInf)));
     }
 
     /**
