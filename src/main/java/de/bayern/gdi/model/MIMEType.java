@@ -35,6 +35,7 @@ public class MIMEType {
     private String type;
 
     public MIMEType() {
+        // This is instantiated in a JAXB-like manner.
     }
 
     /**

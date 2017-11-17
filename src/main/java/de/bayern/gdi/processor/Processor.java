@@ -41,6 +41,7 @@ public class Processor implements Runnable {
     public static final Job QUIT_JOB = new Job() {
         @Override
         public void run(Processor p) throws JobExecutionException {
+            // Do nothing.
         }
     };
 

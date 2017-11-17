@@ -78,6 +78,7 @@ public class ProxyConfiguration {
     private static final String NAME = "ProxyConfig";
 
     public ProxyConfiguration() {
+        // This is instantiated in a JAXB-like manner.
     }
 
     /**

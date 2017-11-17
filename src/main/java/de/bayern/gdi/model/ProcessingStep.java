@@ -40,6 +40,7 @@ public class ProcessingStep {
     private List<Parameter> parameters;
 
     public ProcessingStep() {
+        // This is instantiated in a JAXB-like manner.
     }
 
     /**
