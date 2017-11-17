@@ -82,7 +82,7 @@ public class StringUtils {
 
     private static Predicate<String> within(String[] haystack) {
         return needle-> Stream.of(haystack)
-                .anyMatch(straw->needle.equals(straw));
+                .anyMatch(needle::equals);
     }
 
     /**
@@ -260,7 +260,7 @@ public class StringUtils {
      * @return filter result
      */
     private static Predicate<String> isNotIgnoredPrefix(String[] prefixes) {
-        return str -> Stream.of(prefixes).noneMatch(x -> str.startsWith(x));
+        return str -> Stream.of(prefixes).noneMatch(str::startsWith);
     }
 
     /**
