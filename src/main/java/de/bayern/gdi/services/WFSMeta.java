@@ -278,6 +278,27 @@ public class WFSMeta {
         }
 
         @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Version && compareTo((Version)obj) == 0;
+        }
+
+        private static final int THIRTYONE = 31;
+
+        @Override
+        public int hashCode() {
+            int hash = 0;
+
+            if (this.parsed != null) {
+                hash = 1;
+                for (int x: this.parsed) {
+                    hash = THIRTYONE * hash + x;
+                }
+            }
+
+            return hash + THIRTYONE * version.hashCode();
+        }
+
+        @Override
         public String toString() {
             return this.version;
         }
