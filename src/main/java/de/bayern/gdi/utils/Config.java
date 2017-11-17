@@ -41,6 +41,8 @@ public class Config {
 
     /** Inner class to implicit synchronize the instance access. */
     private static final class Holder {
+        private Holder() {
+        }
         static final Config INSTANCE = new Config();
     }
 
