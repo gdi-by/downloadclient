@@ -361,7 +361,7 @@ public class DataBean extends Observable {
      */
     public DownloadStep convertToDownloadStep(String savePath) {
         ServiceType type = getServiceType();
-        String serviceURL = type == ServiceType.Atom
+        String serviceURL = type == ServiceType.ATOM
             ? getAtomService().getURL()
             : getWFSService().getURL();
 
@@ -373,10 +373,10 @@ public class DataBean extends Observable {
         }
         String serviceTypeStr = null;
         switch (type) {
-            case WFSOne:
+            case WFS_ONE:
                 serviceTypeStr = "WFS1";
                 break;
-            case WFSTwo:
+            case WFS_TWO:
                 ItemModel itemModel = getDatatype();
                 if (itemModel instanceof StoredQueryModel) {
                     serviceTypeStr = "WFS2_SIMPLE";
@@ -384,7 +384,7 @@ public class DataBean extends Observable {
                     serviceTypeStr = "WFS2_BASIC";
                 }
                 break;
-            case Atom:
+            case ATOM:
                 serviceTypeStr = "ATOM";
                 break;
             default:

@@ -155,9 +155,9 @@ public class ServiceChecker {
                 switch (nnm.getNamedItem("version").getNodeValue()) {
                     case "1.0.0":
                     case "1.1.0":
-                        return ServiceType.WFSOne;
+                        return ServiceType.WFS_ONE;
                     case "2.0.0":
-                        return ServiceType.WFSTwo;
+                        return ServiceType.WFS_TWO;
                     default:
                         return null;
                 }
@@ -171,7 +171,7 @@ public class ServiceChecker {
             NamedNodeMap nnm = n.getAttributes();
             String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
             if (wfsVersion.toLowerCase().endsWith("atom")) {
-                return ServiceType.Atom;
+                return ServiceType.ATOM;
             }
         }
 
@@ -185,7 +185,7 @@ public class ServiceChecker {
      * @return true if restriced; false if not
      */
     public static boolean isRestricted(URL url) {
-        if (checkService(url) == ServiceType.Atom) {
+        if (checkService(url) == ServiceType.ATOM) {
             if (simpleRestricted(url)) {
                 return true;
             }

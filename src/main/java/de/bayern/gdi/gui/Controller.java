@@ -1305,11 +1305,11 @@ public class Controller {
     private void extractBoundingBox() {
         Envelope2D envelope = null;
         switch (this.dataBean.getServiceType()) {
-            case Atom:
+            case ATOM:
                 //in Atom the bboxes are given by the extend of every dataset
                 break;
-            case WFSOne:
-            case WFSTwo:
+            case WFS_ONE:
+            case WFS_TWO:
                 if (mapWFS != null) {
                     envelope = this.mapWFS.getBounds(
                             referenceSystemChooser.
@@ -1567,7 +1567,7 @@ public class Controller {
      */
     private void chooseSelectedService(DownloadConfig downloadConf) {
         switch (dataBean.getSelectedService().getServiceType()) {
-            case Atom:
+            case ATOM:
                 Platform.runLater(() ->
                     setStatusTextUI(
                             I18n.getMsg("status.type.atom"))
@@ -1595,7 +1595,7 @@ public class Controller {
                     dataBean.setAtomService(atom);
                 }
                 break;
-            case WFSOne:
+            case WFS_ONE:
                 Platform.runLater(() ->
                     setStatusTextUI(
                             I18n.getMsg("status.type.wfsone"))
@@ -1621,7 +1621,7 @@ public class Controller {
                     dataBean.setWFSService(metaOne);
                 }
                 break;
-            case WFSTwo:
+            case WFS_TWO:
                 Platform.runLater(() ->
                     setStatusTextUI(
                             I18n.getMsg("status.type.wfstwo"))
@@ -1679,8 +1679,8 @@ public class Controller {
     public void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
             switch (dataBean.getServiceType()) {
-                case WFSOne:
-                case WFSTwo:
+                case WFS_ONE:
+                case WFS_TWO:
                     ReferencedEnvelope extendWFS = null;
                     List<WFSMeta.Feature> features =
                             dataBean.getWFSService().getFeatures();
@@ -1711,7 +1711,7 @@ public class Controller {
                     serviceTypeChooser.setValue(types.get(0));
                     chooseType(serviceTypeChooser.getValue());
                     break;
-                case Atom:
+                case ATOM:
                     List<Atom.Item> items =
                             dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
@@ -1956,9 +1956,9 @@ public class Controller {
             datasetAvailable = true;
             setStatusTextUI(I18n.format(STATUS_READY));
         }
-        if (type == ServiceType.Atom) {
+        if (type == ServiceType.ATOM) {
             chooseAtomType(data, datasetAvailable);
-        } else if (type == ServiceType.WFSTwo) {
+        } else if (type == ServiceType.WFS_TWO) {
             chooseWFSType(data, datasetAvailable);
         }
     }
