@@ -27,9 +27,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
 import static net.jadler.Jadler.onRequest;
-import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.port;
 import static org.hamcrest.Matchers.isOneOf;
 
@@ -48,14 +48,6 @@ public class Issue86Test extends TestBase {
             "/issues/issue86.xml";
     private static final String QUERY_PATH =
             "/issues/issue86";
-    private static final String SERVICE_SELECTION =
-            "#serviceSelection";
-    private static final String CHK_CHAIN =
-            "#chkChain";
-    private static final String CHAIN_ITEM =
-            "#addChainItem";
-    private static final String NO_FORMAT_CHOSEN =
-            "gui.process.no.format";
 
     private void prepareServer(String queryPath, String body)
             throws IOException {
@@ -109,14 +101,15 @@ public class Issue86Test extends TestBase {
         setServiceUrl(getCapabilitiesUrl(QUERY_PATH, port()));
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
-        clickOn(CHK_CHAIN);
-        clickOn(CHAIN_ITEM);
+        clickOn(ACTIVATE_FURTHER_PROCESSING);
+        clickOn(PROCESS_ITEM);
         Assert.assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
     }
 
 
     /**
      * Mock response for jadler.
+     *
      * @return Prepared ResponseBody
      * @throws IOException Exception thrown by IOUtils
      */

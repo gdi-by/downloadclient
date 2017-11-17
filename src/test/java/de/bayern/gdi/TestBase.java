@@ -31,6 +31,7 @@ import de.bayern.gdi.utils.Unauthorized;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -54,25 +55,71 @@ import static org.awaitility.Awaitility.await;
 public class TestBase extends ApplicationTest {
 
     /**
+     * ServiceURL element.
+     */
+    protected static final String URL =
+            "#serviceURL";
+    /**
+     * Ready state.
+     */
+    static final String READY_STATUS =
+            "status.ready";
+    /**
+     * Search field.
+     */
+    static final String SEARCH =
+            "#searchField";
+    /**
+     * Username field.
+     */
+    static final String USERNAME =
+            "#serviceUser";
+    /**
+     * Password field.
+     */
+    static final String PASSWORD =
+            "#servicePW";
+    /**
+     * Selection field.
+     */
+    static final String SERVICE_SELECTION =
+            "#serviceSelection";
+    /**
+     * ACTIVATE_FURTHER_PROCESSING.
+     */
+    static final String ACTIVATE_FURTHER_PROCESSING =
+            "#chkChain";
+    /**
+     * PROCESS_ITEM.
+     */
+    static final String PROCESS_ITEM =
+            "#addChainItem";
+    /**
+     * NO_FORMAT CHOSEN.
+     */
+    static final String NO_FORMAT_CHOSEN =
+            "gui.process.no.format";
+    /**
+     * List of services.
+     */
+    static final String LIST_OF_SERVICES =
+            "#serviceList";
+    /**
      * Width of the scene.
      */
     private static final int WIDTH = 1024;
-
     /**
      * Height of the scene.
      */
     private static final int HEIGHT = 768;
-
     /**
      * Timeout.
      */
     private static final int TIMEOUT_SECONDS = 15;
-
     /**
      * Polling time.
      */
     private static final int POLL_MILLISECONDS = 250;
-
     /**
      * Name of the Logo.
      */
@@ -83,19 +130,10 @@ public class TestBase extends ApplicationTest {
     private static final String HISTORY_PARENT =
             "#logHistoryParent";
     /**
-     * ServiceURL element.
-     */
-    private static final String SERVICE_URL =
-            "#serviceURL";
-    /**
-     * Ready state.
-     */
-    private static final String READY_STATUS =
-            "status.ready";
-    /**
      * The Scene.
      */
     private Scene scene;
+
     /**
      * The logger.
      */
@@ -199,9 +237,26 @@ public class TestBase extends ApplicationTest {
      * @return Textfield
      */
     private TextField getServiceURL() {
-        return getElementById(SERVICE_URL, TextField.class);
+        return getElementById(URL, TextField.class);
     }
 
+
+    /**
+     * Tests, whether a given field has no content.
+     */
+    boolean isEmpty(String element) {
+        boolean result;
+        switch (element) {
+            case LIST_OF_SERVICES:
+                ListView lv = getElementById(element, ListView.class);
+                result = lv.getItems().isEmpty();
+                break;
+            default:
+                TextField t = getElementById(element, TextField.class);
+                result = t.getText().isEmpty();
+        }
+        return result;
+    }
 
     /**
      * Gets Element from the scene.
