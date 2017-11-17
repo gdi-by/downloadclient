@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class App {
 
     private static final Logger log
-        = Logger.getLogger(Logger.class.getName());
+        = Logger.getLogger(App.class.getName());
 
     private App() {
         // Not to be instantiated.

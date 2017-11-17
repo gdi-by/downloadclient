@@ -54,7 +54,7 @@ import de.bayern.gdi.utils.XML;
 public class DownloadStepConverter {
 
     private static final Logger log
-        = Logger.getLogger(FileDownloadJob.class.getName());
+        = Logger.getLogger(DownloadStepConverter.class.getName());
 
     private static final int THREE = 3;
     private static final int FOUR = 4;

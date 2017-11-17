@@ -54,6 +54,9 @@ import org.xml.sax.SAXException;
  */
 public class Atom {
 
+    private static final Logger log
+            = Logger.getLogger(Atom.class.getName());
+
     private String serviceURL;
     private String username;
     private String password;
@@ -61,8 +64,6 @@ public class Atom {
     private String subTitle;
     private String serviceID;
     private Document mainDoc;
-    private static final Logger log
-            = Logger.getLogger(CatalogService.class.getName());
     private List<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
