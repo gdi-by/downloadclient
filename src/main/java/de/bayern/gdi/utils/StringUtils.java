@@ -76,14 +76,13 @@ public class StringUtils {
      * false otherwise.
      */
     public static boolean contains(String[] haystack, String[] needles) {
-        for (String straw : haystack) {
-            for (String needle : needles) {
-                if (straw.equals(needle)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Stream.of(needles)
+                .anyMatch(within(haystack));
+    }
+
+    private static Predicate<String> within(String[] haystack) {
+        return needle-> Stream.of(haystack)
+                .anyMatch(straw->needle.equals(straw));
     }
 
     /**

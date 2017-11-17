@@ -17,26 +17,28 @@
  */
 package de.bayern.gdi;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-
 import de.bayern.gdi.utils.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * Class to test String Utilities.
  */
-public class StringUtilsTest extends TestCase {
+@RunWith(JUnit4.class)
+public class StringUtilsTest {
 
-    public StringUtilsTest(String testName) {
-        super(testName);
-    }
-
-    private static final String [] PREFIXES = {
-        "b:",
-        "d:"
+    private static final String[] PREFIXES = {
+            "b:",
+            "d:"
     };
 
-    /** Test StringUtils.ignorePartsWithPrefix. */
+    /**
+     * Test StringUtils.ignorePartsWithPrefix.
+     */
     @Test
     public void testIgnorePartsWithPrefix() {
 
@@ -46,5 +48,20 @@ public class StringUtilsTest extends TestCase {
         String out = StringUtils.ignorePartsWithPrefix(in, " ", PREFIXES);
 
         assertEquals(want, out);
+    }
+
+    /**
+     * Test StringUtils.contains.
+     */
+    @Test
+    public void testContains() {
+        String[] needles = {"a", "b", "c"};
+        String[] needles2 = {"a", "i", "o"};
+        String[] haystack = {"d", "e", "f"};
+        String[] haystack2 = {"a", "e", "f"};
+        Assert.assertFalse(StringUtils.contains(needles, haystack));
+        Assert.assertTrue(StringUtils.contains(needles, haystack2));
+        Assert.assertTrue(StringUtils.contains(needles2, haystack2));
+        Assert.assertFalse(StringUtils.contains(needles2, haystack));
     }
 }
