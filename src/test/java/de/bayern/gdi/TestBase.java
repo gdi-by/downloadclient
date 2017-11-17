@@ -55,22 +55,22 @@ public class TestBase extends ApplicationTest {
     /**
      * Width of the scene.
      */
-    protected static final int WIDTH = 1024;
+    private static final int WIDTH = 1024;
 
     /**
      * Height of the scene.
      */
-    protected static final int HEIGHT = 768;
+    private static final int HEIGHT = 768;
 
     /**
      * Timeout.
      */
-    protected static final int TIMEOUT_SECONDS = 15;
+    private static final int TIMEOUT_SECONDS = 15;
 
     /**
      * Polling time.
      */
-    protected static final int POLL_MILLISECONDS = 250;
+    private static final int POLL_MILLISECONDS = 250;
 
     /**
      * Name of the Logo.
@@ -80,12 +80,7 @@ public class TestBase extends ApplicationTest {
     /**
      * The Scene.
      */
-    protected Scene scene;
-
-    /**
-     * The controller.
-     */
-    private Controller controller;
+    private Scene scene;
 
     /**
      * The logger.
@@ -121,7 +116,7 @@ public class TestBase extends ApplicationTest {
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
         Parent root = fxmlLoader.load();
         scene = new Scene(root, WIDTH, HEIGHT);
-        controller = fxmlLoader.getController();
+        Controller controller = fxmlLoader.getController();
         controller.setDataBean(new DataBean());
         controller.setPrimaryStage(primaryStage);
         Unauthorized unauthorized = new WarningPopup();
@@ -139,7 +134,7 @@ public class TestBase extends ApplicationTest {
      * @param titlePane Pane to watch
      * @param status Status to watch for
      */
-    protected void waitForStatus(TitledPane titlePane, String status) {
+    void waitForStatus(TitledPane titlePane, String status) {
         await()
                 .atMost(TIMEOUT_SECONDS, SECONDS)
                 .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
@@ -156,7 +151,7 @@ public class TestBase extends ApplicationTest {
      * @param <T> Generic returntype
      * @return Returns Element
      */
-    protected <T extends javafx.scene.control.Control> T getElementByName(
+    <T extends javafx.scene.control.Control> T getElementByName(
             String element, Class<T> type) {
         return type.cast(scene.lookup(element));
     }
