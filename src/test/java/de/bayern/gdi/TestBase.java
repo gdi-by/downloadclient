@@ -78,17 +78,17 @@ public class TestBase extends ApplicationTest {
      */
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
     /**
-     * Titlepane
+     * Titlepane.
      */
     private static final String HISTORY_PARENT =
             "#logHistoryParent";
     /**
-     * ServiceURL element
+     * ServiceURL element.
      */
     private static final String SERVICE_URL =
             "#serviceURL";
     /**
-     * Ready state
+     * Ready state.
      */
     private static final String READY_STATUS =
             "status.ready";
@@ -160,7 +160,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Waits until UI has settled down
+     * Waits until UI has settled down.
      */
     void waitUntilReady() {
         TitledPane titledPane = getPane();
@@ -168,7 +168,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Retrieves the title pane
+     * Retrieves the title pane.
      *
      * @return the selected pane
      */
@@ -177,7 +177,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Get state from titlepane
+     * Get state from titlepane.
      */
     boolean titlePaneShows(String msg) {
         TitledPane titledPane = getPane();
@@ -186,7 +186,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Sets the serviceURL
+     * Sets the serviceURL.
      */
     void setServiceUrl(String url) {
         TextField serviceURL = getServiceURL();
@@ -194,7 +194,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Retrieve ServiceURLTextfield
+     * Retrieve ServiceURLTextfield.
      *
      * @return Textfield
      */

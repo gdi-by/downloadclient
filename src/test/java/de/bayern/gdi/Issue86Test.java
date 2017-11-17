@@ -116,7 +116,7 @@ public class Issue86Test extends TestBase {
 
 
     /**
-     * Mock response for jadler
+     * Mock response for jadler.
      * @return Prepared ResponseBody
      * @throws IOException Exception thrown by IOUtils
      */
