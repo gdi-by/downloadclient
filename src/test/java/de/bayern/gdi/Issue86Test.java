@@ -18,9 +18,6 @@
 
 package de.bayern.gdi;
 
-import de.bayern.gdi.utils.I18n;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -46,25 +43,21 @@ public class Issue86Test extends TestBase {
     /**
      * Constant for HTTP_OKAY.
      */
-    public static final int HTTP_OKAY = 200;
+    private static final int HTTP_OKAY = 200;
     private static final String QUERY_RESOURCE =
             "/issues/issue86.xml";
     private static final String QUERY_PATH =
             "/issues/issue86";
-    private static final String HISTORY_PARENT =
-            "#logHistoryParent";
-    private static final String READY_STATUS =
-            "status.ready";
-    private static final String SERVICE_URL =
-            "#serviceURL";
     private static final String SERVICE_SELECTION =
             "#serviceSelection";
     private static final String CHK_CHAIN =
             "#chkChain";
     private static final String CHAIN_ITEM =
             "#addChainItem";
+    private static final String NO_FORMAT_CHOSEN =
+            "gui.process.no.format";
 
-    private void prepareResource(String queryPath, String body)
+    private void prepareServer(String queryPath, String body)
             throws IOException {
 
         onRequest()
@@ -77,7 +70,7 @@ public class Issue86Test extends TestBase {
                 .withContentType("application/xml; charset=UTF-8");
     }
 
-    private String buildGetCapabilitiesUrl(String queryPath, int port) {
+    private String getCapabilitiesUrl(String queryPath, int port) {
         StringBuilder sb = new StringBuilder();
         sb.append("http://localhost:");
         sb.append(port);
@@ -111,30 +104,23 @@ public class Issue86Test extends TestBase {
      */
     @Test
     public void processingChainValidationTest() throws Exception {
-        String body = getBody();
-        prepareResource(QUERY_PATH, body);
-        TitledPane titledPane = getPane();
-        waitForStatus(titledPane, READY_STATUS);
-        TextField serviceURL = getServiceURL();
-        String url = buildGetCapabilitiesUrl(QUERY_PATH, port());
-        serviceURL.setText(url);
+        prepareServer(QUERY_PATH, getResponseBody());
+        waitUntilReady();
+        setServiceUrl(getCapabilitiesUrl(QUERY_PATH, port()));
         clickOn(SERVICE_SELECTION);
-        waitForStatus(titledPane, READY_STATUS);
+        waitUntilReady();
         clickOn(CHK_CHAIN);
         clickOn(CHAIN_ITEM);
-        Assert.assertTrue(titledPane.getText().equals(
-                I18n.getMsg("gui.process.no.format")));
+        Assert.assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
     }
 
-    private TextField getServiceURL() {
-        return getElementByName(SERVICE_URL, TextField.class);
-    }
 
-    private TitledPane getPane() {
-        return getElementByName(HISTORY_PARENT, TitledPane.class);
-    }
-
-    private String getBody() throws IOException {
+    /**
+     * Mock response for jadler
+     * @return Prepared ResponseBody
+     * @throws IOException Exception thrown by IOUtils
+     */
+    private String getResponseBody() throws IOException {
         return IOUtils.toString(
                 Issue86Test.class.getResourceAsStream(QUERY_RESOURCE),
                 "UTF-8");
