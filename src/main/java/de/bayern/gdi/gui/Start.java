@@ -87,6 +87,17 @@ public class Start extends Application {
         return Start.start;
     }
 
+    private static DataBean forceDataBean() {
+        try {
+            return new DataBean();
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE, ioe.getMessage(), ioe);
+            System.exit(1);
+        }
+        // Not reached.
+        return null;
+    }
+
     /**
      * starts the application.
      * @param primaryStage the stage
@@ -100,13 +111,7 @@ public class Start extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = null;
-            try {
-                dataBean = new DataBean();
-            } catch (IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-                System.exit(1);
-            }
+            DataBean dataBean = forceDataBean();
             Controller controller = fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);
