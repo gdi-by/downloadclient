@@ -48,39 +48,30 @@ public class Validator {
      */
     public static boolean isValid(String className, String value) {
         if (value != null && !value.isEmpty()) {
-            try {
-                Class<?> aClass = classByName(className);
-                if (aClass != null) {
-                    return isCastableTo(aClass, value);
-                } else {
-                    //https://github.com/gdi-by/downloadclient-test/
-                    // issues/24#issuecomment-233619602
-                    return true;
-                }
-            } catch (ClassNotFoundException ex) {
-                return false;
+            Class<?> aClass = classByName(className);
+            if (aClass != null) {
+                return isCastableTo(aClass, value);
             }
         }
+        //https://github.com/gdi-by/downloadclient-test/
+        // issues/24#issuecomment-233619602
         return true;
     }
 
     private static boolean isCastableTo(Class myClass, String value) {
-        boolean constructorTest = false;
         for (Constructor constructor : myClass.getConstructors()) {
             try {
                 constructor.newInstance(value);
-                constructorTest = true;
-                break;
+                return true;
             } catch (IllegalArgumentException | InstantiationException
                     | IllegalAccessException | InvocationTargetException e) {
-                constructorTest = false;
+                // Ignore this an try the Constructors.
             }
         }
-        return constructorTest;
+        return false;
     }
 
-    private static Class classByName(String className) throws
-            ClassNotFoundException {
+    private static Class classByName(String className) {
         if (!className.contains(".")) {
             className = className.substring(0, 1).toUpperCase()
                    + className.substring(1, className.length());
@@ -89,7 +80,7 @@ public class Validator {
                 try {
                     return systemClassLoader.loadClass(namespace + className);
                 } catch (ClassNotFoundException e) {
-
+                    // Ignore this and try the other classes.
                 }
             }
         }
