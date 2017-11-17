@@ -23,6 +23,9 @@ import org.junit.Test;
 
 import de.bayern.gdi.model.MIMEType;
 
+/**
+ * Test for Mimetypes
+ */
 public class MIMETypeTest extends TestCase {
 
     public MIMETypeTest(String testName) {

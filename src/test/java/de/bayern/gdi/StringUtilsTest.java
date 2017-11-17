@@ -22,6 +22,9 @@ import org.junit.Test;
 
 import de.bayern.gdi.utils.StringUtils;
 
+/**
+ * Class to test String Utilities
+ */
 public class StringUtilsTest extends TestCase {
 
     public StringUtilsTest(String testName) {
