@@ -248,6 +248,7 @@ public class StringUtils {
             String s, String sep, String[] prefixes) {
         String[] splits = s.split(Pattern.quote(sep));
         List<String> filtered = Stream.of(splits)
+                .map(String::toLowerCase)
                 .filter(isNotIgnoredPrefix(prefixes))
                 .collect(Collectors.toList());
         return join(filtered, sep);
@@ -260,7 +261,9 @@ public class StringUtils {
      * @return filter result
      */
     private static Predicate<String> isNotIgnoredPrefix(String[] prefixes) {
-        return str -> Stream.of(prefixes).noneMatch(str::startsWith);
+        return str -> Stream.of(prefixes)
+                .map(String::toLowerCase)
+                .noneMatch(str::startsWith);
     }
 
     /**
