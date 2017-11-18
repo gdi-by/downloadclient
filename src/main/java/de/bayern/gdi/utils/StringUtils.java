@@ -246,29 +246,17 @@ public class StringUtils {
      */
     public static String ignorePartsWithPrefix(
             String s, String sep, String[] prefixes) {
-        List<String> use = new ArrayList<>();
-    parts:
-        for (String part: s.split(Pattern.quote(sep))) {
-            for (String prefix: prefixes) {
-                if (part.toLowerCase().startsWith(prefix.toLowerCase())) {
-                    continue parts;
-                }
-            }
-            use.add(part);
-        }
-        return join(use, sep);
-    }
 
-    /**
-     * Filters prefixed strings.
-     *
-     * @param prefixes filter criteria
-     * @return filter result
-     */
-    private static Predicate<String> isNotIgnoredPrefix(String[] prefixes) {
-        return str -> Stream.of(prefixes)
-                .map(String::toLowerCase)
-                .noneMatch(str::startsWith);
+        List<String> lcPrefixes = Stream.of(prefixes)
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
+
+        List<String> use = Stream.of(s.split(Pattern.quote(sep)))
+            .filter(str -> lcPrefixes.stream()
+                .noneMatch(p -> str.toLowerCase().startsWith(p)))
+            .collect(Collectors.toList());
+
+        return join(use, sep);
     }
 
     /**
