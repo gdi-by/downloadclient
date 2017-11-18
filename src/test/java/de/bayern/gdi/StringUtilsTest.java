@@ -42,8 +42,8 @@ public class StringUtilsTest {
     @Test
     public void testIgnorePartsWithPrefix() {
 
-        String in = "a:a1 b:Ignored c:c1 d:Ignored a:a2 c:c2";
-        String want = "a:a1 c:c1 a:a2 c:c2";
+        String in = "a:A1 b:Ignored C:c1 d:Ignored a:a2 c:c2";
+        String want = "a:A1 C:c1 a:a2 c:c2";
 
         String out = StringUtils.ignorePartsWithPrefix(in, " ", PREFIXES);
 

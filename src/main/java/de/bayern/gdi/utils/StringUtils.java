@@ -246,12 +246,17 @@ public class StringUtils {
      */
     public static String ignorePartsWithPrefix(
             String s, String sep, String[] prefixes) {
-        String[] splits = s.split(Pattern.quote(sep));
-        List<String> filtered = Stream.of(splits)
-                .map(String::toLowerCase)
-                .filter(isNotIgnoredPrefix(prefixes))
-                .collect(Collectors.toList());
-        return join(filtered, sep);
+        List<String> use = new ArrayList<>();
+    parts:
+        for (String part: s.split(Pattern.quote(sep))) {
+            for (String prefix: prefixes) {
+                if (part.toLowerCase().startsWith(prefix.toLowerCase())) {
+                    continue parts;
+                }
+            }
+            use.add(part);
+        }
+        return join(use, sep);
     }
 
     /**
