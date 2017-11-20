@@ -159,6 +159,9 @@ public class StringUtilsTest {
         }
     }
 
+    /**
+     * Test StringUtils.toDouble.
+     */
     @Test
     public void testToDouble() {
         final String have = "1 2 4 3 5";
@@ -167,5 +170,37 @@ public class StringUtilsTest {
         assertDoubleEquals(want, got);
         got = StringUtils.toDouble("1 bad 2");
         assertDoubleEquals(new double[0], got);
+    }
+
+    private static final class NOE {
+        String a;
+        String b;
+        boolean want;
+
+        private NOE(String a, String b, boolean want) {
+            this.a = a;
+            this.b = b;
+            this.want = want;
+        }
+    }
+
+    private static final NOE[] NOE_CASES = {
+        new NOE(null, null, true),
+        new NOE(null, "A", false),
+        new NOE("B", null, false),
+        new NOE("A", "B", false),
+        new NOE("A", "A", true)
+    };
+
+    /**
+     * Test StringUtils.nullOrEquals.
+     */
+    @Test
+    public void testNullOrEquals() {
+        for (NOE c: NOE_CASES) {
+            Assert.assertEquals(
+                StringUtils.nullOrEquals(c.a, c.b),
+                c.want);
+        }
     }
 }
