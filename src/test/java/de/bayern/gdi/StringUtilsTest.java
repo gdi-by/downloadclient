@@ -145,4 +145,27 @@ public class StringUtilsTest {
         Assert.assertEquals("" + -M13, THREE, StringUtils.places(-M13));
         Assert.assertEquals("" + -SEVEN, TWO, StringUtils.places(-SEVEN));
     }
+
+    private static final double EPS = 0.00001;
+
+    private static void assertDoubleEquals(double [] a, double [] b) {
+        if (a.length != b.length) {
+            Assert.fail("arrays are not of same size");
+        }
+        for (int i = 0; i < a.length; i++) {
+            if (Math.abs(a[i] - b[i]) > EPS) {
+                Assert.fail("values are different");
+            }
+        }
+    }
+
+    @Test
+    public void testToDouble() {
+        final String have = "1 2 4 3 5";
+        final double[] want = new double[] {ONE, TWO, FOUR, THREE, FIVE};
+        double [] got = StringUtils.toDouble(have);
+        assertDoubleEquals(want, got);
+        got = StringUtils.toDouble("1 bad 2");
+        assertDoubleEquals(new double[0], got);
+    }
 }
