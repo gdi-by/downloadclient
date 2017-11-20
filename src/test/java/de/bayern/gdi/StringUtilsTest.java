@@ -18,6 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.utils.StringUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,5 +64,52 @@ public class StringUtilsTest {
         Assert.assertTrue(StringUtils.contains(needles, haystack2));
         Assert.assertTrue(StringUtils.contains(needles2, haystack2));
         Assert.assertFalse(StringUtils.contains(needles2, haystack));
+    }
+
+
+    private static final class SCL {
+        String have;
+        String []want;
+
+        private SCL(String have, String []want) {
+            this.have = have;
+            this.want = want;
+        }
+    }
+
+    private static final SCL[] SCL_CASES = {
+        new SCL(null,
+            new String[0]),
+        new SCL("",
+            new String[0]),
+        new SCL("hello world",
+            new String[] {"hello", "world"}),
+        new SCL("hello 'planet world'",
+            new String[] {"hello", "planet world"}),
+        new SCL("hello \"planet world\"",
+            new String[] {"hello", "planet world"}),
+        new SCL("hello' world'",
+            new String[] {"hello world"})
+    };
+
+
+    /**
+     * Test StringUtils.splitCommandLine.
+     */
+    @Test
+    public void testSplitCommandLine() {
+        for (SCL c: SCL_CASES) {
+            String[] got = StringUtils.splitCommandLine(c.have);
+            Assert.assertArrayEquals(c.want, got);
+        }
+
+        try {
+            StringUtils.splitCommandLine("\"");
+            Assert.fail("Unbalanced \" not detected.");
+            StringUtils.splitCommandLine("'");
+            Assert.fail("Unbalanced ' not detected.");
+        } catch (IllegalArgumentException iae) {
+            // Test passed.
+        }
     }
 }
