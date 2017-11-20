@@ -207,7 +207,11 @@ public class StringUtils {
      */
     public static int places(int n) {
         int places = 1;
-        for (int value = TEN; n > value; value *= TEN) {
+        if (n < 0) {
+            places++;
+            n = -n;
+        }
+        for (int value = TEN; n >= value; value *= TEN) {
             places++;
         }
         return places;

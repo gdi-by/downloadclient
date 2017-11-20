@@ -112,4 +112,37 @@ public class StringUtilsTest {
             // Test passed.
         }
     }
+
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
+    private static final int FOUR = 4;
+    private static final int FIVE = 5;
+    private static final int SEVEN = 7;
+
+    private static final int M1000 = 1000;
+    private static final int M999 = 999;
+    private static final int M256 = 256;
+    private static final int M13 = 13;
+
+    /**
+     * Test StringUtils.places.
+     */
+    @Test
+    public void testPlaces() {
+        System.err.println(StringUtils.places(M1000));
+        Assert.assertEquals("" + ZERO, ONE, StringUtils.places(ZERO));
+        Assert.assertEquals("" + M1000, FOUR, StringUtils.places(M1000));
+        Assert.assertEquals("" + M999, THREE, StringUtils.places(M999));
+        Assert.assertEquals("" + M256, THREE, StringUtils.places(M256));
+        Assert.assertEquals("" + M13, TWO, StringUtils.places(M13));
+        Assert.assertEquals("" + SEVEN, ONE, StringUtils.places(SEVEN));
+
+        Assert.assertEquals("" + -M1000, FIVE, StringUtils.places(-M1000));
+        Assert.assertEquals("" + -M999, FOUR, StringUtils.places(-M999));
+        Assert.assertEquals("" + -M256, FOUR, StringUtils.places(-M256));
+        Assert.assertEquals("" + -M13, THREE, StringUtils.places(-M13));
+        Assert.assertEquals("" + -SEVEN, TWO, StringUtils.places(-SEVEN));
+    }
 }

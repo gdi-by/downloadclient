@@ -147,7 +147,10 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
-        String format = "%0" + StringUtils.places(nl.getLength()) + "d.%s";
+        // 1000 file -> 000, 000, ..., 999
+        int places = StringUtils.places(Math.max(0, nl.getLength() - 1));
+        String format = "%0" + places + "d.%s";
+
         for (int i = 0, j = 0, n = nl.getLength(); i < n; i++) {
             Element link = (Element)nl.item(i);
             String href = link.getAttribute("href");

@@ -656,7 +656,9 @@ public class DownloadStepConverter {
         boolean isGML = ext.equals("gml");
 
         int numFiles = Math.max(1, numFeatures / fpp);
-        String format = "%0" + StringUtils.places(numFiles) + "d-%d." + ext;
+        // 1000 file -> 000, 000, ..., 999
+        int places = StringUtils.places(Math.max(0, numFiles - 1));
+        String format = "%0" + places + "d-%d." + ext;
 
         boolean wfs2 =
             meta.highestVersion(WFSMeta.WFS2_0_0)
