@@ -67,6 +67,9 @@ public class StringUtilsTest {
     }
 
 
+    /**
+     * Helper class for table driven test of splitCommandLine.
+     */
     private static final class SCL {
         String have;
         String []want;
@@ -172,6 +175,9 @@ public class StringUtilsTest {
         assertDoubleEquals(new double[0], got);
     }
 
+    /**
+     * Helper class for table driven test of nullOrEquals.
+     */
     private static final class NOE {
         String a;
         String b;
