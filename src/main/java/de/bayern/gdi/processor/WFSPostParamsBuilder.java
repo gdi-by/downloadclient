@@ -1,0 +1,274 @@
+/*
+ * DownloadClient Geodateninfrastruktur Bayern
+ *
+ * (c) 2016 GSt. GDI-BY (gdi.bayern.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.bayern.gdi.processor;
+
+import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+
+import de.bayern.gdi.services.WFSMeta;
+
+/**
+ * A builder for WFS POST request bodies.
+ */
+public class WFSPostParamsBuilder {
+
+    private static final int ZERO  = 0;
+    private static final int ONE   = 1;
+    private static final int TWO   = 2;
+    private static final int THREE = 3;
+    private static final int FOUR  = 4;
+    private static final int FIVE  = 5;
+
+    private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
+
+    private WFSPostParamsBuilder() {
+        // Not for public use.
+    }
+
+    /**
+     * Creates a new XML document to be send as a POST request.
+     *
+     * @param dls The download step.
+     * @param usedVars The used variables.
+     * @param meta The WFS meta data.
+     * @return The XML document.
+     * @throws ParserConfigurationException XML setup is bad.
+     */
+    public static Document create(
+        DownloadStep dls,
+        Set<String>  usedVars,
+        WFSMeta      meta
+    ) throws ParserConfigurationException {
+        return create(dls, usedVars, meta, false, -1, -1, false);
+    }
+
+    /**
+     * Creates a new XML document to be send as a POST request.
+     *
+     * @param dls The download step.
+     * @param usedVars The used variables.
+     * @param meta The WFS meta data.
+     * @param ofs Offset of features.
+     * @param count Limit number of features.
+     * @param wfs2 Generate a WFS2 document.
+     * @return The XML document.
+     * @throws ParserConfigurationException XML setup is bad.
+     */
+    public static Document create(
+        DownloadStep dls,
+        Set<String>  usedVars,
+        WFSMeta      meta,
+        int          ofs,
+        int          count,
+        boolean      wfs2
+    ) throws ParserConfigurationException {
+        return create(dls, usedVars, meta, false, ofs, count, wfs2);
+    }
+
+    /**
+     * Creates a new XML document to be send as a POST request.
+     *
+     * @param dls The download step.
+     * @param usedVars The used variables.
+     * @param meta The WFS meta data.
+     * @param hits Generate a hits document.
+     * @return The XML document.
+     * @throws ParserConfigurationException XML setup is bad.
+     */
+    private static Document create(
+        DownloadStep dls,
+        Set<String>  usedVars,
+        WFSMeta      meta,
+        boolean      hits
+    ) throws ParserConfigurationException {
+        return create(dls, usedVars, meta, hits, -1, -1, false);
+    }
+
+    /**
+     * Creates a new XML document to be send as a POST request.
+     *
+     * @param dls The download step.
+     * @param usedVars The used variables.
+     * @param meta The WFS meta data.
+     * @param hits Generate a hits document.
+     * @param ofs Offset of features.
+     * @param count Limit number of features.
+     * @param wfs2 Generate a WFS2 document.
+     * @return The XML document.
+     * @throws ParserConfigurationException XML setup is bad.
+     */
+    public static Document create(
+        DownloadStep dls,
+        Set<String> usedVars,
+        WFSMeta     meta,
+        boolean     hits,
+        int         ofs,
+        int         count,
+        boolean     wfs2
+    ) throws ParserConfigurationException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.newDocument();
+
+        String dataset = dls.getDataset();
+
+        String queryType = DownloadStepConverter.findQueryType(
+            dls.getServiceType());
+
+        String storedQueryId = "";
+        String typeNames = "";
+
+        boolean storedQuery = queryType.equals(STOREDQUERY_ID);
+        if (storedQuery) {
+            storedQueryId = dataset;
+        } else {
+            typeNames = dataset;
+        }
+
+        String namespaces = "";
+
+        int idx = dataset.indexOf(':');
+        if (idx >= 0) {
+            String prefix = dataset.substring(0, idx);
+            namespaces = meta.getNamespaces().getNamespaceURI(prefix);
+        }
+
+        String outputFormat = "";
+        String srsName = "";
+        String bbox = "";
+
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+
+        for (Parameter p: dls.getParameters()) {
+            String value = p.getValue();
+            if (!value.isEmpty() && !usedVars.contains(p.getKey())) {
+                switch (p.getKey()) {
+                    case "outputformat":
+                        outputFormat = value;;
+                        break;
+                    case "srsName":
+                        srsName = value;
+                        break;
+                    case "bbox":
+                        bbox = value;
+                        break;
+                    default:
+                        params.put(p.getKey(), value);
+                        break;
+                }
+            }
+        }
+
+        String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
+
+        final String wfsNS = "http://www.opengis.net/wfs/2.0";
+        final String fesNS = "http://www.opengis.net/fes/2.0";
+        final String gmlNS = "http://www.opengis.net/gml/3.2/";
+
+        Element getFeature = doc.createElementNS(
+            wfsNS, "wfs:GetFeature");
+
+        getFeature.setAttributeNS(
+            wfsNS, "wfs:service", "WFS");
+
+        getFeature.setAttributeNS(
+            wfsNS, "wfs:version", version);
+
+        getFeature.setAttributeNS(
+            wfsNS, "wfs:outputFormat", outputFormat);
+
+        if (hits) {
+            getFeature.setAttributeNS(
+                wfsNS, "wfs:resultType", "hits");
+        }
+
+        if (ofs != -1) {
+            getFeature.setAttributeNS(
+                wfsNS, "wfs:startIndex", String.valueOf(ofs));
+            getFeature.setAttributeNS(
+                wfsNS,
+                wfs2
+                    ? "wfs:count"
+                    : "wfs:maxFeatures",
+                String.valueOf(count));
+        }
+
+        if (storedQuery) {
+            Element sqEl = doc.createElementNS(wfsNS, "wfs:StoredQuery");
+            sqEl.setAttribute("id", storedQueryId);
+
+            for (Map.Entry<String, String> p: params.entrySet()) {
+                Element pEl = doc.createElementNS(wfsNS, "wfs:Parameter");
+                pEl.setAttribute("name", p.getKey());
+                pEl.setTextContent(p.getValue());
+                sqEl.appendChild(pEl);
+            }
+
+            getFeature.appendChild(sqEl);
+        } else {
+            Element queryEl = doc.createElementNS(wfsNS, "wfs:Query");
+            queryEl.setAttribute("typeNames", typeNames);
+            queryEl.setAttribute("xmlns:bvv", namespaces);
+            getFeature.setAttributeNS(
+                wfsNS, "wfs:startIndex", String.valueOf(ofs));
+
+            queryEl.setAttribute("srsName", srsName);
+
+            getFeature.appendChild(queryEl);
+
+            String [] bboxArr = bbox.split("\\*s,\\s*");
+            if (bboxArr.length == FIVE) {
+                Element filterEl = doc.createElementNS(fesNS, "fes:Filter");
+                Element bboxEl = doc.createElementNS(fesNS, "fes:BBOX");
+
+                Element envEl = doc.createElementNS(gmlNS, "gml:Envelope");
+                envEl.setAttribute("srsName", bboxArr[FOUR]);
+
+                Element lcEl = doc.createElementNS(gmlNS, "lowerCorner");
+                lcEl.setTextContent(bboxArr[ZERO] + " " + bboxArr[ONE]);
+
+                Element ucEl = doc.createElementNS(gmlNS, "upperCorner");
+                ucEl.setTextContent(bboxArr[TWO] + " " + bboxArr[THREE]);
+
+                envEl.appendChild(lcEl);
+                envEl.appendChild(ucEl);
+
+                bboxEl.appendChild(envEl);
+                filterEl.appendChild(bboxEl);
+                queryEl.appendChild(filterEl);
+            }
+        }
+
+        doc.appendChild(getFeature);
+
+        return doc;
+    }
+}

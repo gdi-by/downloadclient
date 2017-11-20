@@ -157,7 +157,12 @@ public class DownloadStepConverter {
     }
 
 
-    private static String findQueryType(String type) {
+    /**
+     * Finds WFS service type for given dataset.
+     * @param type The dataset type.
+     * @return The WFS type.
+     */
+    protected static String findQueryType(String type) {
         String t = type.toUpperCase();
         for (String []pair: SERVICE2TYPE) {
             if (t.equals(pair[0])) {
