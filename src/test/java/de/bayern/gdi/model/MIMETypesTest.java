@@ -60,6 +60,7 @@ public class MIMETypesTest extends TestCase {
             , mimeTypesActual.getTypes());
     }
 
+    /** Test MIMETypes.toString. */
     @Test
     public void testToString() {
 
