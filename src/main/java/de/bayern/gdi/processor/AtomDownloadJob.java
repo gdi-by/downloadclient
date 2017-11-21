@@ -32,13 +32,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.AutoFileNames;
 import de.bayern.gdi.utils.XML;
 
 /** AtomDownloadJob is a job to download things from a ATOM service. */
@@ -101,10 +100,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         }
     }
 
-    private static String mimetypeToExt(String type) {
-        return Config.getInstance().getMimeTypes().findExtension(type, "gml");
-    }
-
     private static final String DATASOURCE_XPATH
         = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
         + " inspire_dls:spatial_dataset_identifier_code/text()=$CODE]"
@@ -134,25 +129,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         return ds;
     }
 
-    /** A class to generate numbered filenames. */
-    private static class AutoFileName {
-        private String format;
-        private int fileNo;
-
-        private AutoFileName(int numFiles) {
-            // 1000 files -> 000, 000, ..., 999
-            int places = StringUtils.places(Math.max(0, numFiles - 1));
-            this.format = "%0" + places + "d.%s";
-        }
-
-        private String nextFileName(String type) {
-            String ext = mimetypeToExt(type);
-            String fileName = String.format(format, this.fileNo, ext);
-            this.fileNo++;
-            return fileName;
-        }
-    }
-
     @Override
     protected void download() throws JobExecutionException {
         String dsURL = figureoutDatasource();
@@ -166,7 +142,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
-        AutoFileName afn = new AutoFileName(nl.getLength());
+        AutoFileNames afn = new AutoFileNames(nl.getLength());
 
         for (int i = 0, n = nl.getLength(); i < n; i++) {
             Element link = (Element)nl.item(i);
