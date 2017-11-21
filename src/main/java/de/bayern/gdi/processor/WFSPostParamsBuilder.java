@@ -142,16 +142,7 @@ public class WFSPostParamsBuilder {
         boolean     wfs2
     ) throws ConverterException {
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db;
-
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
-            throw new ConverterException(
-                I18n.format("dls.converter.bad.xml", pce));
-        }
+        Document doc = newDocument();
 
         String outputFormat = "";
         String srsName = "";
@@ -178,8 +169,6 @@ public class WFSPostParamsBuilder {
                 }
             }
         }
-
-        Document doc = db.newDocument();
 
         Element getFeature = doc.createElementNS(
             WFS_NS, "wfs:GetFeature");
@@ -236,6 +225,18 @@ public class WFSPostParamsBuilder {
         doc.appendChild(getFeature);
 
         return doc;
+    }
+
+    private static Document newDocument() throws ConverterException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            return db.newDocument();
+        } catch (ParserConfigurationException pce) {
+            throw new ConverterException(
+                I18n.format("dls.converter.bad.xml", pce));
+        }
     }
 
     private static void appendParameters(
