@@ -53,10 +53,6 @@ public class DownloadStepConverter {
     private static final Logger log
         = Logger.getLogger(DownloadStepConverter.class.getName());
 
-    private static final int THREE = 3;
-    private static final int FOUR = 4;
-    private static final int FIVE = 5;
-
     private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
     private static final String DATASET = "DATASET";
     private static final String GETFEATURE = "GetFeature";
