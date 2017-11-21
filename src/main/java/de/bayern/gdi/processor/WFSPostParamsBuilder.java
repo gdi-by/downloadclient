@@ -221,14 +221,16 @@ public class WFSPostParamsBuilder {
         }
 
         if (ofs != -1) {
-            getFeature.setAttributeNS(
-                wfsNS, "wfs:startIndex", String.valueOf(ofs));
-            getFeature.setAttributeNS(
-                wfsNS,
+            System.out.println(ofs + " ------ " + count);
+            getFeature.setAttribute(
+                "startIndex", String.valueOf(ofs));
+            getFeature.setAttribute(
                 wfs2
-                    ? "wfs:count"
-                    : "wfs:maxFeatures",
+                    ? "count"
+                    : "maxFeatures",
                 String.valueOf(count));
+        } else {
+            System.out.println("---- unpaged");
         }
 
         if (storedQuery) {
@@ -247,8 +249,6 @@ public class WFSPostParamsBuilder {
             Element queryEl = doc.createElementNS(wfsNS, "wfs:Query");
             queryEl.setAttribute("typeNames", typeNames);
             queryEl.setAttribute("xmlns:bvv", namespaces);
-            getFeature.setAttributeNS(
-                wfsNS, "wfs:startIndex", String.valueOf(ofs));
 
             queryEl.setAttribute("srsName", srsName);
 
@@ -279,6 +279,35 @@ public class WFSPostParamsBuilder {
 
         doc.appendChild(getFeature);
 
+        return printXML(doc);
+    }
+
+    private static Document printXML(Document doc) throws ConverterException {
+        try {
+            java.io.StringWriter writer =
+                new java.io.StringWriter();
+            javax.xml.transform.stream.StreamResult out =
+                new javax.xml.transform.stream.StreamResult(writer);
+
+            javax.xml.transform.TransformerFactory tf =
+                javax.xml.transform.TransformerFactory.newInstance();
+            javax.xml.transform.Transformer transformer =
+                tf.newTransformer();
+            transformer.setOutputProperty(
+                javax.xml.transform.OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(
+                javax.xml.transform.OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(
+                javax.xml.transform.OutputKeys.INDENT, "no");
+            transformer.transform(
+                new javax.xml.transform.dom.DOMSource(doc), out);
+
+            String s = writer.getBuffer().toString();
+            System.out.println(s);
+
+        } catch (javax.xml.transform.TransformerException te) {
+            throw new ConverterException(te.getMessage());
+        }
         return doc;
     }
 }

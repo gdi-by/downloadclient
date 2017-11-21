@@ -35,6 +35,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.EntityTemplate;
 import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
 
@@ -278,12 +279,7 @@ public class DownloadStepConverter {
 
         return sb.toString();
     }
-    private static String createWFSPostParams(
-        DownloadStep dls,
-        Set<String> usedVars,
-        WFSMeta meta) {
-        return createWFSPostParams(dls, usedVars, meta, false, -1, -1, false);
-    }
+
     private static String createWFSPostParams(
         DownloadStep dls,
         Set<String> usedVars,
@@ -426,20 +422,19 @@ public class DownloadStepConverter {
         File         workingDir,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) {
-        boolean usePost = false;
+    ) throws ConverterException {
         WFSMeta.Operation getFeature = meta.findOperation(GETFEATURE);
-        if (getFeature.getPOST() != null) {
-            usePost = true;
-        }
+
+        boolean usePost = getFeature.getPOST() != null;
 
         String url = usePost
             ? getFeature.getPOST()
             : wfsURL(dls, usedVars, meta);
-        String params = null;
-        if (usePost) {
-            params = createWFSPostParams(dls, usedVars, meta);
-        }
+
+        Document params = usePost
+            ? WFSPostParamsBuilder.create(dls, usedVars, meta)
+            : null;
+
         log.log(Level.INFO, () -> "url: " + url);
 
         String ext = extension();
@@ -449,17 +444,14 @@ public class DownloadStepConverter {
 
         FileDownloadJob fdj = null;
         if (usePost) {
-            try {
-                HttpEntity ent =
-                new StringEntity(params);
-                fdj = new FileDownloadJob(
-                    url, gml,
-                    this.user, this.password,
-                    ent,
-                    this.logger);
-            } catch (Exception e) {
-                logger.log(e.getMessage());
-            }
+            HttpEntity ent = new EntityTemplate(
+                XML.toContentProducer(params));
+
+            fdj = new FileDownloadJob(
+                url, gml,
+                this.user, this.password,
+                ent,
+                this.logger);
         } else {
             fdj = new FileDownloadJob(
                 url, gml,
