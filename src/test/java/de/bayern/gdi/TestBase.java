@@ -344,8 +344,25 @@ public class TestBase extends ApplicationTest {
      * @param index of service
      */
     void selectDataFormatByNumber(int index) {
-        ComboBox services =  getElementById(DATAFORMATCHOOSER, ComboBox.class);
-        services.getSelectionModel().select(index);
+        selectComboBoxOption(index, DATAFORMATCHOOSER);
+    }
+
+    /**
+     * Selects serviceType by zerobased index.
+     * @param index of service
+     */
+    void selectServiceTypeByNumber(int index) {
+        selectComboBoxOption(index, SERVICE_TYPE_CHOOSER);
+    }
+
+    /**
+     * Select an option of a combobox
+     * @param index index of option
+     * @param combobox id of combobox
+     */
+    private void selectComboBoxOption(int index, String combobox) {
+        ComboBox box = getElementById(combobox, ComboBox.class);
+        box.getSelectionModel().select(index);
     }
 
     /**
