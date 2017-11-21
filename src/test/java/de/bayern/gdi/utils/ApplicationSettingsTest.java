@@ -38,7 +38,10 @@ public class ApplicationSettingsTest extends TestCase {
         super(testName);
     }
 
-    /** test ApplicationSettings. */
+    /**
+     * test ApplicationSettings.
+     * @throws Exception if anything does wrong.
+     */
     @Test
     public void testApplicationSettings() throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
