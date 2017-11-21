@@ -151,6 +151,12 @@ public class TestBase extends ApplicationTest {
     private static final String HISTORY_PARENT =
         "#logHistoryParent";
     /**
+     * ProcessStep Combobox.
+     */
+    static final String PROCESS_SELECTION =
+        "#process_name";
+
+    /**
      * The Scene.
      */
     private Scene scene;
@@ -160,6 +166,12 @@ public class TestBase extends ApplicationTest {
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
+
+    /**
+     * DataFormatChooser Combobox.
+     */
+    private static final String DATAFORMATCHOOSER =
+        "#dataFormatChooser";
 
     /**
      * Initial phase.
@@ -322,9 +334,18 @@ public class TestBase extends ApplicationTest {
      * Selects service by zerobased index.
      * @param index of service
      */
-    void selectServiceNumber(int index) {
+    void selectServiceByNumber(int index) {
        ListView services =  getElementById(SERVICE_LIST, ListView.class);
        services.getSelectionModel().select(index);
+    }
+
+    /**
+     * Selects dataformat by zerobased index.
+     * @param index of service
+     */
+    void selectDataFormatByNumber(int index) {
+        ComboBox services =  getElementById(DATAFORMATCHOOSER, ComboBox.class);
+        services.getSelectionModel().select(index);
     }
 
     /**
@@ -333,6 +354,7 @@ public class TestBase extends ApplicationTest {
     boolean isEmpty(String element) {
         boolean result;
         switch (element) {
+            case PROCESS_SELECTION:
             case SERVICE_TYPE_CHOOSER:
                 ComboBox cb = getElementById(element, ComboBox.class);
                 result = cb.getItems().isEmpty();
@@ -358,6 +380,7 @@ public class TestBase extends ApplicationTest {
     boolean size(String element, int number) {
         boolean result;
         switch (element) {
+            case PROCESS_SELECTION:
             case SERVICE_TYPE_CHOOSER:
                 ComboBox cb = getElementById(element, ComboBox.class);
                 result = cb.getItems().size() == number;

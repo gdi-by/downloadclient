@@ -169,6 +169,10 @@ public class IntegrationTest extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
+        selectDataFormatByNumber(0);
+        clickOn(ACTIVATE_FURTHER_PROCESSING);
+        clickOn(ADD_PROCESSING_STEP);
+        assertFalse(isEmpty(PROCESS_SELECTION));
     }
 
 }
