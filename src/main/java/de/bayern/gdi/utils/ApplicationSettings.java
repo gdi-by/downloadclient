@@ -32,24 +32,26 @@ import org.w3c.dom.NodeList;
 
 public class ApplicationSettings {
 
-    private Map<String, String> applicationSettings;
+    private Map<String, String> settings;
 
     public ApplicationSettings(Document doc) throws IOException {
         parseDocument(doc);
     }
 
     private void parseDocument(Document xmlDocument) throws IOException {
-        this.applicationSettings = parseNodeForElements(
+        this.settings = parseNodeForElements(
                 xmlDocument, "application");
     }
 
     /**Parse Node by name, save all elements to map.*/
     private Map<String, String> parseNodeForElements(Document doc,
             String nodeName) throws IOException {
-        Node parent = doc.getElementsByTagName(nodeName).item(0);
-        if (parent == null) {
+
+        NodeList nodes = doc.getElementsByTagName(nodeName);
+        if (nodes.getLength() < 1) {
             throw new IOException("Node " + nodeName + " not found");
         }
+        Node parent = nodes.item(0);
 
         Map<String, String> elements = new HashMap<>();
 
@@ -69,6 +71,6 @@ public class ApplicationSettings {
      * @return String value
      */
     public String getApplicationSetting(String name) {
-        return applicationSettings.get(name);
+        return settings.get(name);
     }
 }

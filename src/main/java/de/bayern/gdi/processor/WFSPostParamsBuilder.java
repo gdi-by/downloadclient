@@ -142,41 +142,7 @@ public class WFSPostParamsBuilder {
         boolean     wfs2
     ) throws ConverterException {
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db;
-
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
-            throw new ConverterException(
-                I18n.format("dls.converter.bad.xml", pce));
-        }
-
-        Document doc = db.newDocument();
-
-        String dataset = dls.getDataset();
-
-        String queryType = DownloadStepConverter.findQueryType(
-            dls.getServiceType());
-
-        String storedQueryId = "";
-        String typeNames = "";
-
-        boolean storedQuery = queryType.equals(STOREDQUERY_ID);
-        if (storedQuery) {
-            storedQueryId = dataset;
-        } else {
-            typeNames = dataset;
-        }
-
-        String namespaces = "";
-
-        int idx = dataset.indexOf(':');
-        if (idx >= 0) {
-            String prefix = dataset.substring(0, idx);
-            namespaces = meta.getNamespaces().getNamespaceURI(prefix);
-        }
+        Document doc = newDocument();
 
         String outputFormat = "";
         String srsName = "";
@@ -230,14 +196,26 @@ public class WFSPostParamsBuilder {
                 String.valueOf(count));
         }
 
+        String dataset = dls.getDataset();
+
+        String queryType = DownloadStepConverter.findQueryType(
+            dls.getServiceType());
+
+        boolean storedQuery = queryType.equals(STOREDQUERY_ID);
         if (storedQuery) {
             Element sqEl = doc.createElementNS(WFS_NS, "wfs:StoredQuery");
-            sqEl.setAttribute("id", storedQueryId);
+            sqEl.setAttribute("id", dataset);
             appendParameters(doc, sqEl, params.entrySet());
             getFeature.appendChild(sqEl);
         } else {
+            int idx = dataset.indexOf(':');
+            String namespaces = idx >= 0
+                ? meta.getNamespaces()
+                      .getNamespaceURI(dataset.substring(0, idx))
+                : "";
+
             Element queryEl = doc.createElementNS(WFS_NS, "wfs:Query");
-            queryEl.setAttribute("typeNames", typeNames);
+            queryEl.setAttribute("typeNames", dataset);
             queryEl.setAttribute("xmlns:bvv", namespaces);
             queryEl.setAttribute(SRS_NAME, srsName);
             appendBBox(doc, bbox, queryEl);
@@ -247,6 +225,18 @@ public class WFSPostParamsBuilder {
         doc.appendChild(getFeature);
 
         return doc;
+    }
+
+    private static Document newDocument() throws ConverterException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            return db.newDocument();
+        } catch (ParserConfigurationException pce) {
+            throw new ConverterException(
+                I18n.format("dls.converter.bad.xml", pce));
+        }
     }
 
     private static void appendParameters(
