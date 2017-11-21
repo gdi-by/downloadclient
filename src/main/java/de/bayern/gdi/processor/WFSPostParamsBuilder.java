@@ -33,6 +33,8 @@ import de.bayern.gdi.model.Parameter;
 
 import de.bayern.gdi.services.WFSMeta;
 
+import de.bayern.gdi.utils.I18n;
+
 /**
  * A builder for WFS POST request bodies.
  */
@@ -58,13 +60,13 @@ public class WFSPostParamsBuilder {
      * @param usedVars The used variables.
      * @param meta The WFS meta data.
      * @return The XML document.
-     * @throws ParserConfigurationException XML setup is bad.
+     * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) throws ParserConfigurationException {
+    ) throws ConverterException {
         return create(dls, usedVars, meta, false, -1, -1, false);
     }
 
@@ -78,7 +80,7 @@ public class WFSPostParamsBuilder {
      * @param count Limit number of features.
      * @param wfs2 Generate a WFS2 document.
      * @return The XML document.
-     * @throws ParserConfigurationException XML setup is bad.
+     * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
@@ -87,7 +89,7 @@ public class WFSPostParamsBuilder {
         int          ofs,
         int          count,
         boolean      wfs2
-    ) throws ParserConfigurationException {
+    ) throws ConverterException {
         return create(dls, usedVars, meta, false, ofs, count, wfs2);
     }
 
@@ -99,14 +101,14 @@ public class WFSPostParamsBuilder {
      * @param meta The WFS meta data.
      * @param hits Generate a hits document.
      * @return The XML document.
-     * @throws ParserConfigurationException XML setup is bad.
+     * @throws ConverterException XML setup is bad.
      */
-    private static Document create(
+    public static Document create(
         DownloadStep dls,
         Set<String>  usedVars,
         WFSMeta      meta,
         boolean      hits
-    ) throws ParserConfigurationException {
+    ) throws ConverterException {
         return create(dls, usedVars, meta, hits, -1, -1, false);
     }
 
@@ -121,7 +123,7 @@ public class WFSPostParamsBuilder {
      * @param count Limit number of features.
      * @param wfs2 Generate a WFS2 document.
      * @return The XML document.
-     * @throws ParserConfigurationException XML setup is bad.
+     * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
@@ -131,11 +133,19 @@ public class WFSPostParamsBuilder {
         int         ofs,
         int         count,
         boolean     wfs2
-    ) throws ParserConfigurationException {
+    ) throws ConverterException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
+        DocumentBuilder db;
+
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException pce) {
+            throw new ConverterException(
+                I18n.format("dls.converter.bad.xml", pce));
+        }
+
         Document doc = db.newDocument();
 
         String dataset = dls.getDataset();
@@ -172,7 +182,7 @@ public class WFSPostParamsBuilder {
             if (!value.isEmpty() && !usedVars.contains(p.getKey())) {
                 switch (p.getKey()) {
                     case "outputformat":
-                        outputFormat = value;;
+                        outputFormat = value;
                         break;
                     case "srsName":
                         srsName = value;
