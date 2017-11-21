@@ -356,7 +356,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Select an option of a combobox
+     * Select an option of a combobox.
      * @param index index of option
      * @param combobox id of combobox
      */
