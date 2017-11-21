@@ -9,8 +9,10 @@ Please keep the list sorted.
     awoestmann
     bernhardreiter
     BjoernSchilberg
+    DirkMassmann
     dmth
     gdi-by
     jsaalfeld
     rrenkert
     s-l-teichmann
+    ThomasJunk
