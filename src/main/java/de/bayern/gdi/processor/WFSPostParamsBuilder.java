@@ -47,6 +47,8 @@ public class WFSPostParamsBuilder {
     private static final int FOUR  = 4;
     private static final int FIVE  = 5;
 
+    private static final String SRS_NAME = "srsName";
+
     private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
 
     private WFSPostParamsBuilder() {
@@ -184,7 +186,7 @@ public class WFSPostParamsBuilder {
                     case "outputformat":
                         outputFormat = value;
                         break;
-                    case "srsName":
+                    case SRS_NAME:
                         srsName = value;
                         break;
                     case "bbox":
@@ -244,7 +246,7 @@ public class WFSPostParamsBuilder {
             queryEl.setAttribute("typeNames", typeNames);
             queryEl.setAttribute("xmlns:bvv", namespaces);
 
-            queryEl.setAttribute("srsName", srsName);
+            queryEl.setAttribute(SRS_NAME, srsName);
 
             getFeature.appendChild(queryEl);
 
@@ -254,7 +256,7 @@ public class WFSPostParamsBuilder {
                 Element bboxEl = doc.createElementNS(fesNS, "fes:BBOX");
 
                 Element envEl = doc.createElementNS(gmlNS, "gml:Envelope");
-                envEl.setAttribute("srsName", bboxArr[FOUR]);
+                envEl.setAttribute(SRS_NAME, bboxArr[FOUR]);
 
                 Element lcEl = doc.createElementNS(gmlNS, "lowerCorner");
                 lcEl.setTextContent(bboxArr[ZERO] + " " + bboxArr[ONE]);
