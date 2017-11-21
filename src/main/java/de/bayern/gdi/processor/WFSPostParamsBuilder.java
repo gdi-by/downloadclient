@@ -49,6 +49,11 @@ public class WFSPostParamsBuilder {
 
     private static final String SRS_NAME = "srsName";
 
+    private static final String WFS_NS = "http://www.opengis.net/wfs/2.0";
+    private static final String FES_NS = "http://www.opengis.net/fes/2.0";
+    private static final String GML_NS = "http://www.opengis.net/gml/3.2/";
+
+
     private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
 
     private WFSPostParamsBuilder() {
@@ -199,25 +204,21 @@ public class WFSPostParamsBuilder {
             }
         }
 
-        final String wfsNS = "http://www.opengis.net/wfs/2.0";
-        final String fesNS = "http://www.opengis.net/fes/2.0";
-        final String gmlNS = "http://www.opengis.net/gml/3.2/";
-
         Element getFeature = doc.createElementNS(
-            wfsNS, "wfs:GetFeature");
+            WFS_NS, "wfs:GetFeature");
 
         getFeature.setAttributeNS(
-            wfsNS, "wfs:service", "WFS");
+            WFS_NS, "wfs:service", "WFS");
 
-        getFeature.setAttributeNS(wfsNS, "wfs:version",
+        getFeature.setAttributeNS(WFS_NS, "wfs:version",
              meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         getFeature.setAttributeNS(
-            wfsNS, "wfs:outputFormat", outputFormat);
+            WFS_NS, "wfs:outputFormat", outputFormat);
 
         if (hits) {
             getFeature.setAttributeNS(
-                wfsNS, "wfs:resultType", "hits");
+                WFS_NS, "wfs:resultType", "hits");
         }
 
         if (ofs != -1) {
@@ -230,51 +231,62 @@ public class WFSPostParamsBuilder {
         }
 
         if (storedQuery) {
-            Element sqEl = doc.createElementNS(wfsNS, "wfs:StoredQuery");
+            Element sqEl = doc.createElementNS(WFS_NS, "wfs:StoredQuery");
             sqEl.setAttribute("id", storedQueryId);
-
-            for (Map.Entry<String, String> p: params.entrySet()) {
-                Element pEl = doc.createElementNS(wfsNS, "wfs:Parameter");
-                pEl.setAttribute("name", p.getKey());
-                pEl.setTextContent(p.getValue());
-                sqEl.appendChild(pEl);
-            }
-
+            appendParameters(doc, sqEl, params.entrySet());
             getFeature.appendChild(sqEl);
         } else {
-            Element queryEl = doc.createElementNS(wfsNS, "wfs:Query");
+            Element queryEl = doc.createElementNS(WFS_NS, "wfs:Query");
             queryEl.setAttribute("typeNames", typeNames);
             queryEl.setAttribute("xmlns:bvv", namespaces);
-
             queryEl.setAttribute(SRS_NAME, srsName);
-
+            appendBBox(doc, bbox, queryEl);
             getFeature.appendChild(queryEl);
-
-            String [] bboxArr = bbox.split("\\*s,\\s*");
-            if (bboxArr.length == FIVE) {
-                Element filterEl = doc.createElementNS(fesNS, "fes:Filter");
-                Element bboxEl = doc.createElementNS(fesNS, "fes:BBOX");
-
-                Element envEl = doc.createElementNS(gmlNS, "gml:Envelope");
-                envEl.setAttribute(SRS_NAME, bboxArr[FOUR]);
-
-                Element lcEl = doc.createElementNS(gmlNS, "lowerCorner");
-                lcEl.setTextContent(bboxArr[ZERO] + " " + bboxArr[ONE]);
-
-                Element ucEl = doc.createElementNS(gmlNS, "upperCorner");
-                ucEl.setTextContent(bboxArr[TWO] + " " + bboxArr[THREE]);
-
-                envEl.appendChild(lcEl);
-                envEl.appendChild(ucEl);
-
-                bboxEl.appendChild(envEl);
-                filterEl.appendChild(bboxEl);
-                queryEl.appendChild(filterEl);
-            }
         }
 
         doc.appendChild(getFeature);
 
         return doc;
+    }
+
+    private static void appendParameters(
+        Document doc,
+        Element  parent,
+        Set<Map.Entry<String, String>> params
+    ) {
+        for (Map.Entry<String, String> p: params) {
+            Element child = doc.createElementNS(WFS_NS, "wfs:Parameter");
+            child.setAttribute("name", p.getKey());
+            child.setTextContent(p.getValue());
+            parent.appendChild(child);
+        }
+    }
+
+    private static void appendBBox(
+        Document doc,
+        String   bbox,
+        Element  parent
+    ) {
+        String [] bboxArr = bbox.split("\\*s,\\s*");
+        if (bboxArr.length == FIVE) {
+            Element filterEl = doc.createElementNS(FES_NS, "fes:Filter");
+            Element bboxEl = doc.createElementNS(FES_NS, "fes:BBOX");
+
+            Element envEl = doc.createElementNS(GML_NS, "gml:Envelope");
+            envEl.setAttribute(SRS_NAME, bboxArr[FOUR]);
+
+            Element lcEl = doc.createElementNS(GML_NS, "gml:lowerCorner");
+            lcEl.setTextContent(bboxArr[ZERO] + " " + bboxArr[ONE]);
+
+            Element ucEl = doc.createElementNS(GML_NS, "gml:upperCorner");
+            ucEl.setTextContent(bboxArr[TWO] + " " + bboxArr[THREE]);
+
+            envEl.appendChild(lcEl);
+            envEl.appendChild(ucEl);
+
+            bboxEl.appendChild(envEl);
+            filterEl.appendChild(bboxEl);
+            parent.appendChild(filterEl);
+        }
     }
 }
