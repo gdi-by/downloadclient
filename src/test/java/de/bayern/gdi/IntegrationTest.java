@@ -43,6 +43,19 @@ public class IntegrationTest extends TestBase {
             + "a90c75a0-f1b5-46e7-9e45-c0385fd0c200";
 
     /**
+     * Verwaltungsgrenzen.
+     */
+    private static final String VERWALTUNGSGRENZEN = "Verwaltungsgrenzen";
+
+    /**
+     * Verwaltungsgrenzen_URL.
+     */
+    private static final String VERWALTUNGSGRENZEN_URL =
+        "http://geoserv.weichand.de:8080/geoserver/wfs?service="
+            + "wfs&acceptversions=2.0.0"
+            + "&request=GetCapabilities";
+
+    /**
      * Tests the initial state of the application.
      *
      * @throws Exception if something went wrong.
@@ -126,12 +139,33 @@ public class IntegrationTest extends TestBase {
     /**
      * Chooses "Biergarten"-Service.
      *
+     * This is an example for an Atom Feed
+     *
      * @throws Exception in case something breaks
      */
     @Test
     public void chooseBiergarten() throws Exception {
         selectBiergarten();
         setServiceUrl(BIERGARTEN_URL);
+        clickOn(SERVICE_SELECTION);
+        waitUntilReady();
+        assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
+    }
+
+    /**
+     * Chooses "Verwaltungsgrenzen".
+     *
+     * This is an example for an WFS2 Feed
+     *
+     * @throws Exception in case something breaks
+     */
+    @Test
+    public void chooseVerwaltungsgrenzen() throws Exception {
+        waitUntilReady();
+        clickOn(SEARCH).write(VERWALTUNGSGRENZEN);
+        waitForPopulatedServiceList();
+        assertFalse(isEmpty(SERVICE_LIST));
+        setServiceUrl(VERWALTUNGSGRENZEN_URL);
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));

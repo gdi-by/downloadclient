@@ -121,7 +121,7 @@ public class TestBase extends ApplicationTest {
     static final String SERVICE_TYPE_CHOOSER =
         "#serviceTypeChooser";
     /**
-     * The list of services
+     * The list of services.
      */
     protected static final String SERVICE_LIST =
         "#serviceList";
@@ -319,7 +319,7 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Selects service by zerobased index
+     * Selects service by zerobased index.
      * @param index of service
      */
     void selectServiceNumber(int index) {
