@@ -26,7 +26,6 @@ import java.util.ArrayList;
 /**
  * Test for Mimetypes.
  */
-
 public class MIMETypesTest extends TestCase {
 
     public MIMETypesTest(String testName) {
@@ -111,15 +110,14 @@ public class MIMETypesTest extends TestCase {
 //        String typeName = "Hallo";
 //    }
 
-    /** Test the mimetypefile */
+    /** Test the mimetypefile. */
     @Test
     public void testMIMETYPESFILE() {
         assertEquals("mimetypes.xml", MIMETypes.MIME_TYPES_FILE); }
 
-    /** Test the name getter */
+    /** Test the name getter. */
     @Test
     public void testGetName() {
         assertEquals("MimeTypeConfig", MIMETypes.getName());
     }
-
 }
