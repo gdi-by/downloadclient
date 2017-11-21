@@ -47,6 +47,8 @@ public class WFSPostParamsBuilder {
     private static final int FOUR  = 4;
     private static final int FIVE  = 5;
 
+    private static final String SRS_NAME = "srsName";
+
     private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
 
     private WFSPostParamsBuilder() {
@@ -184,7 +186,7 @@ public class WFSPostParamsBuilder {
                     case "outputformat":
                         outputFormat = value;
                         break;
-                    case "srsName":
+                    case SRS_NAME:
                         srsName = value;
                         break;
                     case "bbox":
@@ -197,8 +199,6 @@ public class WFSPostParamsBuilder {
             }
         }
 
-        String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
-
         final String wfsNS = "http://www.opengis.net/wfs/2.0";
         final String fesNS = "http://www.opengis.net/fes/2.0";
         final String gmlNS = "http://www.opengis.net/gml/3.2/";
@@ -209,8 +209,8 @@ public class WFSPostParamsBuilder {
         getFeature.setAttributeNS(
             wfsNS, "wfs:service", "WFS");
 
-        getFeature.setAttributeNS(
-            wfsNS, "wfs:version", version);
+        getFeature.setAttributeNS(wfsNS, "wfs:version",
+             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         getFeature.setAttributeNS(
             wfsNS, "wfs:outputFormat", outputFormat);
@@ -221,16 +221,12 @@ public class WFSPostParamsBuilder {
         }
 
         if (ofs != -1) {
-            System.out.println(ofs + " ------ " + count);
             getFeature.setAttribute(
                 "startIndex", String.valueOf(ofs));
-            getFeature.setAttribute(
-                wfs2
-                    ? "count"
-                    : "maxFeatures",
+            getFeature.setAttribute(wfs2
+                ? "count"
+                : "maxFeatures",
                 String.valueOf(count));
-        } else {
-            System.out.println("---- unpaged");
         }
 
         if (storedQuery) {
@@ -250,7 +246,7 @@ public class WFSPostParamsBuilder {
             queryEl.setAttribute("typeNames", typeNames);
             queryEl.setAttribute("xmlns:bvv", namespaces);
 
-            queryEl.setAttribute("srsName", srsName);
+            queryEl.setAttribute(SRS_NAME, srsName);
 
             getFeature.appendChild(queryEl);
 
@@ -260,7 +256,7 @@ public class WFSPostParamsBuilder {
                 Element bboxEl = doc.createElementNS(fesNS, "fes:BBOX");
 
                 Element envEl = doc.createElementNS(gmlNS, "gml:Envelope");
-                envEl.setAttribute("srsName", bboxArr[FOUR]);
+                envEl.setAttribute(SRS_NAME, bboxArr[FOUR]);
 
                 Element lcEl = doc.createElementNS(gmlNS, "lowerCorner");
                 lcEl.setTextContent(bboxArr[ZERO] + " " + bboxArr[ONE]);
@@ -279,35 +275,6 @@ public class WFSPostParamsBuilder {
 
         doc.appendChild(getFeature);
 
-        return printXML(doc);
-    }
-
-    private static Document printXML(Document doc) throws ConverterException {
-        try {
-            java.io.StringWriter writer =
-                new java.io.StringWriter();
-            javax.xml.transform.stream.StreamResult out =
-                new javax.xml.transform.stream.StreamResult(writer);
-
-            javax.xml.transform.TransformerFactory tf =
-                javax.xml.transform.TransformerFactory.newInstance();
-            javax.xml.transform.Transformer transformer =
-                tf.newTransformer();
-            transformer.setOutputProperty(
-                javax.xml.transform.OutputKeys.METHOD, "xml");
-            transformer.setOutputProperty(
-                javax.xml.transform.OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(
-                javax.xml.transform.OutputKeys.INDENT, "no");
-            transformer.transform(
-                new javax.xml.transform.dom.DOMSource(doc), out);
-
-            String s = writer.getBuffer().toString();
-            System.out.println(s);
-
-        } catch (javax.xml.transform.TransformerException te) {
-            throw new ConverterException(te.getMessage());
-        }
         return doc;
     }
 }

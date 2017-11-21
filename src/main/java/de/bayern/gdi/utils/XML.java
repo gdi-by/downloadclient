@@ -69,6 +69,8 @@ public class XML {
     private static final Logger log
             = Logger.getLogger(XML.class.getName());
 
+    private static final String UTF8 = "UTF-8";
+
     private XML() {
     }
 
@@ -504,12 +506,12 @@ public class XML {
                     "no");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.ENCODING, UTF8);
             transformer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
 
             transformer.transform(new DOMSource(doc),
-                    new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+                    new StreamResult(new OutputStreamWriter(out, UTF8)));
         } catch (IOException
                 | TransformerException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -544,7 +546,7 @@ public class XML {
                 TransformerFactory tf = TransformerFactory.newInstance();
                 Transformer transformer = tf.newTransformer();
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                transformer.setOutputProperty(OutputKeys.ENCODING, UTF8);
                 transformer.setOutputProperty(OutputKeys.INDENT, "no");
                 transformer.transform(
                     new DOMSource(doc), new StreamResult(out));
