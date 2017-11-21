@@ -17,10 +17,9 @@
  */
 package de.bayern.gdi;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * @author thomas
@@ -31,6 +30,17 @@ public class IntegrationTest extends TestBase {
      * Number of steps.
      */
     private static final int TWO_ELEMENTS = 2;
+
+    /**
+     * Biergarten text.
+     */
+    private static final String BIERGARTEN = "Biergarten";
+    /**
+     * Biergarten URL.
+     */
+    private static final String BIERGARTEN_URL =
+        "https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/"
+            + "a90c75a0-f1b5-46e7-9e45-c0385fd0c200";
 
     /**
      * Tests the initial state of the application.
@@ -45,11 +55,12 @@ public class IntegrationTest extends TestBase {
         assertTrue(isEmpty(URL));
         assertTrue(isEmpty(USERNAME));
         assertTrue(isEmpty(PASSWORD));
-        assertTrue(isEmpty(LIST_OF_SERVICES));
+        assertTrue(isEmpty(SERVICE_LIST));
     }
 
     /**
      * When no URL is chosen, the user should get feedback.
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -61,6 +72,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Select additional steps.
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -80,6 +92,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Selects steps and adds one.
+     *
      * @throws Exception if something went wrong.
      */
     @Test
@@ -88,6 +101,40 @@ public class IntegrationTest extends TestBase {
         clickOn(ADD_PROCESSING_STEP);
         assertFalse(isEmpty(PROCESSINGSTEPS));
         assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
+    }
+
+    /**
+     * Select Biergarten.
+     *
+     * @throws Exception in case something breaks
+     */
+    @Test
+    public void searchBiergarten() throws Exception {
+        selectBiergarten();
+        assertTrue(titlePaneShows(CALLING_SERVICE));
+    }
+
+    /**
+     * Enters "Biergarten" in the search area.
+     */
+    private void selectBiergarten() {
+        waitUntilReady();
+        clickOn(SEARCH).write(BIERGARTEN);
+        waitForPopulatedServiceList();
+    }
+
+    /**
+     * Chooses "Biergarten"-Service.
+     *
+     * @throws Exception in case something breaks
+     */
+    @Test
+    public void chooseBiergarten() throws Exception {
+        selectBiergarten();
+        setServiceUrl(BIERGARTEN_URL);
+        clickOn(SERVICE_SELECTION);
+        waitUntilReady();
+        assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
     }
 
 }
