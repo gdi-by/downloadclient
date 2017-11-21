@@ -218,7 +218,6 @@ public class Config {
         if (Holder.INSTANCE.getMimeTypes() == null) {
             throwConfigFailureException(MIMETypes.getName());
         }
-        // TODO: MIME types -> file extensions.
     }
 
     private static void throwConfigFailureException(String configName)
