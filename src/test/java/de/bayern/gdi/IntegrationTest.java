@@ -19,6 +19,7 @@ package de.bayern.gdi;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import java.util.stream.IntStream;
 import org.junit.Test;
 
 /**
@@ -30,6 +31,12 @@ public class IntegrationTest extends TestBase {
      * Number of steps.
      */
     private static final int TWO_ELEMENTS = 2;
+
+    /**
+     * Total number of services.
+     */
+    private static final int TOTAL_NUMBER_OF_SERVICES = 13;
+
 
     /**
      * Biergarten text.
@@ -138,7 +145,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Chooses "Biergarten"-Service.
-     *
+     * <p>
      * This is an example for an Atom Feed
      *
      * @throws Exception in case something breaks
@@ -154,7 +161,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Chooses "Verwaltungsgrenzen".
-     *
+     * <p>
      * This is an example for an WFS2 Feed
      *
      * @throws Exception in case something breaks
@@ -169,6 +176,17 @@ public class IntegrationTest extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
+        assertTrue(size(SERVICE_TYPE_CHOOSER, TOTAL_NUMBER_OF_SERVICES));
+        selectDataFormatByNumber(0);
+        clickOn(ACTIVATE_FURTHER_PROCESSING);
+        clickOn(ADD_PROCESSING_STEP);
+        assertFalse(isEmpty(PROCESS_SELECTION));
+        IntStream.range(1, TOTAL_NUMBER_OF_SERVICES - 1).forEach(i -> {
+                selectDataFormatByNumber(i);
+                clickOn(SERVICE_TYPE_CHOOSER);
+            }
+        );
+
     }
 
 }
