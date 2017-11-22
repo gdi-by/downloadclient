@@ -19,6 +19,8 @@ package de.bayern.gdi.utils;
 
 import de.bayern.gdi.gui.Controller;
 
+import java.nio.file.Files;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -122,12 +124,20 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         } catch (IOException ioe) {
             // Clean up debris if there was an error.
             // XXX: Maybe keep it to recover download?
-            if (!this.file.delete()) {
-                log.log(
-                    Level.WARNING, "Deleting file '" + file + "' failed.");
-            }
+            deleteGraceful();
             throw ioe;
         }
         return Boolean.TRUE;
+    }
+
+    private void deleteGraceful() {
+        try {
+            Files.delete(this.file.toPath());
+        } catch (IOException ioe) {
+            log.log(
+                Level.WARNING,
+                () -> String.format(
+                    "Deleting file {0} failed: {1}", file, ioe));
+        }
     }
 }
