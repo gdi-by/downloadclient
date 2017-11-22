@@ -20,6 +20,9 @@ package de.bayern.gdi.model;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+/**
+ * Test for the DownloadStep.
+ */
 public class DownloadStepTest extends TestCase {
 
 
