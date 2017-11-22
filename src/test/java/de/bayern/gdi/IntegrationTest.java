@@ -64,7 +64,8 @@ public class IntegrationTest extends TestBase {
             + "&request=GetCapabilities";
 
     /**
-     * Before wait.
+     * Before wait for Ready state
+     * @throws Exception just in case
      */
     @Before
     public void applicationReady() throws Exception {
