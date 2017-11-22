@@ -143,14 +143,13 @@ public class MIMETypesTest extends TestCase {
     /** TODO Test the read File and InputStream */
 //    @Test
 //    public void testRead() {
-//        String typeName = "Hallo";
 //    }
 
-    /** TODO Test the loadDefault */
-//    @Test
-//    public void testLoadDefault() {
-//        String typeName = "Hallo";
-//    }
+    /** Test that the loadDefault actual return an object. */
+    @Test
+    public void testLoadDefault() {
+        assertNotNull(MIMETypes.loadDefault());
+    }
 
     /** Test the mimetypefile. */
     @Test
