@@ -136,8 +136,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         } catch (IOException ioe) {
             log.log(
                 Level.WARNING,
-                () -> String.format(
-                    "Deleting file {0} failed: {1}", file, ioe));
+                () -> "delete failed: " + ioe.getMessage());
         }
     }
 }
