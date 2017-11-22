@@ -20,6 +20,7 @@ package de.bayern.gdi;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import java.util.stream.IntStream;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -63,13 +64,20 @@ public class IntegrationTest extends TestBase {
             + "&request=GetCapabilities";
 
     /**
+     * Before wait.
+     */
+    @Before
+    public void applicationReady() throws Exception {
+        waitUntilReady();
+    }
+
+    /**
      * Tests the initial state of the application.
      *
      * @throws Exception if something went wrong.
      */
     @Test
     public void initialState() throws Exception {
-        waitUntilReady();
         assertTrue(titlePaneShows(READY_STATUS));
         assertTrue(isEmpty(SEARCH));
         assertTrue(isEmpty(URL));
@@ -87,7 +95,6 @@ public class IntegrationTest extends TestBase {
      */
     @Test
     public void noURLChosen() throws Exception {
-        waitUntilReady();
         clickOn(SERVICE_SELECTION);
         assertTrue(titlePaneShows(NO_URL));
     }
@@ -108,7 +115,6 @@ public class IntegrationTest extends TestBase {
      * Adds one processing step.
      */
     private void addOneStep() {
-        waitUntilReady();
         clickOn(ACTIVATE_FURTHER_PROCESSING);
     }
 
@@ -140,7 +146,6 @@ public class IntegrationTest extends TestBase {
      * Enters "Biergarten" in the search area.
      */
     private void selectBiergarten() {
-        waitUntilReady();
         clickOn(SEARCH).write(BIERGARTEN);
         waitForPopulatedServiceList();
     }
@@ -170,7 +175,6 @@ public class IntegrationTest extends TestBase {
      */
     @Test
     public void chooseVerwaltungsgrenzen() throws Exception {
-        waitUntilReady();
         clickOn(SEARCH).write(VERWALTUNGSGRENZEN);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
