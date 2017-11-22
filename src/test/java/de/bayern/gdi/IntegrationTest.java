@@ -76,6 +76,8 @@ public class IntegrationTest extends TestBase {
         assertTrue(isEmpty(USERNAME));
         assertTrue(isEmpty(PASSWORD));
         assertTrue(isEmpty(SERVICE_LIST));
+        clickOn(DOWNLOAD_BUTTON);
+        clickOn(SAVE_BUTTON);
     }
 
     /**
