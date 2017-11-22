@@ -137,15 +137,15 @@ public class Processor implements Runnable {
                     }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    break;
+                    return;
                 }
                 if (this.done) {
-                    break;
+                    return;
                 }
                 job = this.jobs.poll();
             }
             if (job == QUIT_JOB) {
-                break;
+                return;
             }
             try {
                 job.run(this);
