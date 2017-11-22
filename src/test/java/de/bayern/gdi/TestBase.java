@@ -61,6 +61,23 @@ public class TestBase extends ApplicationTest {
     protected static final String URL =
         "#serviceURL";
     /**
+     * The list of services.
+     */
+    static final String SERVICE_LIST =
+        "#serviceList";
+    /**
+     * Download Button.
+     */
+    static final String DOWNLOAD_BUTTON = "#buttonDownload";
+    /**
+     * Save Button.
+     */
+    static final String SAVE_BUTTON = "#buttonSaveConfig";
+    /**
+     * Close Button.
+     */
+    static final String CLOSE_BUTTON = "buttonClose";
+    /**
      * Calling the service msg.
      */
     static final String CALLING_SERVICE =
@@ -121,10 +138,10 @@ public class TestBase extends ApplicationTest {
     static final String SERVICE_TYPE_CHOOSER =
         "#serviceTypeChooser";
     /**
-     * The list of services.
+     * ProcessStep Combobox.
      */
-    protected static final String SERVICE_LIST =
-        "#serviceList";
+    static final String PROCESS_SELECTION =
+        "#process_name";
     /**
      * Width of the scene.
      */
@@ -151,27 +168,19 @@ public class TestBase extends ApplicationTest {
     private static final String HISTORY_PARENT =
         "#logHistoryParent";
     /**
-     * ProcessStep Combobox.
+     * DataFormatChooser Combobox.
      */
-    static final String PROCESS_SELECTION =
-        "#process_name";
-
+    private static final String DATAFORMATCHOOSER =
+        "#dataFormatChooser";
     /**
      * The Scene.
      */
     private Scene scene;
-
     /**
      * The logger.
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
-
-    /**
-     * DataFormatChooser Combobox.
-     */
-    private static final String DATAFORMATCHOOSER =
-        "#dataFormatChooser";
 
     /**
      * Initial phase.
@@ -332,15 +341,17 @@ public class TestBase extends ApplicationTest {
 
     /**
      * Selects service by zerobased index.
+     *
      * @param index of service
      */
     void selectServiceByNumber(int index) {
-       ListView services =  getElementById(SERVICE_LIST, ListView.class);
-       services.getSelectionModel().select(index);
+        ListView services = getElementById(SERVICE_LIST, ListView.class);
+        services.getSelectionModel().select(index);
     }
 
     /**
      * Selects dataformat by zerobased index.
+     *
      * @param index of service
      */
     void selectDataFormatByNumber(int index) {
@@ -349,6 +360,7 @@ public class TestBase extends ApplicationTest {
 
     /**
      * Selects serviceType by zerobased index.
+     *
      * @param index of service
      */
     void selectServiceTypeByNumber(int index) {
@@ -357,7 +369,8 @@ public class TestBase extends ApplicationTest {
 
     /**
      * Select an option of a combobox.
-     * @param index index of option
+     *
+     * @param index    index of option
      * @param combobox id of combobox
      */
     private void selectComboBoxOption(int index, String combobox) {
