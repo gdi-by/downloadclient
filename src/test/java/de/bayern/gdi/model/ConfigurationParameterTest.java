@@ -22,6 +22,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+/**
+ * Class to test  ConfigurationParameter.
+ */
 public class ConfigurationParameterTest extends TestCase {
 
     /** Test the mandatory setter and state. */
