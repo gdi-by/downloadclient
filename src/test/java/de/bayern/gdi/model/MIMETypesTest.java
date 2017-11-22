@@ -36,10 +36,8 @@ public class MIMETypesTest extends TestCase {
     @Test
     public void testTypes() {
 
-        MIMEType mimeType1 = new MIMEType();
-        MIMEType mimeType2 = new MIMEType();
-        mimeType1.setType("Hello");
-        mimeType2.setType("World");
+        MIMEType mimeType1 = createMimeType("Hello");
+        MIMEType mimeType2 = createMimeType("World");
 
         ArrayList<MIMEType> actualMimeType = new ArrayList<>();
         actualMimeType.add(mimeType1);
@@ -59,14 +57,13 @@ public class MIMETypesTest extends TestCase {
             , mimeTypesActual.getTypes());
     }
 
+
     /** Test MIMETypes.toString. */
     @Test
     public void testToString() {
 
-        MIMEType mimeType1 = new MIMEType();
-        MIMEType mimeType2 = new MIMEType();
-        mimeType1.setType("Hello");
-        mimeType2.setType("World");
+        MIMEType mimeType1 = createMimeType("Hello");
+        MIMEType mimeType2 = createMimeType("World");
 
         ArrayList<MIMEType> actualMimeType = new ArrayList<>();
         actualMimeType.add(mimeType1);
@@ -86,17 +83,62 @@ public class MIMETypesTest extends TestCase {
             + "]", actualMimeTypes.toString());
     }
 
-    /** TODO Test the findExtensions with typeName and default*/
-//    @Test
-//    public void testFindExtension() {
-//        String typeName = "Hallo";
-//    }
+    /** Test the findExtensions with typeName and default. */
+    @Test
+    public void testFindExtension() {
+        String name = null;
+        String def = "default";
+        MIMEType mimeType1 = new MIMEType();
+        MIMEType mimeType2 = new MIMEType();
+        mimeType1.setType("type1");
+        mimeType1.setName("name1");
+        mimeType2.setType("type2");
+        mimeType2.setName("name2");
+        mimeType1.setExt("ext1");
+        mimeType2.setExt("ext2");
 
-    /** TODO Test the findByName */
-//    @Test
-//    public void testFindByName() {
-//        String typeName = "Hallo";
-//    }
+        ArrayList<MIMEType> actualMimeType = new ArrayList<>();
+        actualMimeType.add(mimeType1);
+        actualMimeType.add(mimeType2);
+
+        MIMETypes actualMimeTypes = new MIMETypes();
+        actualMimeTypes.setTypes(actualMimeType);
+
+        assertEquals(null, actualMimeTypes.findExtension(name));
+        name = "unknown Extension";
+        assertEquals(null, actualMimeTypes.findExtension(name));
+        assertEquals("default", actualMimeTypes.findExtension(name, def));
+
+        name = "name1";
+        assertEquals("ext1", actualMimeTypes.findExtension(name));
+        name = "name2";
+        assertEquals("ext2", actualMimeTypes.findExtension(name, def));
+    }
+
+    /** Test the findByName. */
+    @Test
+    public void testFindByName() {
+//        String name = null;
+        String name = "not in MimeType";
+        MIMEType mimeType1 = new MIMEType();
+        MIMEType mimeType2 = new MIMEType();
+
+        mimeType1.setName("Hallo");
+        mimeType2.setName("Welt");
+
+        ArrayList<MIMEType> actualMimeType = new ArrayList<>();
+        actualMimeType.add(mimeType1);
+        actualMimeType.add(mimeType2);
+
+        MIMETypes actualMimeTypes = new MIMETypes();
+        actualMimeTypes.setTypes(actualMimeType);
+
+        assertEquals(null, actualMimeTypes.findByName(name));
+        name = "Hallo";
+        assertEquals(mimeType1, actualMimeTypes.findByName(name));
+        name = "Welt";
+        assertEquals(mimeType2, actualMimeTypes.findByName(name));
+    }
 
     /** TODO Test the read File and InputStream */
 //    @Test
@@ -119,5 +161,12 @@ public class MIMETypesTest extends TestCase {
     @Test
     public void testGetName() {
         assertEquals("MimeTypeConfig", MIMETypes.getName());
+    }
+
+    /** Create a MIMEType-Object. */
+    private MIMEType createMimeType(String type) {
+        MIMEType mimeType = new MIMEType();
+        mimeType.setType(type);
+        return mimeType;
     }
 }
