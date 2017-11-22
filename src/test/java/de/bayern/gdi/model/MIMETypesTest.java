@@ -86,7 +86,7 @@ public class MIMETypesTest extends TestCase {
     /** Test the findExtensions with typeName and default. */
     @Test
     public void testFindExtension() {
-        String name = "unknown Extension";
+        String name = null;
         String def = "default";
         MIMEType mimeType1 = new MIMEType();
         MIMEType mimeType2 = new MIMEType();
@@ -104,6 +104,8 @@ public class MIMETypesTest extends TestCase {
         MIMETypes actualMimeTypes = new MIMETypes();
         actualMimeTypes.setTypes(actualMimeType);
 
+        assertEquals(null, actualMimeTypes.findExtension(name));
+        name = "unknown Extension";
         assertEquals(null, actualMimeTypes.findExtension(name));
         assertEquals("default", actualMimeTypes.findExtension(name, def));
 
