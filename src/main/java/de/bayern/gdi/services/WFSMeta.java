@@ -228,24 +228,24 @@ public class WFSMeta {
     /** Version. */
     public static class Version implements Comparable<Version> {
         /** version. */
-        protected String version;
+        private String versionString;
         /** parsed. */
-        protected int[] parsed;
+        private int[] parsed;
 
         /** Version. */
         public Version() {
         }
 
         /** @param version The version. */
-        public Version(String version) {
-            this.version = version;
+        public Version(String versionString) {
+            this.versionString = versionString;
             parse();
         }
 
         /** Parses the version string to numbers. */
         public void parse() {
             try {
-                String[] parts = version.split("\\.");
+                String[] parts = versionString.split("\\.");
                 int[] converted = new int[parts.length];
                 for (int i = 0; i < converted.length; i++) {
                     converted[i] = Integer.parseInt(parts[i]);
@@ -259,7 +259,7 @@ public class WFSMeta {
         @Override
         public int compareTo(Version other) {
             if (other.parsed == null && this.parsed == null) {
-                return this.version.compareTo(other.version);
+                return this.versionString.compareTo(other.versionString);
             }
             if (this.parsed == null) {
                 return +1;
@@ -295,12 +295,12 @@ public class WFSMeta {
                 }
             }
 
-            return hash + THIRTYONE * version.hashCode();
+            return hash + THIRTYONE * versionString.hashCode();
         }
 
         @Override
         public String toString() {
-            return this.version;
+            return this.versionString;
         }
     }
 
