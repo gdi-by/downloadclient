@@ -83,14 +83,7 @@ public class IntegrationTest extends TestBase {
      */
     public static final String AUTH =
         "#serviceAuthenticationCbx";
-
-    /**
-     * FlurStuecke.
-     */
-    private static final String FLUR_STUECKE =
-        "Flurst\u00fccke und Geb\u00e4ude Bayern - "
-            + "Web Feature Service - Passwortgesch\u00fczt";
-
+    
     /**
      * Before waitFor for Ready state.
      *
@@ -228,7 +221,7 @@ public class IntegrationTest extends TestBase {
         clickOn(SEARCH).write(WFS);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
-        clickOn(FLUR_STUECKE);
+        selectNthService(0);
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
     }

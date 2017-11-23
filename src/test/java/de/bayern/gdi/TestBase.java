@@ -404,6 +404,15 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
+     * Selects the Service at position n.
+     * @param n number. Zerobased index
+     */
+    void selectNthService(int n) {
+        ListView lw = getElementById(SERVICE_LIST, ListView.class);
+        clickOn(lw.getItems().get(n).toString());
+    }
+
+    /**
      * Tests, whether a given field has no content.
      */
     boolean isEmpty(String element) {
