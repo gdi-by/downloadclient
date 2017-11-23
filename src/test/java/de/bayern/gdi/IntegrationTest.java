@@ -69,7 +69,7 @@ public class IntegrationTest extends TestBase {
             + "wfs&acceptversions=2.0.0"
             + "&request=GetCapabilities";
     /**
-     * Downloadconfigurator
+     * Downloadconfigurator.
      */
     private static final DownloadConfiguration DOWNLOAD_CONFIGURATION =
         new DownloadConfiguration();
@@ -215,7 +215,7 @@ public class IntegrationTest extends TestBase {
     public void testDownloadOf() throws Exception {
         String dirname = "gdiBY";
         Path tempPath = Files.createTempDirectory(dirname);
-        String config = DOWNLOAD_CONFIGURATION.getSimpleConfiguration(
+        String config = DOWNLOAD_CONFIGURATION.getBiergartenConfiguration(
             tempPath.toString());
         List<DownloadStep> steps = new ArrayList<>();
         steps.add(DownloadStep.read(config));

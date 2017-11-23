@@ -51,10 +51,11 @@ public class DownloadConfiguration {
             + "</DownloadSchritt>";
 
     /**
-     * Retrieves a simple config.
-     * @return simple config
+     * Biergarten.
+     * @param path temppath
+     * @return config
      */
-    public String getSimpleConfiguration(String path) {
+    public String getBiergartenConfiguration(String path) {
         return String.format(SIMPLE_CONFIG_TMPL, path);
     }
 
