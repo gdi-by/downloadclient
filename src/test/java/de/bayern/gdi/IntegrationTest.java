@@ -83,7 +83,6 @@ public class IntegrationTest extends TestBase {
      */
     public static final String AUTH =
         "#serviceAuthenticationCbx";
-    
     /**
      * Before waitFor for Ready state.
      *
