@@ -33,6 +33,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -183,6 +184,12 @@ public class TestBase extends ApplicationTest {
         this.getClass().getName());
 
     /**
+     * Protected state.
+     */
+    static final String PROTECTED_STATE =
+        "status.service-needs-auth";
+
+    /**
      * Initial phase.
      */
     @BeforeClass
@@ -275,8 +282,15 @@ public class TestBase extends ApplicationTest {
      * Waits until UI has settled down.
      */
     void waitUntilReady() {
+        waitFor(READY_STATUS);
+    }
+
+    /**
+     * Waits untitl UI has reached state.
+     */
+    void waitFor(String state) {
         TitledPane titledPane = getPane();
-        waitForTitlebarStatus(titledPane, READY_STATUS);
+        waitForTitlebarStatus(titledPane, state);
     }
 
     /**
@@ -357,6 +371,17 @@ public class TestBase extends ApplicationTest {
     void selectDataFormatByNumber(int index) {
         selectComboBoxOption(index, DATAFORMATCHOOSER);
     }
+
+    /**
+     * Checks whether checkox is checked.
+     *
+     * @return true, if so
+     */
+    boolean isChecked(String checkbox) {
+        CheckBox b = getElementById(checkbox, CheckBox.class);
+        return b.isSelected();
+    }
+
 
     /**
      * Selects serviceType by zerobased index.

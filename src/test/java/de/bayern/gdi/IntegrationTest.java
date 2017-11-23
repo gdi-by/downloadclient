@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,9 +74,25 @@ public class IntegrationTest extends TestBase {
      */
     private static final DownloadConfiguration DOWNLOAD_CONFIGURATION =
         new DownloadConfiguration();
+    /**
+     * WFS.
+     */
+    private static final String WFS = "WFS";
+    /**
+     * Auth.
+     */
+    public static final String AUTH =
+        "#serviceAuthenticationCbx";
 
     /**
-     * Before wait for Ready state.
+     * FlurStuecke
+     */
+    private static final String FLUR_STUECKE =
+        "Flurstücke und Gebäude Bayern - "
+            + "Web Feature Service - Passwortgeschüzt";
+
+    /**
+     * Before waitFor for Ready state.
      *
      * @throws Exception just in case
      */
@@ -201,11 +216,16 @@ public class IntegrationTest extends TestBase {
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);
         assertFalse(isEmpty(PROCESS_SELECTION));
-        IntStream.range(1, TOTAL_NUMBER_OF_SERVICES - 1).forEach(i -> {
-                selectDataFormatByNumber(i);
-                clickOn(SERVICE_TYPE_CHOOSER);
-            }
-        );
+    }
+
+    @Test
+    public void testProtected() throws Exception {
+        clickOn(SEARCH).write(WFS);
+        waitForPopulatedServiceList();
+        assertFalse(isEmpty(SERVICE_LIST));
+        clickOn(FLUR_STUECKE);
+        waitFor(PROTECTED_STATE);
+        assertTrue(isChecked(AUTH));
     }
 
     /**
