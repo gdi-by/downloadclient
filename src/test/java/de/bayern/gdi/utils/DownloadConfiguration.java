@@ -19,6 +19,7 @@ package de.bayern.gdi.utils;
 
 /**
  * Encapsulates XML configurations for download test cases.
+ *
  * @author thomas
  */
 public class DownloadConfiguration {
@@ -49,7 +50,9 @@ public class DownloadConfiguration {
             + "        </Parameter>\n"
             + "    </Parameters>\n"
             + "</DownloadSchritt>";
-
+    /**
+     * Nuremburg.
+     */
     private static final String NUREMBURG =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
             + "<DownloadSchritt>\n"
@@ -71,9 +74,50 @@ public class DownloadConfiguration {
             + "        </Parameter>\n"
             + "    </Parameters>\n"
             + "</DownloadSchritt>";
+    /**
+     * AGZ.
+     */
+    private static final String AGZ =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+            + "<DownloadSchritt>\n"
+            + "    <ServiceTyp>WFS2_BASIC</ServiceTyp>\n"
+            + "    <URL>https://gdiserv.bayern.de/srv66381/services/"
+            + "benachteiligtegebiete-wfs?service=wfs&amp;acceptversions"
+            + "=2.0.0&amp;request=GetCapabilities</URL>\n"
+            + "    <DownloadPfad>%s</DownloadPfad>\n"
+            + "    <Dataset>agz:BenachteiligteGebiete</Dataset>\n"
+            + "    <Verarbeitungskette/>\n"
+            + "    <Parameters>\n"
+            + "        <Parameter>\n"
+            + "            <Name>srsName</Name>\n"
+            + "            <Wert>urn:ogc:def:crs:EPSG::4326</Wert>\n"
+            + "        </Parameter>\n"
+            + "        <Parameter>\n"
+            + "            <Name>outputformat</Name>\n"
+            + "            <Wert>text/xml; subtype=gml/3.2.1</Wert>\n"
+            + "        </Parameter>\n"
+            + "        <Parameter>\n"
+            + "            <Name>bbox</Name>\n"
+            + "            <Wert>47.24843532655711,8.945096154917964,"
+            + "50.56420950059199,13.908908586487573,urn:ogc:def:crs:EPSG"
+            + "::4326</Wert>\n"
+            + "        </Parameter>\n"
+            + "    </Parameters>\n"
+            + "</DownloadSchritt>";
+
+    /**
+     * AGZ.
+     *
+     * @param path tempdir path
+     * @return config
+     */
+    public String getAGZConfiguration(String path) {
+        return String.format(AGZ, path);
+    }
 
     /**
      * Biergarten.
+     *
      * @param path temppath
      * @return config
      */
@@ -83,6 +127,7 @@ public class DownloadConfiguration {
 
     /**
      * Nuremburg.
+     *
      * @param path temppath
      * @return config
      */

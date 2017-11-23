@@ -258,6 +258,24 @@ public class IntegrationTest extends TestBase {
     }
 
     /**
+     * Start AGZ download.
+     *
+     * Even though the server answers Bad Request. The exitcode is 0 (?)
+     *
+     * @throws Exception just in case
+     */
+    @Test
+    public void testDownloadAGZ() throws Exception {
+        List<DownloadStep> steps = prepareStep(
+            DOWNLOAD_CONFIGURATION::getAGZConfiguration
+        );
+        String username = "";
+        String password = "";
+        int result = Headless.runHeadless(username, password, steps);
+        assertTrue(result == 0);
+    }
+
+    /**
      * Generic DownloadStep preparation.
      * @param getConfig Lambda to retrieve configuration
      * @return Downloadsteps
