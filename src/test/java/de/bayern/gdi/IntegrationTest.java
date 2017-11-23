@@ -230,9 +230,9 @@ public class IntegrationTest extends TestBase {
      * @throws Exception just in case
      */
     @Test
-    public void testDownloadVerwaltungsgebiete() throws Exception {
+    public void testDownloadNuremburg() throws Exception {
         List<DownloadStep> steps = prepareStep(
-            DOWNLOAD_CONFIGURATION::getVerwaltungsGebieteConfiguration
+            DOWNLOAD_CONFIGURATION::getNuremburgConfig
         );
         String username = "";
         String password = "";

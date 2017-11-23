@@ -50,24 +50,24 @@ public class DownloadConfiguration {
             + "    </Parameters>\n"
             + "</DownloadSchritt>";
 
-    private static final String VERWALTUNGS_GEBIETE =
+    private static final String NUREMBURG =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
             + "<DownloadSchritt>\n"
-            + "    <ServiceTyp>ATOM</ServiceTyp>\n"
-            + "    <URL>https://geoportal.bayern.de/gdiadmin/ausgabe"
-            + "/ATOM_SERVICE/bf9ff4ed-62c7-4935-9318-d5251108acc3</URL>\n"
+            + "    <ServiceTyp>WFS2_SIMPLE</ServiceTyp>\n"
+            + "    <URL>http://geoserv.weichand.de:8080/"
+            + "geoserver/wfs?service=wfs&amp;acceptversions=2.0.0&amp;"
+            + "request=GetCapabilities</URL>\n"
             + "    <DownloadPfad>%s</DownloadPfad>\n"
-            + "    <Dataset>125cce16-7ae1-3cf0-96e2-05a4453f3cb1</Dataset>\n"
+            + "    <Dataset>GemeindeByGemeindeschluesselEpsg31468</Dataset>\n"
             + "    <Verarbeitungskette/>\n"
             + "    <Parameters>\n"
             + "        <Parameter>\n"
-            + "            <Name>VARIATION</Name>\n"
-            + "            <Wert>http://www.geodaten.bayern.de/opendata/"
-            + "Verwaltungsgebiete_shp_epsg31468.zip</Wert>\n"
+            + "            <Name>gemeindeschluessel</Name>\n"
+            + "            <Wert>09564000 </Wert>\n"
             + "        </Parameter>\n"
             + "        <Parameter>\n"
             + "            <Name>outputformat</Name>\n"
-            + "            <Wert>application/x-shapefile</Wert>\n"
+            + "            <Wert>text/xml; subtype=gml/3.2</Wert>\n"
             + "        </Parameter>\n"
             + "    </Parameters>\n"
             + "</DownloadSchritt>";
@@ -82,12 +82,12 @@ public class DownloadConfiguration {
     }
 
     /**
-     * Biergarten.
+     * Nuremburg.
      * @param path temppath
      * @return config
      */
-    public String getVerwaltungsGebieteConfiguration(String path) {
-        return String.format(SIMPLE_CONFIG_TMPL, path);
+    public String getNuremburgConfig(String path) {
+        return String.format(NUREMBURG, path);
     }
 
 }
