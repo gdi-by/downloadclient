@@ -85,7 +85,7 @@ public class IntegrationTest extends TestBase {
         "#serviceAuthenticationCbx";
 
     /**
-     * FlurStuecke
+     * FlurStuecke.
      */
     private static final String FLUR_STUECKE =
         "Flurstücke und Gebäude Bayern - "
@@ -218,6 +218,11 @@ public class IntegrationTest extends TestBase {
         assertFalse(isEmpty(PROCESS_SELECTION));
     }
 
+
+    /**
+     * Test a protected serivce.
+     * @throws Exception in case
+     */
     @Test
     public void testProtected() throws Exception {
         clickOn(SEARCH).write(WFS);
