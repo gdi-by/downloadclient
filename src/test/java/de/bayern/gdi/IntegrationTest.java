@@ -88,8 +88,8 @@ public class IntegrationTest extends TestBase {
      * FlurStuecke.
      */
     private static final String FLUR_STUECKE =
-        "Flurstücke und Gebäude Bayern - "
-            + "Web Feature Service - Passwortgeschüzt";
+        "Flurst\u00fccke und Geb\u00e4ude Bayern - "
+            + "Web Feature Service - Passwortgesch\u00fczt";
 
     /**
      * Before waitFor for Ready state.
