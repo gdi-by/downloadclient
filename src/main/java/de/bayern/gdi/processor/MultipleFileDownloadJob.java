@@ -27,6 +27,7 @@ import de.bayern.gdi.utils.WrapInputStreamFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,6 +71,14 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             this.url = url;
             this.postParams = postParams;
         }
+
+        /**
+         * Should we try to download it again?
+         * @return true if we should else if we should not.
+         */
+        protected boolean tryAgain() {
+            return ++this.tries < MAX_TRIES;
+        }
     }
 
     /** Number of bytes of the currently downloading file. */
@@ -107,7 +116,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         this.currentCount = 0;
 
 
-        boolean usePost = (dlf.postParams != null) ? true : false;
+        boolean usePost = dlf.postParams != null;
 
         HttpGet httpget = null;
         HttpPost httppost = null;
@@ -149,6 +158,16 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         }
     }
 
+    private static boolean sleep() {
+        try {
+            Thread.sleep(FAIL_SLEEP);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Downloads a list of files.
      * @param files The files to download.
@@ -156,47 +175,45 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      */
     protected void downloadFiles(List<DLFile> files)
     throws JobExecutionException {
-        int failed = 0;
-        int numFiles = files.size();
 
         broadcastMessage(I18n.format("file.download.start"));
-        for (;;) {
-            for (int i = 0; i < files.size();) {
-                DLFile file = files.get(i);
-                broadcastMessage(I18n.format(
-                        "download.file", file.url,
-                        file.file.getAbsolutePath()));
+
+        int numFiles = files.size();
+
+        List<DLFile> successful = new ArrayList<>();
+        List<DLFile> again = new ArrayList<>();
+        List<DLFile> failed = new ArrayList<>();
+
+        while (!files.isEmpty()) {
+            for (DLFile file: files) {
                 RemoteFileState rfs = downloadFile(file);
-                if (RemoteFileState.SUCCESS == rfs) {
-                    files.remove(i);
-                } else if (RemoteFileState.FATAL == rfs) {
-                    for (int j = i; j < files.size();) {
-                        files.remove(j);
-                        failed++;
-                    }
-                    i = files.size();
-                } else {
-                    if (++file.tries < MAX_TRIES) {
-                        i++;
-                    } else {
-                        failed++;
-                        files.remove(i);
-                    }
+                switch (rfs) {
+                    case SUCCESS:
+                        successful.add(file);
+                        break;
+                    case FATAL:
+                        failed.add(file);
+                        break;
+                    default:
+                        (file.tryAgain() ? again : failed).add(file);
+                        break;
                 }
                 broadcastMessage(I18n.format(
                     "atom.downloaded.files",
-                    numFiles - failed - files.size(),
-                    files.size()));
+                    successful.size(),
+                    Math.min(
+                        numFiles,
+                        numFiles - failed.size()
+                             - successful.size()
+                             + again.size())));
             }
-            if (files.isEmpty()) {
+
+            // Only sleep if there are files to try again.
+            if (!again.isEmpty() && !sleep()) {
                 break;
             }
-            try {
-                Thread.sleep(FAIL_SLEEP);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+            files = again;
+            again = new ArrayList<>();
         }
 
         String msg =
@@ -204,14 +221,14 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         log(msg);
         log.log(Level.INFO, msg);
 
-        if (failed > 0) {
+        if (!failed.isEmpty()) {
             msg = I18n.format(
-                "atom.downloaded.failed", numFiles - failed, failed);
+                "atom.downloaded.failed", successful.size(), failed.size());
             JobExecutionException jee = new JobExecutionException(msg);
             broadcastException(jee);
             throw jee;
         }
-        msg = I18n.format("atom.downloaded.success", numFiles);
+        msg = I18n.format("atom.downloaded.success", successful.size());
         broadcastMessage(msg);
     }
 }
