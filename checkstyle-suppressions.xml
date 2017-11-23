@@ -7,8 +7,6 @@
             files="generated-sources"/>
   <suppress checks=".*"
             files="src[/\\]main[/\\]resources[/\\]sql[/\\].*"/>
-  <suppress checks="Javadoc.*"
-            files="src[/\\]test"/>
   <suppress checks="HeaderCheck"
 	  files="src[/\\]resources[/\\].*\.properties"/>
 </suppressions>
