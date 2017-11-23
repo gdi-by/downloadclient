@@ -21,10 +21,12 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.utils.DownloadConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -212,17 +214,46 @@ public class IntegrationTest extends TestBase {
      * @throws Exception just in case
      */
     @Test
-    public void testDownloadOf() throws Exception {
-        String dirname = "gdiBY";
-        Path tempPath = Files.createTempDirectory(dirname);
-        String config = DOWNLOAD_CONFIGURATION.getBiergartenConfiguration(
-            tempPath.toString());
-        List<DownloadStep> steps = new ArrayList<>();
-        steps.add(DownloadStep.read(config));
+    public void testDownloadBiergarten() throws Exception {
+        List<DownloadStep> steps = prepareStep(
+            DOWNLOAD_CONFIGURATION::getBiergartenConfiguration
+        );
         String username = "";
         String password = "";
         int result = Headless.runHeadless(username, password, steps);
         assertTrue(result == 0);
+    }
+
+    /**
+     * Start Verwaltungsgebiete download.
+     *
+     * @throws Exception just in case
+     */
+    @Test
+    public void testDownloadVerwaltungsgebiete() throws Exception {
+        List<DownloadStep> steps = prepareStep(
+            DOWNLOAD_CONFIGURATION::getVerwaltungsGebieteConfiguration
+        );
+        String username = "";
+        String password = "";
+        int result = Headless.runHeadless(username, password, steps);
+        assertTrue(result == 0);
+    }
+
+    /**
+     * Generic DownloadStep preparation.
+     * @param getConfig Lambda to retrieve configuration
+     * @return Downloadsteps
+     * @throws IOException just in case
+     */
+    private List<DownloadStep> prepareStep(
+        Function<String, String> getConfig) throws IOException {
+        String dirname = "gdiBY";
+        Path tempPath = Files.createTempDirectory(dirname);
+        String config = getConfig.apply(tempPath.toString());
+        List<DownloadStep> steps = new ArrayList<>();
+        steps.add(DownloadStep.read(config));
+        return steps;
     }
 
 }

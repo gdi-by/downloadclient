@@ -50,12 +50,43 @@ public class DownloadConfiguration {
             + "    </Parameters>\n"
             + "</DownloadSchritt>";
 
+    private static final String VERWALTUNGS_GEBIETE =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+            + "<DownloadSchritt>\n"
+            + "    <ServiceTyp>ATOM</ServiceTyp>\n"
+            + "    <URL>https://geoportal.bayern.de/gdiadmin/ausgabe"
+            + "/ATOM_SERVICE/bf9ff4ed-62c7-4935-9318-d5251108acc3</URL>\n"
+            + "    <DownloadPfad>%s</DownloadPfad>\n"
+            + "    <Dataset>125cce16-7ae1-3cf0-96e2-05a4453f3cb1</Dataset>\n"
+            + "    <Verarbeitungskette/>\n"
+            + "    <Parameters>\n"
+            + "        <Parameter>\n"
+            + "            <Name>VARIATION</Name>\n"
+            + "            <Wert>http://www.geodaten.bayern.de/opendata/"
+            + "Verwaltungsgebiete_shp_epsg31468.zip</Wert>\n"
+            + "        </Parameter>\n"
+            + "        <Parameter>\n"
+            + "            <Name>outputformat</Name>\n"
+            + "            <Wert>application/x-shapefile</Wert>\n"
+            + "        </Parameter>\n"
+            + "    </Parameters>\n"
+            + "</DownloadSchritt>";
+
     /**
      * Biergarten.
      * @param path temppath
      * @return config
      */
     public String getBiergartenConfiguration(String path) {
+        return String.format(SIMPLE_CONFIG_TMPL, path);
+    }
+
+    /**
+     * Biergarten.
+     * @param path temppath
+     * @return config
+     */
+    public String getVerwaltungsGebieteConfiguration(String path) {
         return String.format(SIMPLE_CONFIG_TMPL, path);
     }
 
