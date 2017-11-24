@@ -27,6 +27,16 @@ import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
+import de.bayern.gdi.utils.SceneConstants;
+import static de.bayern.gdi.utils.SceneConstants.DATAFORMATCHOOSER;
+import static de.bayern.gdi.utils.SceneConstants.HEIGHT;
+import static de.bayern.gdi.utils.SceneConstants.HISTORY_PARENT;
+import static de.bayern.gdi.utils.SceneConstants.PROCESSINGSTEPS;
+import static de.bayern.gdi.utils.SceneConstants.PROCESS_SELECTION;
+import static de.bayern.gdi.utils.SceneConstants.READY_STATUS;
+import static de.bayern.gdi.utils.SceneConstants.SERVICE_LIST;
+import static de.bayern.gdi.utils.SceneConstants.SERVICE_TYPE_CHOOSER;
+import static de.bayern.gdi.utils.SceneConstants.WIDTH;
 import de.bayern.gdi.utils.Unauthorized;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -57,111 +67,8 @@ import org.testfx.framework.junit.ApplicationTest;
  */
 public class TestBase extends ApplicationTest {
 
-    /**
-     * Auth.
-     */
-    public static final String AUTH =
-        "#serviceAuthenticationCbx";
-    /**
-     * ServiceURL element.
-     */
-    protected static final String URL =
-        "#serviceURL";
-    /**
-     * The list of services.
-     */
-    static final String SERVICE_LIST =
-        "#serviceList";
-    /**
-     * Download Button.
-     */
-    static final String DOWNLOAD_BUTTON = "#buttonDownload";
-    /**
-     * Save Button.
-     */
-    static final String SAVE_BUTTON = "#buttonSaveConfig";
-    /**
-     * Close Button.
-     */
-    static final String CLOSE_BUTTON = "buttonClose";
-    /**
-     * Calling the service msg.
-     */
-    static final String CALLING_SERVICE =
-        "status.calling-service";
-    /**
-     * Processing steps Containerelement.
-     */
-    static final String PROCESSINGSTEPS =
-        "#processStepContainter";
-    /**
-     * Ready state.
-     */
-    static final String READY_STATUS =
-        "status.ready";
-    /**
-     * Search field.
-     */
-    static final String SEARCH =
-        "#searchField";
-    /**
-     * Username field.
-     */
-    static final String USERNAME =
-        "#serviceUser";
-    /**
-     * Password field.
-     */
-    static final String PASSWORD =
-        "#servicePW";
-    /**
-     * Selection field.
-     */
-    static final String SERVICE_SELECTION =
-        "#serviceSelection";
-    /**
-     * ACTIVATE_FURTHER_PROCESSING.
-     */
-    static final String ACTIVATE_FURTHER_PROCESSING =
-        "#chkChain";
-    /**
-     * ADD_PROCESSING_STEP.
-     */
-    static final String ADD_PROCESSING_STEP =
-        "#addChainItem";
-    /**
-     * No format chosen.
-     */
-    static final String NO_FORMAT_CHOSEN =
-        "gui.process.no.format";
-    /**
-     * No URL.
-     */
-    static final String NO_URL =
-        "status.no-url";
-    /**
-     * Selection of service kinds.
-     */
-    static final String SERVICE_TYPE_CHOOSER =
-        "#serviceTypeChooser";
-    /**
-     * ProcessStep Combobox.
-     */
-    static final String PROCESS_SELECTION =
-        "#process_name";
-    /**
-     * Protected state.
-     */
-    static final String PROTECTED_STATE =
-        "status.service-needs-auth";
-    /**
-     * Width of the scene.
-     */
-    private static final int WIDTH = 1024;
-    /**
-     * Height of the scene.
-     */
-    private static final int HEIGHT = 768;
+    // Constants
+
     /**
      * Timeout.
      */
@@ -175,16 +82,6 @@ public class TestBase extends ApplicationTest {
      */
     private static final String LOGONAME = "icon_118x118_300dpi.jpg";
     /**
-     * Titlepane.
-     */
-    private static final String HISTORY_PARENT =
-        "#logHistoryParent";
-    /**
-     * DataFormatChooser Combobox.
-     */
-    private static final String DATAFORMATCHOOSER =
-        "#dataFormatChooser";
-    /**
      * The Scene.
      */
     private Scene scene;
@@ -193,6 +90,8 @@ public class TestBase extends ApplicationTest {
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
+
+    // Overrides and Annotated Methods
 
     /**
      * Initial phase.
@@ -235,67 +134,20 @@ public class TestBase extends ApplicationTest {
 
     }
 
+    // Methods
+
     /**
-     * Waits for Display of Status in TitlePane.
+     * Gets Element from the scene.
      *
-     * @param titlePane Pane to watch
-     * @param status    Status to watch for
+     * @param el  Selector for the element to look
+     * @param t   Class of the Element
+     * @param <T> Generic returntype
+     * @return Returns Element
      */
-    private void waitForTitlebarStatus(TitledPane titlePane, String status) {
-        await()
-            .atMost(TIMEOUT_SECONDS, SECONDS)
-            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
-            .until(
-                titlePaneShowsMessage(titlePane, status)
-            );
-    }
-
-    /**
-     * Waits for the servicelist to populate.
-     */
-    void waitForPopulatedServiceList() {
-        ListView serviceList = getElementById(SERVICE_LIST, ListView.class);
-        await()
-            .atMost(TIMEOUT_SECONDS, SECONDS)
-            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
-            .until(serviceListIsPopulated(serviceList));
-    }
-
-    /**
-     * Lambda for Titlepane.
-     *
-     * @param titlePane The titlepane to look at
-     * @param status    the status to look fot
-     * @return whether the status is set according expectations
-     */
-    private Callable<Boolean> titlePaneShowsMessage(TitledPane titlePane,
-                                                    String status) {
-        return () -> titlePane.getText().equals(I18n.getMsg(status));
-    }
-
-    /**
-     * Lambda for service list.
-     *
-     * @param serviceList The servicelist to watch
-     * @return true, if there is at least one element
-     */
-    private Callable<Boolean> serviceListIsPopulated(ListView serviceList) {
-        return () -> serviceList.getItems().size() > 0;
-    }
-
-    /**
-     * Waits until UI has settled down.
-     */
-    void waitUntilReady() {
-        waitFor(READY_STATUS);
-    }
-
-    /**
-     * Waits untitl UI has reached state.
-     */
-    void waitFor(String state) {
-        TitledPane titledPane = getPane();
-        waitForTitlebarStatus(titledPane, state);
+    private <T extends javafx.scene.layout.Region> T getElementById(String el,
+                                                                    Class<T> t
+    ) {
+        return t.cast(scene.lookup(el));
     }
 
     /**
@@ -308,63 +160,10 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Get state from titlepane.
+     * Tests, if a given field has n elements.
      */
-    boolean titlePaneShows(String msg) {
-        TitledPane titledPane = getPane();
-        return titledPane.getText().equals(
-            I18n.getMsg(msg));
-    }
-
-    /**
-     * Sets the serviceURL.
-     */
-    void setServiceUrl(String url) {
-        setTextField(URL, url);
-    }
-
-    /**
-     * Sets content of TextField.
-     *
-     * @param fieldId Id of field
-     * @param text    content
-     */
-    private void setTextField(String fieldId, String text) {
-        TextField field = getElementById(fieldId, TextField.class);
-        field.setText(text);
-    }
-
-    /**
-     * Checks whether a given textfield fieldContentContains a given text.
-     *
-     * @param fieldId Id of field
-     * @param text    text to compare to
-     * @return result of comparison
-     */
-    boolean fieldContentContains(String fieldId, String text) {
-        TextField field = getElementById(fieldId, TextField.class);
-        return field.getText().contains(text);
-    }
-
-    /**
-     * Checks whether a given textfield equals a given text.
-     *
-     * @param fieldId Id of field
-     * @param text    text to compare to
-     * @return result of comparison
-     */
-    boolean fieldContentEquals(String fieldId, String text) {
-        TextField field = getElementById(fieldId, TextField.class);
-        return field.getText().contains(text);
-    }
-
-    /**
-     * Selects dataformat by zerobased index.
-     *
-     * @param index of service
-     */
-    void selectDataFormatByNumber(int index) {
-        selectComboBoxOption(index, DATAFORMATCHOOSER);
+    boolean hasSize(String element, int number) {
+        return size(element, x -> x == number);
     }
 
     /**
@@ -375,37 +174,6 @@ public class TestBase extends ApplicationTest {
     boolean isChecked(String checkbox) {
         CheckBox b = getElementById(checkbox, CheckBox.class);
         return b.isSelected();
-    }
-
-
-    /**
-     * Selects serviceType by zerobased index.
-     *
-     * @param index of service
-     */
-    void selectServiceTypeByNumber(int index) {
-        selectComboBoxOption(index, SERVICE_TYPE_CHOOSER);
-    }
-
-    /**
-     * Select an option of a combobox.
-     *
-     * @param index    index of option
-     * @param combobox id of combobox
-     */
-    private void selectComboBoxOption(int index, String combobox) {
-        ComboBox box = getElementById(combobox, ComboBox.class);
-        box.getSelectionModel().select(index);
-    }
-
-    /**
-     * Selects the Service at position n.
-     *
-     * @param n number. Zerobased index
-     */
-    void selectNthService(int n) {
-        ListView lw = getElementById(SERVICE_LIST, ListView.class);
-        clickOn(lw.getItems().get(n).toString());
     }
 
     /**
@@ -432,6 +200,64 @@ public class TestBase extends ApplicationTest {
                 result = t.getText().isEmpty();
         }
         return result;
+    }
+
+    /**
+     * Select an option of a combobox.
+     *
+     * @param index    index of option
+     * @param combobox id of combobox
+     */
+    private void selectComboBoxOption(int index, String combobox) {
+        ComboBox box = getElementById(combobox, ComboBox.class);
+        box.getSelectionModel().select(index);
+    }
+
+    /**
+     * Selects the Service at position n.
+     *
+     * @param n number. Zerobased index
+     */
+    void selectNthService(int n) {
+        ListView lw = getElementById(SERVICE_LIST, ListView.class);
+        clickOn(lw.getItems().get(n).toString());
+    }
+
+    /**
+     * Selects dataformat by zerobased index.
+     *
+     * @param index of service
+     */
+    void selectDataFormatByNumber(int index) {
+        selectComboBoxOption(index, DATAFORMATCHOOSER);
+    }
+
+    /**
+     * Lambda for service list.
+     *
+     * @param serviceList The servicelist to watch
+     * @return true, if there is at least one element
+     */
+    private Callable<Boolean> serviceListIsPopulated(ListView serviceList) {
+        return () -> serviceList.getItems().size() > 0;
+    }
+
+    /**
+     * Sets the serviceURL.
+     */
+    void setServiceUrl(String url) {
+        setTextField(SceneConstants.URL, url);
+    }
+
+    /**
+     * Sets content of TextField.
+     *
+     * @param fieldId Id of field
+     * @param text    content
+     */
+    private void setTextField(String fieldId, String text) {
+        TextField field = getElementById(fieldId, TextField.class);
+        field.setText(text);
     }
 
     /**
@@ -466,24 +292,64 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Tests, if a given field has n elements.
+     * Get state from titlepane.
      */
-    boolean hasSize(String element, int number) {
-        return size(element, x -> x == number);
+    boolean titlePaneShows(String msg) {
+        TitledPane titledPane = getPane();
+        return titledPane.getText().equals(
+            I18n.getMsg(msg));
     }
 
     /**
-     * Gets Element from the scene.
+     * Lambda for Titlepane.
      *
-     * @param el  Selector for the element to look
-     * @param t   Class of the Element
-     * @param <T> Generic returntype
-     * @return Returns Element
+     * @param titlePane The titlepane to look at
+     * @param status    the status to look fot
+     * @return whether the status is set according expectations
      */
-    private <T extends javafx.scene.layout.Region> T getElementById(String el,
-                                                                    Class<T> t
-    ) {
-        return t.cast(scene.lookup(el));
+    private Callable<Boolean> titlePaneShowsMessage(TitledPane titlePane,
+                                                    String status) {
+        return () -> titlePane.getText().equals(I18n.getMsg(status));
     }
 
+    /**
+     * Waits untitl UI has reached state.
+     */
+    void waitFor(String state) {
+        TitledPane titledPane = getPane();
+        waitForTitlebarStatus(titledPane, state);
+    }
+
+    /**
+     * Waits for the servicelist to populate.
+     */
+    void waitForPopulatedServiceList() {
+        ListView serviceList = getElementById(SERVICE_LIST, ListView.class);
+        await()
+            .atMost(TIMEOUT_SECONDS, SECONDS)
+            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
+            .until(serviceListIsPopulated(serviceList));
+    }
+
+    /**
+     * Waits for Display of Status in TitlePane.
+     *
+     * @param titlePane Pane to watch
+     * @param status    Status to watch for
+     */
+    private void waitForTitlebarStatus(TitledPane titlePane, String status) {
+        await()
+            .atMost(TIMEOUT_SECONDS, SECONDS)
+            .pollInterval(POLL_MILLISECONDS, MILLISECONDS)
+            .until(
+                titlePaneShowsMessage(titlePane, status)
+            );
+    }
+
+    /**
+     * Waits until UI has settled down.
+     */
+    void waitUntilReady() {
+        waitFor(READY_STATUS);
+    }
 }

@@ -27,6 +27,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import static de.bayern.gdi.utils.SceneConstants.ACTIVATE_FURTHER_PROCESSING;
+import static de.bayern.gdi.utils.SceneConstants.ADD_PROCESSING_STEP;
+import static de.bayern.gdi.utils.SceneConstants.NO_FORMAT_CHOSEN;
+import static de.bayern.gdi.utils.SceneConstants.SERVICE_SELECTION;
 import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
 import static net.jadler.Jadler.onRequest;
