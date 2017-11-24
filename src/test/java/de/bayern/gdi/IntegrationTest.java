@@ -39,13 +39,10 @@ public class IntegrationTest extends TestBase {
      * Number of steps.
      */
     private static final int TWO_ELEMENTS = 2;
-
     /**
      * Total number of services.
      */
     private static final int TOTAL_NUMBER_OF_SERVICES = 13;
-
-
     /**
      * Biergarten text.
      */
@@ -56,12 +53,10 @@ public class IntegrationTest extends TestBase {
     private static final String BIERGARTEN_URL =
         "https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/"
             + "a90c75a0-f1b5-46e7-9e45-c0385fd0c200";
-
     /**
      * Verwaltungsgrenzen.
      */
     private static final String VERWALTUNGSGRENZEN = "Verwaltungsgrenzen";
-
     /**
      * Verwaltungsgrenzen_URL.
      */
@@ -78,11 +73,7 @@ public class IntegrationTest extends TestBase {
      * WFS.
      */
     private static final String WFS = "WFS";
-    /**
-     * Auth.
-     */
-    public static final String AUTH =
-        "#serviceAuthenticationCbx";
+
     /**
      * Before waitFor for Ready state.
      *
@@ -130,7 +121,7 @@ public class IntegrationTest extends TestBase {
     public void activateProcessingSteps() throws Exception {
         addOneStep();
         assertFalse(isEmpty(PROCESSINGSTEPS));
-        assertTrue(size(PROCESSINGSTEPS, TWO_ELEMENTS));
+        assertTrue(hasSize(PROCESSINGSTEPS, TWO_ELEMENTS));
     }
 
     /**
@@ -203,7 +194,7 @@ public class IntegrationTest extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
-        assertTrue(size(SERVICE_TYPE_CHOOSER, TOTAL_NUMBER_OF_SERVICES));
+        assertTrue(hasSize(SERVICE_TYPE_CHOOSER, TOTAL_NUMBER_OF_SERVICES));
         selectDataFormatByNumber(0);
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);
@@ -213,13 +204,25 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Test a protected serivce.
+     *
      * @throws Exception in case
+     *
+     * TODO selectNthService is a brittle solution
+     * which circumvents a problem of selecting a
+     * service by name. Since there are Umlauts in
+     * the services name, tests broke.
+     * To improve testability, I added an additional
+     * assertion, that at least the size has the
+     * appropriate length.
+     *
+     * Works for **now**. tj
      */
     @Test
     public void testProtected() throws Exception {
         clickOn(SEARCH).write(WFS);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
+        assertTrue(size(SERVICE_LIST, x -> x > 0));
         selectNthService(0);
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
@@ -259,7 +262,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Start AGZ download.
-     *
+     * <p>
      * Even though the server answers Bad Request. The exitcode is 0 (?)
      *
      * @throws Exception just in case
@@ -277,12 +280,13 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Generic DownloadStep preparation.
+     *
      * @param getConfig Lambda to retrieve configuration
      * @return Downloadsteps
      * @throws IOException just in case
      */
-    private List<DownloadStep> prepareStep(
-        Function<String, String> getConfig) throws IOException {
+    private List<DownloadStep> prepareStep(Function<String, String>
+                                               getConfig) throws IOException {
         String dirname = "gdiBY";
         Path tempPath = Files.createTempDirectory(dirname);
         String config = getConfig.apply(tempPath.toString());

@@ -44,6 +44,7 @@ import javafx.stage.Stage;
 import static org.awaitility.Awaitility.await;
 import java.net.URL;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.BeforeClass;
@@ -56,6 +57,11 @@ import org.testfx.framework.junit.ApplicationTest;
  */
 public class TestBase extends ApplicationTest {
 
+    /**
+     * Auth.
+     */
+    public static final String AUTH =
+        "#serviceAuthenticationCbx";
     /**
      * ServiceURL element.
      */
@@ -144,6 +150,11 @@ public class TestBase extends ApplicationTest {
     static final String PROCESS_SELECTION =
         "#process_name";
     /**
+     * Protected state.
+     */
+    static final String PROTECTED_STATE =
+        "status.service-needs-auth";
+    /**
      * Width of the scene.
      */
     private static final int WIDTH = 1024;
@@ -182,12 +193,6 @@ public class TestBase extends ApplicationTest {
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
-
-    /**
-     * Protected state.
-     */
-    static final String PROTECTED_STATE =
-        "status.service-needs-auth";
 
     /**
      * Initial phase.
@@ -354,16 +359,6 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Selects service by zerobased index.
-     *
-     * @param index of service
-     */
-    void selectServiceByNumber(int index) {
-        ListView services = getElementById(SERVICE_LIST, ListView.class);
-        services.getSelectionModel().select(index);
-    }
-
-    /**
      * Selects dataformat by zerobased index.
      *
      * @param index of service
@@ -405,6 +400,7 @@ public class TestBase extends ApplicationTest {
 
     /**
      * Selects the Service at position n.
+     *
      * @param n number. Zerobased index
      */
     void selectNthService(int n) {
@@ -439,29 +435,41 @@ public class TestBase extends ApplicationTest {
     }
 
     /**
-     * Tests, if a given field has n elements.
+     * More generic size method.
+     *
+     * @param element    element to which size is compared
+     * @param comparison lambda
+     * @return true, if so
      */
-    boolean size(String element, int number) {
+    boolean size(String element,
+                 Predicate<Integer> comparison) {
         boolean result;
         switch (element) {
             case PROCESS_SELECTION:
             case SERVICE_TYPE_CHOOSER:
                 ComboBox cb = getElementById(element, ComboBox.class);
-                result = cb.getItems().size() == number;
+                result = comparison.test(cb.getItems().size());
                 break;
             case SERVICE_LIST:
                 ListView lv = getElementById(element, ListView.class);
-                result = lv.getItems().size() == number;
+                result = comparison.test(lv.getItems().size());
                 break;
             case PROCESSINGSTEPS:
                 HBox b = getElementById(element, HBox.class);
-                result = b.getChildren().size() == number;
+                result = comparison.test(b.getChildren().size());
                 break;
             default:
                 TextField t = getElementById(element, TextField.class);
-                result = t.getText().length() == number;
+                result = comparison.test(t.getText().length());
         }
         return result;
+    }
+
+    /**
+     * Tests, if a given field has n elements.
+     */
+    boolean hasSize(String element, int number) {
+        return size(element, x -> x == number);
     }
 
     /**
