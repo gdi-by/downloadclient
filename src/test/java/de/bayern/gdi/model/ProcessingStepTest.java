@@ -50,13 +50,14 @@ public class ProcessingStepTest extends TestCase {
     @Test
     public void testFindParameter() {
         ProcessingStep procStep = new ProcessingStep();
-        Parameter para1 = new Parameter();
-        Parameter para2 = new Parameter();
-        ArrayList<Parameter> listOfParameters = new ArrayList<Parameter>();
+        ArrayList<Parameter> listOfParameters = createListOfParameters();
+        String key = "an unknown key";
 
+        procStep.setParameters(listOfParameters);
+        assertNull(procStep.findParameter(key));
 
-        procStep.findParameter("a parameter key");
-
+        key = "key 1";
+        assertEquals("value 1", procStep.findParameter(key));
     }
 
     /** Test the toString. */
