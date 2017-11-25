@@ -163,6 +163,8 @@ public class ServiceSettings {
             && this.checkWithGET.matcher(url).matches();
     }
 
+    // This is an XPATH expression and not an URI.
+    @java.lang.SuppressWarnings("squid:S1075")
     private static final String CHECK_WITH_GET_XPATH =
         "//check-restriction/use-get-url/text()";
 

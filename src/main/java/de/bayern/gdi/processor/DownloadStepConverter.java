@@ -365,6 +365,8 @@ public class DownloadStepConverter {
         return wfsURL + "&resultType=hits";
     }
 
+    // This is an XPATH expression and not an URI.
+    @java.lang.SuppressWarnings("squid:S1075")
     private static final String XPATH_NUMBER_MATCHED
         = "/wfs:FeatureCollection/@numberMatched";
 
