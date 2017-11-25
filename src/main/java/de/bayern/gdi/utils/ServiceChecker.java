@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathConstants;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -263,14 +263,21 @@ public class ServiceChecker {
      * @return HTTP Return code
      * @throws IOException if something goes wrong
      */
-    public static int tryHead(URL url)
-        throws IOException {
-        try {
-            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
-            HttpHead getRequest = HTTP.getHeadRequest(url);
-            CloseableHttpResponse execute = httpCl.execute(getRequest);
-            StatusLine statusLine = execute.getStatusLine();
-            return statusLine.getStatusCode();
+    public static int tryHead(URL url) throws IOException {
+        // Should this URL be tested with HTTP GET instead?
+        boolean useGET = Config.getInstance().getServices()
+            .checkRestrictionWithGET(url.toExternalForm());
+
+        try (CloseableHttpClient httpCl = HTTP.getClient(url, null, null)) {
+
+            HttpUriRequest req = useGET
+                ? HTTP.getGetRequest(url)
+                : HTTP.getHeadRequest(url);
+
+            try (CloseableHttpResponse execute = httpCl.execute(req)) {
+                StatusLine statusLine = execute.getStatusLine();
+                return statusLine.getStatusCode();
+            }
         } catch (URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
