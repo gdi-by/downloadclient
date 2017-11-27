@@ -21,7 +21,6 @@ package de.bayern.gdi.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
-import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -32,8 +31,6 @@ import org.xml.sax.SAXException;
  */
 
 public class Settings {
-    private static final Logger log
-        = Logger.getLogger(Settings.class.getName());
 
     /** Name of the config file. */
     public static final String SETTINGS_FILE =
@@ -87,8 +84,7 @@ public class Settings {
     }
 
     private static InputStream getFileStream(String fileName) {
-        InputStream stream = Misc.getResource(fileName);
-        return stream;
+        return Misc.getResource(fileName);
     }
 
     /**

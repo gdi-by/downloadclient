@@ -19,8 +19,8 @@ package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.InputElement;
@@ -82,26 +82,23 @@ public class UIFactory {
     /**
      * Creates a stack pane with content based on the selected service.
      *
-     * @param dataBean The data
      * @param type The selected service type
      * @param container The container node
      * @param outputFormats the Outputformats of the selected service
      *
      */
     public void fillSimpleWFS(
-        DataBean dataBean,
         VBox container,
         WFSMeta.StoredQuery type,
         List <OutputFormatModel> outputFormats
     ) {
-        createSimpleWFS(dataBean,
-                type,
-                container,
-                outputFormats);
+        createSimpleWFS(
+            type,
+            container,
+            outputFormats);
     }
 
     private void createSimpleWFS(
-        DataBean dataBean,
         WFSMeta.StoredQuery type,
         VBox container,
         List <OutputFormatModel> outputFormats
@@ -135,7 +132,7 @@ public class UIFactory {
             | IllegalAccessException e) {
             // Displays the webview with white background...
         }
-        engine.loadContent(type.abstractDescription);
+        engine.loadContent(type.getAbstractDescription());
 
         container.getChildren().add(descriptionHead);
         container.getChildren().add(description);
@@ -144,7 +141,7 @@ public class UIFactory {
         container.setMargin(description,
             new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
 
-        for (Field entry : type.parameters) {
+        for (Field entry : type.getParameters()) {
             HBox attributeItem = createAttributeItem(entry);
             container.getChildren().add(attributeItem);
         }
@@ -175,15 +172,15 @@ public class UIFactory {
         root.setPrefHeight(PREF_HEIGHT);
         root.setMaxHeight(PREF_HEIGHT);
         Label label = new Label();
-        label.setText(field.name);
+        label.setText(field.getName());
         label.setMinWidth(LABEL_MIN_WIDTH);
         TextField textField = new TextField();
-        textField.setUserData(field.name);
+        textField.setUserData(field.getName());
         textField.setId("parameter");
         textField.setMinWidth(TEXTFIELD_MIN_WIDTH);
         Label type = new Label();
         //TODO - Save the type w/o the replace
-        type.setText(field.type.replace("xsd:", "").replace("xs:", ""));
+        type.setText(field.getType().replace("xsd:", "").replace("xs:", ""));
         type.setMinWidth(LABEL_MIN_WIDTH);
         root.setMargin(label,
             new Insets(MARGIN_5, MARGIN_5, MARGIN_5, MARGIN_15));
@@ -200,22 +197,43 @@ public class UIFactory {
     /**
      * Add new post process chain item.
      *
-     * @param dataBean The databean
      * @param container The container
      */
-    public void addChainAttribute(DataBean dataBean, VBox container) {
-        addChainAttribute(dataBean, container, null);
+    public void addChainAttribute(VBox container) {
+        addChainAttribute(container, null);
+    }
+
+    private static void addRemoveButton(
+        final VBox container,
+        final VBox root,
+        VBox dynroot,
+        HBox subroot,
+        ComboBox box) {
+
+        Button remove = new Button(I18n.getMsg("gui.remove"));
+        remove.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                ObservableList<Node> items = container.getChildren();
+                items.remove(root);
+            }
+        });
+        subroot.getChildren().addAll(box, remove);
+        subroot.setMargin(box, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_20));
+        subroot.setMargin(remove, new Insets(MARGIN_5,
+            MARGIN_5, MARGIN_5, MARGIN_5));
+        Separator sep = new Separator();
+        root.getChildren().addAll(subroot, dynroot, sep);
+        root.setId("process_parameter");
     }
 
     /**
      * Add new post process chain item.
      *
-     * @param dataBean The databean
      * @param container The container
      * @param onChange A function called if the ComboBox value changed
      */
-    public void addChainAttribute(DataBean dataBean, VBox container,
-            Runnable onChange) {
+    public void addChainAttribute(VBox container, Runnable onChange) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();
@@ -248,22 +266,7 @@ public class UIFactory {
                 }
             }
         });
-        Button remove = new Button(I18n.getMsg("gui.remove"));
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                ObservableList<Node> items = container.getChildren();
-                items.remove(root);
-            }
-        });
-        subroot.getChildren().addAll(box, remove);
-        subroot.setMargin(box, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_20));
-        subroot.setMargin(remove, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
-        Separator sep = new Separator();
-        root.getChildren().addAll(subroot, dynroot, sep);
-        root.setId("process_parameter");
-
+        addRemoveButton(container, root, dynroot, subroot, box);
         container.getChildren().add(root);
     }
 
@@ -271,18 +274,16 @@ public class UIFactory {
      * Add new post process chain item with pre-selected process name
      * and parameters.
      *
-     * @param dataBean The databean
      * @param container The container
      * @param processName The process' name
      * @param params The parameters
      */
-    public void addChainAttribute(DataBean dataBean, VBox container,
-            String processName, HashMap<String, String> params) {
+    public void addChainAttribute(VBox container,
+            String processName, Map<String, String> params) {
         VBox root = new VBox();
         VBox dynroot = new VBox();
         HBox subroot = new HBox();
-        ComboBox<ProcessingStepConfiguration> box =
-                new ComboBox<ProcessingStepConfiguration>();
+        ComboBox<ProcessingStepConfiguration> box = new ComboBox<>();
         ProcessingConfiguration config =
             Config.getInstance().getProcessingConfig();
         List<ProcessingStepConfiguration> steps = config.getProcessingSteps();
@@ -298,21 +299,7 @@ public class UIFactory {
                     config);
             }
         });
-        Button remove = new Button(I18n.getMsg("gui.remove"));
-        remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                ObservableList<Node> items = container.getChildren();
-                items.remove(root);
-            }
-        });
-        subroot.getChildren().addAll(box, remove);
-        subroot.setMargin(box, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_20));
-        subroot.setMargin(remove, new Insets(MARGIN_5,
-            MARGIN_5, MARGIN_5, MARGIN_5));
-        Separator sep = new Separator();
-        root.getChildren().addAll(subroot, dynroot, sep);
-        root.setId("process_parameter");
+        addRemoveButton(container, root, dynroot, subroot, box);
 
         for (ProcessingStepConfiguration cfg : box.getItems()) {
             if (cfg.getName().equals(processName)) {
@@ -341,10 +328,9 @@ public class UIFactory {
 
     /**
      * removes all Processing attributes.
-     * @param dataBean the databean
      * @param container the container they should be removed from
      */
-    public void removeAllChainAttributes(DataBean dataBean, VBox container) {
+    public void removeAllChainAttributes(VBox container) {
         Collection<Node> nodeColl = new ArrayList<>();
         for (Node node : container.getChildren()) {
             if (node.getId().equals("process_parameter")) {

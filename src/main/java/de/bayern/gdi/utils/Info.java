@@ -45,8 +45,10 @@ import java.util.logging.Logger;
 public class Info {
 
     private static Info instance;
-    private static String version;
-    private static String name;
+
+    private String version;
+    private String name;
+
     private static final String MAVEN_PACKAGE = "de.bayern.gdi";
     private static final String MAVEN_ARTIFACT = "downloadclient";
     private static final String COMMENT = "Geodateninfrastruktur Bayern";
@@ -77,7 +79,7 @@ public class Info {
         if (instance == null) {
             instance = new Info();
         }
-        return version;
+        return instance.version;
     }
 
     /**
@@ -88,7 +90,7 @@ public class Info {
         if (instance == null) {
             instance = new Info();
         }
-        return name;
+        return instance.name;
     }
 
     /**
@@ -175,30 +177,26 @@ public class Info {
     private String parseXPathInPom(String xPath) throws URISyntaxException,
     IOException {
         Path pom = getPomPath();
-        if (pom != null) {
-            InputStream is = Files.newInputStream(pom);
-            try {
-                Document doc = DocumentBuilderFactory.newInstance()
-                        .newDocumentBuilder().parse(is);
-                doc.getDocumentElement().normalize();
-                String v = (String) XPathFactory.newInstance()
-                        .newXPath().compile(xPath)
-                        .evaluate(doc, XPathConstants.STRING);
-                if (v != null) {
-                    v = v.trim();
-                    if (!v.isEmpty()) {
-                        return v;
-                    }
-                }
-            } catch (ParserConfigurationException
-                    | XPathExpressionException
-                    | SAXException e) {
-                log.log(Level.SEVERE,
-                        "Parsing of " + xPath + " in Pom failed: "
-                                + e.getMessage(), e);
-            }
+        if (pom == null) {
+            return "";
         }
-        return "";
+        try (InputStream is = Files.newInputStream(pom)) {
+            Document doc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder().parse(is);
+            doc.getDocumentElement().normalize();
+            String v = (String) XPathFactory.newInstance()
+                    .newXPath().compile(xPath)
+                    .evaluate(doc, XPathConstants.STRING);
+
+            return v != null ? v.trim() : "";
+        } catch (ParserConfigurationException
+                | XPathExpressionException
+                | SAXException e) {
+            log.log(Level.SEVERE,
+                    "Parsing of " + xPath + " in Pom failed: "
+                            + e.getMessage(), e);
+            return "";
+        }
     }
 
     private String getTagFromProperties(String tag) {

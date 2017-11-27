@@ -33,5 +33,44 @@ public enum ServiceType {
     /**
      * Atom Webservice.
      */
-    Atom
+    Atom;
+
+    private static final String ATOM = "atom";
+    private static final String WFSONE = "wfs 1";
+    private static final String WFSTWO = "wfs 2";
+
+    /**
+     * Checks if two service types are equal or both null.
+     * @param a The first service type.
+     * @param b The second service type.
+     * @return true if both service type are equal or both null.
+     */
+    public static boolean nullOrEquals(ServiceType a, ServiceType b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
+    }
+
+    /**
+     * guesses the service Type based on String.
+     * @param typeString the string
+     * @return service Type
+     */
+    public static ServiceType guess(String typeString) {
+        typeString = typeString.toLowerCase();
+        if (typeString.contains(ATOM)) {
+            return ServiceType.Atom;
+        }
+        if (typeString.contains(WFSONE)) {
+            return ServiceType.WFSOne;
+        }
+        if (typeString.contains(WFSTWO)) {
+            return ServiceType.WFSTwo;
+        }
+        return null;
+    }
 }

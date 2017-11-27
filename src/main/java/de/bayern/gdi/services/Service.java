@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.http.HttpStatus;
+import de.bayern.gdi.utils.StringUtils;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -34,9 +35,6 @@ public class Service extends Object {
     private static final String GET_CAP_EXPR = "getcapabilities";
     private static final String URL_TRY_APPENDIX =
             "?service=wfs&acceptversions=2.0.0&request=GetCapabilities";
-    private static final String ATOM = "atom";
-    private static final String WFSONE = "wfs 1";
-    private static final String WFSTWO = "wfs 2";
 
     private URL serviceURL;
     private ServiceType serviceType;
@@ -193,19 +191,17 @@ public class Service extends Object {
                 //Checking for validity before?!
                 if (this.serviceType == null) {
                     checkServiceType();
-                    if (this.serviceType == null) {
-                        if (!checkURLOptionsAndSetType()) {
-                            return;
-                        }
+                    if (this.serviceType == null
+                    && !checkURLOptionsAndSetType()) {
+                        return;
                     }
                 }
             } else if (headStatus == HttpStatus.SC_UNAUTHORIZED) {
                 this.restricted = true;
                 checkServiceType();
-                if (serviceType == null) {
-                    if (!checkURLOptionsAndSetType()) {
-                        return;
-                    }
+                if (serviceType == null
+                && !checkURLOptionsAndSetType()) {
+                    return;
                 }
             } else {
                 return;
@@ -219,20 +215,20 @@ public class Service extends Object {
     private boolean checkURLOptionsAndSetType() {
         try {
             URL newURL = guessURL(this.serviceURL);
-            if (!newURL.equals(this.serviceURL)) {
-                if (ServiceChecker.isReachable(newURL)) {
-                    ServiceType st;
-                    if (ServiceChecker.isRestricted(newURL)) {
-                        st = ServiceChecker.checkService(newURL, this
-                                .username, this.password);
-                    } else {
-                        st = ServiceChecker.checkService(newURL);
-                    }
-                    if (st != null) {
-                        this.serviceURL = newURL;
-                        this.serviceType = st;
-                        return true;
-                    }
+            if (!newURL.equals(this.serviceURL)
+            && ServiceChecker.isReachable(newURL)) {
+
+                ServiceType st;
+                if (ServiceChecker.isRestricted(newURL)) {
+                    st = ServiceChecker.checkService(newURL, this
+                            .username, this.password);
+                } else {
+                    st = ServiceChecker.checkService(newURL);
+                }
+                if (st != null) {
+                    this.serviceURL = newURL;
+                    this.serviceType = st;
+                    return true;
                 }
             }
         } catch (Exception e) {
@@ -244,26 +240,25 @@ public class Service extends Object {
     private static URL guessURL(URL url) throws MalformedURLException {
         String urlStr = url.toString();
         if (urlStr.toLowerCase().contains(WFS_URL_EXPR)
-                && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
+        && urlStr.toLowerCase().contains(GET_CAP_EXPR)) {
             return url;
-        } else {
-            if (urlStr.endsWith("?")) {
-                urlStr = urlStr.substring(0, urlStr.lastIndexOf("?"));
-            }
-            return new URL(urlStr + URL_TRY_APPENDIX);
         }
+        if (urlStr.endsWith("?")) {
+            urlStr = urlStr.substring(0, urlStr.lastIndexOf('?'));
+        }
+        return new URL(urlStr + URL_TRY_APPENDIX);
     }
 
     private void checkServiceType() {
         if (this.isRestricted()) {
-            if (this.username != null && this.password != null) {
-                if (!this.username.isEmpty()
-                        && !this.password.isEmpty()) {
-                    this.serviceType = ServiceChecker.checkService(
-                            this.serviceURL,
-                            this.username,
-                            this.password);
-                }
+            if (this.username != null
+            && this.password != null
+            && !this.username.isEmpty()
+            && !this.password.isEmpty()) {
+                this.serviceType = ServiceChecker.checkService(
+                    this.serviceURL,
+                    this.username,
+                    this.password);
             }
         } else {
             this.serviceType = ServiceChecker.checkService(this.serviceURL,
@@ -297,7 +292,24 @@ public class Service extends Object {
         return code;
     }
 
-    private static boolean equals(Object a, Object b) {
+    /**
+     * checks if given object is equal.
+     * @param s given object
+     * @return true if equal; false if not
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Service)) {
+            return false;
+        }
+        Service s = (Service)o;
+        return StringUtils.nullOrEquals(this.name, s.name)
+            && nullOrEquals(this.serviceURL, s.serviceURL)
+            && StringUtils.nullOrEquals(this.username, s.username)
+            && ServiceType.nullOrEquals(this.serviceType, s.serviceType);
+    }
+
+    private static boolean nullOrEquals(URL a, URL b) {
         if (a == null && b == null) {
             return true;
         }
@@ -308,44 +320,10 @@ public class Service extends Object {
     }
 
     /**
-     * checks if given object is equal.
-     * @param s given object
-     * @return true if equal; false if not
-     */
-    @Override
-    public boolean equals(Object o) {
-        Service s = (Service)o;
-        return s != null
-            && equals(this.name, s.name)
-            && equals(this.serviceURL, s.serviceURL)
-            && equals(this.username, s.username)
-            && equals(this.serviceType, s.serviceType);
-    }
-
-    /**
      * checks if the object is loded.
      * @return true if loaded; false if not
      */
     public boolean isLoaded() {
         return this.loaded;
-    }
-
-    /**
-     * guesses the service Type based on String.
-     * @param typeString the string
-     * @return service Type
-     */
-    public static ServiceType guessServiceType(String typeString) {
-        typeString = typeString.toLowerCase();
-        if (typeString.contains(ATOM)) {
-            return ServiceType.Atom;
-        }
-        if (typeString.contains(WFSONE)) {
-            return ServiceType.WFSOne;
-        }
-        if (typeString.contains(WFSTWO)) {
-            return ServiceType.WFSTwo;
-        }
-        return null;
     }
 }

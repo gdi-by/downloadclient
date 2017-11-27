@@ -46,7 +46,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     /** Number to re-tries for a failed download. */
     protected static final int MAX_TRIES = 5;
     /** Pause after failed downloads. */
-    protected static final long FAIL_SLEEP = 30 * 1000;
+    protected static final long FAIL_SLEEP = 30L * 1000L;
 
     /** Stores a file location to down from and to. */
     protected static class DLFile {
@@ -194,12 +194,13 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             try {
                 Thread.sleep(FAIL_SLEEP);
             } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
                 break;
             }
         }
 
-        // TODO: i18n
-        String msg = "Bytes downloaded: " + this.totalCount;
+        String msg =
+            I18n.format("atom.bytes.downloaded.total", this.totalCount);
         log(msg);
         log.log(Level.INFO, msg);
 

@@ -24,10 +24,13 @@ import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
 
 /**
- * A Class containg various cell types for combo boxes.
+ * A Class containing various cell types for combo boxes.
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
-public class CellTypes {
+public final class CellTypes {
+
+    private CellTypes() {
+    }
 
    /**
     * Cell class, changing its font color and weight
@@ -91,7 +94,7 @@ public class CellTypes {
                 setStyle("-fx-font-weight: normal;");
 
             }
-            setText(item == null ? "" : item.getItem());
+            setText(item.getItem());
         }
     }
 
@@ -118,7 +121,7 @@ public class CellTypes {
                 setStyle("-fx-font-weight: normal;");
             }
 
-            setText(item == null ? "" : item.toString());
+            setText(item.toString());
         }
     }
 }

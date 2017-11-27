@@ -36,15 +36,27 @@ public class WFSMeta {
     /** operation. */
     public static class Operation {
         /** name. */
-        public String name;
+        protected String name;
         /** get. */
-        public String get;
+        protected String get;
         /** post. */
-        public String post;
+        protected String post;
         /** output formats. */
-        public List<String> outputFormats;
+        protected List<String> outputFormats;
         /** constraints. */
-        public List<Constraint> constraints;
+        protected List<Constraint> constraints;
+
+        public String getGET() {
+            return this.get;
+        }
+
+        public String getPOST() {
+            return this.post;
+        }
+
+        public List<String> getOutputFormats() {
+            return this.outputFormats;
+        }
 
         public Operation() {
             this.outputFormats = new ArrayList<>();
@@ -84,19 +96,39 @@ public class WFSMeta {
     /** feature. */
     public static class Feature {
         /** name. */
-        public String name;
+        protected String name;
         /** title. */
-        public String title;
+        protected String title;
         /** abstract. */
-        public String abstractDescription;
+        protected String abstractDescription;
         /** default CRS. */
-        public String defaultCRS;
+        protected String defaultCRS;
         /** other CRSs. */
-        public List<String> otherCRSs;
+        protected List<String> otherCRSs;
         /** outputFormats. */
-        public List<String> outputFormats;
+        protected List<String> outputFormats;
         /** bbox. */
-        public ReferencedEnvelope bbox;
+        protected ReferencedEnvelope bbox;
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getDefaultCRS() {
+            return this.defaultCRS;
+        }
+
+        public List<String> getOtherCRSs() {
+            return this.otherCRSs;
+        }
+
+        public ReferencedEnvelope getBBox() {
+            return this.bbox;
+        }
 
         public Feature() {
             this.otherCRSs = new ArrayList<>();
@@ -127,16 +159,32 @@ public class WFSMeta {
     /** stored Query. */
     public static class StoredQuery {
         /** id. */
-        public String id;
+        protected String id;
         /** title. */
-        public String title;
+        protected String title;
         /** abstract. */
-        public String abstractDescription;
+        protected String abstractDescription;
         /** parameters. */
-        public ArrayList<Field> parameters;
+        protected List<Field> parameters;
 
         public StoredQuery() {
             parameters = new ArrayList<>();
+        }
+
+        public String getID() {
+            return this.id;
+        }
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getAbstractDescription() {
+            return this.abstractDescription;
+        }
+
+        public List<Field> getParameters() {
+            return this.parameters;
         }
 
         private String parameters() {
@@ -156,11 +204,11 @@ public class WFSMeta {
     /** Constraint. */
     public static class Constraint {
         /** name. */
-        public String name;
+        protected String name;
         /** value. */
-        public String value;
+        protected String value;
         /** allowed. */
-        public List<String> allowed;
+        protected List<String> allowed;
 
         public Constraint() {
             allowed = new ArrayList<>();
@@ -178,9 +226,9 @@ public class WFSMeta {
     /** Version. */
     public static class Version implements Comparable<Version> {
         /** version. */
-        public String version;
+        protected String version;
         /** parsed. */
-        public int[] parsed;
+        protected int[] parsed;
 
         /** Version. */
         public Version() {
@@ -237,25 +285,49 @@ public class WFSMeta {
     public static final Version WFS2_0_0 = new Version("2.0.0");
 
     /** title. */
-    public String title;
+    protected String title;
     /** URL. */
-    public String url;
+    protected String url;
     /** abstract. */
-    public String abstractDescription;
+    protected String abstractDescription;
     /** operations. */
-    public List<Operation> operations;
+    protected List<Operation> operations;
     /** constraints. */
-    public List<Constraint> constraints;
+    protected List<Constraint> constraints;
     /** features. */
-    public List<Feature> features;
+    protected List<Feature> features;
     /** stored queries. */
-    public List<StoredQuery> storedQueries;
+    protected List<StoredQuery> storedQueries;
     /** output formats. */
-    public List<String> outputFormats;
+    protected List<String> outputFormats;
     /** versions. */
-    public List<Version> versions;
+    protected List<Version> versions;
     /** namespaces. */
-    public NamespaceContextMap namespaces;
+    protected NamespaceContextMap namespaces;
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getURL() {
+        return this.url;
+    }
+
+    public List<Feature> getFeatures() {
+        return this.features;
+    }
+
+    public List<StoredQuery> getStoredQueries() {
+        return this.storedQueries;
+    }
+
+    public List<String> getOutputFormats() {
+        return this.outputFormats;
+    }
+
+    public NamespaceContextMap getNamespaces() {
+        return this.namespaces;
+    }
 
     public WFSMeta() {
         operations = new ArrayList<>();
@@ -296,7 +368,7 @@ public class WFSMeta {
      * @return The highest version.
      */
     public Version highestVersion(Version def) {
-        return versions.size() > 0
+        return !versions.isEmpty()
             ? versions.get(versions.size() - 1)
             : def;
     }

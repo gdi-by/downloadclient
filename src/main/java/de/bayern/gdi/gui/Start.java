@@ -39,10 +39,16 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Start extends Application {
+
+    private static final Logger log
+        = Logger.getLogger(Start.class.getName());
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
@@ -59,7 +65,8 @@ public class Start extends Application {
         try {
             LATCH.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
         return start;
     }
@@ -125,11 +132,5 @@ public class Start extends Application {
                 System.out.println(element.toString());
             }
         }
-
-        // session scope /application scope Beans initialisieren!
-        // muss von Controller zu Controller weitergegeben werden
-        // Ersten Controller aufrufen
-//        Controller c = new Controller(dataBean);
-//        c.show();
     }
 }

@@ -43,12 +43,12 @@ public class AtomFieldModel implements ItemModel {
     }
 
     public String getDataset() {
-        return item.name;
+        return item.getName();
     }
 
     @Override
     public String toString() {
-        return this.item.description;
+        return this.item.getDescription();
     }
 
 }

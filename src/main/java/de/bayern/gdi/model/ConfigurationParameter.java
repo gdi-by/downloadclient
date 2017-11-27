@@ -166,7 +166,7 @@ public class ConfigurationParameter {
         while (matcher.find()) {
             String name = matcher.group(1);
             String val = vars.get(name);
-            if (value != null) {
+            if (val != null) {
                 matcher.appendReplacement(sb, val);
             } else {
                 matcher.appendReplacement(sb, name);

@@ -68,6 +68,7 @@ public class Config {
                     Holder.INSTANCE.wait(FIVEHUNDRED);
                 }
             } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
             }
             return Holder.INSTANCE;
         }
@@ -164,7 +165,7 @@ public class Config {
     }
 
     private static void load(String dirname) throws IOException {
-        log.info("config directory: " + dirname);
+        log.info(() -> "config directory: " + dirname);
 
         File dir = new File(dirname);
 

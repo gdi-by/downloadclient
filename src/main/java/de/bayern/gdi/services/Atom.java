@@ -38,20 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -72,10 +63,9 @@ public class Atom {
     private Document mainDoc;
     private static final Logger log
             = Logger.getLogger(CatalogService.class.getName());
-    private ArrayList<Item> items;
+    private List<Item> items;
     private NamespaceContext nscontext;
     private static final String ATTRIBUTENAME = "VARIATION";
-    private static final String EPSG = "EPSG";
     private static final int ZERO = 0;
     private static final int ONE = 1;
     private static final int TWO = 2;
@@ -93,25 +83,50 @@ public class Atom {
         /**
          * name.
          */
-        public String name;
+        private String name;
         /**
          * type.
          */
-        public String type;
+        private String type;
         /**
          * description.
          */
-        public String description;
+        private String description;
         /**
          * crs.
          */
-        public String crs;
+        private String crs;
         /**
          * format.
          */
-        public String format;
+        private String format;
 
         public Field() {
+        }
+
+        public String getCRS() {
+            return this.crs;
+        }
+
+        public Field(String format, String crs) {
+            this.format = format;
+            this.crs = crs;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getType() {
+            return this.type;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+
+        public String getFormat() {
+            return this.format;
         }
 
         /**
@@ -136,60 +151,80 @@ public class Atom {
     }
 
     /** feature. */
-    public static class Item {
+    public static final class Item {
         /**
          * title.
          */
-        public String title;
+        private String title;
         /**
          * id.
          */
-        public String id;
+        private String id;
         /**
          * default description.
          */
-        public String description;
+        private String description;
         /**
          * default CRS.
          */
-        public String defaultCRS;
+        private String defaultCRS;
         /**
          * other CRSs.
          */
-        public List<String> otherCRSs;
+        private List<String> otherCRSs;
         /**
          * fields.
          */
-        public List<Field> fields;
+        private List<Field> fields;
 
         /**
          * describedBy.
          */
-        public String describedBy;
+        private String describedBy;
 
         /**
          * bounding Polygon.
          */
-        public Polygon polygon;
+        private Polygon polygon;
 
         /**
          * mimetype.
          */
-        public String format;
+        private String format;
 
         /**
          * username.
          */
-        public String username;
+        private String username;
 
         /**
          * password.
          */
-        public String password;
+        private String password;
 
         private NamespaceContext context;
 
         private URL baseURL;
+
+        public String getTitle() {
+            return this.title;
+        }
+
+        public String getID() {
+            return this.id;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+
+        public List<Field> getFields() {
+            return this.fields;
+        }
+
+        public Polygon getPolygon() {
+            return this.polygon;
+        }
 
         public Item(URL url) {
             this.baseURL = url;
@@ -203,23 +238,30 @@ public class Atom {
                     "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0");
         }
 
+        public Item(URL url, String description) {
+            this(url);
+            this.description = description;
+        }
+
         @Override
         public String toString() {
-            String str = "title: " + title + "\n";
-            str += "id: " + id + "\n";
-            str += "description: " + description + "\n";
-            str += "described by: " + describedBy + "\n";
-            str += "format: " + format + "\n";
-            str += "CRS: " + defaultCRS + "\n";
-            str += "Other CRS:\n";
+            StringBuilder sb = new StringBuilder()
+                .append("title: ").append(title).append('\n')
+                .append("id: ").append(id).append('\n')
+                .append("description: ").append(description).append('\n')
+                .append("descrined by: ").append(describedBy).append('\n')
+                .append("format: ").append(format).append('\n')
+                .append("CRS: ").append(defaultCRS).append('\n')
+                .append("Other CRS:\n");
             for (String crs: otherCRSs) {
-                str += "\t" + crs;
+                sb.append('\t').append(crs);
             }
-            str += "Other Fields:\n";
+            sb.append("Other Fields:\n");
             for (Field f: fields) {
-                str += "\t" + f.name + ": " + f.type + "\n";
+                sb.append('\t')
+                  .append(f.name).append(": ").append(f.type).append('\n');
             }
-            return str;
+            return sb.toString();
         }
 
         /**
@@ -242,7 +284,7 @@ public class Atom {
                 entryDoc = XML.getDocument(this.describedBy);
             }
             format = getFormat(entryDoc, entryDocUrl);
-            fields = getFieldForEntry(entryDoc, entryDocUrl);
+            fields = getFieldForEntry(entryDoc);
         }
 
         private String getFormat(Document entryDoc,
@@ -263,7 +305,7 @@ public class Atom {
                     URL targetURL = HTTP.buildAbsoluteURL(
                             entryDocUrl, targetURLStr);
                     itemformat = targetURL.getFile().substring(
-                            targetURL.getFile().lastIndexOf(".") + 1,
+                            targetURL.getFile().lastIndexOf('.') + 1,
                             targetURL.getFile().length());
                 } catch (URISyntaxException | MalformedURLException e) {
                     log.log(Level.SEVERE, e.getMessage(), e);
@@ -272,25 +314,7 @@ public class Atom {
             return itemformat;
         }
 
-        private static String getMimeType(URL url, String userName,
-                                           String password) {
-            CloseableHttpClient httpCl =
-                    HTTP.getClient(url, userName, password);
-            try {
-                HttpHead getRequest = HTTP.getHeadRequest(url);
-                CloseableHttpResponse execute = httpCl.execute(getRequest);
-                Header firstHeader =
-                        execute.getFirstHeader("Content-Type");
-                return firstHeader.getValue();
-            } catch (URISyntaxException
-                    | IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
-            }
-            return "";
-        }
-
-        private ArrayList<Field> getFieldForEntry(Document entryDoc,
-                                                  URL entryDocUrl) {
+        private ArrayList<Field> getFieldForEntry(Document entryDoc) {
             ArrayList<Field> attrFields = new ArrayList<>();
             //Predefined in ATOM Service
             String getCategories = "//entry";
@@ -313,31 +337,30 @@ public class Atom {
                         XPathConstants.STRING,
                         this.context);
                 if (type.isEmpty()) {
-                    type = entryId.substring(entryId.lastIndexOf(".") + 1,
+                    type = entryId.substring(entryId.lastIndexOf('.') + 1,
                             entryId.length());
                 }
                 String crs = (String) XML.xpath(entryNode,
                         "category/@label",
                         XPathConstants.STRING,
                         this.context);
-                if (crs.isEmpty()) {
-                    if (entryDescription.contains("EPSG:")) {
-                        String temp = entryDescription.substring(
-                                entryDescription.lastIndexOf("EPSG:"),
-                                entryDescription.length());
-                        String epsgNum = new String();
-                        for (int j = "EPSG:".length();
-                            j < temp.length() - 1;
-                            j++) {
-                            String isNum = temp.substring(j, j + 1);
-                            if (Misc.isInteger(isNum)) {
-                                epsgNum += isNum;
-                            } else {
-                                break;
-                            }
+                if (crs.isEmpty() && entryDescription.contains("EPSG:")) {
+
+                    String temp = entryDescription.substring(
+                        entryDescription.lastIndexOf("EPSG:"),
+                        entryDescription.length());
+
+                    StringBuilder epsgNum = new StringBuilder("EPSG:");
+                    for (int j = "EPSG:".length();
+                        j < temp.length() - 1;
+                        j++) {
+                        String isNum = temp.substring(j, j + 1);
+                        if (!Misc.isInteger(isNum)) {
+                            break;
                         }
-                        crs = "EPSG:" + epsgNum;
+                        epsgNum.append(isNum);
                     }
+                    crs = epsgNum.toString();
                 }
                 Field field = new Field(ATTRIBUTENAME,
                         entryId,
@@ -355,12 +378,11 @@ public class Atom {
      * @inheritDoc
      * @param serviceURL the url of the service
      * @throws URISyntaxException if the url is wrong
-     * @throws SAXException if the xml is wrong
      * @throws ParserConfigurationException if the config is wrong
      * @throws IOException if something in io is wrong
      */
     public Atom(String serviceURL)
-            throws URISyntaxException, SAXException,
+            throws URISyntaxException,
             ParserConfigurationException, IOException {
         this(serviceURL, null, null);
     }
@@ -368,8 +390,7 @@ public class Atom {
     private static Document getDocument(URL url,
                                         String username,
                                         String password)
-            throws SAXException, ParserConfigurationException, IOException,
-                URISyntaxException {
+            throws IOException, URISyntaxException {
         Document doc = null;
         if (ServiceChecker.simpleRestricted(url)) {
             if (username == null && password == null) {
@@ -395,14 +416,12 @@ public class Atom {
      * @param userName username
      * @param password password
      * @throws URISyntaxException if the url is wrong
-     * @throws SAXException if the xml is wrong
      * @throws ParserConfigurationException if the config is wrong
      * @throws IOException if something in io is wrong
      */
     public Atom(String serviceURL, String userName, String password)
             throws URISyntaxException,
-            ParserConfigurationException, IOException,
-            IllegalArgumentException, SAXException {
+            ParserConfigurationException, IOException {
         this.serviceURL = serviceURL;
         this.username = userName;
         this.password = password;
@@ -412,7 +431,6 @@ public class Atom {
         } catch (MalformedURLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
-        //System.out.println(this.serviceURL);
         this.nscontext = new NamespaceContextMap(
                 null, "http://www.w3.org/2005/Atom",
                 "georss", "http://www.georss.org/georss",
@@ -566,49 +584,6 @@ public class Atom {
         }
     }
 
-    private static final Pattern CRS_RE
-        = Pattern.compile("(/([^/]+)/([^/]+)/([^/]+)$)"
-            + "|(EPSG:[0-9]*)");
-
-    private static final Pattern CRS_CODE
-            = Pattern.compile("[0-9]{2,}");
-
-    // XXX: This should be coded more defensively!
-    private static CoordinateReferenceSystem decodeCRS(String term)
-    throws FactoryException {
-        Matcher m = CRS_RE.matcher(term);
-        if (m.find()) {
-            String authority = null;
-            String code = null;
-            if (m.group(TWO) != null && m.group(TWO).equals("EPSG")) {
-                authority = m.group(TWO);
-                Matcher c = CRS_CODE.matcher(m.group(THREE));
-                if (c.find()) {
-                    code = m.group(THREE);
-                } else {
-                    code = m.group(FOUR);
-                }
-            } else {
-                if (m.group(ONE) != null) {
-                    authority = m.group(ONE);
-                    Matcher c = CRS_CODE.matcher(m.group(THREE));
-                    if (c.find()) {
-                        code = m.group(THREE);
-                    } else {
-                        code = m.group(TWO);
-                    }
-                } else {
-                    authority = m.group(ZERO).substring(0,
-                            m.group(ZERO).lastIndexOf(":"));
-                    code = m.group(ZERO).substring(authority.length() + 1,
-                            m.group(ZERO).length());
-                }
-            }
-            return CRS.decode(authority + ":" + code);
-        }
-        throw new FactoryException("Cannot parse '" + term + "'");
-    }
-
     private static String convertPolygonToWKT(String text) {
         String[] sep = text.split(" ");
         String[] seperators = new String[TWO];
@@ -674,7 +649,7 @@ public class Atom {
      * Items of the services.
      * @return the Items of the service
      */
-    public ArrayList<Item> getItems() {
+    public List<Item> getItems() {
         return this.items;
     }
 

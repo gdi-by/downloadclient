@@ -20,9 +20,11 @@ package de.bayern.gdi.processor;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.w3c.dom.Document;
@@ -112,9 +115,8 @@ public class DownloadStepConverter {
 
         File dlLog = Misc.uniqueFile(path, "download-", "log", null);
         if (dlLog == null) {
-            // TODO: i18n
             throw new ConverterException(
-                "Cannot create unique download filename");
+                I18n.getMsg("dls.converter.no.unique.filename"));
         }
 
         this.logger = new Log(dlLog);
@@ -126,9 +128,8 @@ public class DownloadStepConverter {
 
         FileTracker fileTracker = new FileTracker(path);
         if (!fileTracker.scan()) {
-            // TODO: i18n
             throw new ConverterException(
-                "Inital scan of download file failed.");
+                I18n.getMsg("dls.converter.init.scan.failed"));
         }
 
         psc.convert(dls, fileTracker, logger);
@@ -163,8 +164,8 @@ public class DownloadStepConverter {
     }
 
     private static String encodeParameters(
-        ArrayList<Parameter> parameters,
-        Set<String>          usedVars
+        List<Parameter> parameters,
+        Set<String>     usedVars
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
@@ -214,12 +215,11 @@ public class DownloadStepConverter {
         DownloadStep dls,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) throws ConverterException {
-
+    ) {
         String url = dls.getServiceURL();
         String base = baseURL(url);
         String vendor = vendorSpecific(url);
-        String getFeaturesURL = meta.findOperation("GetFeature").get;
+        String getFeaturesURL = meta.findOperation("GetFeature").getGET();
         if (getFeaturesURL.startsWith("/")) {
             base += getFeaturesURL;
         } else {
@@ -252,7 +252,7 @@ public class DownloadStepConverter {
         int idx = dataset.indexOf(':');
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
-            String ns = meta.namespaces.getNamespaceURI(prefix);
+            String ns = meta.getNamespaces().getNamespaceURI(prefix);
             sb.append("&namespaces=xmlns(")
                 .append(StringUtils.urlEncode(prefix)).append(',')
                 .append(StringUtils.urlEncode(ns)).append(')');
@@ -303,10 +303,6 @@ public class DownloadStepConverter {
         int          count,
         boolean      wfs2) {
 
-        String url = dls.getServiceURL();
-        String base = baseURL(url);
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-
         String version = meta.highestVersion(WFSMeta.WFS2_0_0).toString();
         String dataset = dls.getDataset();
         String queryType = findQueryType(dls.getServiceType());
@@ -317,7 +313,7 @@ public class DownloadStepConverter {
         String storedQueryId = "";
         String bbox = "";
 
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params = new ArrayList<>();
 
         boolean storedQuery = false;
         if (queryType.equals("STOREDQUERY_ID")) {
@@ -331,11 +327,11 @@ public class DownloadStepConverter {
         int idx = dataset.indexOf(':');
         if (idx >= 0) {
             String prefix = dataset.substring(0, idx);
-            String ns = meta.namespaces.getNamespaceURI(prefix);
+            String ns = meta.getNamespaces().getNamespaceURI(prefix);
             namespaces = ns;
         }
 
-        if (dls.getParameters().size() > 0) {
+        if (!dls.getParameters().isEmpty()) {
             for (Parameter p: dls.getParameters()) {
                 if (p.getValue().isEmpty()
                 || usedVars.contains(p.getKey())) {
@@ -413,8 +409,7 @@ public class DownloadStepConverter {
                         + "</gml:Envelope> </fes:BBOX> </fes:Filter>";
             }
         }
-        xmlString = xmlStart + xmlEnd;
-        return xmlString;
+        return xmlStart + xmlEnd;
     }
 
     private void unpagedWFSDownload(
@@ -422,25 +417,26 @@ public class DownloadStepConverter {
         File         workingDir,
         Set<String>  usedVars,
         WFSMeta      meta
-    ) throws ConverterException {
-
+    ) {
         boolean usePost = false;
         WFSMeta.Operation getFeature = meta.findOperation("GetFeature");
-        if (getFeature.post != null) {
+        if (getFeature.getPOST() != null) {
             usePost = true;
         }
 
-        String url = usePost ? getFeature.post : wfsURL(dls, usedVars, meta);
+        String url = usePost
+            ? getFeature.getPOST()
+            : wfsURL(dls, usedVars, meta);
         String params = null;
         if (usePost) {
             params = createWFSPostParams(dls, usedVars, meta);
         }
-        log.log(Level.INFO, "url: " + url);
+        log.log(Level.INFO, () -> "url: " + url);
 
         String ext = extension();
 
         File gml = new File(workingDir, "download." + ext);
-        log.info("Download to file \"" + gml + "\"");
+        log.info(() -> "Download to file \"" + gml + "\"");
 
         FileDownloadJob fdj = null;
         if (usePost) {
@@ -533,12 +529,18 @@ public class DownloadStepConverter {
         Document hitsDoc = null;
         try {
             hitsDoc = XML.getDocument(url, user, password, ent);
+        } catch (SocketTimeoutException | ConnectTimeoutException te) {
+            throw new ConverterException(
+                I18n.format(
+                    "file.download.failed_reason",
+                    I18n.getMsg("file.download.failed.timeout")),
+                te);
         } catch (URISyntaxException | IOException e) {
             throw new ConverterException(e.getMessage());
         }
         if (hitsDoc == null) {
-            // TODO: I18n
-            throw new ConverterException("cannot load hits document");
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.no.hits.doc"));
         }
 
         checkServiceException(hitsDoc);
@@ -548,14 +550,13 @@ public class DownloadStepConverter {
             WFSMetaExtractor.NAMESPACES);
 
         if (numberMatchedString == null || numberMatchedString.isEmpty()) {
-            // TODO: I18n
-            throw new ConverterException("numberMatched not found");
+            throw new ConverterException(
+                I18n.getMsg("file.download.no.number"));
         }
         try {
             return Integer.parseInt(numberMatchedString);
         } catch (NumberFormatException nfe) {
-            // TODO: I18n
-            throw new ConverterException(nfe.getMessage(), nfe);
+            throw new ConverterException(nfe.getLocalizedMessage(), nfe);
         }
     }
 
@@ -565,20 +566,6 @@ public class DownloadStepConverter {
             .append("&startIndex=").append(ofs)
             .append(wfs2 ? "&count=" : "&maxFeatures=").append(count);
         return newURL(sb.toString());
-    }
-
-    private ArrayList<BasicNameValuePair> pagedFeaturePostParams(
-            int ofs, int count, boolean wfs2) {
-        ArrayList<BasicNameValuePair> params =
-                new ArrayList<BasicNameValuePair>();
-        params.add(new BasicNameValuePair("startIndex", String.valueOf(ofs)));
-        if (wfs2) {
-            params.add(new BasicNameValuePair("count", String.valueOf(count)));
-        } else {
-            params.add(new BasicNameValuePair("maxFeatures",
-                    String.valueOf(count)));
-        }
-        return params;
     }
 
     private String extension() {
@@ -609,14 +596,14 @@ public class DownloadStepConverter {
         try {
             meta = extractor.parse();
         } catch (URISyntaxException | IOException ioe) {
-            // TODO: I18n
-            throw new ConverterException("Cannot load meta data", ioe);
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.no.meta.data"), ioe);
         }
 
         WFSMeta.Operation getFeatureOp = meta.findOperation("GetFeature");
         if (getFeatureOp == null) {
-            // TODO: I18n
-            throw new ConverterException("'GetFeature' not supported.");
+            throw new ConverterException(
+                I18n.getMsg("dls.converter.getfeature.unsupported"));
         }
 
         Integer fpp = getFeatureOp.featuresPerPage();
@@ -632,11 +619,10 @@ public class DownloadStepConverter {
         boolean usePost = false;
         String wfsURL;
         String params = null;
-        HttpEntity ent = null;
         int numFeatures;
-        if (getFeatureOp.post != null) {
+        if (getFeatureOp.getPOST() != null) {
             usePost = true;
-            wfsURL = getFeatureOp.post;
+            wfsURL = getFeatureOp.getPOST();
             params = createWFSPostParams(dls, usedVars, meta, true);
             numFeatures = numFeatures(wfsURL, params);
         } else {
@@ -648,7 +634,7 @@ public class DownloadStepConverter {
         // Page size greater than number features -> Normal download.
         if (numFeatures < fpp) {
             try {
-                ent = new StringEntity(params);
+                new StringEntity(params);
             } catch (Exception e) {
                 logger.log(e.getMessage());
             }
@@ -656,10 +642,9 @@ public class DownloadStepConverter {
             return;
         }
 
-        log.info("total number of features: " + numFeatures);
+        log.info(() -> "total number of features: " + numFeatures);
 
-        FilesDownloadJob fdj = new FilesDownloadJob(
-            this.user, this.password, this.logger);
+        FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob(logger);
 
         String ext = extension();
@@ -676,7 +661,7 @@ public class DownloadStepConverter {
         for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
-            log.info("download to file: " + file);
+            log.info(() -> "download to file: " + file);
             if (!usePost) {
                 fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             } else {

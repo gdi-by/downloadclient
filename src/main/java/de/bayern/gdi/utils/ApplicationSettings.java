@@ -21,7 +21,6 @@ package de.bayern.gdi.utils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,9 +31,6 @@ import org.w3c.dom.NodeList;
  */
 
 public class ApplicationSettings {
-
-    private static final Logger log
-        = Logger.getLogger(ApplicationSettings.class.getName());
 
     private Map<String, String> applicationSettings;
 
@@ -55,7 +51,7 @@ public class ApplicationSettings {
             throw new IOException("Node " + nodeName + " not found");
         }
 
-        Map<String, String> elements = new HashMap<String, String>();
+        Map<String, String> elements = new HashMap<>();
 
         NodeList childs = parent.getChildNodes();
         for (int i = 0; i < childs.getLength(); i++) {

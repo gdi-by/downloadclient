@@ -138,34 +138,31 @@ public class AutoCompleteComboBoxListener<T> {
      */
     private void selectClosestResultBasedOnTextFieldValue(boolean affect,
                                                           boolean inFocus) {
-        ObservableList items =
-                AutoCompleteComboBoxListener.this.comboBox.getItems();
+        ObservableList items = this.comboBox.getItems();
+
         boolean found = false;
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i)
-                    != null
-                    && AutoCompleteComboBoxListener.
-                            this.comboBox.getEditor().getText() != null
-                    && AutoCompleteComboBoxListener
-                            .this.comboBox.getEditor().getText().
-                            toLowerCase().equals(
-                            items.get(i).toString().toLowerCase())
-                    ) {
-                try {
-                    ListView lv = ((ComboBoxListViewSkin)
-                            AutoCompleteComboBoxListener.
-                                    this.comboBox.getSkin()
-                            ).getListView();
-                    lv.getSelectionModel().clearAndSelect(i);
-                    lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
-                    found = true;
-                    break;
-                } catch (Exception ignored) { }
+        String txt = this.comboBox.getEditor().getText();
+
+        if (txt != null) {
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i) != null
+                && txt.equalsIgnoreCase(items.get(i).toString())) {
+                    try {
+                        ListView lv =
+                            ((ComboBoxListViewSkin)this.comboBox.getSkin())
+                            .getListView();
+
+                        lv.getSelectionModel().clearAndSelect(i);
+                        lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
+                        found = true;
+                        break;
+                    } catch (Exception ignored) {
+                    }
+                }
             }
         }
 
         String s = comboBox.getEditor().getText();
-        System.out.println("Found? " + found);
         if (!found && affect) {
             comboBox.getSelectionModel().clearSelection();
             comboBox.getEditor().setText(s);
@@ -182,9 +179,6 @@ public class AutoCompleteComboBoxListener<T> {
                 && comboBox.getEditor().getText() != null
                 && comboBox.getEditor().getText().trim().length() > 0) {
             // press enter key programmatically to have this entry added
-            // KeyEvent ke = new KeyEvent(comboBox, KeyCode.ENTER.toString(),
-            // KeyCode.ENTER.getName(), KeyCode.ENTER.impl_getCode(), false,
-            // false, false, false, KeyEvent.KEY_RELEASED);
             KeyEvent ke = new KeyEvent(KeyEvent.KEY_RELEASED,
                     KeyCode.ENTER.toString(),
                     KeyCode.ENTER.toString(),

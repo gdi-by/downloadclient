@@ -38,7 +38,7 @@ public class Processor implements Runnable {
     /** Add this job to shutdown the processor after
      *  finishing all previous jobs.
      */
-    public static final Job QUIT = new Job() {
+    public static final Job QUIT_JOB = new Job() {
         @Override
         public void run(Processor p) throws JobExecutionException {
         }
@@ -52,12 +52,12 @@ public class Processor implements Runnable {
     private List<ProcessorListener> listeners;
 
     public Processor() {
-        this.jobs = new ArrayDeque<Job>();
-        this.listeners = new CopyOnWriteArrayList<ProcessorListener>();
+        this.jobs = new ArrayDeque<>();
+        this.listeners = new CopyOnWriteArrayList<>();
     }
 
     public Processor(Collection<Job> jobs) {
-        this.jobs = new ArrayDeque<Job>(jobs);
+        this.jobs = new ArrayDeque<>(jobs);
     }
 
     /** Returns a singleton processor started as a separate thread.
@@ -94,7 +94,7 @@ public class Processor implements Runnable {
     /** quit the main loop og this processor. */
     public synchronized void quit() {
         this.done = true;
-        notify();
+        notifyAll();
     }
 
     /** Adds a job at the end of the queue.
@@ -102,7 +102,7 @@ public class Processor implements Runnable {
      */
     public synchronized void addJob(Job job) {
         this.jobs.add(job);
-        notify();
+        notifyAll();
     }
 
     /** Broadcasts an exception to all listeners.
@@ -135,6 +135,7 @@ public class Processor implements Runnable {
                         wait(WAIT_TIME);
                     }
                 } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
                     break;
                 }
                 if (this.done) {
@@ -142,7 +143,7 @@ public class Processor implements Runnable {
                 }
                 job = this.jobs.poll();
             }
-            if (job == QUIT) {
+            if (job == QUIT_JOB) {
                 break;
             }
             try {

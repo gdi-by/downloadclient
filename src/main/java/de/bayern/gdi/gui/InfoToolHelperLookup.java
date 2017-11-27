@@ -19,10 +19,9 @@
 package de.bayern.gdi.gui;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
+
 import org.geotools.map.Layer;
 import org.geotools.swing.tool.InfoToolHelper;
 
@@ -31,8 +30,6 @@ import org.geotools.swing.tool.InfoToolHelper;
  */
 
 class InfoToolHelperLookup {
-    private static final Logger log
-            = Logger.getLogger(InfoToolHelperLookup.class.getName());
 
     private static List<InfoToolHelper> cachedInstances;
 
@@ -66,14 +63,13 @@ class InfoToolHelperLookup {
      */
     private static void loadProviders() {
         if (cachedInstances == null) {
-            cachedInstances = new ArrayList<InfoToolHelper>();
+            cachedInstances = new ArrayList<>();
 
             ServiceLoader<InfoToolHelper> loader =
                     ServiceLoader.load(InfoToolHelper.class);
 
-            Iterator<InfoToolHelper> iter = loader.iterator();
-            while (iter.hasNext()) {
-                cachedInstances.add(iter.next());
+            for (InfoToolHelper helper: loader) {
+                cachedInstances.add(helper);
             }
         }
     }

@@ -76,10 +76,9 @@ public final class NamespaceContextMap implements
             String prefix = node.getPrefix();
             String ns = node.getNamespaceURI();
 
-            if (prefix != null && ns != null) {
-                if (!prefixMap.containsKey(prefix)) {
-                    prefixMap.put(prefix, ns);
-                }
+            if (prefix != null && ns != null
+            && !prefixMap.containsKey(prefix)) {
+                prefixMap.put(prefix, ns);
             }
 
             NodeList children = node.getChildNodes();
@@ -133,19 +132,18 @@ public final class NamespaceContextMap implements
 
     private static Map<String, String> toMap(
             String... mappingPairs) {
-        Map<String, String> prefixMappings = new HashMap<String, String>(
-                mappingPairs.length / 2);
-        for (int i = 0; i < mappingPairs.length; i++) {
+        Map<String, String> prefixMappings
+            = new HashMap<>(mappingPairs.length / 2);
+        for (int i = 0; i < mappingPairs.length; i += 2) {
             prefixMappings
-                    .put(mappingPairs[i], mappingPairs[++i]);
+                    .put(mappingPairs[i], mappingPairs[i + 1]);
         }
         return prefixMappings;
     }
 
     private Map<String, String> createPrefixMap(
             Map<String, String> prefixMappings) {
-        Map<String, String> prefMap = new HashMap<String, String>(
-                prefixMappings);
+        Map<String, String> prefMap = new HashMap<>(prefixMappings);
         addConstant(prefMap, XMLConstants.XML_NS_PREFIX,
                 XMLConstants.XML_NS_URI);
         addConstant(prefMap, XMLConstants.XMLNS_ATTRIBUTE,
@@ -164,7 +162,7 @@ public final class NamespaceContextMap implements
 
     private Map<String, Set<String>> createNamespaceMap(
         Map<String, String> prefMap) {
-        Map<String, Set<String>> namespMap = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> namespMap = new HashMap<>();
         return updateNamespaceMap(prefMap, namespMap);
     }
 
@@ -175,11 +173,8 @@ public final class NamespaceContextMap implements
         for (Map.Entry<String, String> entry : prefMap
                 .entrySet()) {
             String nsURI = entry.getValue();
-            Set<String> prefixes = namespMap.get(nsURI);
-            if (prefixes == null) {
-                prefixes = new HashSet<String>();
-                namespMap.put(nsURI, prefixes);
-            }
+            Set<String> prefixes =
+                namespMap.computeIfAbsent(nsURI, k -> new HashSet<>());
             prefixes.add(entry.getKey());
         }
         for (Map.Entry<String, Set<String>> entry : namespMap

@@ -20,7 +20,9 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,18 +45,18 @@ public class DownloadConfig {
     private String downloadPath;
     private String serviceType;
     private String serviceURL;
-    private HashMap<String, String> parameters = null;
-    private ArrayList<ProcessingStep> procSteps = null;
+    private Map<String, String> parameters;
+    private List<ProcessingStep> procSteps;
 
    /**
     * Exception, thrown if no service URL is found in the config file.
     */
-    public class NoServiceURLException extends Exception { };
+    public class NoServiceURLException extends Exception { }
 
    /**
     * Default Constructor.
     */
-    public DownloadConfig() { };
+    public DownloadConfig() { }
 
     /**
     * Constructor.
@@ -95,7 +97,7 @@ public class DownloadConfig {
         }
 
         //Read parameters
-        parameters = new HashMap<String, String>();
+        parameters = new HashMap<>();
         NodeList paramNodes = configDoc.getElementsByTagName("Parameter");
 
         for (int i = 0; i < paramNodes.getLength(); i++) {
@@ -115,7 +117,7 @@ public class DownloadConfig {
         if (stepNodes.getLength() == 0) {
             procSteps = null;
         } else {
-            procSteps = new ArrayList<ProcessingStep>();
+            procSteps = new ArrayList<>();
             //Verarbeitungsschritt-Nodes
             for (int i = 0; i < stepNodes.getLength(); i++) {
                 ProcessingStep newStep = new ProcessingStep();
@@ -193,7 +195,7 @@ public class DownloadConfig {
     *
     * @return The params
     */
-    public HashMap<String, String> getParams() {
+    public Map<String, String> getParams() {
         return parameters;
     }
 
@@ -202,7 +204,7 @@ public class DownloadConfig {
     *
     * @return The processing step list
     */
-    public ArrayList<ProcessingStep> getProcessingSteps() {
+    public List<ProcessingStep> getProcessingSteps() {
         return procSteps;
     }
 
@@ -244,7 +246,7 @@ public class DownloadConfig {
         try {
             NodeList nodes = parent.getElementsByTagName(tagName).item(0)
                     .getChildNodes();
-            Node valueNode = (Node) nodes.item(0);
+            Node valueNode = nodes.item(0);
             return valueNode.getNodeValue();
         } catch (Exception e) {
             return null;
@@ -254,19 +256,36 @@ public class DownloadConfig {
     /**
       * Class, serving as a simple model for processing chain steps.
       */
-    public class ProcessingStep {
+    public static final class ProcessingStep {
        /**
         * The name of the processing step.
         */
-        public String name;
+        private String name;
 
        /**
         * Name and value of all given parameters for this step.
         */
-        public HashMap<String, String> params;
+        private HashMap<String, String> params;
+
+        /**
+         * Returns the map of the parameters used by
+         * this processing step.
+         * @return the map with the parameters otf this step.
+         */
+        public Map<String, String> getParams() {
+            return this.params;
+        }
+
+        /**
+         * Returns the name of this processing step.
+         * @return the name of the processing step.
+         */
+        public String getName() {
+            return name;
+        }
 
         public ProcessingStep() {
-            params = new HashMap<String, String>();
+            params = new HashMap<>();
         }
     }
 }

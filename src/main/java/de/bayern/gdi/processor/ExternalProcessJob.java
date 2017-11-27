@@ -148,11 +148,15 @@ public class ExternalProcessJob implements Job {
         this.logger      = logger;
     }
 
-    private List<String> commandList() {
+    /**
+     * Returns the list of the command and the arguments to be executed.
+     * @return the command and its arguments.
+     */
+    public List<String> commandList() {
         int n = this.arguments != null
             ? this.arguments.length
             : 0;
-        List<String> list = new ArrayList<String>(n + 1);
+        List<String> list = new ArrayList<>(n + 1);
         list.add(command);
         if (n > 0) {
             Set<File> tmpNames = new HashSet<>();
@@ -197,10 +201,9 @@ public class ExternalProcessJob implements Job {
         if (this.fileTracker != null) {
             this.fileTracker.push();
             if (!this.fileTracker.scan()) {
-                // TODO: i18n
-                String msg =
-                    "Scanning dir '" + this.fileTracker.getDirectory()
-                    + "' failed.";
+                String msg = I18n.format(
+                    "external.process.scan.dir.failed",
+                    this.fileTracker.getDirectory());
                 JobExecutionException jee = new JobExecutionException(msg);
                 broadcastException(p, jee);
                 throw jee;

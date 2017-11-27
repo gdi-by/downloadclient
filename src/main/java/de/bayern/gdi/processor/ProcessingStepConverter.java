@@ -59,8 +59,8 @@ public class ProcessingStepConverter {
     public void convert(DownloadStep dls, FileTracker fileTracker, Log logger)
     throws ConverterException {
 
-        ArrayList<ProcessingStep> steps = dls.getProcessingSteps();
-        if (steps == null || steps.size() == 0) {
+        List<ProcessingStep> steps = dls.getProcessingSteps();
+        if (steps == null || steps.isEmpty()) {
             return;
         }
 
@@ -72,15 +72,15 @@ public class ProcessingStepConverter {
             ProcessingStepConfiguration psc =
                 config.findProcessingStepConfiguration(step.getName());
             if (psc == null) {
-                // TODO: I18n
                 throw new ConverterException(
-                    "Cannot find config for " + step.getName());
+                    I18n.format(
+                        "processing_chain.no.config", step.getName()));
             }
             String command = psc.getCommand();
             if (command == null || command.isEmpty()) {
-                // TODO: I18n
                 throw new ConverterException(
-                    "config " + step.getName() + " has no command.");
+                    I18n.format(
+                        "processing_chain.no.command", step.getName()));
             }
             ArrayList<Arg> params = new ArrayList<>();
 
@@ -102,9 +102,9 @@ public class ProcessingStepConverter {
                             params.add(new GlobalGlob(cp.getValue()));
                             break;
                         default:
-                            // TODO: I18n
                             throw new ConverterException(
-                                "Unknown glob mode '" + glob + "'.");
+                                I18n.format(
+                                    "processing_chain.unknown.glob", glob));
                     }
                     continue;
                 }
@@ -137,9 +137,9 @@ public class ProcessingStepConverter {
                         String val = step.findParameter(var);
                         if (val == null) {
                             if (cp.isMandatory()) {
-                                // TODO: I18n
-                                throw new ConverterException(
-                                    "Parameter " + var + " not found");
+                                throw new ConverterException(I18n.format(
+                                    "processing_chain.param.not.found",
+                                    var));
                             }
                             // This parameter is incomplete -> skip it!
                             continue parameters;

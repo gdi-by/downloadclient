@@ -41,7 +41,14 @@ import org.junit.Test;
  */
 public class WfsTest extends TestCase {
 
+    /**
+     * Constant for HTTP_OKAY.
+     */
     public static final int HTTP_OKAY = 200;
+
+    /**
+     * Constant for FEATURES_PER_PAGE.
+     */
     public static final int FEATURES_PER_PAGE = 1037;
 
     public WfsTest(String testName) {
@@ -51,22 +58,39 @@ public class WfsTest extends TestCase {
     @Before
     @Override
     public void setUp() throws IOException {
-        initJadler();
+        try {
+            initJadler();
+        } catch (IllegalStateException ise) {
+            System.out.println("Jadler is already initialized");
+        }
         Config.initialize(null);
     }
 
+    /**
+     *  The tearDown phase just closes all resources.
+     */
     @After
     @Override
     public void tearDown() {
         closeJadler();
     }
 
+    /**
+     *  Test virtuell GeoServer.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testGeoServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell GeoServer");
         run("/geoserver/wfs", "/wfs20/geoserver/geoserver-capabilities.xml");
     }
 
+    /**
+     *  Test virtuell XtraServer.
+     * @throws IOException Something went wrong
+     * @throws URISyntaxException if URL is wrong
+     */
     @Test
     public void testXtraServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell XtraServer");
@@ -102,13 +126,13 @@ public class WfsTest extends TestCase {
     private void checkFeatureTypes(WFSMeta wfsMeta) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.title);
+        sb.append(wfsMeta.getTitle());
         sb.append(" - ");
         sb.append("FeatureType parsing failed.");
 
-        for (Feature feature : wfsMeta.features) {
-            boolean condition =
-                    feature.name == null || feature.name.isEmpty();
+        for (Feature feature : wfsMeta.getFeatures()) {
+            String name = feature.getName();
+            boolean condition = name == null || name.isEmpty();
             assertFalse(sb.toString(), condition);
         }
     }
@@ -117,7 +141,7 @@ public class WfsTest extends TestCase {
     private void checkFeaturesPerPage(WFSMeta wfsMeta) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.title);
+        sb.append(wfsMeta.getTitle());
         sb.append(" - ");
         sb.append("FeaturesPerPage parsing failed.");
 

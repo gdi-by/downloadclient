@@ -25,11 +25,9 @@ import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,12 +46,8 @@ public class CatalogService {
 
     private static final String CSW_NAMESPACE =
             "http://www.opengis.net/cat/csw/2.0.2";
-    private static final String CSW_SCHEMA =
-            "http://schemas.opengis.net/csw/2.0.2/csw.xsd";
     private static final String GMD_NAMESPACE =
             "http://www.isotc211.org/2005/gmd";
-    private static final String GMD_SCHEMA =
-            "http://www.isotc211.org/2005/gmd/gmd.xsd";
     private static final String OWS_NAMESPACE =
             "http://www.opengis.net/ows";
     private static final String SRV_NAMESPACE =
@@ -193,7 +187,7 @@ public class CatalogService {
      */
     public List<Service> getServicesByFilter(String filter)
         throws URISyntaxException, IOException {
-        List<Service> services = new ArrayList<Service>();
+        List<Service> services = new ArrayList<>();
         if (filter.length() > MIN_SEARCHLENGTH && this.getRecordsURL != null) {
             String search = loadXMLFilter(filter);
             Document xml = XML.getDocument(this.getRecordsURL,
@@ -247,7 +241,7 @@ public class CatalogService {
     }
 
     private String getVersionOfType(String type) {
-        String versionNumber = type.substring(type.lastIndexOf(" ") + 1);
+        String versionNumber = type.substring(type.lastIndexOf(' ') + 1);
         if ("2.0".equals(versionNumber)) {
             versionNumber = "2.0.0";
         } else if ("1.0".equals(versionNumber)) {
@@ -266,7 +260,7 @@ public class CatalogService {
      */
     public List<Service> parseServices(NodeList servicesNL)
             throws MalformedURLException {
-        List<Service> services = new ArrayList<Service>();
+        List<Service> services = new ArrayList<>();
         for (int i = 0; i < servicesNL.getLength(); i++) {
             Node serviceN = servicesNL.item(i);
             String nameExpr =
@@ -293,14 +287,6 @@ public class CatalogService {
             if ("restricted".equals(restriction)) {
                 restricted = true;
             }
-            String typeExpr =
-                    "gmd:identificationInfo"
-                            + "/srv:SV_ServiceIdentification"
-                            + "/srv:serviceType"
-                            + "/gco:LocalName";
-            String serviceType = (String) XML.xpath(serviceN,
-                    typeExpr,
-                    XPathConstants.STRING, context);
             String serviceTypeVersionExpr =
                     "gmd:identificationInfo"
                             + "/srv:SV_ServiceIdentification"
@@ -312,16 +298,16 @@ public class CatalogService {
 
             String serviceURL = getServiceURL(serviceN);
 
-            if (serviceTypeVersion.equals("")) {
+            if (serviceTypeVersion.isEmpty()) {
                 serviceTypeVersion = "ATOM";
             }
-            if (!serviceName.equals("") && serviceURL != null) {
+            if (!serviceName.isEmpty() && serviceURL != null) {
                 serviceURL = makeCapabiltiesURL(serviceURL,
                         serviceTypeVersion);
                 Service service = new Service(new URL(serviceURL),
                         serviceName,
                         restricted,
-                        Service.guessServiceType(serviceTypeVersion));
+                        ServiceType.guess(serviceTypeVersion));
                 services.add(service);
             }
         }
@@ -354,11 +340,11 @@ public class CatalogService {
                     applicationprofileExpr,
                     XPathConstants.STRING, context);
             applicationProfile = applicationProfile.toLowerCase();
+
             if (applicationProfile.equals("wfs-url")
-                    || applicationProfile.equals("feed-url")) {
-                return onLineserviceURL;
-            } else if (applicationProfile.equals("dienste-url")
-                    || applicationProfile.equals("download")) {
+            || applicationProfile.equals("feed-url")
+            || applicationProfile.equals("dienste-url")
+            || applicationProfile.equals("download")) {
                 return onLineserviceURL;
             }
         }
@@ -383,8 +369,8 @@ public class CatalogService {
                     operationMetadataNode,
                     operationsNameExpr,
                     XPathConstants.STRING, context);
-            if (applicationProfile.toLowerCase().
-                    equals("getcapabilities")) {
+
+            if (applicationProfile.equalsIgnoreCase("getcapabilities")) {
                 String operationsURLExpr =
                         "srv:SV_OperationMetadata"
                                 + "/srv:connectPoint"
@@ -407,46 +393,12 @@ public class CatalogService {
                             + "/gmd:CI_OnlineResource"
                             + "/gmd:linkage"
                             + "/gmd:URL";
-            String operationsURL = (String) XML.xpath(
+            return (String)XML.xpath(
                     firstNode,
                     operationsURLExpr,
                     XPathConstants.STRING, context);
-            return operationsURL;
-
         }
         return null;
-    }
-
-    /**
-     * http://www.weichand.de/2012/03/24/
-     * grundlagen-catalogue-service-web-csw-2-0-2/ .
-     */
-    private URL setURLRequestAndSearch(String search) {
-        URL newURL = null;
-        String constraintAnyText = "csw:AnyText Like '%"
-                + search + "%'";
-        try {
-            constraintAnyText = URLEncoder.encode(constraintAnyText, "UTF-8");
-            newURL = new URL(this.catalogURL.toString().replace(
-                    "GetCapabilities", "GetRecords"
-                            + "&version=2.0.2"
-                            + "&namespace=xmlns"
-                            + "(csw=" + CSW_NAMESPACE + "),"
-                            + "xmlns(gmd=" + GMD_NAMESPACE + ")"
-                            + "&resultType=results"
-                            + "&outputFormat=application/xml"
-                            + "&outputSchema=" + GMD_NAMESPACE
-                            + "&startPosition=1"
-                            + "&maxRecords=20"
-                            + "&typeNames=csw:Record"
-                            + "&elementSetName=full"
-                            + "&constraintLanguage=CQL_TEXT"
-                            + "&constraint_language_version=1.1.0"
-                            + "&constraint=" + constraintAnyText));
-        } catch (MalformedURLException | UnsupportedEncodingException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return newURL;
     }
 
     private String loadXMLFilter(String search) {

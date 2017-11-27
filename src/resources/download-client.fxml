@@ -17,7 +17,7 @@
     <children>
         <MenuBar fx:id="menuBar">
             <menus>
-                <Menu text="%menu.file">
+                <Menu text="%menu.file" fx:id="menuFile">
                     <MenuItem text="%menu.load_config" onAction="#handleLoadConfig"
                               fx:id="menuLoadConfig" />
                     <MenuItem text="%menu.quit" onAction="#handleCloseApp"

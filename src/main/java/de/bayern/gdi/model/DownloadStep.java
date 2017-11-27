@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -58,21 +59,21 @@ public class DownloadStep {
 
     @XmlElementWrapper(name = "Verarbeitungskette")
     @XmlElement(name = "Verarbeitungsschritt")
-    private ArrayList<ProcessingStep> processingSteps;
+    private List<ProcessingStep> processingSteps;
 
     @XmlElementWrapper(name = "Parameters")
     @XmlElement(name = "Parameter")
-    private ArrayList<Parameter> parameters;
+    private List<Parameter> parameters;
 
     public DownloadStep() {
     }
 
     public DownloadStep(String dataset,
-                        ArrayList<Parameter> parameters,
+                        List<Parameter> parameters,
                         String serviceType,
                         String serviceURL,
                         String path,
-                        ArrayList<ProcessingStep> processingSteps) {
+                        List<ProcessingStep> processingSteps) {
         this.dataset = dataset;
         this.parameters = parameters;
         this.serviceType = serviceType;
@@ -83,7 +84,7 @@ public class DownloadStep {
 
 
     public DownloadStep(String dataset,
-                        ArrayList<Parameter> parameters,
+                        List<Parameter> parameters,
                         String serviceType,
                         String serviceURL,
                         String path) {
@@ -115,26 +116,25 @@ public class DownloadStep {
         this.dataset = dataset;
     }
 
-    public ArrayList<ProcessingStep> getProcessingSteps() {
+    public List<ProcessingStep> getProcessingSteps() {
         return this.processingSteps;
     }
 
-    public void setProcessingSteps(
-        ArrayList<ProcessingStep> processingSteps) {
+    public void setProcessingSteps(List<ProcessingStep> processingSteps) {
         this.processingSteps = processingSteps;
     }
 
     /**
      * @return the parameters
      */
-    public ArrayList<Parameter> getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
     /**
      * @param parameters the parameters to set
      */
-    public void setParameters(ArrayList<Parameter> parameters) {
+    public void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
     }
 

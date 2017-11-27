@@ -27,7 +27,6 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobExecutionException;
-import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
@@ -80,8 +79,8 @@ public class Headless implements ProcessorListener {
                 if (file.isFile() && file.canRead()) {
                     files.add(file);
                 } else {
-                    log.log(
-                        Level.WARNING, "'" + arg + "' is not a readable file.");
+                    log.log(Level.WARNING,
+                        () -> "'" + arg + "' is not a readable file.");
                 }
             }
         }
@@ -92,38 +91,33 @@ public class Headless implements ProcessorListener {
         thread.start();
 
         for (File file: files) {
-            DownloadStep dls;
             try {
-                dls = DownloadStep.read(file);
-            } catch (IOException ioe) {
-                log.log(
-                    Level.WARNING,
-                    "Cannot load file: " + file, ioe);
-                continue;
-            }
-            log.info("Download steps: " + dls);
-            JobList jobs;
+                DownloadStep dls = DownloadStep.read(file);
+                log.info(() -> "Download steps: " + dls);
 
-            DownloadStepConverter dsc =
-                new DownloadStepConverter(user, password);
+                DownloadStepConverter dsc =
+                    new DownloadStepConverter(user, password);
 
-            try {
-                jobs = dsc.convert(dls);
+                processor.addJob(dsc.convert(dls));
+
             } catch (ConverterException ce) {
                 log.log(
                     Level.WARNING,
                     "Creating download jobs failed",
                     ce);
-                continue;
+            } catch (IOException ioe) {
+                log.log(
+                    Level.WARNING,
+                    "Cannot load file: " + file, ioe);
             }
-            processor.addJob(jobs);
         }
 
-        processor.addJob(Processor.QUIT);
+        processor.addJob(Processor.QUIT_JOB);
 
         try {
             thread.join();
         } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
             return 1;
         }
 

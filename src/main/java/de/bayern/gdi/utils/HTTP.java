@@ -45,7 +45,6 @@ import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 /** Helper for HTTP. */
 public final class HTTP {
 
-    private static int timeout;
     private static final int DEFAULT_TIMEOUT = 10000;
     private static final int S_TO_MS = 1000;
 
@@ -65,6 +64,7 @@ public final class HTTP {
     public static CloseableHttpClient getClient(
         URL url, String user, String password
     ) {
+        int timeout;
         try {
             ApplicationSettings set = Config.getInstance()
                     .getApplicationSettings();

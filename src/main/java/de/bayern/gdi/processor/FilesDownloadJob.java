@@ -24,12 +24,8 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 
-import de.bayern.gdi.utils.Log;
-
 /** Download a list of URLs to given files. */
 public class FilesDownloadJob extends MultipleFileDownloadJob {
-
-    private Log logger;
 
     private List<DLFile> files;
 
@@ -37,11 +33,10 @@ public class FilesDownloadJob extends MultipleFileDownloadJob {
         this.files = new ArrayList<>();
     }
 
-    public FilesDownloadJob(String user, String password, Log logger) {
+    public FilesDownloadJob(String user, String password) {
         this();
         this.user = user;
         this.password = password;
-        this.logger = logger;
     }
 
     /** Downloads an URL to a file.

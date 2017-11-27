@@ -19,12 +19,14 @@ package de.bayern.gdi.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.conn.ConnectTimeoutException;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
@@ -103,6 +105,16 @@ public class FileDownloadJob extends AbstractDownloadJob {
                 httpclient.execute(httppost, responseHandler);
 
             }
+        } catch (ConnectTimeoutException | SocketTimeoutException te) {
+            JobExecutionException jee =
+            new JobExecutionException(
+                    I18n.format(
+                            "file.download.failed_reason",
+                            I18n.getMsg("file.download.failed.timeout")),
+                    te);
+            broadcastException(jee);
+            throw jee;
+
         } catch (IOException ioe) {
             JobExecutionException jee =
                 new JobExecutionException(

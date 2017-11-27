@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.xpath.XPathConstants;
@@ -58,10 +59,11 @@ public class ServiceSettings {
      * @return catalogue URL as String
      */
     public String getCatalogue() {
-        for (String value: this.getCatalogues().values()) {
-            return value;
-        }
-        return null;
+        Optional<String> v = this.getCatalogues()
+            .values()
+            .stream()
+            .findFirst();
+        return v.isPresent() ? v.get() : null;
     }
 
     /**
@@ -146,32 +148,12 @@ public class ServiceSettings {
         return NAME;
     }
 
-    /**Parse Node by name, save all elements to map.*/
-    private Map<String, String> parseNodeForElements(Document doc,
-            String nodeName) throws IOException {
-        Node parent = doc.getElementsByTagName(nodeName).item(0);
-        if (parent == null) {
-            throw new IOException("Node " + nodeName + " not found");
-        }
-
-        Map<String, String> elements = new HashMap<String, String>();
-
-        NodeList childs = parent.getChildNodes();
-        for (int i = 0; i < childs.getLength(); i++) {
-            Node node = childs.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                elements.put(node.getNodeName(), node.getTextContent());
-            }
-        }
-        return elements;
-    }
-
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
 
     private Map<String, String> parseSchema(Document xmlDocument, String
             nodeName, String... names) throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         HashMap<String, String> vars = new HashMap<>();
         vars.put("NODE", nodeName);
@@ -190,22 +172,21 @@ public class ServiceSettings {
     }
 
     private List<Service> parseService(Document xmlDocument) {
-        List<Service> servicesList = new ArrayList<Service>();
+        List<Service> servicesList = new ArrayList<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
         Node servicesNode = servicesNL.item(0);
         NodeList serviceNL = servicesNode.getChildNodes();
-        Node serviceNode, serviceValueNode;
 
         for (int i = 0; i < serviceNL.getLength(); i++) {
-            serviceNode = serviceNL.item(i);
+            Node serviceNode = serviceNL.item(i);
             if (serviceNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
                 boolean restricted = false;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
-                    serviceValueNode = serviceValueNL.item(k);
+                    Node serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =
@@ -240,7 +221,7 @@ public class ServiceSettings {
     private Map<String, String> parseNameURLScheme(Document xmlDocument,
                                                    String nodeName)
             throws IOException {
-        Map<String, String> servicesMap = new HashMap<String, String>();
+        Map<String, String> servicesMap = new HashMap<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName(nodeName);
         Node servicesNode = servicesNL.item(0);
@@ -248,16 +229,15 @@ public class ServiceSettings {
             throw new IOException(nodeName + " Node not found - Config broken");
         }
         NodeList serviceNL = servicesNode.getChildNodes();
-        Node serviceNode, serviceValueNode;
 
         for (int i = 0; i < serviceNL.getLength(); i++) {
-            serviceNode = serviceNL.item(i);
+            Node serviceNode = serviceNL.item(i);
             if (serviceNode.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList serviceValueNL = serviceNode.getChildNodes();
                 String serviceURL = null;
                 String serviceName = null;
                 for (int k = 0; k < serviceValueNL.getLength(); k++) {
-                    serviceValueNode = serviceValueNL.item(k);
+                    Node serviceValueNode = serviceValueNL.item(k);
                     if (serviceValueNode.getNodeType() == 1) {
                         if (serviceValueNode.getNodeName().equals("url")) {
                             serviceURL =

@@ -22,12 +22,29 @@ package de.bayern.gdi.services;
  * Created by jochen on 03.06.16.
  */
 public class Field {
+
     /** name. */
-    public String name;
+    private String name;
     /** type. */
-    public String type;
+    private String type;
 
     public Field() {
+    }
+
+    /**
+     * Returns the name of this field.
+     * @return the name of this field.
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Returns the type of this field.
+     * @return the type of this field.
+     */
+    public String getType() {
+        return this.type;
     }
 
     /**

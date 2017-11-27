@@ -99,7 +99,7 @@ public class StringUtils {
     }
 
     /** States for the command line splitting. */
-    private static enum State {
+    private enum State {
         NORMAL,
         IN_QUOTE,
         IN_DOUBLE_QUOTE
@@ -123,7 +123,7 @@ public class StringUtils {
 
         State state = State.NORMAL;
         StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean lastTokenHasBeenQuoted = false;
 
@@ -286,5 +286,21 @@ parts:
             use.add(part);
         }
         return join(use, sep);
+    }
+
+    /**
+     * Checks if two strings are equal or both null.
+     * @param a The first string.
+     * @param b The second strinh.
+     * @return true if both strings are equal or both null.
+     */
+    public static boolean nullOrEquals(String a, String b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
     }
 }

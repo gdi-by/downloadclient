@@ -20,6 +20,7 @@ package de.bayern.gdi.processor;
 import java.io.IOException;
 
 import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.I18n;
 
 /**
  * A job to open a log file.
@@ -37,8 +38,8 @@ public class OpenLogJob implements Job {
         try {
             logger.open();
         } catch (IOException ioe) {
-            // TODO: i18n
-            throw new JobExecutionException("Cannot open log file", ioe);
+            throw new JobExecutionException(
+                I18n.getMsg("processor.cannot.open.log"), ioe);
         }
     }
 }

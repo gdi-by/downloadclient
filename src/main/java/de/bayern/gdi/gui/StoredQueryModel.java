@@ -39,12 +39,12 @@ public class StoredQueryModel implements ItemModel {
     }
 
     public String getDataset() {
-        return query.id;
+        return this.query.getID();
     }
 
 
     @Override
     public String toString() {
-        return this.query.title;
+        return this.query.getTitle();
     }
 }

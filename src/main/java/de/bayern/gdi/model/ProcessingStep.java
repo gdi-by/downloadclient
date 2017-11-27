@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,7 +37,7 @@ public class ProcessingStep {
 
     @XmlElementWrapper(name = "Parameters")
     @XmlElement(name = "Parameter")
-    private ArrayList<Parameter> parameters;
+    private List<Parameter> parameters;
 
     public ProcessingStep() {
     }
@@ -59,14 +59,14 @@ public class ProcessingStep {
     /**
      * @return the parameters
      */
-    public ArrayList<Parameter> getParameters() {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
     /**
      * @param parameters the parameters to set
      */
-    public void setParameters(ArrayList<Parameter> parameters) {
+    public void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
     }
 
@@ -100,4 +100,3 @@ public class ProcessingStep {
         return sb.toString();
     }
 }
-

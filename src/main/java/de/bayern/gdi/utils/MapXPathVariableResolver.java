@@ -33,7 +33,7 @@ public class MapXPathVariableResolver implements XPathVariableResolver {
     private Map<String, String> variables;
 
     public MapXPathVariableResolver() {
-        this.variables = new HashMap<String, String>();
+        this.variables = new HashMap<>();
     }
 
 

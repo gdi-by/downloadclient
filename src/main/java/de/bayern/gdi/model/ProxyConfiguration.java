@@ -128,11 +128,10 @@ public class ProxyConfiguration {
      * @return Proxystring
      */
     public String getHttpProxyString() {
-        if (!httpProxyPort.equals("") && httpProxyPort != null) {
-            return httpProxyHost + ":" + httpProxyPort;
-        } else {
-            return httpProxyHost;
-        }
+        return ((httpProxyHost != null && !httpProxyHost.isEmpty())
+            && httpProxyPort != null)
+            ? httpProxyHost + ":" + httpProxyPort
+            : httpProxyHost;
     }
 
     /**
@@ -321,7 +320,6 @@ public class ProxyConfiguration {
             BufferedInputStream bis = new BufferedInputStream(fis);
             return (ProxyConfiguration)um.unmarshal(bis);
         } catch (JAXBException je) {
-            je.printStackTrace();
             throw new IOException(je.getMessage(), je);
         }
     }

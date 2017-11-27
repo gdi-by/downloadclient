@@ -38,13 +38,14 @@ public class FeatureModel implements ItemModel {
     }
 
     public String getDataset() {
-        return feature.name;
+        return feature.getName();
     }
 
     @Override
     public String toString() {
-        return this.feature.title != null && !this.feature.title.isEmpty()
-            ? this.feature.title
-            : this.feature.name;
+        String title = this.feature.getTitle();
+        return title != null && !title.isEmpty()
+            ? title
+            : this.feature.getName();
     }
 }

@@ -50,8 +50,8 @@ public class DataBean extends Observable {
     private ItemModel dataType;
     private Atom atomService;
     private WFSMeta wfsService;
-    private ArrayList<Attribute> attributes;
-    private ArrayList<ProcessingStep> processingSteps;
+    private List<Attribute> attributes;
+    private List<ProcessingStep> processingSteps;
     private Service selectedService;
 
     private CatalogService catalogService;
@@ -59,15 +59,39 @@ public class DataBean extends Observable {
     /**
      * Attribute representation.
      */
-    public static class Attribute {
+    public static final class Attribute {
         /** name. */
-        public String name;
+        private String name;
 
         /** value. */
-        public String value;
+        private String value;
 
         /** type. */
-        public String type;
+        private String type;
+
+        /**
+         * Returns the name of the attribute.
+         * @return the name of the attribute
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * Returns the value of the attribute.
+         * @return the value of the attribute
+         */
+        public String getValue() {
+            return this.value;
+        }
+
+        /**
+         * Returns the type of the attribute.
+         * @return the type of the attribute.
+         */
+        public String getType() {
+            return this.type;
+        }
 
         /**
          * Constructor.
@@ -92,9 +116,9 @@ public class DataBean extends Observable {
 
         this.staticServices = serviceSetting.getServices();
 
-        this.attributes = new ArrayList<Attribute>();
+        this.attributes = new ArrayList<>();
 
-        this.catalogServices = new ArrayList<Service>();
+        this.catalogServices = new ArrayList<>();
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
             try {
                 this.catalogService =
@@ -177,9 +201,7 @@ public class DataBean extends Observable {
             ServiceModel sm = new ServiceModel(entry);
             allModels.add(sm);
         }
-        ObservableList<ServiceModel> serviceNames =
-                FXCollections.observableArrayList(allModels);
-        return serviceNames;
+        return FXCollections.observableArrayList(allModels);
     }
 
     /**
@@ -260,19 +282,14 @@ public class DataBean extends Observable {
      * @return true if webservice ist set; false if not set
      */
     public boolean isWebServiceSet() {
-        if (this.atomService == null
-            && this.wfsService == null) {
-            return false;
-        }
-        return true;
-
+        return this.atomService != null || this.wfsService != null;
     }
 
     /**
      * gets the Attributes for a the selected service.
      * @return the attributes
      */
-    public ArrayList<Attribute> getAttributes() {
+    public List<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -280,7 +297,7 @@ public class DataBean extends Observable {
      * sets the Attributes for a selected Service.
      * @param attributes tha attributes
      */
-    public void setAttributes(ArrayList<Attribute> attributes) {
+    public void setAttributes(List<Attribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -292,7 +309,7 @@ public class DataBean extends Observable {
      */
     public void addAttribute(String key, String value, String type) {
         if (this.attributes == null) {
-            this.attributes = new ArrayList<Attribute>();
+            this.attributes = new ArrayList<>();
         }
         for (Attribute attr: this.attributes) {
             if (attr.name.equals(key)) {
@@ -322,14 +339,14 @@ public class DataBean extends Observable {
     /**
      * @return the processingSteps
      */
-    public ArrayList<ProcessingStep> getProcessingSteps() {
+    public List<ProcessingStep> getProcessingSteps() {
         return processingSteps;
     }
 
     /**
      * @param processingSteps the processingSteps to set
      */
-    public void setProcessingSteps(ArrayList<ProcessingStep> processingSteps) {
+    public void setProcessingSteps(List<ProcessingStep> processingSteps) {
         this.processingSteps = processingSteps;
     }
 
@@ -346,9 +363,9 @@ public class DataBean extends Observable {
         ServiceType type = getServiceType();
         String serviceURL = type == ServiceType.Atom
             ? getAtomService().getURL()
-            : getWFSService().url;
+            : getWFSService().getURL();
 
-        ArrayList<Attribute> attrs = getAttributes();
+        List<Attribute> attrs = getAttributes();
         ArrayList<Parameter> parameters = new ArrayList<>(attrs.size());
         for (Attribute attr: attrs) {
             Parameter param = new Parameter(attr.name, attr.value);

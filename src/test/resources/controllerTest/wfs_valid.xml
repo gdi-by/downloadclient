@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DownloadSchritt>
+    <ServiceTyp>WFS2_BASIC</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs?service=wfs&amp;acceptversions=2.0.0&amp;request=GetCapabilities</URL>
+    <DownloadPfad></DownloadPfad>
+    <Dataset>bvv:gmd_ex</Dataset>
+    <Verarbeitungskette>
+        <Verarbeitungsschritt>
+            <Name>toShape</Name>
+            <Parameters>
+                <Parameter>
+                    <Name>EPSG</Name>
+                    <Wert>EPSG:31467</Wert>
+                </Parameter>
+            </Parameters>
+        </Verarbeitungsschritt>
+    </Verarbeitungskette>
+    <Parameters>
+        <Parameter>
+            <Name>srsName</Name>
+            <Wert>urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>outputformat</Name>
+            <Wert>text/xml; subtype=gml/3.2</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>bbox</Name>
+            <Wert>48.83124,11.30677,49.22547,11.86795,urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+    </Parameters>
+</DownloadSchritt>
