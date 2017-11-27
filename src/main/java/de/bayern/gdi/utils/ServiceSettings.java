@@ -223,6 +223,10 @@ public class ServiceSettings {
         List<Service> servicesList = new ArrayList<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
+        if (servicesNL.getLength() == 0) {
+            return servicesList;
+        }
+
         Node servicesNode = servicesNL.item(0);
         NodeList serviceNL = servicesNode.getChildNodes();
 
