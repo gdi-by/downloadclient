@@ -177,7 +177,7 @@ public class ServiceSettings {
             doc, CHECK_WITH_GET_XPATH,
             XPathConstants.NODESET, null, null);
 
-        if (nodes == null) {
+        if (nodes == null || nodes.getLength() == 0) {
             return null;
         }
 
