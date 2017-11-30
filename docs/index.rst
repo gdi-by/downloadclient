@@ -41,6 +41,7 @@ Proxy-Einstellungen
 Falls notwendig, können im Unterordner config des entpackten Download-Client-Programmordners Proxy-Einstellungen in einer Datei mit Namen ``proxy.xml`` abgelegt werden. Der config-Ordner beinhaltet hierfür eine beispielhafte Datei ``proxy.xml.sample``, die folgende Felder zur Konfiguration von HTTP(S) Proxy-Einstellungen enthält:
 
  <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
+
 Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
 
 
@@ -50,7 +51,7 @@ Funktionalität
 Unterstützte Downloaddienstvarianten
 ---------------------------------------
 
-Aktuell werden folgende INSPIRE-Downloaddienstvarianten* vom Download-Client unterstützt:
+Aktuell werden folgende INSPIRE-Downloaddienstvarianten[1_] vom Download-Client unterstützt:
 
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
@@ -62,7 +63,7 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten* vom Download-Client unt
 | Pre-defined Dataset Download        | predefined ATOM                |                            |
 +-------------------------------------+--------------------------------+----------------------------+
 
-*gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf 
+.. [1] gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf
 
 Benutzeroberfläche 
 -------------------
@@ -224,25 +225,18 @@ Hier können folgende Einstellungen angepasst werden:
 
 - im Element ``<services>`` können Downloaddienste folgendermaßen fest in die Dienstesuche eingebunden werden:
 
-  ``<services>``
+.. code-block:: xml
 
-      ``<service>``
-    
-        ``<name>Ein WFS Name</name>``
-        
-        ``<url>EineWFSURL?</url>``
-        
-      ``</service>``
-    
-      ``<service>``
-    
-        ``<name>Ein ATOM-Feed Name</name>``
-    
-        ``<url>EineAtomFeedURL</url>``
-    
-      ``</service>``
-    
-  ``</services>``
+   <services>
+     <service>
+       <name>Ein WFS Name</name>
+       <url>EineWFSURL?</url>
+     </service>
+     <service>
+       <name>Ein ATOM-Feed Name</name>
+       <url>EineAtomFeedURL</url>
+     </service>
+   </services>
 
 
 verarbeitungsschritte.xml
