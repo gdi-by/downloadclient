@@ -28,7 +28,7 @@ Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.c
 Inbetriebnahme
 --------------
 
-Das Zip-Archiv an einen geigneten Ort entpacken.
+Das Zip-Archiv an einen geeigneten Ort entpacken.
 
 Starten der Anwendung
 ----------------------
@@ -214,8 +214,8 @@ Benutzerdefinierte Erweiterungsmöglichkeiten
 Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
 
 
-serviceSetting.xml
----------------------
+settings.xml
+------------
 
 Hier können folgende Einstellungen angepasst werden:
 
@@ -237,6 +237,18 @@ Hier können folgende Einstellungen angepasst werden:
        <url>EineAtomFeedURL</url>
      </service>
    </services>
+
+- im Element ``<check-restriction>`` können Downloaddienste angegeben
+  werden, welche die Prüfung der Verfügbarkeit, sowie des potentiellen
+  Passwortschutzes über HTTP-HEAD ablehnen und daher alternativ über HTTP-GET
+  überprüft werden müssen:
+
+.. code-block:: xml
+
+   <check-restriction>
+     <use-get-url>http://example1.com/.*$</use-get-url>
+     <use-get-url>(http|https)://example2.com/.*$</use-get-url>
+   </check-restriction>
 
 
 verarbeitungsschritte.xml
