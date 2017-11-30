@@ -238,6 +238,22 @@ Hier können folgende Einstellungen angepasst werden:
      </service>
    </services>
 
+- im Element ``<check-restriction>`` können Downloaddienste angegeben
+  werden, welche die Prüfung der Verfügbarkeit, sowie des potentiellen
+  Passwortschutzes über HTTP-HEAD ablehnen und daher alternativ über HTTP-GET
+  überprüft werden müssen:
+
+.. code-block:: xml
+
+   <settings>
+
+     <check-restriction>
+       <use-get-url>http://example1.com/.*$</use-get-url>
+       <use-get-url>(http|https)://example2.com/.*$</use-get-url>
+     </check-restriction>
+
+   </settings>
+
 
 verarbeitungsschritte.xml
 ---------------------------
