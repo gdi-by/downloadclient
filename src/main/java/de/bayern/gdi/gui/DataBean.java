@@ -21,6 +21,7 @@ package de.bayern.gdi.gui;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.Query;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.Service;
@@ -44,6 +45,9 @@ import javafx.collections.ObservableList;
  */
 public class DataBean extends Observable {
 
+    private static final String FEATURE_TYPE_NAME_SUFFIX
+        = " (Filter)";
+
     private Map<String, String> namePwMap;
     private List<Service> staticServices;
     private List<Service> catalogServices;
@@ -55,6 +59,10 @@ public class DataBean extends Observable {
     private Service selectedService;
 
     private CatalogService catalogService;
+
+    private String featureTypeModel;
+
+    private List<Query> complexQueries;
 
     /**
      * Attribute representation.
@@ -119,6 +127,8 @@ public class DataBean extends Observable {
         this.attributes = new ArrayList<>();
 
         this.catalogServices = new ArrayList<>();
+        this.featureTypeModel = "WFS2_Basic";
+
         if (ServiceChecker.isReachable(serviceSetting.getCatalogueURL())) {
             try {
                 this.catalogService =
@@ -355,6 +365,21 @@ public class DataBean extends Observable {
     }
 
     /**
+     * @return The current feature type model
+     */
+    public String getFeatureTypeModel() {
+        return featureTypeModel;
+    }
+
+    /**
+     * Set the current feature type model.
+     * @param featureTypeModel the new model.
+     */
+    public void setFeatureTypeModel(String featureTypeModel) {
+        this.featureTypeModel = featureTypeModel;
+    }
+
+    /**
      * gets Downloadstep from Frontend.
      * @param savePath the save path
      * @return downloadStep
@@ -381,7 +406,20 @@ public class DataBean extends Observable {
                 if (itemModel instanceof StoredQueryModel) {
                     serviceTypeStr = "WFS2_SIMPLE";
                 } else {
-                    serviceTypeStr = "WFS2_BASIC";
+                    FeatureModel fm = (FeatureModel)itemModel;
+                    WFSMeta.Feature feature = (WFSMeta.Feature)fm.getItem();
+                    String fname = feature.getName();
+                    if (fname != null
+                    && fname.endsWith(FEATURE_TYPE_NAME_SUFFIX)) {
+                        serviceTypeStr = "WFS2_SQL";
+                        /* TODO Dead code: What is this for?
+                        if (wfsService != null) {
+                            nameSpace = wfsService.namespaces;
+                        }
+                        */
+                    } else {
+                        serviceTypeStr = "WFS2_BASIC";
+                    }
                 }
                 break;
             case ATOM:
@@ -395,6 +433,23 @@ public class DataBean extends Observable {
             serviceTypeStr,
             serviceURL,
             savePath,
-            processingSteps);
+            processingSteps,
+            complexQueries);
+    }
+
+    /**
+     * Set the complexe queries objects.
+     * @return complexQueries list
+     */
+    public List<Query> getComplexQueries() {
+        return complexQueries;
+    }
+
+    /**
+     * Initialize the entire queries.
+     * @param complexQueries a List of Objects
+     */
+    public void setComplexQueries(List<Query> complexQueries) {
+        this.complexQueries = complexQueries;
     }
 }
