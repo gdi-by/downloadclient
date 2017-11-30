@@ -245,14 +245,10 @@ Hier können folgende Einstellungen angepasst werden:
 
 .. code-block:: xml
 
-   <settings>
-
-     <check-restriction>
-       <use-get-url>http://example1.com/.*$</use-get-url>
-       <use-get-url>(http|https)://example2.com/.*$</use-get-url>
-     </check-restriction>
-
-   </settings>
+   <check-restriction>
+     <use-get-url>http://example1.com/.*$</use-get-url>
+     <use-get-url>(http|https)://example2.com/.*$</use-get-url>
+   </check-restriction>
 
 
 verarbeitungsschritte.xml
