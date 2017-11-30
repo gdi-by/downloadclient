@@ -28,7 +28,7 @@ Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.c
 Inbetriebnahme
 --------------
 
-Das Zip-Archiv an einen geigneten Ort entpacken.
+Das Zip-Archiv an einen geeigneten Ort entpacken.
 
 Starten der Anwendung
 ----------------------
