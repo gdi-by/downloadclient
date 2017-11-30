@@ -60,3 +60,6 @@ nbactions.xml
 *.iws
 *.iml
 out/
+
+# sphinx
+docs/_build/
