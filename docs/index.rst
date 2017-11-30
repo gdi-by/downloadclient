@@ -33,16 +33,26 @@ Das Zip-Archiv an einen geeigneten Ort entpacken.
 Starten der Anwendung
 ----------------------
 
-Die Datei "startup.bat" ausführen.
+Die Datei ``startup.bat`` ausführen.
 
 Proxy-Einstellungen
 --------------------
 
-Falls notwendig, können im Unterordner config des entpackten Download-Client-Programmordners Proxy-Einstellungen in einer Datei mit Namen ``proxy.xml`` abgelegt werden. Der config-Ordner beinhaltet hierfür eine beispielhafte Datei ``proxy.xml.sample``, die folgende Felder zur Konfiguration von HTTP(S) Proxy-Einstellungen enthält:
+Falls notwendig, können im Unterordner ``config`` des entpackten Download-Client-Programmordners Proxy-Einstellungen in einer Datei mit Namen ``proxy.xml`` abgelegt werden. Der ``config``-Ordner beinhaltet hierfür eine beispielhafte Datei ``proxy.xml.sample``, die folgende Felder zur Konfiguration von HTTP(S) Proxy-Einstellungen enthält:
 
- <!-- HTTP settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... <!-- HTTPS settings: --> HOST PORT USER PASSWORD HOST1|HOST2|... 
+.. code-block:: xml
 
-Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über enableSNIExtension kann die Server Name Indication aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte. 
+   <?xml version="1.0" encoding="UTF-8"?>
+   <ProxyConfiguration overrideSystemSettings="true" enableSNIExtension="true">
+       <HTTPProxyHost>some-proxy-host</HTTPProxyHost>
+       <HTTPProxyPort>80</HTTPProxyPort>
+       <HTTPNonProxyHosts>localhost</HTTPNonProxyHosts>
+       <HTTPSProxyHost>some-proxy-host</HTTPSProxyHost>
+       <HTTPSProxyPort>80</HTTPSProxyPort>
+       <HTTPSNonProxyHosts>localhost</HTTPSNonProxyHosts>
+   </ProxyConfiguration>
+
+Alle Felder sind dabei optional. Um die Anwendung der Einstellungen zu vermeiden, kann ``overrideSystemSetting="false"`` gesetzt werden. Über ``enableSNIExtension`` kann die `Server Name Indication <https://de.wikipedia.org/wiki/Server_Name_Indication>`_ aktiviert/deaktiviert werden, was bei „problematischen“ SSL-Hosts notwendig sein könnte.
 
 
 Funktionalität
@@ -78,14 +88,16 @@ Downloaddienste können über verschiedene Wege eingebunden werden:
 
 - Eingabe der URL eines Downloaddienstes (vollständige GetCapabilities-URL inkl. Paramater bei WFS oder URL des ATOM Downloaddienstes) 
 
-- Suche nach Downloaddiensten durch Eingabe eines Suchbegriffes in das Suchfeld. Hier wird im Hintergrund ein GetRecord-Aufruf an einen Metadatenkatalogdienst (CSW) mit einem Filter *ServiceTypeVersion = OGC:WFS:2.0* oder *ATOM* durchgeführt. Standardmäßig ist hier der Metadatenkatalog der GDI-BY (http://geoportal.bayern.de/csw/gdi?) eingebunden. Das Einbinden anderer Kataloge ist möglich (s. Abschnitt „Benutzerdefinierte Erweiterungsmöglichkeiten“)
+- Suche nach Downloaddiensten durch Eingabe eines Suchbegriffes in das Suchfeld. Hier wird im Hintergrund ein GetRecord-Aufruf an einen Metadatenkatalogdienst (CSW) mit einem Filter *ServiceTypeVersion = OGC:WFS:2.0* oder *ATOM* durchgeführt. Standardmäßig ist hier der Metadatenkatalog der GDI-BY (http://geoportal.bayern.de/csw/gdi?) eingebunden. Das Einbinden anderer Kataloge ist möglich (s. Abschnitt :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`).
 
 
 Beispiel-URLs sind:
 
-- http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&acceptversions=2.0.0&request=getCapabilities (WFS 2.0.0)
-- https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/4331d3ef-a12d-48be-a9b9-9597c2591448 (Atom)
-- http://www.geodaten.bayern.de/inspire/dls/dop200.xml (Atom)
+- WFS 2.0.0
+   - http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&acceptversions=2.0.0&request=getCapabilities
+- Atom
+   - https://geoportal.bayern.de/gdiadmin/ausgabe/ATOM_SERVICE/4331d3ef-a12d-48be-a9b9-9597c2591448
+   - http://www.geodaten.bayern.de/inspire/dls/dop200.xml
 
 Über den Button *Dienst wählen* kann ein Downloaddienst eingebunden werden. Bei zugriffsgeschützten Diensten müssen die Zugangsdaten entsprechend in den Feldern *Kennung* und *Passwort* eingetragen werden. 
 
@@ -164,7 +176,7 @@ Die heruntergeladenen Datensätze  können mit Hilfe des Download-Clients zu ein
 
 Nach Anhaken von "Weiterverarbeiten" können über den Button "Hinzufügen" ein oder mehrere Verarbeitungsschritte hinzugefügt werden.
 
-Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung: 
+Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 
 - Konvertierung eines Vektordatenformates nach ESRI-Shape nach Eingabe des folgenden Parameters: 
    - Koordinatenreferenzsystem 
@@ -172,7 +184,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
-Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. 
+Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
 .. image:: img/DLC_Weiterverarbeitung_DOP.png
 
@@ -208,6 +220,8 @@ Variante b) Ausführungswiederholung mit Windows Aufgabenplanung (Voraussetzung:
 Die Ausführungswiederholung ist über Cronjobs möglich.
 
 
+.. _benutzerdefinierte_erweiterungsmoeglichkeiten:
+
 Benutzerdefinierte Erweiterungsmöglichkeiten 
 =============================================
 
@@ -219,9 +233,9 @@ settings.xml
 
 Hier können folgende Einstellungen angepasst werden:
 
-- im Element ``<catalogues>``: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
+- im Element ``<catalogues>`` können Metadatenkatalog für die Dienstesuche eingebunden werden
 
-- im Element ``<wms>``: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
+- im Element ``<wms>`` können Darstellungsdienste für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche eingebunden werden
 
 - im Element ``<services>`` können Downloaddienste folgendermaßen fest in die Dienstesuche eingebunden werden:
 
@@ -256,15 +270,14 @@ verarbeitungsschritte.xml
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
--	im Element ``<Befehl>``: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
+- im Element ``<Befehl>``: Angabe eines Befehls aus der `GDAL Bibliothek <http://www.gdal.org/>`_ zur Geodatenverarbeitung oder einer ausführbaren Datei mit einem Python Skript
 
-- im Element ``<ParameterSet>``: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
+- im Element ``<ParameterSet>``: Notwendige Ein- und Ausgabeparametera für die Ausführung des Befehls
 
-- im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
+- im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (``typ="TextField"``) oder Auswahllistenfeldern (``typ="ComboBox"``)
 
 
 mimetypes.xml
 --------------
 
-Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp ("raster"/"vektor") zugeordnet.
-
+Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp (``raster``/``vektor``) zugeordnet.
