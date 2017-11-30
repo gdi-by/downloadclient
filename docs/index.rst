@@ -214,8 +214,8 @@ Benutzerdefinierte Erweiterungsmöglichkeiten
 Die Funktionalität des Download-Client ist durch den Nutzer erweiterbar bzw. individuell anpassbar. Hierzu können die Default-Einstellungen an folgenden Konfigurationsdateien, die sich im Unterordner config des Download-Client-Programmordners befinden, angepasst werden: 
 
 
-serviceSetting.xml
----------------------
+settings.xml
+------------
 
 Hier können folgende Einstellungen angepasst werden:
 
