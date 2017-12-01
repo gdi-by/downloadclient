@@ -46,7 +46,16 @@ sed -i s/{project.version}/$VERSION/g src/resources/about/about_*.html
 
 echo ''
 echo 'Building Downloadclient Package'
-mvn clean compile package
+if [ $# -eq 0 ]
+  then
+    echo '--using NO proxy for mvn tests'
+    mvn clean compile package
+  else 
+    echo '-- using proxy for mvn tests'   
+    mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean compile package
+fi
+
+exit(0)
 
 #tidy up the version-number alteration above
 git checkout -- src/resources/about
