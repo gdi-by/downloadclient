@@ -33,11 +33,16 @@ import javax.xml.parsers.ParserConfigurationException;
 /** Load configurations from specified directory. */
 public class Config {
 
+    private Config() {
+    }
+
     private static final Logger log
         = Logger.getLogger(Config.class.getName());
 
     /** Inner class to implicit synchronize the instance access. */
     private static final class Holder {
+        private Holder() {
+        }
         static final Config INSTANCE = new Config();
     }
 
@@ -50,9 +55,6 @@ public class Config {
     private ProcessingConfiguration processingConfig;
 
     private ProxyConfiguration proxyConfig;
-
-    private Config() {
-    }
 
     private static final long FIVEHUNDRED = 500;
 
@@ -216,7 +218,6 @@ public class Config {
         if (Holder.INSTANCE.getMimeTypes() == null) {
             throwConfigFailureException(MIMETypes.getName());
         }
-        // TODO: MIME types -> file extensions.
     }
 
     private static void throwConfigFailureException(String configName)

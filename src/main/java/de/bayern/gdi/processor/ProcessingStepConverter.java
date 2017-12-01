@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.DownloadStep;
@@ -82,74 +83,9 @@ public class ProcessingStepConverter {
                     I18n.format(
                         "processing_chain.no.command", step.getName()));
             }
-            ArrayList<Arg> params = new ArrayList<>();
 
-            parameters:
-            for (ConfigurationParameter cp: psc.getParameters()) {
-                String ext = cp.getExt();
-                if (ext != null) { // The <Parameter ext="gml"/> case.
-                    params.add(new UniqueArg(ext));
-                    continue;
-                }
-
-                String glob = cp.getGlob();
-                if (glob != null) {
-                    switch (glob) {
-                        case "delta":
-                            params.add(new DeltaGlob(cp.getValue()));
-                            break;
-                        case "global":
-                            params.add(new GlobalGlob(cp.getValue()));
-                            break;
-                        default:
-                            throw new ConverterException(
-                                I18n.format(
-                                    "processing_chain.unknown.glob", glob));
-                    }
-                    continue;
-                }
-
-                String value = cp.getValue();
-                if (value == null) {
-                    continue;
-                }
-                value = value.trim();
-                if (value.isEmpty()) {
-                    continue;
-                }
-                String[] parts = StringUtils.splitCommandLine(value);
-
-                ArrayList<Arg> row = new ArrayList<>();
-
-                for (String part: parts) {
-                    String[] atoms = StringUtils.split(
-                        part, ConfigurationParameter.VARS_RE, true);
-
-                    for (String atom: atoms) {
-                        String var =
-                            ConfigurationParameter.extractVariable(atom);
-
-                        if (var == null) {
-                            row.add(new Arg(atom));
-                            continue;
-                        }
-
-                        String val = step.findParameter(var);
-                        if (val == null) {
-                            if (cp.isMandatory()) {
-                                throw new ConverterException(I18n.format(
-                                    "processing_chain.param.not.found",
-                                    var));
-                            }
-                            // This parameter is incomplete -> skip it!
-                            continue parameters;
-                        }
-                        usedVars.add(var);
-                        row.add(new Arg(val));
-                    } // for all atoms
-                }
-                params.addAll(row);
-            } // for all config parameters.
+            ArrayList<Arg> params =
+                convertParameters(step, psc.getParameters());
 
             ExternalProcessJob epj = new ExternalProcessJob(
                 command,
@@ -160,6 +96,85 @@ public class ProcessingStepConverter {
             jobs.add(epj);
             jobs.add(new BroadcastJob(I18n.getMsg("processing_chain.end")));
         }
+    }
+
+    private ArrayList<Arg> convertParameters(
+        ProcessingStep               step,
+        List<ConfigurationParameter> cps
+    ) throws ConverterException {
+
+        final ArrayList<Arg> params = new ArrayList<>();
+
+        for (ConfigurationParameter cp: cps) {
+            if (cp.getExt() != null) { // The <Parameter ext="gml"/> case.
+                params.add(new UniqueArg(cp.getExt()));
+            } else if (cp.getGlob() != null) {
+                switch (cp.getGlob()) {
+                    case "delta":
+                        params.add(new DeltaGlob(cp.getValue()));
+                        break;
+                    case "global":
+                        params.add(new GlobalGlob(cp.getValue()));
+                        break;
+                    default:
+                        throw new ConverterException(
+                            I18n.format(
+                                "processing_chain.unknown.glob", cp.getGlob()));
+                }
+            } else {
+                convertCommandLine(step, cp, params::addAll);
+            }
+        } // for all config parameters.
+        return params;
+    }
+
+    private void convertCommandLine(
+        ProcessingStep           step,
+        ConfigurationParameter   cp,
+        Consumer<ArrayList<Arg>> consumer
+    ) throws ConverterException {
+
+        String cmd = cp.getValue();
+        if (cmd == null) {
+            return;
+        }
+        cmd = cmd.trim();
+        if (cmd.isEmpty()) {
+            return;
+        }
+
+        String[] parts = StringUtils.splitCommandLine(cmd);
+
+        ArrayList<Arg> row = new ArrayList<>();
+
+        for (String part: parts) {
+            String[] atoms = StringUtils.split(
+                part, ConfigurationParameter.VARS_RE, true);
+
+            for (String atom: atoms) {
+                String var =
+                    ConfigurationParameter.extractVariable(atom);
+
+                if (var == null) {
+                    row.add(new Arg(atom));
+                    continue;
+                }
+
+                String val = step.findParameter(var);
+                if (val == null) {
+                    if (cp.isMandatory()) {
+                        throw new ConverterException(I18n.format(
+                            "processing_chain.param.not.found",
+                            var));
+                    }
+                    // This parameter is incomplete -> skip it!
+                    return;
+                }
+                usedVars.add(var);
+                row.add(new Arg(val));
+            } // for all atoms
+        }
+        consumer.accept(row);
     }
 
     /**

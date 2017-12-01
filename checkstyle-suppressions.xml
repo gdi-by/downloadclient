@@ -6,9 +6,7 @@
   <suppress checks=".*"
             files="generated-sources"/>
   <suppress checks=".*"
-            files="src/main/resources/sql/.*"/>
-  <suppress checks="Javadoc.*"
-            files="src/test"/>
+            files="src[/\\]main[/\\]resources[/\\]sql[/\\].*"/>
   <suppress checks="HeaderCheck"
-	  files="src/resources/.*\.properties"/>
+	  files="src[/\\]resources[/\\].*\.properties"/>
 </suppressions>

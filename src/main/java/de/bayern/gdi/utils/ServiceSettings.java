@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -46,6 +48,7 @@ public class ServiceSettings {
     private List<Service> services;
     private Map<String, String> catalogues;
     private Map<String, String> wms;
+    private Pattern checkWithGET;
 
     private static final String NAME =
             "ServiceSetting";
@@ -132,6 +135,7 @@ public class ServiceSettings {
     private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
         this.catalogues = parseNameURLScheme(xmlDocument, "catalogues");
+        this.checkWithGET = extractCheckWithGET(xmlDocument);
         this.wms = parseSchema(xmlDocument,
                 "wms",
                 "url",
@@ -146,6 +150,50 @@ public class ServiceSettings {
      */
     public static String getName() {
         return NAME;
+    }
+
+    /**
+     * Check if an URL should be check with HTTP GET instead of HTTP HEAD
+     * for being access restricted.
+     * @param url The URL to check.
+     * @return true if the URL needs a GET check otherwise false.
+     */
+    public boolean checkRestrictionWithGET(String url) {
+        return this.checkWithGET != null
+            && this.checkWithGET.matcher(url).matches();
+    }
+
+    // This is an XPATH expression and not an URI.
+    @java.lang.SuppressWarnings("squid:S1075")
+    private static final String CHECK_WITH_GET_XPATH =
+        "//check-restriction/use-get-url/text()";
+
+    private Pattern extractCheckWithGET(Document doc)
+        throws IOException {
+
+        StringBuilder pattern = new StringBuilder();
+
+        NodeList nodes = (NodeList)XML.xpath(
+            doc, CHECK_WITH_GET_XPATH,
+            XPathConstants.NODESET, null, null);
+
+        if (nodes == null || nodes.getLength() == 0) {
+            return null;
+        }
+
+        // Compile them into a super pattern.
+        for (int i = 0, n = nodes.getLength(); i < n; i++) {
+            if (i > 0) {
+                pattern.append('|');
+            }
+            String expr = nodes.item(i).getTextContent().trim();
+            pattern.append('(').append(expr).append(')');
+        }
+        try {
+            return Pattern.compile(pattern.toString());
+        } catch (PatternSyntaxException pse) {
+            throw new IOException(pse);
+        }
     }
 
     private static final String SERVICE_XPATH =
@@ -175,6 +223,10 @@ public class ServiceSettings {
         List<Service> servicesList = new ArrayList<>();
 
         NodeList servicesNL = xmlDocument.getElementsByTagName("services");
+        if (servicesNL.getLength() == 0) {
+            return servicesList;
+        }
+
         Node servicesNode = servicesNL.item(0);
         NodeList serviceNL = servicesNode.getChildNodes();
 

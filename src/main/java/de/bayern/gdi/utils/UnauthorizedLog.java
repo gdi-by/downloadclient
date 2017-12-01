@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
-public class UnauthorizedLog implements Unauthorized {
+public final class UnauthorizedLog implements Unauthorized {
 
     private static final Logger log
             = Logger.getLogger(UnauthorizedLog.class.getName());
@@ -33,11 +33,13 @@ public class UnauthorizedLog implements Unauthorized {
      * Constructor.
      */
     public UnauthorizedLog() {
+        // Do nothing.
     }
 
     /**
      * writes to the log, when user and pw is wrong.
      */
+    @Override
     public void unauthorized() {
         log.log(Level.SEVERE, I18n.getMsg("gui.wrong.user.and.pw"), this);
     }

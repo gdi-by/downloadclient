@@ -100,7 +100,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     @Override
     public Document handleResponse(HttpResponse response)
-        throws ClientProtocolException, IOException {
+        throws IOException {
         int status = response.getStatusLine().getStatusCode();
         String reason = response.getStatusLine().getReasonPhrase();
         Controller.logToAppLog(status + " " + reason + " "

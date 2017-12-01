@@ -19,10 +19,12 @@ package de.bayern.gdi.model;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,11 +91,11 @@ public class DownloadStep {
                         String serviceURL,
                         String path) {
         this(dataset,
-                parameters,
-                serviceType,
-                serviceURL,
-                path,
-                new ArrayList<ProcessingStep>());
+            parameters,
+            serviceType,
+            serviceURL,
+            path,
+            new ArrayList<ProcessingStep>());
     }
 
     /**
@@ -189,11 +191,12 @@ public class DownloadStep {
 
     /**
      * Finds a value for a given parameter key.
+     *
      * @param key The key.
      * @return The value if found else null.
      */
     public String findParameter(String key) {
-        for (Parameter p: this.parameters) {
+        for (Parameter p : this.parameters) {
             if (p.getKey().equals(key)) {
                 return p.getValue();
             }
@@ -210,7 +213,7 @@ public class DownloadStep {
         sb.append("\tpath: \"").append(path).append("\"\n");
         sb.append("\tparameters: ");
         for (int i = 0,
-            n = parameters != null ? parameters.size() : 0; i < n; i++) {
+             n = parameters != null ? parameters.size() : 0; i < n; i++) {
             if (i > 0) {
                 sb.append(", ");
             }
@@ -219,8 +222,8 @@ public class DownloadStep {
         sb.append("]\n");
         sb.append("\tprocessing steps:\n");
         for (int i = 0,
-            n = processingSteps != null ? processingSteps.size() : 0;
-            i < n; i++) {
+             n = processingSteps != null ? processingSteps.size() : 0;
+             i < n; i++) {
             sb.append("\t\t");
             sb.append(processingSteps.get(i));
             sb.append('\n');
@@ -231,6 +234,7 @@ public class DownloadStep {
 
     /**
      * Save the Object.
+     *
      * @param file File to save to
      * @throws IOException if space does not exist
      */
@@ -250,18 +254,43 @@ public class DownloadStep {
 
     /**
      * Loads DownloadStep from a file.
+     *
      * @param file The file to load the DownloadStep from.
      * @return The restored DownloadStep.
      * @throws IOException Something went wrong.
      */
     public static DownloadStep read(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
-            JAXBContext context = JAXBContext.newInstance(DownloadStep.class);
-            Unmarshaller um = context.createUnmarshaller();
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            return (DownloadStep)um.unmarshal(bis);
+            return getStep(fis);
+        } catch (JAXBException je) {
+            throw new IOException("", je);
+        }
+    }
+
+    private static DownloadStep getStep(InputStream is) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(DownloadStep.class);
+        Unmarshaller um = context.createUnmarshaller();
+        BufferedInputStream bis = new BufferedInputStream(is);
+        return (DownloadStep) um.unmarshal(bis);
+    }
+
+    /**
+     * Downloadstep from String.
+     *
+     * @param xmlString Configurationstring
+     * @return unmarshalled DownloadStep
+     * @throws IOException Just in case
+     */
+    public static DownloadStep read(String xmlString) throws IOException {
+        try {
+            InputStream stringStream = new ByteArrayInputStream(
+                xmlString.getBytes());
+            return getStep(stringStream);
         } catch (JAXBException je) {
             throw new IOException("", je);
         }
     }
 }
+
+
+

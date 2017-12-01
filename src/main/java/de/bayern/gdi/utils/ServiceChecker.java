@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathConstants;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -43,6 +43,9 @@ public class ServiceChecker {
 
     private static final Logger log
             = Logger.getLogger(ServiceChecker.class.getName());
+
+    private static final String COULD_NOT_GET_DOCUMENT_OF_URL
+            = "Could not get Document of URL: ";
 
     private ServiceChecker() {
     }
@@ -126,7 +129,7 @@ public class ServiceChecker {
             }
         } catch (URISyntaxException
                 | IOException e) {
-            log.log(Level.SEVERE, "Could not get Document of URL: "
+            log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                     + serviceURL.toString(), e);
             return null;
         }
@@ -152,9 +155,9 @@ public class ServiceChecker {
                 switch (nnm.getNamedItem("version").getNodeValue()) {
                     case "1.0.0":
                     case "1.1.0":
-                        return ServiceType.WFSOne;
+                        return ServiceType.WFS_ONE;
                     case "2.0.0":
-                        return ServiceType.WFSTwo;
+                        return ServiceType.WFS_TWO;
                     default:
                         return null;
                 }
@@ -168,7 +171,7 @@ public class ServiceChecker {
             NamedNodeMap nnm = n.getAttributes();
             String wfsVersion = nnm.getNamedItem("xmlns").getNodeValue();
             if (wfsVersion.toLowerCase().endsWith("atom")) {
-                return ServiceType.Atom;
+                return ServiceType.ATOM;
             }
         }
 
@@ -182,7 +185,7 @@ public class ServiceChecker {
      * @return true if restriced; false if not
      */
     public static boolean isRestricted(URL url) {
-        if (checkService(url) == ServiceType.Atom) {
+        if (checkService(url) == ServiceType.ATOM) {
             if (simpleRestricted(url)) {
                 return true;
             }
@@ -191,7 +194,7 @@ public class ServiceChecker {
                 mainXML = XML.getDocument(url, false);
             } catch (URISyntaxException
                     | IOException e) {
-                log.log(Level.SEVERE, "Could not get Document of URL: "
+                log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                         + url.toString(), e);
                 return true;
             }
@@ -213,7 +216,7 @@ public class ServiceChecker {
                      entryDoc = XML.getDocument(entryURL, false);
                 } catch (URISyntaxException
                     | IOException e) {
-                    log.log(Level.SEVERE, "Could not get Document of URL: "
+                    log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
                         + entryURL.toString(), e);
                     return true;
                 }
@@ -260,14 +263,21 @@ public class ServiceChecker {
      * @return HTTP Return code
      * @throws IOException if something goes wrong
      */
-    public static int tryHead(URL url)
-        throws IOException {
-        try {
-            CloseableHttpClient httpCl = HTTP.getClient(url, null, null);
-            HttpHead getRequest = HTTP.getHeadRequest(url);
-            CloseableHttpResponse execute = httpCl.execute(getRequest);
-            StatusLine statusLine = execute.getStatusLine();
-            return statusLine.getStatusCode();
+    public static int tryHead(URL url) throws IOException {
+        // Should this URL be tested with HTTP GET instead?
+        boolean useGET = Config.getInstance().getServices()
+            .checkRestrictionWithGET(url.toExternalForm());
+
+        try (CloseableHttpClient httpCl = HTTP.getClient(url, null, null)) {
+
+            HttpUriRequest req = useGET
+                ? HTTP.getGetRequest(url)
+                : HTTP.getHeadRequest(url);
+
+            try (CloseableHttpResponse execute = httpCl.execute(req)) {
+                StatusLine statusLine = execute.getStatusLine();
+                return statusLine.getStatusCode();
+            }
         } catch (URISyntaxException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }

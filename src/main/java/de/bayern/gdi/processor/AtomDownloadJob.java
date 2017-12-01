@@ -32,13 +32,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.StringUtils;
+import de.bayern.gdi.utils.AutoFileNames;
 import de.bayern.gdi.utils.XML;
 
 /** AtomDownloadJob is a job to download things from a ATOM service. */
@@ -101,10 +100,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
         }
     }
 
-    private static String mimetypeToExt(String type) {
-        return Config.getInstance().getMimeTypes().findExtension(type, "gml");
-    }
-
     private static final String DATASOURCE_XPATH
         = "/atom:feed/atom:entry[atom:id/text()=$CODE or"
         + " inspire_dls:spatial_dataset_identifier_code/text()=$CODE]"
@@ -147,8 +142,9 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
         ArrayList<DLFile> files = new ArrayList<>(nl.getLength());
 
-        String format = "%0" + StringUtils.places(nl.getLength()) + "d.%s";
-        for (int i = 0, j = 0, n = nl.getLength(); i < n; i++) {
+        AutoFileNames afn = new AutoFileNames(nl.getLength());
+
+        for (int i = 0, n = nl.getLength(); i < n; i++) {
             Element link = (Element)nl.item(i);
             String href = link.getAttribute("href");
             if (href.isEmpty()) {
@@ -159,9 +155,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
             // Service call?
             if (dataURL.getQuery() != null) {
                 String type = link.getAttribute("type");
-                String ext = mimetypeToExt(type);
-                fileName = String.format(format, j, ext);
-                j++;
+                fileName = afn.nextFileName(type);
             } else { // Direct download.
                 // XXX: Do more to prevent directory traversals?
                 fileName = new File(dataURL.getPath())
@@ -169,9 +163,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
 
                 if (fileName.isEmpty()) {
                     String type = link.getAttribute("type");
-                    String ext = mimetypeToExt(type);
-                    fileName = String.format(format, j, ext);
-                    j++;
+                    fileName = afn.nextFileName(type);
                 }
             }
             File file = new File(this.workingDir, fileName);

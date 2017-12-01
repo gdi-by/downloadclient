@@ -68,22 +68,34 @@ public class Start extends Application {
             log.log(Level.SEVERE, e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
-        return start;
+        return getInstance();
     }
 
     /**
      * Constructor.
      */
     public Start() {
-        start = this;
+        setInstance(this);
         LATCH.countDown();
     }
 
-    /**
-     * print a String, if this was invoked.
-     */
-    public void printInvoking() {
-        System.out.println("You called a method on the application");
+    private static synchronized void setInstance(Start s) {
+        Start.start = s;
+    }
+
+    private static synchronized Start getInstance() {
+        return Start.start;
+    }
+
+    private static DataBean forceDataBean() {
+        try {
+            return new DataBean();
+        } catch (IOException ioe) {
+            log.log(Level.SEVERE, ioe.getMessage(), ioe);
+            System.exit(1);
+        }
+        // Not reached.
+        return null;
     }
 
     /**
@@ -99,13 +111,7 @@ public class Start extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = null;
-            try {
-                dataBean = new DataBean();
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
-            }
+            DataBean dataBean = forceDataBean();
             Controller controller = fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
             controller.setDataBean(dataBean);
@@ -125,12 +131,9 @@ public class Start extends Application {
                 }
             });
         } catch (IOException ioe) {
-            System.out.println("Could not find UI description file.");
-            System.out.println(ioe.getMessage());
-            System.out.println(ioe.getCause());
-            for (StackTraceElement element : ioe.getStackTrace()) {
-                System.out.println(element.toString());
-            }
+            log.log(Level.SEVERE, ioe,
+                () -> "Could not find UI description file: "
+                + ioe.getMessage());
         }
     }
 }

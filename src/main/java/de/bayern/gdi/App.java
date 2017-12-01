@@ -19,109 +19,44 @@ package de.bayern.gdi;
 
 import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.utils.Config;
-import de.bayern.gdi.utils.StringUtils;
+
 import java.io.IOException;
+
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
 
-    private static final String[] HEADLESS = {
-        "-h",
-        "--headless",
-        "-headless"
-    };
-
-    private static final String[] CONFIG = {
-        "-c=",
-        "--config=",
-        "-config="
-    };
-
-    private static final String[] USER = {
-        "-u=",
-        "--user=",
-        "-user="
-    };
-
-    private static final String[] PASSWORD = {
-        "-p=",
-        "--password=",
-        "-password="
-    };
-
-    private static final String[] HELP = {
-        "-?",
-        "--help",
-        "-help"
-    };
+    private static final Logger log
+        = Logger.getLogger(App.class.getName());
 
     private App() {
+        // Not to be instantiated.
     }
 
-    private static boolean runHeadless(String[] args) {
-        return StringUtils.contains(args, HEADLESS);
+    private static void usage(Options options, int exitCode) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp(
+            "java -jar downloader.jar",
+            "", options,
+            "Without options (except '--config')"
+            + " the GUI application is started.",
+            true);
+        System.exit(exitCode);
     }
 
-    private static boolean help(String[] args) {
-        return StringUtils.contains(args, HELP);
-    }
-
-    private static String useConfig(String[] args) {
-        return StringUtils.extractPostfix(args, CONFIG);
-    }
-
-    private static String user(String[] args) {
-        return StringUtils.extractPostfix(args, USER);
-    }
-
-    private static String password(String[] args) {
-        return StringUtils.extractPostfix(args, PASSWORD);
-    }
-
-    private static void helpAndExit() {
-        System.out.println("java -jar downloader.jar [options]");
-        System.out.println("with options:");
-        System.out.println(
-            "  -?|--help|-help: Print this message and exit.");
-        System.out.println(
-            "  -h|--headless|-headless: Start command line tool.");
-        System.out.println(
-              "  -c=<dir>|--config=<dir>|-config=<dir>:"
-            + " Directory to overwrite default configuration.");
-        System.out.println(
-              "  -u=<user>|--user=<user>|-user=<user>:"
-            + " User name for protected services.");
-        System.out.println(
-              "  -p=<password>|--password=<password>|-password=<password>:"
-            + " Password for protected services.");
-        System.out.println("without options (except '--config'):");
-        System.out.println("  Start as GUI application.");
-        System.exit(0);
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-        if (help(args)) {
-            helpAndExit();
-        }
-
-        try {
-            Config.initialize(useConfig(args));
-        } catch (NullPointerException | IOException ioe) {
-            // TODO: Remove the NPE above!
-            System.err.println(
-                "Loading config failed: " + ioe.getMessage());
-            System.exit(1);
-        }
-
-        if (runHeadless(args)) {
-            System.exit(Headless.main(args, user(args), password(args)));
-        }
+    private static void startGUI() {
         // Its kind of complicated to start a javafx application from
         // another class. See http://stackoverflow.com/a/25909862
         new Thread() {
@@ -131,5 +66,84 @@ public class App {
             }
         }.start();
         Start.waitForStart();
+    }
+
+    private static void initConfig(String dir) {
+        try {
+            Config.initialize(dir);
+        } catch (NullPointerException | IOException ex) {
+            // TODO: Remove the NPE above!
+            log.log(Level.SEVERE,
+                () -> "Loading config failed: " + ex.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+
+        Options options = new Options();
+
+        Option help = Option.builder("?")
+            .hasArg(false)
+            .longOpt("help")
+            .desc("Print this message and exit.")
+            .build();
+
+        Option headless = Option.builder("h")
+            .hasArg(false)
+            .longOpt("headless")
+            .desc("Start command line tool.")
+            .build();
+
+        Option conf = Option.builder("c")
+            .hasArg(true)
+            .longOpt("config")
+            .desc("Directory to overwrite default configuration.")
+            .build();
+
+        Option user = Option.builder("u")
+            .hasArg(true)
+            .longOpt("user")
+            .desc("User name for protected services.")
+            .build();
+
+        Option password = Option.builder("p")
+            .hasArg(true)
+            .longOpt("password")
+            .desc("Password for protected services.")
+            .build();
+
+        options.addOption(help);
+        options.addOption(headless);
+        options.addOption(conf);
+        options.addOption(user);
+        options.addOption(password);
+
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine line = parser.parse(options, args);
+
+            if (line.hasOption("?")) {
+                usage(options, 0);
+            }
+
+            initConfig(line.getOptionValue("c"));
+
+            if (line.hasOption("h")) {
+                System.exit(Headless.main(
+                    line.getArgs(),
+                    line.getOptionValue("u"),
+                    line.getOptionValue("p")));
+            }
+
+            startGUI();
+
+        } catch (ParseException pe) {
+            log.log(Level.SEVERE, pe.getMessage());
+            usage(options, 1);
+        }
     }
 }

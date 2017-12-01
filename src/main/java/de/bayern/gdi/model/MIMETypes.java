@@ -185,6 +185,7 @@ public class MIMETypes {
                 try {
                     in.close();
                 } catch (IOException ioe) {
+                    log.log(Level.SEVERE, "Failed to close mimetypes", ioe);
                 }
             }
         }

@@ -64,17 +64,21 @@ public final class HTTP {
     public static CloseableHttpClient getClient(
         URL url, String user, String password
     ) {
-        int timeout;
-        try {
-            ApplicationSettings set = Config.getInstance()
-                    .getApplicationSettings();
-            timeout = Integer.parseInt(
-                    set.getApplicationSetting("requestTimeout_s"));
-            timeout *= S_TO_MS;
-        } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage());
-            timeout = DEFAULT_TIMEOUT;
+        int timeout = DEFAULT_TIMEOUT;
+
+        ApplicationSettings set = Config
+            .getInstance()
+            .getApplicationSettings();
+
+        String ts = set.getApplicationSetting("requestTimeout_s");
+        if (ts != null) {
+            try {
+                timeout = S_TO_MS * Integer.parseInt(ts);
+            } catch (NumberFormatException nfe) {
+                log.log(Level.SEVERE, nfe.getMessage());
+            }
         }
+
         // Use JVM proxy settings.
         SystemDefaultRoutePlanner routePlanner
             = new SystemDefaultRoutePlanner(ProxySelector.getDefault());

@@ -17,12 +17,6 @@
  */
 package de.bayern.gdi;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
@@ -30,10 +24,16 @@ import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
-import de.bayern.gdi.utils.Unauthorized;
-import de.bayern.gdi.utils.UnauthorizedLog;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
+import de.bayern.gdi.utils.Unauthorized;
+import de.bayern.gdi.utils.UnauthorizedLog;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The command line tool.
@@ -46,24 +46,13 @@ public class Headless implements ProcessorListener {
     private Headless() {
     }
 
-    @Override
-    public void receivedMessage(ProcessorEvent pe) {
-        log.info(pe.getMessage());
-    }
-
-    @Override
-    public void receivedException(ProcessorEvent pe) {
-        JobExecutionException jee = pe.getException();
-        log.log(Level.SEVERE, jee.getMessage(), jee);
-    }
-
     /**
-     * @param args The command line arguments.
-     * @param user Optional user name.
+     * @param args     The command line arguments.
+     * @param user     Optional user name.
      * @param password Optional user name.
      * @return Non zero if the operation fails.
      */
-    public static int main(String [] args, String user, String password) {
+    public static int main(String[] args, String user, String password) {
 
         log.info("Running in headless mode");
 
@@ -71,44 +60,54 @@ public class Headless implements ProcessorListener {
         DocumentResponseHandler.setUnauthorized(unauthorized);
         FileResponseHandler.setUnauthorized(unauthorized);
 
-        ArrayList<File> files = new ArrayList<>();
+        List<DownloadStep> steps = new ArrayList<>();
 
-        for (String arg: args) {
-            if (!arg.startsWith("-")) {
-                File file = new File(arg);
-                if (file.isFile() && file.canRead()) {
-                    files.add(file);
-                } else {
-                    log.log(Level.WARNING,
-                        () -> "'" + arg + "' is not a readable file.");
+        for (String arg : args) {
+            File file = new File(arg);
+            if (file.isFile() && file.canRead()) {
+                try {
+                    steps.add(DownloadStep.read(file));
+                    log.info(() -> "Download steps: " + file.getName());
+                } catch (IOException ioe) {
+                    log.log(
+                        Level.WARNING,
+                        "Cannot load file: " + file.getName(), ioe);
                 }
+            } else {
+                log.log(Level.WARNING,
+                    () -> "'" + arg + "' is not a readable file.");
             }
         }
 
+        return runHeadless(user, password, steps);
+    }
+
+    /**
+     * Triggers the actual Headless Mode.
+     *
+     * @param user     username
+     * @param password password
+     * @param steps    downloadSteps
+     * @return exit code
+     */
+    static int runHeadless(String user,
+                                   String password,
+                                   List<DownloadStep> steps) {
         Processor processor = new Processor();
         processor.addListener(new Headless());
         Thread thread = new Thread(processor);
         thread.start();
 
-        for (File file: files) {
+        for (DownloadStep step : steps) {
             try {
-                DownloadStep dls = DownloadStep.read(file);
-                log.info(() -> "Download steps: " + dls);
-
                 DownloadStepConverter dsc =
                     new DownloadStepConverter(user, password);
-
-                processor.addJob(dsc.convert(dls));
-
+                processor.addJob(dsc.convert(step));
             } catch (ConverterException ce) {
                 log.log(
                     Level.WARNING,
                     "Creating download jobs failed",
                     ce);
-            } catch (IOException ioe) {
-                log.log(
-                    Level.WARNING,
-                    "Cannot load file: " + file, ioe);
             }
         }
 
@@ -122,6 +121,17 @@ public class Headless implements ProcessorListener {
         }
 
         return 0;
+    }
+
+    @Override
+    public void receivedMessage(ProcessorEvent pe) {
+        log.info(pe.getMessage());
+    }
+
+    @Override
+    public void receivedException(ProcessorEvent pe) {
+        JobExecutionException jee = pe.getException();
+        log.log(Level.SEVERE, jee.getMessage(), jee);
     }
 }
 

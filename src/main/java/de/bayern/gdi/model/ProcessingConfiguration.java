@@ -187,14 +187,19 @@ public class ProcessingConfiguration {
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Failed to load configuration", ioe);
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ioe) {
-                }
-            }
+            closeGraceful(in);
         }
         return new ProcessingConfiguration();
+    }
+
+    private static void closeGraceful(InputStream in) {
+        if (in != null) {
+            try {
+                in.close();
+            } catch (IOException ioe) {
+                log.log(Level.INFO, "Failed to close file", ioe);
+            }
+        }
     }
 
     /**

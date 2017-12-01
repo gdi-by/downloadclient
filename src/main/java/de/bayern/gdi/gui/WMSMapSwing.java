@@ -776,13 +776,26 @@ public class WMSMapSwing extends Parent {
 
                 @Override
                 public void onMousePressed(MapMouseEvent ev) {
+                    // ignore me
                 }
 
                 @Override
                 public void onMouseDragged(MapMouseEvent ev) {
+                    // ignore me
                 }
             };
             mapPane.setCursorTool(tool);
+        }
+
+        /**
+         * sets name and id of the selected polygon.
+         * @param name name
+         * @param id id
+         */
+        private void setNameAndId(String name, String id) {
+            PolygonInfos polyInf = new PolygonInfos(name, id);
+            Platform.runLater(
+                () -> fireEvent(new PolygonClickedEvent(polyInf)));
         }
     }
 
@@ -818,16 +831,6 @@ public class WMSMapSwing extends Parent {
         public String getID() {
             return this.id;
         }
-    }
-
-    /**
-     * sets name and id of the selected polygon.
-     * @param name name
-     * @param id id
-     */
-    private void setNameAndId(String name, String id) {
-        PolygonInfos polyInf = new PolygonInfos(name, id);
-        Platform.runLater(() -> fireEvent(new PolygonClickedEvent(polyInf)));
     }
 
     /**
@@ -949,13 +952,19 @@ public class WMSMapSwing extends Parent {
             //Add listener to log getMap requests after rendering
             mapPane.addMapPaneListener(new MapPaneListener() {
                 @Override
-                public void onDisplayAreaChanged(MapPaneEvent ev) { }
+                public void onDisplayAreaChanged(MapPaneEvent ev) {
+                    // ignore me
+                }
 
                 @Override
-                public void onNewMapContent(MapPaneEvent ev) { }
+                public void onNewMapContent(MapPaneEvent ev) {
+                    // ignore me
+                }
 
                 @Override
-                public void onRenderingStarted(MapPaneEvent ev) { }
+                public void onRenderingStarted(MapPaneEvent ev) {
+                    // ignore me
+                }
 
                 @Override
                 public void onRenderingStopped(MapPaneEvent ev) {

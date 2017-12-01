@@ -22,24 +22,28 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Common string operations.
  */
 public class StringUtils {
-
-    private static final Logger log
-        = Logger.getLogger(StringUtils.class.getName());
+    private static final Logger log =
+            Logger.getLogger(StringUtils.class.getName());
+    private static final int TEN = 10;
 
     private StringUtils() {
     }
 
     /**
      * URL-encodes a given string in UTF-8.
+     *
      * @param s The string to encode.
      * @return The encodes string.
      */
@@ -49,11 +53,12 @@ public class StringUtils {
 
     /**
      * URL-encodes a given string in a given encoding.
-     * @param s The string to encode.
+     *
+     * @param s   The string to encode.
      * @param enc The encoding to use.
      * @return The encodes string.
      */
-    public static String urlEncode(String s, String enc) {
+    private static String urlEncode(String s, String enc) {
         try {
             return URLEncoder.encode(s, enc);
         } catch (UnsupportedEncodingException e) {
@@ -64,56 +69,32 @@ public class StringUtils {
 
     /**
      * Searches a needle of a set of needles in a haystack.
+     *
      * @param haystack The haystack.
-     * @param needles The needles.
+     * @param needles  The needles.
      * @return true if the haystack contains one of the needles.
      * false otherwise.
      */
     public static boolean contains(String[] haystack, String[] needles) {
-        for (String straw: haystack) {
-            for (String needle: needles) {
-                if (straw.equals(needle)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return Stream.of(needles)
+                .anyMatch(within(haystack));
     }
 
-    /**
-     * Search for a prefix of a set of prefexis in a haystack.
-     * @param haystack The haystack.
-     * @param prefixes The prefixes.
-     * @return The postfix of the found prefix if found.
-     * null otherwise.
-     */
-    public static String extractPostfix(String []haystack, String[] prefixes) {
-        for (String straw: haystack) {
-            for (String p: prefixes) {
-                if (straw.startsWith(p)) {
-                    return straw.substring(p.length());
-                }
-            }
-        }
-        return null;
-    }
-
-    /** States for the command line splitting. */
-    private enum State {
-        NORMAL,
-        IN_QUOTE,
-        IN_DOUBLE_QUOTE
+    private static Predicate<String> within(String[] haystack) {
+        return needle-> Stream.of(haystack)
+                .anyMatch(needle::equals);
     }
 
     /**
      * Split a command line.
+     *
      * @param toProcess the command line to process.
      * @return the command line broken into strings.
      * An empty or null toProcess parameter results in a zero sized array.
      * @throws IllegalArgumentException Thrown if quotes are unbalanced.
      */
     public static String[] splitCommandLine(String toProcess)
-    throws IllegalArgumentException {
+            throws IllegalArgumentException {
 
         if (toProcess == null || toProcess.length() == 0) {
             //no command? no string
@@ -130,37 +111,37 @@ public class StringUtils {
         while (tok.hasMoreTokens()) {
             String nextTok = tok.nextToken();
             switch (state) {
-            case IN_QUOTE:
-                if ("\'".equals(nextTok)) {
-                    lastTokenHasBeenQuoted = true;
-                    state = State.NORMAL;
-                } else {
-                    current.append(nextTok);
-                }
-                break;
-            case IN_DOUBLE_QUOTE:
-                if ("\"".equals(nextTok)) {
-                    lastTokenHasBeenQuoted = true;
-                    state = State.NORMAL;
-                } else {
-                    current.append(nextTok);
-                }
-                break;
-            default:
-                if ("\'".equals(nextTok)) {
-                    state = State.IN_QUOTE;
-                } else if ("\"".equals(nextTok)) {
-                    state = State.IN_DOUBLE_QUOTE;
-                } else if (" ".equals(nextTok)) {
-                    if (lastTokenHasBeenQuoted || current.length() != 0) {
-                        result.add(current.toString());
-                        current.setLength(0);
+                case IN_QUOTE:
+                    if ("\'".equals(nextTok)) {
+                        lastTokenHasBeenQuoted = true;
+                        state = State.NORMAL;
+                    } else {
+                        current.append(nextTok);
                     }
-                } else {
-                    current.append(nextTok);
-                }
-                lastTokenHasBeenQuoted = false;
-                break;
+                    break;
+                case IN_DOUBLE_QUOTE:
+                    if ("\"".equals(nextTok)) {
+                        lastTokenHasBeenQuoted = true;
+                        state = State.NORMAL;
+                    } else {
+                        current.append(nextTok);
+                    }
+                    break;
+                default:
+                    if ("\'".equals(nextTok)) {
+                        state = State.IN_QUOTE;
+                    } else if ("\"".equals(nextTok)) {
+                        state = State.IN_DOUBLE_QUOTE;
+                    } else if (" ".equals(nextTok)) {
+                        if (lastTokenHasBeenQuoted || current.length() != 0) {
+                            result.add(current.toString());
+                            current.setLength(0);
+                        }
+                    } else {
+                        current.append(nextTok);
+                    }
+                    lastTokenHasBeenQuoted = false;
+                    break;
             }
         }
         if (lastTokenHasBeenQuoted || current.length() != 0) {
@@ -168,26 +149,17 @@ public class StringUtils {
         }
         if (state == State.IN_QUOTE || state == State.IN_DOUBLE_QUOTE) {
             throw new IllegalArgumentException(
-                "unbalanced quotes in " + toProcess);
+                    "unbalanced quotes in " + toProcess);
         }
         return result.toArray(new String[result.size()]);
     }
 
     /**
-     * Splits a string by a pattern. It does not keep the delimeters.
-     * @param s The string to split.
-     * @param delim The delimeter.
-     * @return The splitted string.
-     */
-    public static String[] split(String s, Pattern delim) {
-        return split(s, delim, false);
-    }
-
-    /**
      * Splits a string by a pattern.
-     * @param s The string to split.
+     *
+     * @param s     The string to split.
      * @param delim The delimeter.
-     * @param keep Indicates if the delimeters should be kept.
+     * @param keep  Indicates if the delimeters should be kept.
      * @return The splitted string.
      */
     public static String[] split(String s, Pattern delim, boolean keep) {
@@ -216,40 +188,42 @@ public class StringUtils {
 
     /**
      * Joins a list of objects with a separator to a string.
-     * @param s The list of objects.
+     *
+     * @param s   The list of objects.
      * @param sep The separator.
      * @return the joined string.
      */
     public static String join(List<?> s, String sep) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0, n = s.size(); i < n; i++) {
-            if (i > 0) {
-                sb.append(sep);
-            }
-            sb.append(s.get(i));
-        }
-        return sb.toString();
+        return s.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(sep));
     }
 
-    private static final int TEN = 10;
-
-    /** How many digit place does a number need?
+    /**
+     * How many digit place does a number need?
+     *
      * @param n The number.
      * @return the number of digits.
      */
     public static int places(int n) {
         int places = 1;
-        for (int value = TEN; n > value; value *= TEN) {
+        if (n < 0) {
+            places++;
+            n = -n;
+        }
+        for (int value = TEN; n >= value; value *= TEN) {
             places++;
         }
         return places;
     }
 
-    /** Convert a whitespace separated list of double strings
+    /**
+     * Convert a whitespace separated list of double strings
      * to a double array.
+     *
      * @param s the string with the double values.
      * @return the converted array. Returns an empty array
-     *         if the conversion fails.
+     * if the conversion fails.
      */
     public static double[] toDouble(String s) {
         try {
@@ -268,39 +242,44 @@ public class StringUtils {
      * Splits a given string by a separator and ignores parts
      * that starts with a given prefixes (case insensitve).
      * Afterwards the parts are re-joined with the separator.
-     * @param s The string.
-     * @param sep The separator.
+     *
+     * @param s        The string.
+     * @param sep      The separator.
      * @param prefixes The prefixes.
      * @return The treated string.
      */
     public static String ignorePartsWithPrefix(
-        String s, String sep, String[] prefixes) {
-        List<String> use = new ArrayList<>();
-parts:
-        for (String part: s.split(Pattern.quote(sep))) {
-            for (String prefix: prefixes) {
-                if (part.toLowerCase().startsWith(prefix.toLowerCase())) {
-                    continue parts;
-                }
-            }
-            use.add(part);
-        }
+            String s, String sep, String[] prefixes) {
+
+        List<String> lcPrefixes = Stream.of(prefixes)
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
+
+        List<String> use = Stream.of(s.split(Pattern.quote(sep)))
+            .filter(str -> lcPrefixes.stream()
+                .noneMatch(p -> str.toLowerCase().startsWith(p)))
+            .collect(Collectors.toList());
+
         return join(use, sep);
     }
 
     /**
      * Checks if two strings are equal or both null.
+     *
      * @param a The first string.
      * @param b The second strinh.
      * @return true if both strings are equal or both null.
      */
     public static boolean nullOrEquals(String a, String b) {
-        if (a == null && b == null) {
-            return true;
-        }
-        if (a == null || b == null) {
-            return false;
-        }
-        return a.equals(b);
+        return a == null && b == null || a != null && b != null && a.equals(b);
+    }
+
+    /**
+     * States for the command line splitting.
+     */
+    private enum State {
+        NORMAL,
+        IN_QUOTE,
+        IN_DOUBLE_QUOTE
     }
 }

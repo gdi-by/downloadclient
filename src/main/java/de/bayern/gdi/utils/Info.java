@@ -52,6 +52,7 @@ public class Info {
     private static final String MAVEN_PACKAGE = "de.bayern.gdi";
     private static final String MAVEN_ARTIFACT = "downloadclient";
     private static final String COMMENT = "Geodateninfrastruktur Bayern";
+    private static final String UNKNOWN = "unknown";
 
     private static final Logger log
             = Logger.getLogger(Info.class.getName());
@@ -65,8 +66,8 @@ public class Info {
             log.log(Level.SEVERE,
                     "Reading of Version or Name failed: " + e.getMessage(),
                     e);
-            version = "unknown";
-            name = "unknown";
+            version = UNKNOWN;
+            name = UNKNOWN;
         }
     }
 
@@ -121,7 +122,7 @@ public class Info {
             }
         }
         n = n == null ? "" : n.trim();
-        return n.isEmpty() ? "unknown" : n;
+        return n.isEmpty() ? UNKNOWN : n;
     }
 
     private synchronized String pullVersion() throws URISyntaxException,
@@ -146,7 +147,7 @@ public class Info {
             }
         }
         v = v == null ? "" : v.trim();
-        return v.isEmpty() ? "unknown" : v;
+        return v.isEmpty() ? UNKNOWN : v;
     }
 
     private Path getPomPath() throws URISyntaxException {

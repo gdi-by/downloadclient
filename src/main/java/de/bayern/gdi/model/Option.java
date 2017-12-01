@@ -33,6 +33,7 @@ public class Option {
     private String value;
 
     public Option() {
+        // This is instantiated in a JAXB-like manner.
     }
 
     /**

@@ -64,6 +64,13 @@ public final class NamespaceContextMap implements
         this.nsMap = createNamespaceMap(this.prefixMap);
     }
 
+    private static void childrenToStack(Node node, ArrayDeque<Node> stack) {
+        NodeList children = node.getChildNodes();
+        for (int i = 0, n = children.getLength(); i < n; i++) {
+            stack.push(children.item(i));
+        }
+    }
+
     private static Map<String, String> collectNS(Node node) {
 
         Map<String, String> prefixMap = new HashMap<>();
@@ -76,15 +83,12 @@ public final class NamespaceContextMap implements
             String prefix = node.getPrefix();
             String ns = node.getNamespaceURI();
 
-            if (prefix != null && ns != null
-            && !prefixMap.containsKey(prefix)) {
-                prefixMap.put(prefix, ns);
+            if (prefix != null && ns != null) {
+                prefixMap.putIfAbsent(prefix, ns);
             }
 
-            NodeList children = node.getChildNodes();
-            for (int i = 0, n = children.getLength(); i < n; i++) {
-                stack.push(children.item(i));
-            }
+            childrenToStack(node, stack);
+
             NamedNodeMap attrs = node.getAttributes();
             if (attrs != null) {
                 for (int i = 0, n = attrs.getLength(); i < n; i++) {
@@ -94,9 +98,7 @@ public final class NamespaceContextMap implements
                     && nsa.equals("http://www.w3.org/2000/xmlns/")) {
                         String nsp = attr.getLocalName();
                         String nsv = attr.getValue();
-                        if (!prefixMap.containsKey(nsp)) {
-                            prefixMap.put(nsp, nsv);
-                        }
+                        prefixMap.putIfAbsent(nsp, nsv);
                     }
                     stack.push(attr);
                 }

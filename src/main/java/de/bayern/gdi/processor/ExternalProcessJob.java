@@ -36,19 +36,25 @@ import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Starts an external process with optional arguments and
  * an optional working directory.
  */
 public class ExternalProcessJob implements Job {
 
+    private static final Logger log
+        = Logger.getLogger(ExternalProcessJob.class.getName());
+
     /** An argument for an external call. */
     public static class Arg {
 
-        /** The argmuent. */
-        protected String arg;
-        public Arg(String arg) {
-            this.arg = arg;
+        /** The argument. */
+        protected String argument;
+        public Arg(String argument) {
+            this.argument = argument;
         }
 
         /**
@@ -58,14 +64,14 @@ public class ExternalProcessJob implements Job {
          * @return The expanded argument.
          */
         public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
-            return new String[] {this.arg};
+            return new String[] {this.argument};
         }
     }
 
     /** Generate a unique file name with an extension. */
     public static class UniqueArg extends Arg {
-        public UniqueArg(String arg) {
-            super(arg);
+        public UniqueArg(String argument) {
+            super(argument);
         }
 
         @Override
@@ -73,8 +79,8 @@ public class ExternalProcessJob implements Job {
             if (fileTracker == null) {
                 return super.getArgs(fileTracker, tmpNames);
             }
-            File file = Misc.uniqueFile(
-                fileTracker.getDirectory(), "download-", this.arg, tmpNames);
+            File file = Misc.uniqueFile(fileTracker.getDirectory(),
+                "download-", this.argument, tmpNames);
 
             if (file == null) {
                 throw new IllegalArgumentException("No unique name available.");
@@ -87,8 +93,8 @@ public class ExternalProcessJob implements Job {
 
     /** A global globbing argument for an external call. */
     public static class GlobalGlob extends Arg {
-        public GlobalGlob(String arg) {
-            super(arg);
+        public GlobalGlob(String argument) {
+            super(argument);
         }
 
         /**
@@ -107,21 +113,21 @@ public class ExternalProcessJob implements Job {
         @Override
         public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
             return fileTracker != null
-                ? toString(fileTracker.globalGlob(arg))
+                ? toString(fileTracker.globalGlob(this.argument))
                 : super.getArgs(fileTracker, tmpNames);
         }
     }
 
     /** A delta globbing argument for an external call. */
     public static class DeltaGlob extends GlobalGlob {
-        public DeltaGlob(String arg) {
-            super(arg);
+        public DeltaGlob(String argument) {
+            super(argument);
         }
 
         @Override
         public String[] getArgs(FileTracker fileTracker, Set<File> tmpNames) {
             return fileTracker != null
-                ? toString(fileTracker.deltaGlob(arg))
+                ? toString(fileTracker.deltaGlob(this.argument))
                 : super.getArgs(fileTracker, tmpNames);
         }
     }
@@ -170,21 +176,21 @@ public class ExternalProcessJob implements Job {
         return list;
     }
 
-    private void log(String msg) {
+    private void logExtra(String msg) {
         if (this.logger != null) {
             this.logger.log(msg);
         }
     }
 
     private void broadcastMessage(Processor p, String msg) {
-        log(msg);
+        logExtra(msg);
         if (p != null) {
             p.broadcastMessage(msg);
         }
     }
 
     private void broadcastException(Processor p, JobExecutionException jee) {
-        log(jee.getMessage());
+        logExtra(jee.getMessage());
         if (p != null) {
             p.broadcastException(jee);
         }
@@ -242,17 +248,21 @@ public class ExternalProcessJob implements Job {
                     try {
                         String line;
                         while ((line = in.readLine()) != null) {
-                            log(line);
+                            logExtra(line);
                         }
                     } catch (IOException ioe) {
-                        log(ioe.getMessage());
+                        logExtra(ioe.getMessage());
                     } finally {
-                        try {
-                            in.close();
-                        } catch (IOException ioe) {
-                        }
+                        closeGraceful();
                     }
+                }
 
+                private void closeGraceful() {
+                    try {
+                        in.close();
+                    } catch (IOException ioe) {
+                        log.log(Level.INFO, ioe.getMessage(), ioe);
+                    }
                 }
             };
             t.setDaemon(true);

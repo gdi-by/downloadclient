@@ -51,6 +51,7 @@ public class ConfigurationParameter {
     private String value;
 
     public ConfigurationParameter() {
+        // This is instantiated in a JAXB-like manner.
     }
 
     /**

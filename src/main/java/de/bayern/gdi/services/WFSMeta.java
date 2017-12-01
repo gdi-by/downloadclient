@@ -33,6 +33,8 @@ public class WFSMeta {
     private static final Logger log
         = Logger.getLogger(WFSMeta.class.getName());
 
+    private static final String TAB_NEWLINE = "\t}\n";
+
     /** operation. */
     public static class Operation {
         /** name. */
@@ -226,24 +228,24 @@ public class WFSMeta {
     /** Version. */
     public static class Version implements Comparable<Version> {
         /** version. */
-        protected String version;
+        private String versionString;
         /** parsed. */
-        protected int[] parsed;
+        private int[] parsed;
 
         /** Version. */
         public Version() {
         }
 
         /** @param version The version. */
-        public Version(String version) {
-            this.version = version;
+        public Version(String versionString) {
+            this.versionString = versionString;
             parse();
         }
 
         /** Parses the version string to numbers. */
         public void parse() {
             try {
-                String[] parts = version.split("\\.");
+                String[] parts = versionString.split("\\.");
                 int[] converted = new int[parts.length];
                 for (int i = 0; i < converted.length; i++) {
                     converted[i] = Integer.parseInt(parts[i]);
@@ -257,7 +259,7 @@ public class WFSMeta {
         @Override
         public int compareTo(Version other) {
             if (other.parsed == null && this.parsed == null) {
-                return this.version.compareTo(other.version);
+                return this.versionString.compareTo(other.versionString);
             }
             if (this.parsed == null) {
                 return +1;
@@ -276,8 +278,29 @@ public class WFSMeta {
         }
 
         @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Version && compareTo((Version)obj) == 0;
+        }
+
+        private static final int THIRTYONE = 31;
+
+        @Override
+        public int hashCode() {
+            int hash = 0;
+
+            if (this.parsed != null) {
+                hash = 1;
+                for (int x: this.parsed) {
+                    hash = THIRTYONE * hash + x;
+                }
+            }
+
+            return hash + THIRTYONE * versionString.hashCode();
+        }
+
+        @Override
         public String toString() {
-            return this.version;
+            return this.versionString;
         }
     }
 
@@ -454,37 +477,37 @@ public class WFSMeta {
         for (Operation op: operations) {
             sb.append("\t\t").append(op).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tconstraints: {\n");
         for (Constraint c: constraints) {
             sb.append("\t\t").append(c).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tfeatures: {\n");
         for (Feature f: features) {
             sb.append("\t\t").append(f).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tstored queries: {\n");
         for (StoredQuery sq: storedQueries) {
             sb.append("\t\t").append(sq).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tversions: {\n");
         for (Version version: versions) {
             sb.append("\t\t").append(version).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\toutput formats: {\n");
         for (String outputFormat: outputFormats) {
             sb.append("\t\t").append(outputFormat).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("\tconstraints: {\n");
         for (Constraint constraint: constraints) {
             sb.append("\t\t").append(constraint).append("\n");
         }
-        sb.append("\t}\n");
+        sb.append(TAB_NEWLINE);
         sb.append("}");
         return sb.toString();
     }
