@@ -55,8 +55,6 @@ if [ $# -eq 0 ]
     mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean compile package
 fi
 
-exit(0)
-
 #tidy up the version-number alteration above
 git checkout -- src/resources/about
 
