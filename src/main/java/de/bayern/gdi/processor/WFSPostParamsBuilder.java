@@ -257,7 +257,7 @@ public class WFSPostParamsBuilder {
         String   bbox,
         Element  parent
     ) {
-        String [] bboxArr = bbox.split("\\*s,\\s*");
+        String [] bboxArr = bbox.split(",");
         if (bboxArr.length == FIVE) {
             Element filterEl = doc.createElementNS(FES_NS, "fes:Filter");
             Element bboxEl = doc.createElementNS(FES_NS, "fes:BBOX");
