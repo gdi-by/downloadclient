@@ -173,18 +173,15 @@ public class WFSPostParamsBuilder {
         Element getFeature = doc.createElementNS(
             WFS_NS, "wfs:GetFeature");
 
-        getFeature.setAttributeNS(
-            WFS_NS, "wfs:service", "WFS");
+        getFeature.setAttribute("service", "WFS");
 
-        getFeature.setAttributeNS(WFS_NS, "wfs:version",
+        getFeature.setAttribute("version",
              meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
-        getFeature.setAttributeNS(
-            WFS_NS, "wfs:outputFormat", outputFormat);
+        getFeature.setAttribute("outputFormat", outputFormat);
 
         if (hits) {
-            getFeature.setAttributeNS(
-                WFS_NS, "wfs:resultType", "hits");
+            getFeature.setAttribute("resultType", "hits");
         }
 
         if (ofs != -1) {
