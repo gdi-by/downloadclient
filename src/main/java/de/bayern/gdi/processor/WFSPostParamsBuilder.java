@@ -173,18 +173,15 @@ public class WFSPostParamsBuilder {
         Element getFeature = doc.createElementNS(
             WFS_NS, "wfs:GetFeature");
 
-        getFeature.setAttributeNS(
-            WFS_NS, "wfs:service", "WFS");
+        getFeature.setAttribute("service", "WFS");
 
-        getFeature.setAttributeNS(WFS_NS, "wfs:version",
+        getFeature.setAttribute("version",
              meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
-        getFeature.setAttributeNS(
-            WFS_NS, "wfs:outputFormat", outputFormat);
+        getFeature.setAttribute("outputFormat", outputFormat);
 
         if (hits) {
-            getFeature.setAttributeNS(
-                WFS_NS, "wfs:resultType", "hits");
+            getFeature.setAttribute("resultType", "hits");
         }
 
         if (ofs != -1) {
@@ -257,7 +254,7 @@ public class WFSPostParamsBuilder {
         String   bbox,
         Element  parent
     ) {
-        String [] bboxArr = bbox.split("\\*s,\\s*");
+        String [] bboxArr = bbox.split(",");
         if (bboxArr.length == FIVE) {
             Element filterEl = doc.createElementNS(FES_NS, "fes:Filter");
             Element bboxEl = doc.createElementNS(FES_NS, "fes:BBOX");
