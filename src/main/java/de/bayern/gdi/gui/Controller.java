@@ -1062,19 +1062,27 @@ public class Controller {
      */
     @FXML
     protected void handleDataformatSelect(ActionEvent event) {
-        if (dataFormatChooser.getValue() != null) {
-            if (dataFormatChooser.getValue().isAvailable()) {
-                dataFormatChooser.setStyle(FX_BORDER_COLOR_NULL);
-            } else {
-                dataFormatChooser.setStyle(FX_BORDER_COLOR_RED);
-            }
+        ComboBox<OutputFormatModel> cb =
+            (ComboBox<OutputFormatModel>)event.getSource();
+        handleDataformatSelect(cb);
+    }
+
+    /**
+     * Handle the dataformat selection.
+     *
+     * @param cb The ComboBox
+     */
+    protected void handleDataformatSelect(ComboBox<OutputFormatModel> cb) {
+        if (cb.getValue() != null) {
+            cb.setStyle(cb.getValue().isAvailable()
+                ? FX_BORDER_COLOR_NULL
+                : FX_BORDER_COLOR_RED);
         }
-        ComboBox source = (ComboBox) event.getSource();
         dataBean.addAttribute(OUTPUTFORMAT,
-                source.getValue() != null
-                        ? source.getValue().toString()
-                        : "",
-                "");
+            cb.getValue() != null
+                ? cb.getValue().toString()
+                : "",
+            "");
         validateChainContainerItems();
     }
 
@@ -1939,6 +1947,18 @@ public class Controller {
                     this.simpleWFSContainer,
                     storedQuery,
                     formatModels);
+
+            // XXX: This is a bit ugly. We need real MVC.
+            Node df = this.simpleWFSContainer
+                .lookup("#" + UIFactory.getDataFormatID());
+            if (df instanceof ComboBox) {
+                ((ComboBox)df).setOnAction(evt -> {
+                    ComboBox<OutputFormatModel> cb =
+                        (ComboBox<OutputFormatModel>)evt.getSource();
+                    handleDataformatSelect(cb);
+                });
+            }
+
             this.atomContainer.setVisible(false);
             this.simpleWFSContainer.setVisible(true);
             this.basicWFSContainer.setVisible(false);
