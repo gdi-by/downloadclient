@@ -51,7 +51,7 @@ public class WFSPostParamsBuilder {
 
     private static final String WFS_NS = "http://www.opengis.net/wfs/2.0";
     private static final String FES_NS = "http://www.opengis.net/fes/2.0";
-    private static final String GML_NS = "http://www.opengis.net/gml/3.2/";
+    private static final String GML_NS = "http://www.opengis.net/gml/3.2";
 
 
     private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
