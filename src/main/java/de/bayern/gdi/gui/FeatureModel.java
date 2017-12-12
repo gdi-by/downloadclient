@@ -48,4 +48,8 @@ public class FeatureModel implements ItemModel {
             ? title
             : this.feature.getName();
     }
+
+    public WFSMeta.Feature getFeature() {
+        return feature;
+    }
 }
