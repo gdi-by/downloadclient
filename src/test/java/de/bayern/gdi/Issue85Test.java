@@ -28,6 +28,7 @@ import java.util.List;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
+import de.bayern.gdi.model.Query;
 
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.ExternalProcessJob;
@@ -64,6 +65,7 @@ public class Issue85Test extends TestCase {
 
         ArrayList<ProcessingStep> pss = new ArrayList<>();
         ArrayList<Parameter> params = new ArrayList<>();
+        ArrayList<Query> queries = new ArrayList<>();
 
         ProcessingStep ps = new ProcessingStep();
         ps.setName("toShape");
@@ -73,7 +75,7 @@ public class Issue85Test extends TestCase {
         DownloadStep dls = new DownloadStep(
             "", params,
             "", "", "",
-            pss);
+            pss, queries);
 
         ProcessingStepConverter psc = new ProcessingStepConverter();
 
