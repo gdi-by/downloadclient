@@ -35,7 +35,7 @@ import org.apache.http.HttpStatus;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 
 /**
  * File handler for HttpClient.
@@ -68,19 +68,19 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
 
     private File file;
 
-    private HttpRequestBase request;
+    private HttpUriRequest request;
 
     private WrapInputStreamFactory wrapFactory;
 
     public FileResponseHandler() {
     }
 
-    public FileResponseHandler(File file, HttpRequestBase request) {
+    public FileResponseHandler(File file, HttpUriRequest request) {
         this(file, null, request);
     }
 
     public FileResponseHandler(File file, WrapInputStreamFactory wrapFactory,
-            HttpRequestBase request) {
+            HttpUriRequest request) {
         this.file = file;
         this.wrapFactory = wrapFactory;
         this.request = request;
