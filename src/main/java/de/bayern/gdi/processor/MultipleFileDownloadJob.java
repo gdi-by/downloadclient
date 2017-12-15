@@ -33,10 +33,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 /** Abstract class to do multiple file downloads. */
 public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
@@ -118,13 +117,14 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         boolean usePost = dlf.postParams != null;
 
-        HttpGet httpget = null;
-        HttpPost httppost = null;
+        HttpUriRequest req;
+
         if (usePost) {
-            httppost = new HttpPost(dlf.url.toString());
+            HttpPost httppost = new HttpPost(dlf.url.toString());
             httppost.setEntity(dlf.postParams);
+            req = httppost;
         } else {
-            httpget = getGetRequest(dlf.url);
+            req = getGetRequest(dlf.url);
         }
 
         WrapInputStreamFactory wrapFactory
@@ -132,20 +132,12 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         CloseableHttpClient client = null;
         try {
-            if (usePost) {
-                client = HttpClients.createDefault();
-                FileResponseHandler frh
-                    = new FileResponseHandler(dlf.file, wrapFactory,
-                    httppost);
-                client.execute(httppost, frh);
+            client = getClient(dlf.url);
 
-            } else {
-                client = getClient(dlf.url);
-                FileResponseHandler frh
-                    = new FileResponseHandler(dlf.file, wrapFactory,
-                    httpget);
-                client.execute(httpget, frh);
-            }
+            FileResponseHandler frh = new FileResponseHandler(
+                dlf.file, wrapFactory, req);
+
+            client.execute(req, frh);
 
             return RemoteFileState.SUCCESS;
         } catch (ClientProtocolException cpe) {
