@@ -33,11 +33,7 @@ Das Zip-Archiv an einen geeigneten Ort entpacken.
 Starten der Anwendung
 ----------------------
 
-<<<<<<< HEAD
-Die Datei "startup.bat" ausführen.
-=======
 Die Datei ``startup.bat`` ausführen.
->>>>>>> master
 
 Proxy-Einstellungen
 --------------------
