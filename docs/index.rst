@@ -119,7 +119,7 @@ Bei Auswahl einer vordefinierten Abfrage passt sich der Datensatzvarianten-Auswa
 
 **Beispiel:**
 
-.. image:: img/DLC_storedquery_WFS.PNG
+.. image:: img/V1.1_storedquery_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Die vordefinierte Abfrage lautet *"Abfrage einer Gemeinde über den Gemeindeschlüssel"*. 
@@ -134,7 +134,7 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 **Beispiel:**
 
-.. image:: img/DLC_featuretype_WFS.PNG
+.. image:: img/V1.1_featuretype_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"GemeindenBayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
@@ -150,7 +150,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 **Beispiel Variante a):**
 
-.. image:: img/DLC_Kartenauswahl_Atom.PNG
+.. image:: img/V1.1_Kartenauswahl_ATOM.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
@@ -160,7 +160,7 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspo
 
 **Beispiel Variante b):**
 
-.. image:: img/DLC_Listenauswahl_Atom.PNG
+.. image:: img/V1.1_Listenauswahl_ATOM.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
@@ -187,9 +187,9 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 Nicht ausführbare Verarbeitungsschritte werden rot eingefärbt. 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
-.. image:: img/DLC_Weiterverarbeitung_DOP.png
+.. image:: img/V1.1_Weiterverarbeitung_DOP.png
 
-Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112013-0" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
+Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112017-1" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
 
 Download-Logfiles
 -------------------
