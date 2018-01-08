@@ -78,7 +78,7 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten[1_] vom Download-Client 
 Benutzeroberfläche 
 -------------------
 
-.. image:: img/DLC_GUI.png
+.. image:: img/V1.1_Benutzeroberflaeche.png
 
 
 
