@@ -184,6 +184,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
+Nicht ausführbare Verarbeitungsschritte werden rot eingefärbt. 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
 .. image:: img/DLC_Weiterverarbeitung_DOP.png
@@ -272,7 +273,7 @@ Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitung
 
 - im Element ``<Befehl>``: Angabe eines Befehls aus der `GDAL Bibliothek <http://www.gdal.org/>`_ zur Geodatenverarbeitung oder einer ausführbaren Datei mit einem Python Skript
 
-- im Element ``<ParameterSet>``: Notwendige Ein- und Ausgabeparametera für die Ausführung des Befehls
+- im Element ``<ParameterSet>``: Notwendige Ein- und Ausgabeparameter für die Ausführung des Befehls
 
 - im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (``typ="TextField"``) oder Auswahllistenfeldern (``typ="ComboBox"``)
 
@@ -280,4 +281,4 @@ Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitung
 mimetypes.xml
 --------------
 
-Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp (``raster``/``vektor``) zugeordnet.
+Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterung sowie ein Formattyp (``raster``/``vektor``) zugeordnet.
