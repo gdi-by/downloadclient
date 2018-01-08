@@ -141,7 +141,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'DownloadclientGDI-BY.tex', u'Downloadclient GDI-BY Documentation',
-     u'bjoern', 'manual'),
+     u'GDI-BY', 'manual'),
 ]
 
 
