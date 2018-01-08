@@ -93,7 +93,6 @@ Downloaddienste können über verschiedene Wege eingebunden werden:
 
 Beispiel-URLs sind:
 
-=======
 - WFS 2.0.0
    - http://geoserv.weichand.de:8080/geoserver/wfs?service=WFS&acceptversions=2.0.0&request=getCapabilities
 - Atom
@@ -177,11 +176,7 @@ Die heruntergeladenen Datensätze  können mit Hilfe des Download-Clients zu ein
 
 Nach Anhaken von "Weiterverarbeiten" können über den Button "Hinzufügen" ein oder mehrere Verarbeitungsschritte hinzugefügt werden.
 
-<<<<<<< HEAD
-Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung: 
-=======
 Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
->>>>>>> master
 
 - Konvertierung eines Vektordatenformates nach ESRI-Shape nach Eingabe des folgenden Parameters: 
    - Koordinatenreferenzsystem 
@@ -189,11 +184,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 - Konvertierung eines Rasterdatenformates nach GeoTIFF nach Eingabe des folgenden Parameters:
    - Koordinatenreferenzsystem
 
-<<<<<<< HEAD
-Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. „Benutzerdefinierte Erweiterungsmöglichkeiten) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden. 
-=======
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
->>>>>>> master
 
 .. image:: img/DLC_Weiterverarbeitung_DOP.png
 
@@ -229,11 +220,8 @@ Variante b) Ausführungswiederholung mit Windows Aufgabenplanung (Voraussetzung:
 Die Ausführungswiederholung ist über Cronjobs möglich.
 
 
-<<<<<<< HEAD
-=======
 .. _benutzerdefinierte_erweiterungsmoeglichkeiten:
 
->>>>>>> master
 Benutzerdefinierte Erweiterungsmöglichkeiten 
 =============================================
 
@@ -245,15 +233,9 @@ settings.xml
 
 Hier können folgende Einstellungen angepasst werden:
 
-<<<<<<< HEAD
-- im Element ``<catalogues>``: eingebundene(r) Metadatenkatalog(e) für die Dienstesuche
-
-- im Element ``<wms>``: eingebundener Darstellungsdienst für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche
-=======
 - im Element ``<catalogues>`` können Metadatenkatalog für die Dienstesuche eingebunden werden
 
 - im Element ``<wms>`` können Darstellungsdienste für die Kartenkomponente im Datensatzvarianten-Auswahlbereich der Benutzeroberfläche eingebunden werden
->>>>>>> master
 
 - im Element ``<services>`` können Downloaddienste folgendermaßen fest in die Dienstesuche eingebunden werden:
 
@@ -288,27 +270,14 @@ verarbeitungsschritte.xml
 
 Hier können bestehende Verarbeitungsschritte modifiziert oder neue Verarbeitungsschritte angelegt werden, indem u.a. folgende Einstellungen vorgenommen werden:
 
-<<<<<<< HEAD
--	im Element ``<Befehl>``: Angabe eines Befehls aus der GDAL (Bibliothek zur Geodatenverarbeitung) oder einer ausführbaren Datei mit einem Python Skript
-
-- im Element ``<ParameterSet>``: für die Ausführung des Befehls notwendige Ein- und Ausgabeparameter
-
-- im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (`typ="TextField"`) oder Auswahllistenfeldern (`typ="ComboBox"`)
-=======
 - im Element ``<Befehl>``: Angabe eines Befehls aus der `GDAL Bibliothek <http://www.gdal.org/>`_ zur Geodatenverarbeitung oder einer ausführbaren Datei mit einem Python Skript
 
 - im Element ``<ParameterSet>``: Notwendige Ein- und Ausgabeparametera für die Ausführung des Befehls
 
 - im Element ``<Eingabeelement>``: Definition von Eingabeelementen für die Benutzeroberfläche wie bspw. Text-Eingabefelder (``typ="TextField"``) oder Auswahllistenfeldern (``typ="ComboBox"``)
->>>>>>> master
 
 
 mimetypes.xml
 --------------
 
-<<<<<<< HEAD
-Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp ("raster"/"vektor") zugeordnet.
-
-=======
 Hier kann die Liste der angegebenen MIMETypes erweitert werden. Jedem MIMEType wird eine Dateierweiterungen sowie ein Formattyp (``raster``/``vektor``) zugeordnet.
->>>>>>> master
