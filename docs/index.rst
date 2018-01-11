@@ -200,7 +200,7 @@ Für jeden Download, der über den Button „Download start…“ angestoßen wu
 Ausführungswiederholung
 ---------------------------
 
-Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert und im Download-Client über das Menü Datei --> Download-Konfiguration laden erneut geladen werden. Zudem kann die gespeicherte Download-Konfiguration über ein Konsolenprogramm erneut bzw. in regelmäßigen Intervallen ausgeführt werden. 
+Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert und im Download-Client über das Menü *Datei* --> *Download-Konfiguration laden* erneut geladen werden. Zudem kann die gespeicherte Download-Konfiguration über ein Konsolenprogramm erneut bzw. in regelmäßigen Intervallen ausgeführt werden. 
  
 **Windows:**
 
