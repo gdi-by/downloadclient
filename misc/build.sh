@@ -45,7 +45,7 @@ sed -i s/{project.version}/$VERSION/g src/resources/about/about_*.html
 
 echo ''
 echo 'Altering the help_*.html to contain the Version ' $VERSION
-sed -i s/{VERSION}/$VERSION/g src/resources/help/help_*.html
+sed -i s/{VERSION}/$VERSION/g src/resources/help/help_*.txt
 
 
 echo ''
