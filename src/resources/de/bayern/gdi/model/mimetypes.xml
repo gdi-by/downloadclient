@@ -2,27 +2,45 @@
 <MIMETypes>
     <Type name="image/tiff" ext="tiff" formattyp="raster"/>
     <Type name="image/jpeg" ext="jpg" formattyp="raster"/>
+	<Type name="image/jp2" ext="jp2" formattyp="raster"/>
     <Type name="image/png" ext="png" formattyp="raster"/>
     <Type name="image/gif" ext="gif" formattyp="raster"/>
     <Type name="application/pdf" ext="pdf" formattyp="raster"/>
     <Type name="text/xml" ext="xml" formattyp="vektor"/>
     <Type name="csv" ext="csv" formattyp="vektor"/>
     <Type name="text/csv" ext="csv" formattyp="vektor"/>
+	<Type name="application/geo+json" ext="geojson" formattyp="vektor"/>
     <Type name="json" ext="json" formattyp="vektor"/>
     <Type name="application/json" ext="json" formattyp="vektor"/>
     <Type name="kml" ext="kml" formattyp="vektor"/>
     <Type name="application/vnd.google-earth.kml xml" ext="kml" formattyp="vektor"/>
     <Type name="application/vnd.google-earth.kml+xml" ext="kml" formattyp="vektor"/>
+	<Type name="application/vnd.google-earth.kmz" ext="kmz" formattyp="vektor"/>
+	<Type name="application/x-ascii-grid" ext="asc" formattyp="raster"/>
+	<Type name="application/x-ecw" ext="ecw" formattyp="raster"/>
+	<Type name="application/x-filegdb" ext="gdb" formattyp="vektor"/>
+	<Type name="application/x-filegdb" ext="gdb" formattyp="vektor"/>
+	<Type name="application/x-gmz" ext="zip" formattyp="vektor"/>
+	<Type name="application/x-las" ext="las" formattyp="raster"/>
+	<Type name="application/x-laz" ext="laz" formattyp="raster"/>
+	<Type name="application/x-tab" ext="zip" formattyp="vektor"/>
+	<Type name="application/x-tab-raster" ext="tab" formattyp="raster"/>
+	<Type name="application/x-worldfile" ext="tfw" formattyp="raster"/>
     <Type name="gml2" ext="gml" formattyp="vektor"/>
     <Type name="gml3" ext="gml" formattyp="vektor"/>
+	<Type name="gml31" ext="gml" formattyp="vektor"/>
     <Type name="gml32" ext="gml" formattyp="vektor"/>
     <Type name="application/gml+xml; version=3.2" ext="gml" formattyp="vektor"/>
+	<Type name="application/gml+xml; version=3.1" ext="gml" formattyp="vektor"/>
+	<Type name="application/gml+xml; version=2.1" ext="gml" formattyp="vektor"/>
     <Type name="text/xml; subformattyp=gml/2.1.2" ext="gml" formattyp="vektor"/>
     <Type name="text/xml; subformattyp=gml/3.1.1" ext="gml" formattyp="vektor"/>
-    <Type name="shape-zip" ext="zip" formattyp="vektor"/>
-    <Type name="application/x-zip-shapefile" ext="zip" formattyp="vektor"/>     
-    <Type name="text/xml; subtype=gml/3.2" ext="gml" formattyp="vektor"/>
+	<Type name="shape-zip" ext="zip" formattyp="vektor"/>
+    <Type name="application/x-zip-shapefile" ext="zip" formattyp="vektor"/>
+    <Type name="application/x-shapefile" ext="zip" formattyp="vektor"/>	
+	<Type name="text/xml; subtype=gml/3.2" ext="gml" formattyp="vektor"/>
+	<Type name="text/xml; subtype=gml/3.2.1" ext="gml" formattyp="vektor"/>	
     <Type name="text/xml; subtype=gml/2.1.2" ext="gml" formattyp="vektor"/>
     <Type name="text/xml; subtype=gml/3.1.1" ext="gml" formattyp="vektor"/>
-    <Type name="text/xml; subtype=gml/3.2.1" ext="gml" formattyp="vektor"/>
+	<Type name="text/xml; subType=gml/3.1.1/profiles/gmlsf/1.0.0/0" ext="gml" formattyp="vektor"/>
 </MIMETypes>
