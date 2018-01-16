@@ -43,6 +43,10 @@ echo ''
 echo 'Altering the about_*.html to contain the Version ' $VERSION
 sed -i s/{project.version}/$VERSION/g src/resources/about/about_*.html
 
+echo ''
+echo 'Altering the help_*.html to contain the Version ' $VERSION
+sed -i s/{VERSION}/$VERSION/g src/resources/help/help_*.html
+
 
 echo ''
 echo 'Building Downloadclient Package'
