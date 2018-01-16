@@ -1,1 +1,1 @@
-http://downloadclient-gdi-by.readthedocs.io/de/docs/index.html
+http://downloadclient-gdi-by.readthedocs.io/de/v{VERSION}/
