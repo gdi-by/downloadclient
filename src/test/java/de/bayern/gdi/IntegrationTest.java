@@ -274,7 +274,7 @@ public class IntegrationTest extends TestBase {
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
-        selectNthService(0);
+        selectNthService(2);
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
     }
