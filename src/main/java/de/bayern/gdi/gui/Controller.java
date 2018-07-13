@@ -1415,6 +1415,17 @@ public class Controller {
     }
 
     /**
+     * Validates the input in the SQL-Textbox for ECQL pattern.
+     *
+     * @param userInput      TODO
+     * @param overallQueries TODO
+     * @return TODO
+     */
+    public boolean validateUserInput(String userInput, boolean overallQueries) {
+        return false;
+    }
+
+    /**
      * Start the download.
      *
      * @param event The event
