@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.bayern.gdi</groupId>
@@ -100,7 +100,7 @@
                         <manifestEntries>
                             <Specification-Vendor>GDI-BY</Specification-Vendor>
                             <Implementation-Vendor>GDI-BY</Implementation-Vendor>
-                        </manifestEntries>                        
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -260,6 +260,18 @@
           <artifactId>awaitility</artifactId>
           <version>3.0.0</version>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlmatchers</groupId>
+            <artifactId>xml-matchers</artifactId>
+            <version>1.0-RC1</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.sf.saxon</groupId>
+                    <artifactId>Saxon-HE</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <repositories>

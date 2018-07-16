@@ -126,4 +126,12 @@ public class FileDownloadJob extends AbstractDownloadJob {
         }
         broadcastMessage(I18n.getMsg("file.download.finished"));
     }
+
+    /**
+     * @return the HttpEntity used a POST body.
+     */
+    public HttpEntity getPostParams() {
+        return postParams;
+    }
+
 }
