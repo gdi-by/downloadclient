@@ -76,6 +76,12 @@ public class DownloadConfiguration {
         return getConfiguration(NUREMBURG, path);
     }
 
+    /**
+     * CQL.
+     *
+     * @param path temppath
+     * @return config
+     */
     public String getCqlConfig(String path) {
         return getConfiguration(CQL, path);
     }

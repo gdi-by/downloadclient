@@ -17,33 +17,26 @@
  */
 package de.bayern.gdi.model;
 
+import de.bayern.gdi.WFS20ResourceTestBase;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.FileDownloadJob;
 import de.bayern.gdi.processor.Job;
 import de.bayern.gdi.processor.JobList;
-import de.bayern.gdi.utils.Config;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static java.nio.file.Files.createTempDirectory;
-import static net.jadler.Jadler.closeJadler;
-import static net.jadler.Jadler.initJadler;
-import static net.jadler.Jadler.onRequest;
 import static net.jadler.Jadler.port;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -56,30 +49,11 @@ import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 @RunWith(Parameterized.class)
-public class DownloadStepConverterTest {
+public class DownloadStepConverterTest extends WFS20ResourceTestBase {
 
-    private static final int HTTP_OKAY = 200;
     private String testName;
+
     private DownloadStep downloadStep;
-
-    /**
-     * Setup Jadler.
-     *
-     * @throws IOException if config initialization failed
-     */
-    @Before
-    public void setUp() throws IOException {
-        initJadler();
-        Config.initialize(null);
-    }
-
-    /**
-     * Close Jadler.
-     */
-    @After
-    public void tearDown() {
-        closeJadler();
-    }
 
     /**
      * @return DownloadSteps to tests
@@ -125,12 +99,13 @@ public class DownloadStepConverterTest {
     public void testConvert() throws Exception {
         System.out.println("Start test " + testName + "...");
         int port = port();
-
-        prepareCapabilities(port);
+        String queryPath = "/wfs/caps";
+        prepareCapabilities("/wfs20/geoserver/geoserver-capabilities.xml",
+            queryPath, port);
         prepareGetFeature();
         prepareDescribeStoredQueries();
 
-        String serviceURL = buildServiceUrl(port);
+        String serviceURL = buildGetCapabilitiesUrl(queryPath, port);
         downloadStep.setServiceURL(serviceURL);
 
         DownloadStepConverter downloadStepConverter =
@@ -169,71 +144,6 @@ public class DownloadStepConverterTest {
             }
         }
         return null;
-    }
-
-    private void prepareResource(String method, String queryPath, String body) {
-        onRequest()
-            .havingMethodEqualTo(method)
-            .havingPathEqualTo(queryPath)
-            .respond()
-            .withStatus(HTTP_OKAY)
-            .withBody(body)
-            .withEncoding(Charset.forName("UTF-8"))
-            .withContentType("application/xml; charset=UTF-8");
-    }
-
-
-    private void prepareCapabilities(int port) throws IOException {
-        String capabilities = "/wfs20/geoserver/geoserver-capabilities.xml";
-        String body = readResourceAsString(capabilities);
-        body = body.replace("{GETFEATURE_URL}",
-            buildGetFeatureUrl(port));
-        body = body.replace("{DESCRIBESTOREDQUERIES_URL}",
-            buildDescribeStoredQueriesUrl(port));
-        prepareResource("GET", "/wfs/caps", body);
-    }
-
-    private void prepareGetFeature() throws IOException {
-        String body = readResourceAsString("/wfs20/getfeature-hits.xml");
-        prepareResource("POST", "/wfs/gf", body);
-    }
-
-    private void prepareDescribeStoredQueries() throws IOException {
-        String body = readResourceAsString("/wfs20/desc-storedqueries.xml");
-        prepareResource("GET", "/wfs/wfs", body);
-    }
-
-    private String readResourceAsString(String resource) throws IOException {
-        InputStream resourceIs = getClass().getResourceAsStream(resource);
-        return IOUtils.toString(resourceIs, "UTF-8");
-    }
-
-    private String buildServiceUrl(int port) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://localhost:");
-        sb.append(port);
-        sb.append("/wfs/caps");
-        System.out.println("Service-URL: " + sb.toString());
-        return sb.toString();
-    }
-
-    private CharSequence buildGetFeatureUrl(int port) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://localhost:");
-        sb.append(port);
-        sb.append("/wfs/gf");
-        System.out.println("GetFeature-URL: " + sb.toString());
-        return sb.toString();
-    }
-
-    private String buildDescribeStoredQueriesUrl(int port) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://localhost:");
-        sb.append(port);
-        sb.append("/wfs/wfs");
-        System.out.println("DescribeStoredQueries-URL: " + sb.toString());
-        return sb.toString();
     }
 
 }
