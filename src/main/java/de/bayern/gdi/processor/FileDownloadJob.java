@@ -75,7 +75,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    public void download() throws JobExecutionException {
         URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
