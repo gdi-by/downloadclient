@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DownloadSchritt>
+    <ServiceTyp>WFS2_BASIC</ServiceTyp>
+    <URL>https://gdiserv.bayern.de/srv66381/services/benachteiligtegebiete-wfs?service=wfs&amp;acceptversions=2.0.0&amp;request=GetCapabilities</URL>
+    <DownloadPfad>%s</DownloadPfad>
+    <Dataset>agz:BenachteiligteGebiete</Dataset>
+    <Verarbeitungskette/>
+    <Parameters>
+        <Parameter>
+            <Name>srsName</Name>
+            <Wert>urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>outputformat</Name>
+            <Wert>text/xml; subtype=gml/3.2.1</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>bbox</Name>
+            <Wert>47.24843532655711,8.945096154917964,50.56420950059199,13.908908586487573,urn:ogc:def:crs:EPSG::4326</Wert>
+        </Parameter>
+    </Parameters>
+</DownloadSchritt>
