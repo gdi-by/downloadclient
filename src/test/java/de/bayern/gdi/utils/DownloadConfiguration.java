@@ -41,6 +41,10 @@ public class DownloadConfiguration {
      * AGZ.
      */
     private static final String AGZ = "/downloadconfig/agz.xml";
+    /**
+     * CQL.
+     */
+    private static final String CQL = "/downloadconfig/cql.xml";
 
     /**
      * AGZ.
@@ -70,6 +74,10 @@ public class DownloadConfiguration {
      */
     public String getNuremburgConfig(String path) {
         return getConfiguration(NUREMBURG, path);
+    }
+
+    public String getCqlConfig(String path) {
+        return getConfiguration(CQL, path);
     }
 
 

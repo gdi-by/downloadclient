@@ -329,4 +329,21 @@ public class IntegrationTest extends TestBase {
         assertTrue(result == 0);
     }
 
+
+    /**
+     * Start CQL download.
+     *
+     * @throws Exception just in case
+     */
+    @Test
+    public void testDownloadCql() throws Exception {
+        List<DownloadStep> steps = prepareStep(
+            DOWNLOAD_CONFIGURATION::getCqlConfig
+        );
+        String username = "";
+        String password = "";
+        int result = Headless.runHeadless(username, password, steps);
+        assertTrue(result == 0);
+    }
+
 }
