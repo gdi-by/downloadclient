@@ -97,6 +97,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
@@ -296,6 +297,13 @@ public class Controller {
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
+
+    @FXML
+    private TextArea sqlTextarea;
+    @FXML
+    private VBox sqlWFSArea;
+    @FXML
+    private HBox basicWFSFirstRows;
 
     /**
      * Creates the Controller.
@@ -1487,14 +1495,20 @@ public class Controller {
         );
         this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
         this.dataBean.reset();
-        this.mapAtom.reset();
-        this.mapWFS.reset();
+        if (mapWFS != null) {
+            this.mapWFS.reset();
+        }
+        if (mapAtom != null) {
+            this.mapAtom.reset();
+        }
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
         this.atomContainer.setVisible(false);
         this.basicWFSX1Y1.setVisible(false);
         this.basicWFSX2Y2.setVisible(false);
+        this.sqlWFSArea.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
         resetProcessingChainContainer();
@@ -1865,74 +1879,54 @@ public class Controller {
                 + item.getDescription() + "</div>");
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.atomContainer.setVisible(true);
     }
 
     private void chooseWFSType(ItemModel data, boolean datasetAvailable) {
         if (data instanceof FeatureModel
+            || data instanceof  OverallFeatureTypeModel
             || (!datasetAvailable
             && downloadConfig.getServiceType() == "WFS2_BASIC")) {
+            boolean isSqlFilterType = false;
+            if (data instanceof OverallFeatureTypeModel) {
+                isSqlFilterType = true;
+            }
+            if (data instanceof FeatureModel) {
+                FeatureModel.FilterType filterType =
+                    ((FeatureModel) data).getFilterType();
+                isSqlFilterType = FILTER.equals(filterType);
+            }
+
+            if (isSqlFilterType) {
+                this.sqlWFSArea.setVisible(true);
+                this.sqlWFSArea.setManaged(true);
+                this.basicWFSFirstRows.setVisible(false);
+                this.basicWFSX1Y1.setVisible(false);
+                this.basicWFSX1Y1.setManaged(false);
+                this.basicWFSX2Y2.setVisible(false);
+                this.basicWFSX2Y2.setManaged(false);
+                this.mapNodeWFS.setVisible(false);
+                this.mapNodeWFS.setManaged(false);
+            } else {
+                this.sqlWFSArea.setVisible(false);
+                this.sqlWFSArea.setManaged(false);
+                this.basicWFSFirstRows.setVisible(true);
+                this.basicWFSX1Y1.setVisible(true);
+                this.basicWFSX1Y1.setManaged(true);
+                this.basicWFSX2Y2.setVisible(true);
+                this.basicWFSX2Y2.setManaged(true);
+                this.mapNodeWFS.setVisible(true);
+                this.mapNodeWFS.setManaged(true);
+            }
             this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(true);
-            this.mapNodeWFS.setVisible(true);
             this.atomContainer.setVisible(false);
-            this.basicWFSX1Y1.setVisible(true);
-            this.basicWFSX2Y2.setVisible(true);
             this.referenceSystemChooser.setVisible(true);
             this.referenceSystemChooserLabel.setVisible(true);
-            WFSMeta.Feature feature;
-            if (datasetAvailable) {
-                feature = (WFSMeta.Feature) data.getItem();
-            } else {
-                feature = new WFSMeta.Feature();
-            }
-            mapWFS.setExtend(feature.getBBox());
-            ArrayList<String> list = new ArrayList<>();
-            list.add(feature.getDefaultCRS());
-            list.addAll(feature.getOtherCRSs());
-            ObservableList<CRSModel> crsList =
-                    FXCollections.observableArrayList();
-            for (String crsStr : list) {
-                try {
-                    String newcrsStr = crsStr;
-                    String seperator = null;
-                    if (newcrsStr.contains("::")) {
-                        seperator = "::";
-                    } else if (newcrsStr.contains("/")) {
-                        seperator = "/";
-                    }
-                    if (seperator != null) {
-                        newcrsStr = "EPSG:"
-                                + newcrsStr.substring(
-                                newcrsStr.lastIndexOf(seperator)
-                                        + seperator.length(),
-                                newcrsStr.length());
-                    }
-                    CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
-                    CRSModel crsm = new CRSModel(crs);
-                    crsm.setOldName(crsStr);
-                    crsList.add(crsm);
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-            }
-            if (!crsList.isEmpty()) {
-                this.referenceSystemChooser.setItems(crsList);
-                CRSModel crsm = crsList.get(0);
-                try {
-                    CoordinateReferenceSystem initCRS = CRS.decode(
-                            INITIAL_CRS_DISPLAY);
-                    CRSModel initCRSM = new CRSModel(initCRS);
-                    for (int i = 0; i < crsList.size(); i++) {
-                        if (crsList.get(i).equals(initCRSM)) {
-                            crsm = crsList.get(i);
-                            break;
-                        }
-                    }
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-                this.referenceSystemChooser.setValue(crsm);
+            this.basicWFSContainer.setVisible(true);
+
+            if (data.getItem() instanceof WFSMeta.Feature) {
+                setCrsAndExtent(data);
             }
             List<String> outputFormats = this
                 .dataBean.getWFSService()
@@ -1994,6 +1988,59 @@ public class Controller {
             this.atomContainer.setVisible(false);
             this.simpleWFSContainer.setVisible(true);
             this.basicWFSContainer.setVisible(false);
+            this.basicWFSFirstRows.setVisible(false);
+        }
+    }
+
+    private void setCrsAndExtent(ItemModel data) {
+        WFSMeta.Feature feature = (WFSMeta.Feature) data.getItem();
+        mapWFS.setExtend(feature.getBBox());
+        ArrayList<String> list = new ArrayList<>();
+        list.add(feature.getDefaultCRS());
+        list.addAll(feature.getOtherCRSs());
+        ObservableList<CRSModel> crsList =
+            FXCollections.observableArrayList();
+        for (String crsStr : list) {
+            try {
+                String newcrsStr = crsStr;
+                String seperator = null;
+                if (newcrsStr.contains("::")) {
+                    seperator = "::";
+                } else if (newcrsStr.contains("/")) {
+                    seperator = "/";
+                }
+                if (seperator != null) {
+                    newcrsStr = "EPSG:"
+                        + newcrsStr.substring(
+                        newcrsStr.lastIndexOf(seperator)
+                            + seperator.length(),
+                        newcrsStr.length());
+                }
+                CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                CRSModel crsm = new CRSModel(crs);
+                crsm.setOldName(crsStr);
+                crsList.add(crsm);
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        if (!crsList.isEmpty()) {
+            this.referenceSystemChooser.setItems(crsList);
+            CRSModel crsm = crsList.get(0);
+            try {
+                CoordinateReferenceSystem initCRS = CRS.decode(
+                    INITIAL_CRS_DISPLAY);
+                CRSModel initCRSM = new CRSModel(initCRS);
+                for (int i = 0; i < crsList.size(); i++) {
+                    if (crsList.get(i).equals(initCRSM)) {
+                        crsm = crsList.get(i);
+                        break;
+                    }
+                }
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+            this.referenceSystemChooser.setValue(crsm);
         }
     }
 
@@ -2080,6 +2127,7 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
         this.processStepContainter.setVisible(false);

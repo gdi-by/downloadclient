@@ -80,6 +80,13 @@ public class FeatureModel implements ItemModel {
         return feature;
     }
 
+    /**
+     * @return the filter type, <code>null</code> if not supported
+     */
+    public FilterType getFilterType() {
+        return filterType;
+    }
+
     @Override
     public String toString() {
         String prefix = this.feature.getTitle();
