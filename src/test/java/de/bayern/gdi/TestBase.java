@@ -52,6 +52,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import static org.awaitility.Awaitility.await;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -65,7 +67,7 @@ import org.testfx.framework.junit.ApplicationTest;
  *
  * @author thomas
  */
-public class TestBase extends ApplicationTest {
+public abstract class TestBase extends ApplicationTest {
 
     // Constants
 
@@ -85,11 +87,18 @@ public class TestBase extends ApplicationTest {
      * The Scene.
      */
     private Scene scene;
+
+    /**
+     * The Controller.
+     */
+    protected Controller controller;
+
     /**
      * The logger.
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
+
 
     // Overrides and Annotated Methods
 
@@ -121,8 +130,8 @@ public class TestBase extends ApplicationTest {
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
         Parent root = fxmlLoader.load();
         scene = new Scene(root, WIDTH, HEIGHT);
-        Controller controller = fxmlLoader.getController();
-        controller.setDataBean(new DataBean());
+        controller = fxmlLoader.getController();
+        controller.setDataBean(getDataBean());
         controller.setPrimaryStage(primaryStage);
         Unauthorized unauthorized = new WarningPopup();
         FileResponseHandler.setUnauthorized(unauthorized);
@@ -132,6 +141,14 @@ public class TestBase extends ApplicationTest {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    /**
+     * @return the DataBean to pass to the Controller.
+     * @throws IOException if an exception occurred
+     */
+    protected DataBean getDataBean() throws IOException {
+        return new DataBean();
     }
 
     // Methods
@@ -349,7 +366,7 @@ public class TestBase extends ApplicationTest {
     /**
      * Waits until UI has settled down.
      */
-    void waitUntilReady() {
+    protected void waitUntilReady() {
         waitFor(READY_STATUS);
     }
 }

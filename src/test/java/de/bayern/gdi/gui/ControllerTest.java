@@ -17,7 +17,11 @@
  */
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.TestBase;
+import de.bayern.gdi.services.WFSMeta;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -25,31 +29,101 @@ import static org.junit.Assert.assertThat;
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
-public class ControllerTest {
+public class ControllerTest extends TestBase {
+
+    @Override
+    protected DataBean getDataBean() throws IOException {
+        DataBean dataBean = new DataBean();
+        WFSMeta wfsService = new WFSMeta();
+        wfsService.addFeature(createFeature("bvv:gmd_ex"));
+        wfsService.addFeature(createFeature("bvv:lkr_ex"));
+        dataBean.setWFSService(wfsService);
+        return dataBean;
+    }
 
     /**
-     * Test.
+     * Test simple valid input.
      */
     @Test
     public void testInputValidatorSimple() {
         String userInput = "bvv:objid='DEBYBDLMjK0001Ia'";
-        Controller controller = new Controller();
-        boolean result = controller.validateUserInput(userInput, false);
+
+        boolean result = controller.validateEcqlUserInput(userInput, false);
         assertThat(result, is(true));
 
     }
 
     /**
-     * TODO: Check test - was not used before.
+     * Test valid input with two feature types.
      */
     @Test
     public void testInputValidatorOverall() {
-        String userInput = "\"bvv:gmd_ex\" WHERE bvv:objid='DEBYBDLMjK0001Ia'\n"
+        String userInput =
+            "\"bvv:gmd_ex\" WHERE bvv:objid='DEBYBDLMjK0001Ia'\n"
             + "\"bvv:lkr_ex\" WHERE bvv:bez_krs='Ingolstadt'";
-        Controller controller = new Controller();
 
-        boolean result = controller.validateUserInput(userInput, false);
-        assertThat(result, is(true));
+        boolean result = controller.validateEcqlUserInput(userInput, false);
+        assertThat(result, is(false));
+    }
+
+
+    /**
+     * Test simple invalid input with WHERE.
+     */
+    @Test
+    public void testInputValidatorSimpleWithWhere() {
+        String userInput =
+            "\"bvv:gmd_ex\" WHERE bvv:objid='DEBYBDLMjK0001Ia'";
+
+        boolean result = controller.validateEcqlUserInput(userInput, false);
+        assertThat(result, is(false));
+
+    }
+
+
+    /**
+     * Test simple invalid input with line break.
+     */
+    @Test
+    public void testInputValidatorSimpleWithLineBreak() {
+        String userInput =
+            "\"bvv:gmd_ex\" WHERE \nbvv:objid='DEBYBDLMjK0001Ia'";
+
+        boolean result = controller.validateEcqlUserInput(userInput, false);
+        assertThat(result, is(false));
+
+    }
+
+    /**
+     * Test invalid input with unknown feature types.
+     */
+    @Test
+    public void testInputValidatorOverallWithUnknownFeatureType() {
+        String userInput =
+            "\"bvv:unknown\" WHERE bvv:objid='DEBYBDLMjK0001Ia'\n"
+            + "\"bvv:lkr_ex\" WHERE bvv:bez_krs='Ingolstadt'";
+
+        boolean result = controller.validateEcqlUserInput(userInput, false);
+        assertThat(result, is(false));
+    }
+
+    /**
+     * Test invalid input without WHERE.
+     */
+    @Test
+    public void testInputValidatorOverallWithoutWhere() {
+        String userInput =
+            "\"bvv:unknown\" WHERE bvv:objid='DEBYBDLMjK0001Ia'\n"
+            + "\"bvv:lkr_ex\" WHERE bvv:bez_krs='Ingolstadt'";
+
+        boolean result = controller.validateEcqlUserInput(userInput, false);
+        assertThat(result, is(false));
+    }
+
+    private WFSMeta.Feature createFeature(String name) {
+        WFSMeta.Feature feature1 = new WFSMeta.Feature();
+        feature1.setName(name);
+        return feature1;
     }
 
 }

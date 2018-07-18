@@ -35,6 +35,7 @@ public class WFSMeta {
 
     private static final String TAB_NEWLINE = "\t}\n";
 
+
     /** operation. */
     public static class Operation {
         /** name. */
@@ -130,6 +131,10 @@ public class WFSMeta {
 
         public ReferencedEnvelope getBBox() {
             return this.bbox;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public Feature() {
@@ -236,7 +241,7 @@ public class WFSMeta {
         public Version() {
         }
 
-        /** @param version The version. */
+        /** @param versionString The version. */
         public Version(String versionString) {
             this.versionString = versionString;
             parse();
@@ -318,7 +323,7 @@ public class WFSMeta {
     /** constraints. */
     protected List<Constraint> constraints;
     /** features. */
-    protected List<Feature> features;
+    private final List<Feature> features;
     /** stored queries. */
     protected List<StoredQuery> storedQueries;
     /** output formats. */
@@ -350,6 +355,15 @@ public class WFSMeta {
 
     public NamespaceContextMap getNamespaces() {
         return this.namespaces;
+    }
+
+    /**
+     * Adds a feature.
+     *
+     * @param feature to add
+     */
+    public void addFeature(Feature feature) {
+        this.features.add(feature);
     }
 
     public WFSMeta() {

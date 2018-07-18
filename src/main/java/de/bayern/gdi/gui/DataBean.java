@@ -40,6 +40,8 @@ import java.util.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
+
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -438,18 +440,28 @@ public class DataBean extends Observable {
     }
 
     /**
-     * Set the complexe queries objects.
-     * @return complexQueries list
+     * @return <code>true</code> if it is a CQLFilter request,
+     * <code>false</code> otherwise
      */
-    public List<Query> getComplexQueries() {
-        return complexQueries;
+    public boolean isFilterType() {
+        if (dataType != null && dataType instanceof OverallFeatureTypeModel) {
+            return true;
+        }
+        if (dataType != null && dataType instanceof FeatureModel) {
+            return FILTER.equals(((FeatureModel) dataType).getFilterType());
+        }
+        return false;
     }
 
     /**
-     * Initialize the entire queries.
-     * @param complexQueries a List of Objects
+     * @return <code>true</code> if it is a CQLFilter request over
+     * all feature types, <code>false</code> otherwise
      */
-    public void setComplexQueries(List<Query> complexQueries) {
-        this.complexQueries = complexQueries;
+    public boolean isMultipleQuery() {
+        if (dataType != null && dataType instanceof OverallFeatureTypeModel) {
+            return true;
+        }
+        return false;
     }
+
 }

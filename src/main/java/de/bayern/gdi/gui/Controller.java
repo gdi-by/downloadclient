@@ -1429,11 +1429,58 @@ public class Controller {
     /**
      * Validates the input in the SQL-Textbox for ECQL pattern.
      *
-     * @param userInput      TODO
-     * @param overallQueries TODO
-     * @return TODO
+     * @param userInput      the ECQL to validate
+     * @param overallQueries if the query is over all feature types
+     * @return <code>true</code> if the ECQL is valid,
+     * <code>false</code> otherwise
      */
-    public boolean validateUserInput(String userInput, boolean overallQueries) {
+    public boolean validateEcqlUserInput(String userInput,
+                                         boolean overallQueries) {
+        if (overallQueries) {
+            String[] userInputLines = userInput.split("\n");
+            for (String userInputLine : userInputLines) {
+                boolean lineContainsNoWhere = !userInputLine
+                    .toLowerCase().contains("where");
+                if (lineContainsNoWhere) {
+                    setStatusTextUI(I18n.format(
+                        "status.sql.validation.error.overall.where"));
+                    return false;
+                }
+                boolean lineContainsSupportedFeatureType =
+                    featureTypeWithNameExists(userInputLine);
+                if (!lineContainsSupportedFeatureType) {
+                    setStatusTextUI(I18n.format(
+                        "status.sql.validation.error.overall.featureTypes"));
+                    return false;
+                }
+            }
+        } else {
+            boolean filterContainsWhere = userInput
+                .toLowerCase().contains("where");
+            if (filterContainsWhere) {
+                setStatusTextUI(I18n.format(
+                    "status.sql.validation.error.simple.where"));
+                return false;
+            }
+            boolean filterContiansLineBreak = userInput
+                .toLowerCase().contains("\n");
+            if (filterContiansLineBreak) {
+                setStatusTextUI(I18n.format(
+                    "status.sql.validation.error.simple.lineBreak"));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean featureTypeWithNameExists(String userInputLine) {
+        List<WFSMeta.Feature> featureTypes = dataBean.getWFSService()
+            .getFeatures();
+        for (WFSMeta.Feature feature : featureTypes) {
+            if (userInputLine.contains(feature.getName())) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -1444,6 +1491,24 @@ public class Controller {
      */
     @FXML
     protected void handleDownload(ActionEvent event) {
+        if (dataBean.isFilterType()) {
+            String sqlInput = sqlTextarea.getText();
+            logHistoryParent.setStyle(null);
+
+            if (sqlInput == null || sqlInput.isEmpty()) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.input.empty"));
+                return;
+            }
+            boolean multipleQuery = dataBean.isMultipleQuery();
+            boolean isValidCql = validateEcqlUserInput(sqlInput,
+                multipleQuery);
+            if (!isValidCql) {
+                return;
+            }
+        }
+
         extractStoredQuery();
         extractBoundingBox();
         if (validateInput()) {
@@ -2281,6 +2346,7 @@ public class Controller {
             setStatusTextUI(I18n.format(STATUS_READY));
         }
     }
+
 
     /**
      * Handels the Action, when a polygon is selected.
