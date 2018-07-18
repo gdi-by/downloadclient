@@ -15,29 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi;
+package de.bayern.gdi.services;
 
-import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.WFS20ResourceTestBase;
 import de.bayern.gdi.services.WFSMeta.Feature;
-import de.bayern.gdi.services.WFSMetaExtractor;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static net.jadler.Jadler.port;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Juergen Weichand
  */
-public class WfsTest extends WFS20ResourceTestBase {
+public class WFSMetaExtractorTest extends WFS20ResourceTestBase {
 
-    /**
-     * Constant for FEATURES_PER_PAGE.
-     */
-    public static final int FEATURES_PER_PAGE = 1037;
+    private static final int FEATURES_PER_PAGE = 1037;
 
+    private static final int NUMBER_OF_FEATURE_TYPES_GEOSERVER = 5;
+
+    private static final int NUMBER_OF_FEATURE_TYPES_XTRASERVER = 123;
 
     /**
      * Test virtuell GeoServer.
@@ -48,7 +51,9 @@ public class WfsTest extends WFS20ResourceTestBase {
     @Test
     public void testGeoServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell GeoServer");
-        run("/geoserver/wfs", "/wfs20/geoserver/geoserver-capabilities.xml");
+        run("/geoserver/wfs",
+            "/wfs20/geoserver/geoserver-capabilities.xml",
+            NUMBER_OF_FEATURE_TYPES_GEOSERVER);
     }
 
     /**
@@ -60,10 +65,13 @@ public class WfsTest extends WFS20ResourceTestBase {
     @Test
     public void testXtraServer() throws IOException, URISyntaxException {
         System.out.println("... Testing virtuell XtraServer");
-        run("/xtraserver/wfs", "/wfs20/xtraserver/xtraserver-capabilities.xml");
+        run("/xtraserver/wfs",
+            "/wfs20/xtraserver/xtraserver-capabilities.xml",
+            NUMBER_OF_FEATURE_TYPES_XTRASERVER);
     }
 
-    private void run(String queryPath, String queryResource)
+    private void run(String queryPath, String queryResource,
+                     int numberOfFeatureTypes)
         throws IOException, URISyntaxException {
         int port = port();
 
@@ -73,43 +81,36 @@ public class WfsTest extends WFS20ResourceTestBase {
         WFSMeta wfsMeta = new WFSMetaExtractor(
             buildGetCapabilitiesUrl(queryPath, port)).parse();
 
-        checkFeatureTypes(wfsMeta);
+        checkFeatureTypes(wfsMeta, numberOfFeatureTypes);
         checkFeaturesPerPage(wfsMeta);
     }
 
     /*
         Checks
     */
-    private void checkFeatureTypes(WFSMeta wfsMeta) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.getTitle());
-        sb.append(" - ");
-        sb.append("FeatureType parsing failed.");
-
-        for (Feature feature : wfsMeta.getFeatures()) {
+    private void checkFeatureTypes(WFSMeta wfsMeta, int numberOfFeatureTypes) {
+        List<Feature> features = wfsMeta.getFeatures();
+        for (Feature feature : features) {
             String name = feature.getName();
-            boolean condition = name == null || name.isEmpty();
-            assertFalse(sb.toString(), condition);
+            assertThat(name, is(notNullValue()));
+            assertThat(name.isEmpty(), is(false));
         }
+        assertThat(features.size(), is(numberOfFeatureTypes));
     }
 
 
     private void checkFeaturesPerPage(WFSMeta wfsMeta) {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(wfsMeta.getTitle());
-        sb.append(" - ");
-        sb.append("FeaturesPerPage parsing failed.");
-
-
         Integer fpp = wfsMeta.findOperation("GetFeature").featuresPerPage();
         if (fpp == null) { // Fall back to global default.
             fpp = wfsMeta.featuresPerPage();
         }
 
         if (fpp == null || !fpp.equals(FEATURES_PER_PAGE)) {
-            assertFalse(sb.toString(), true);
+            StringBuilder sb = new StringBuilder();
+            sb.append(wfsMeta.getTitle());
+            sb.append(" - ");
+            sb.append("FeaturesPerPage parsing failed.");
+            fail(sb.toString());
         }
     }
 
