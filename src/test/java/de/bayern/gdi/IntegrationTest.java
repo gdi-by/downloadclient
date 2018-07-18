@@ -78,9 +78,21 @@ public class IntegrationTest extends TestBase {
     private static final int TWO_ELEMENTS = 2;
 
     /**
-     * Total number of services.
+     * Total number of FeatureTypes provided by service
+     * VERWALTUNGSGRENZEN_URL.
      */
-    private static final int TOTAL_NUMBER_OF_SERVICES = 13;
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES = 5;
+
+    /**
+     * Total number of StoredQueries provided by service
+     * VERWALTUNGSGRENZEN_URL.
+     */
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 8;
+
+    /**
+     * Number of services overall FeatureTypes.
+     */
+    private static final int  VERWALTUNGSGRENZEN_NUMBER_OF_OVERALL = 1;
 
     /**
      * Verwaltungsgrenzen.
@@ -182,7 +194,12 @@ public class IntegrationTest extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
-        assertTrue(hasSize(SERVICE_TYPE_CHOOSER, TOTAL_NUMBER_OF_SERVICES));
+        int numberOfExpectedServices =
+            VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_OVERALL;
+        assertTrue(hasSize(SERVICE_TYPE_CHOOSER, numberOfExpectedServices));
         selectDataFormatByNumber(0);
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);

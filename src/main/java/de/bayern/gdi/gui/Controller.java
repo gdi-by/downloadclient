@@ -126,6 +126,10 @@ import org.xml.sax.SAXException;
 
 import org.apache.commons.io.IOUtils;
 
+import static de.bayern.gdi.gui.FeatureModel.FilterType.BBOX;
+import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
+import static de.bayern.gdi.services.ServiceType.WFS_TWO;
+
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -1700,31 +1704,10 @@ public class Controller {
             switch (dataBean.getServiceType()) {
                 case WFS_ONE:
                 case WFS_TWO:
-                    ReferencedEnvelope extendWFS = null;
-                    List<WFSMeta.Feature> features =
-                            dataBean.getWFSService().getFeatures();
-                    List<WFSMeta.StoredQuery> queries =
-                            dataBean.getWFSService().getStoredQueries();
+                    boolean isWfs2 = WFS_TWO.equals(dataBean.getServiceType());
                     ObservableList<ItemModel> types =
-                            FXCollections.observableArrayList();
-                    if (!dataBean.getWFSService().isSimple()) {
-                        for (WFSMeta.Feature f : features) {
-                            types.add(new FeatureModel(f));
-                            if (f.getBBox() != null) {
-                                if (extendWFS == null) {
-                                    extendWFS = f.getBBox();
-                                } else {
-                                    extendWFS.expandToInclude(f.getBBox());
-                                }
-                            }
-                        }
-                    }
-                    if (extendWFS != null) {
-                        mapWFS.setExtend(extendWFS);
-                    }
-                    for (WFSMeta.StoredQuery s : queries) {
-                        types.add(new StoredQueryModel(s));
-                    }
+                        collectServiceTypes(isWfs2);
+                    addStoredQueries(types);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(types);
                     serviceTypeChooser.setValue(types.get(0));
@@ -1780,6 +1763,44 @@ public class Controller {
                     break;
                 default:
             }
+        }
+    }
+
+    private ObservableList<ItemModel> collectServiceTypes(boolean isWfs2) {
+        ReferencedEnvelope extendWFS = null;
+        List<WFSMeta.Feature> features =
+                dataBean.getWFSService().getFeatures();
+        ObservableList<ItemModel> types =
+                FXCollections.observableArrayList();
+        if (!dataBean.getWFSService().isSimple()) {
+            for (WFSMeta.Feature f : features) {
+                if (isWfs2) {
+                    types.add(new FeatureModel(f, FILTER));
+                    types.add(new FeatureModel(f, BBOX));
+                } else {
+                    types.add(new FeatureModel(f));
+                }
+                if (f.getBBox() != null) {
+                    if (extendWFS == null) {
+                        extendWFS = f.getBBox();
+                    } else {
+                        extendWFS.expandToInclude(f.getBBox());
+                    }
+                }
+            }
+            types.add(new OverallFeatureTypeModel(features));
+        }
+        if (extendWFS != null) {
+            mapWFS.setExtend(extendWFS);
+        }
+        return types;
+    }
+
+    private void addStoredQueries(ObservableList<ItemModel> types) {
+        List<WFSMeta.StoredQuery> queries =
+            dataBean.getWFSService().getStoredQueries();
+        for (WFSMeta.StoredQuery s : queries) {
+            types.add(new StoredQueryModel(s));
         }
     }
 
@@ -1989,7 +2010,7 @@ public class Controller {
         }
         if (type == ServiceType.ATOM) {
             chooseAtomType(data, datasetAvailable);
-        } else if (type == ServiceType.WFS_TWO) {
+        } else if (type == WFS_TWO) {
             chooseWFSType(data, datasetAvailable);
         }
     }

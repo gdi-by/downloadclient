@@ -24,32 +24,73 @@ import de.bayern.gdi.services.WFSMeta;
  */
 public class FeatureModel implements ItemModel {
 
+    /**
+     * FilterType (Filter or BBox).
+     */
+    public enum FilterType {
+        /**
+         * Filter.
+         */
+        FILTER("(Filter)"),
+        /**
+         * BBox.
+         */
+        BBOX("(BBOX)");
+
+        private String labelSuffix;
+
+        FilterType(String labelSuffix) {
+            this.labelSuffix = labelSuffix;
+        }
+    }
+
     private WFSMeta.Feature feature;
 
+    private FilterType filterType;
+
     /**
-     * Contructor to wrap.
+     * Constructor to wrap.
      */
     public FeatureModel(WFSMeta.Feature f) {
         this.feature = f;
     }
 
+    /**
+     * Constructor to wrap.
+     */
+    public FeatureModel(WFSMeta.Feature f, FilterType filterType) {
+        this.feature = f;
+        this.filterType = filterType;
+    }
+
+    @Override
     public Object getItem() {
         return this.feature;
     }
 
+    @Override
     public String getDataset() {
         return feature.getName();
     }
 
-    @Override
-    public String toString() {
-        String title = this.feature.getTitle();
-        return title != null && !title.isEmpty()
-            ? title
-            : this.feature.getName();
-    }
-
+    /**
+     * @return the encapsulated feature type
+     */
     public WFSMeta.Feature getFeature() {
         return feature;
     }
+
+    @Override
+    public String toString() {
+        String prefix = this.feature.getTitle();
+        if (prefix == null || prefix.isEmpty()) {
+            prefix = this.feature.getName();
+        }
+
+        if (filterType != null) {
+            return prefix + " " + filterType.labelSuffix;
+        }
+        return prefix;
+    }
+
 }
