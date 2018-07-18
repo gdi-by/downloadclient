@@ -26,6 +26,7 @@ import de.bayern.gdi.model.Option;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
+import de.bayern.gdi.model.Query;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
@@ -33,6 +34,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.FilterEncoder;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
@@ -115,6 +117,7 @@ import javafx.util.Callback;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -1505,6 +1508,15 @@ public class Controller {
             boolean isValidCql = validateEcqlUserInput(sqlInput,
                 multipleQuery);
             if (!isValidCql) {
+                return;
+            }
+            try {
+                FilterEncoder filterEncoder = new FilterEncoder();
+                filterEncoder.initializeQueries(sqlInput);
+                this.dataBean.addAttribute("CQL", sqlInput,  "");
+            } catch (CQLException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(e.getSyntaxError());
                 return;
             }
         }
