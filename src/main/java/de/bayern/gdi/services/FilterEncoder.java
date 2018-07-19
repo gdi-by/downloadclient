@@ -25,6 +25,10 @@ import org.geotools.filter.v2_0.FES;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.opengis.filter.Filter;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +52,7 @@ public class FilterEncoder {
     private static final int INDENTSIZE = 3;
     private ArrayList<Query> entireQueries;
     private ArrayList<Query> complexQueries;
+    private List<Document> filters = new ArrayList<>();
 
 
     public FilterEncoder() {
@@ -85,16 +90,21 @@ public class FilterEncoder {
                     encoder.setIndentSize(INDENTSIZE);
                     encoder.setOmitXMLDeclaration(true);
 
-                    String filterString = null;
-                    filterString = encoder.encodeAsString(filter, FES.Filter);
-
-                    if (filterString != null) {
-                        eCQLFilters.add(filterString);
-                        query.seteCQLFilter(filterString);
-                        queryList.add(query);
+                    Document filterDocument = encoder.encodeAsDOM(
+                        filter, FES.Filter);
+                    if (filterDocument != null) {
+                        filters.add(filterDocument);
+                        //query.seteCQLFilter(filterString);
+                        //queryList.add(query);
                     }
                 } catch (IOException e) {
                     // log.log(log.getLevel(), e.getMessage(), e.getCause());
+                    e.printStackTrace();
+                } catch (TransformerException e) {
+                    // TODO
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    // TODO
                     e.printStackTrace();
                 }
             }
@@ -245,4 +255,14 @@ public class FilterEncoder {
     public void setComplexQueries(ArrayList<Query> complexQueries) {
         this.complexQueries = complexQueries;
     }
+
+    /**
+     * @return one Document encoded as "Filter Encoding Specification"
+     * per query line, an empty list if the input is not parsed yet,
+     * never <code></code>
+     */
+    public List<Document> getFilters() {
+        return filters;
+    }
+
 }

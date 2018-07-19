@@ -22,6 +22,9 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -68,10 +71,9 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
 
     /**
      * @return DownloadSteps to tests
-     * @throws IOException if creation of a DownloadStep failed
      */
     @Parameterized.Parameters
-    public static Collection<Object[]> downloadSteps() throws IOException {
+    public static Collection<Object[]> downloadSteps() {
         return Arrays.asList(new Object[][] {
             {"SimpleExampleGeoserver",
                 createDownloadStep("bvv:gmd_ex"),
@@ -80,25 +82,25 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
                 createDownloadStep("adv:AP_LTO"),
                 "/wfs20/xtraserver/xtraserver-capabilities.xml"},
             {"Example1",
-                createDownloadStep("bvv:gmd_ex (Filter)",
-                "\"bvv:sch\" = '09774135'"),
+                createDownloadStep("bvv:gmd_ex",
+                    "\"bvv:sch\" = '09774135'"),
                 "/wfs20/geoserver/geoserver-capabilities.xml"},
             {"Example2",
-                createDownloadStep("bvv:gmd_ex (Filter)",
-                "\"bvv:sch\" LIKE '09774%'"),
+                createDownloadStep("bvv:gmd_ex",
+                    "\"bvv:sch\" LIKE '09774%'"),
                 "/wfs20/geoserver/geoserver-capabilities.xml"},
             {"Example3",
                 createDownloadStep(
-                "Typübergreifende Abfrage (Filter)",
-                "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'"),
+                    "Typübergreifende Abfrage (Filter)",
+                    "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
+                        + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'"),
                 "/wfs20/geoserver/geoserver-capabilities.xml"},
             {"Example4",
                 createDownloadStep(
-                "Typübergreifende Abfrage (Filter)",
-                "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
-                    + "('09161000', '09161000')"),
+                    "Typübergreifende Abfrage (Filter)",
+                    "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
+                        + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
+                        + "('09161000', '09161000')"),
                 "/wfs20/geoserver/geoserver-capabilities.xml"}
         });
     }
@@ -106,8 +108,8 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
     /**
      * Tests a single Build.
      *
-     * @param testName     name of the test
-     * @param downloadStep DownloadStep to test
+     * @param testName      name of the test
+     * @param downloadStep  DownloadStep to test
      * @param queryResource path to the capabilities
      */
     public WFSPostParamsBuilderTest(String testName,
@@ -169,10 +171,12 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
             "urn:ogc:def:crs:EPSG::31468"));
         parameters.add(new Parameter("outputformat",
             "text/xml; subtype=gml/3.2"));
+        String typeName = "WFS2_BASIC";
         if (cql != null) {
+            typeName = "WFS2_SQL";
             parameters.add(new Parameter("CQL", cql));
         }
-        return new DownloadStep(dataset, parameters, "WFS2_SQL",
+        return new DownloadStep(dataset, parameters, typeName,
             "DUMMYURL", "DUMMYPATH", Collections.emptyList());
     }
 

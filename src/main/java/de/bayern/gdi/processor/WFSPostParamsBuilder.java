@@ -20,15 +20,19 @@ package de.bayern.gdi.processor;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.processor.DownloadStepConverter.QueryType;
+import de.bayern.gdi.services.FilterEncoder;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.I18n;
+import org.geotools.filter.text.cql2.CQLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,9 +53,6 @@ public class WFSPostParamsBuilder {
     private static final String WFS_NS = "http://www.opengis.net/wfs/2.0";
     private static final String FES_NS = "http://www.opengis.net/fes/2.0";
     private static final String GML_NS = "http://www.opengis.net/gml/3.2";
-
-
-    private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
 
     private WFSPostParamsBuilder() {
         // Not for public use.
@@ -144,6 +145,7 @@ public class WFSPostParamsBuilder {
         String outputFormat = "";
         String srsName = "";
         String bbox = "";
+        String cql = null;
 
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
 
@@ -160,6 +162,9 @@ public class WFSPostParamsBuilder {
                     case "bbox":
                         bbox = value;
                         break;
+                    case "CQL":
+                        cql = value;
+                        break;
                     default:
                         params.put(p.getKey(), value);
                         break;
@@ -171,33 +176,29 @@ public class WFSPostParamsBuilder {
             count, wfs2, doc, outputFormat);
 
         String dataset = dls.getDataset();
-
         QueryType queryType = DownloadStepConverter.findQueryType(
             dls.getServiceType());
-
-        boolean storedQuery = queryType.equals(QueryType.STOREDQUERY);
-        if (storedQuery) {
-            Element sqEl = doc.createElementNS(WFS_NS, "wfs:StoredQuery");
-            sqEl.setAttribute("id", dataset);
-            appendParameters(doc, sqEl, params.entrySet());
-            getFeature.appendChild(sqEl);
-        } else {
-            Element queryEl = doc.createElementNS(WFS_NS, "wfs:Query");
-            queryEl.setAttribute("typeNames", dataset);
-            int idx = dataset.indexOf(':');
-            if (idx >= 0) {
-                String namespacePrefix = dataset.substring(0, idx);
-                String namespaceUri = meta.getNamespaces()
-                    .getNamespaceURI(namespacePrefix);
-                queryEl.setAttribute("xmlns:" + namespacePrefix, namespaceUri);
-            }
-            queryEl.setAttribute(SRS_NAME, srsName);
-            appendBBox(doc, bbox, queryEl);
-            getFeature.appendChild(queryEl);
+        switch (queryType) {
+            case STOREDQUERY:
+                Element sqEl = createStoredQueryElement(doc, params, dataset);
+                getFeature.appendChild(sqEl);
+                break;
+            case SQLQUERY:
+                createAndAppendFilters(
+                    meta, doc, srsName, cql, getFeature, dataset);
+                break;
+            case DATASET:
+                Element bboxQueryEl = createQueryElement(
+                    meta, doc, srsName, dataset);
+                appendBBox(doc, bbox, bboxQueryEl);
+                getFeature.appendChild(bboxQueryEl);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Unexpected query type " + queryType);
         }
 
         doc.appendChild(getFeature);
-
         return doc;
     }
 
@@ -231,6 +232,61 @@ public class WFSPostParamsBuilder {
                 String.valueOf(count));
         }
         return getFeature;
+    }
+
+
+    private static Element createStoredQueryElement(
+        Document doc,
+        LinkedHashMap<String, String> params,
+        String dataset) {
+
+        Element sqEl = doc.createElementNS(WFS_NS, "wfs:StoredQuery");
+        sqEl.setAttribute("id", dataset);
+        appendParameters(doc, sqEl, params.entrySet());
+        return sqEl;
+    }
+
+
+    private static void createAndAppendFilters(WFSMeta meta,
+                                               Document doc,
+                                               String srsName,
+                                               String cql,
+                                               Element getFeature,
+                                               String dataset) {
+        try {
+            FilterEncoder filterEncoder = new FilterEncoder();
+            filterEncoder.initializeQueries(cql);
+            List<Document> filters = filterEncoder.getFilters();
+            for (Document filter : filters) {
+                Element queryElement = createQueryElement(meta
+                    , doc, srsName, dataset);
+                Node filterElement = filter.getFirstChild().cloneNode(true);
+                Node copiedFilterElement = doc.importNode(filterElement, true);
+                queryElement.appendChild(copiedFilterElement);
+                getFeature.appendChild(queryElement);
+            }
+        } catch (CQLException e) {
+            e.printStackTrace();
+            // TODO
+        }
+
+    }
+
+    private static Element createQueryElement(WFSMeta meta,
+                                              Document doc,
+                                              String srsName,
+                                              String typeName) {
+        Element queryEl = doc.createElementNS(WFS_NS, "wfs:Query");
+        queryEl.setAttribute("typeNames", typeName);
+        int idx = typeName.indexOf(':');
+        if (idx >= 0) {
+            String namespacePrefix = typeName.substring(0, idx);
+            String namespaceUri = meta.getNamespaces()
+                .getNamespaceURI(namespacePrefix);
+            queryEl.setAttribute("xmlns:" + namespacePrefix, namespaceUri);
+        }
+        queryEl.setAttribute(SRS_NAME, srsName);
+        return queryEl;
     }
 
     private static Document newDocument() throws ConverterException {
