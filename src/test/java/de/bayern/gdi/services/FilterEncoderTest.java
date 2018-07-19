@@ -35,6 +35,8 @@ import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
 
 /**
+ * Test class to verify CQL to filter expressions encoder.
+ *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 public class FilterEncoderTest {
