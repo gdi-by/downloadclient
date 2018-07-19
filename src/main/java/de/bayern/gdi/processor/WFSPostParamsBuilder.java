@@ -17,35 +17,31 @@
  */
 package de.bayern.gdi.processor;
 
-import java.util.Set;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.services.WFSMeta;
+import de.bayern.gdi.utils.I18n;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.model.Parameter;
-
-import de.bayern.gdi.services.WFSMeta;
-
-import de.bayern.gdi.utils.I18n;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A builder for WFS POST request bodies.
  */
 public class WFSPostParamsBuilder {
 
-    private static final int ZERO  = 0;
-    private static final int ONE   = 1;
-    private static final int TWO   = 2;
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
     private static final int THREE = 3;
-    private static final int FOUR  = 4;
-    private static final int FIVE  = 5;
+    private static final int FOUR = 4;
+    private static final int FIVE = 5;
 
     private static final String SRS_NAME = "srsName";
 
@@ -63,16 +59,16 @@ public class WFSPostParamsBuilder {
     /**
      * Creates a new XML document to be send as a POST request.
      *
-     * @param dls The download step.
+     * @param dls      The download step.
      * @param usedVars The used variables.
-     * @param meta The WFS meta data.
+     * @param meta     The WFS meta data.
      * @return The XML document.
      * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
-        Set<String>  usedVars,
-        WFSMeta      meta
+        Set<String> usedVars,
+        WFSMeta meta
     ) throws ConverterException {
         return create(dls, usedVars, meta, false, -1, -1, false);
     }
@@ -80,22 +76,22 @@ public class WFSPostParamsBuilder {
     /**
      * Creates a new XML document to be send as a POST request.
      *
-     * @param dls The download step.
+     * @param dls      The download step.
      * @param usedVars The used variables.
-     * @param meta The WFS meta data.
-     * @param ofs Offset of features.
-     * @param count Limit number of features.
-     * @param wfs2 Generate a WFS2 document.
+     * @param meta     The WFS meta data.
+     * @param ofs      Offset of features.
+     * @param count    Limit number of features.
+     * @param wfs2     Generate a WFS2 document.
      * @return The XML document.
      * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
-        Set<String>  usedVars,
-        WFSMeta      meta,
-        int          ofs,
-        int          count,
-        boolean      wfs2
+        Set<String> usedVars,
+        WFSMeta meta,
+        int ofs,
+        int count,
+        boolean wfs2
     ) throws ConverterException {
         return create(dls, usedVars, meta, false, ofs, count, wfs2);
     }
@@ -103,18 +99,18 @@ public class WFSPostParamsBuilder {
     /**
      * Creates a new XML document to be send as a POST request.
      *
-     * @param dls The download step.
+     * @param dls      The download step.
      * @param usedVars The used variables.
-     * @param meta The WFS meta data.
-     * @param hits Generate a hits document.
+     * @param meta     The WFS meta data.
+     * @param hits     Generate a hits document.
      * @return The XML document.
      * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
-        Set<String>  usedVars,
-        WFSMeta      meta,
-        boolean      hits
+        Set<String> usedVars,
+        WFSMeta meta,
+        boolean hits
     ) throws ConverterException {
         return create(dls, usedVars, meta, hits, -1, -1, false);
     }
@@ -122,24 +118,24 @@ public class WFSPostParamsBuilder {
     /**
      * Creates a new XML document to be send as a POST request.
      *
-     * @param dls The download step.
+     * @param dls      The download step.
      * @param usedVars The used variables.
-     * @param meta The WFS meta data.
-     * @param hits Generate a hits document.
-     * @param ofs Offset of features.
-     * @param count Limit number of features.
-     * @param wfs2 Generate a WFS2 document.
+     * @param meta     The WFS meta data.
+     * @param hits     Generate a hits document.
+     * @param ofs      Offset of features.
+     * @param count    Limit number of features.
+     * @param wfs2     Generate a WFS2 document.
      * @return The XML document.
      * @throws ConverterException XML setup is bad.
      */
     public static Document create(
         DownloadStep dls,
         Set<String> usedVars,
-        WFSMeta     meta,
-        boolean     hits,
-        int         ofs,
-        int         count,
-        boolean     wfs2
+        WFSMeta meta,
+        boolean hits,
+        int ofs,
+        int count,
+        boolean wfs2
     ) throws ConverterException {
 
         Document doc = newDocument();
@@ -150,7 +146,7 @@ public class WFSPostParamsBuilder {
 
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
 
-        for (Parameter p: dls.getParameters()) {
+        for (Parameter p : dls.getParameters()) {
             String value = p.getValue();
             if (!value.isEmpty() && !usedVars.contains(p.getKey())) {
                 switch (p.getKey()) {
@@ -176,7 +172,7 @@ public class WFSPostParamsBuilder {
         getFeature.setAttribute("service", "WFS");
 
         getFeature.setAttribute("version",
-             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
+            meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         getFeature.setAttribute("outputFormat", outputFormat);
 
@@ -188,8 +184,8 @@ public class WFSPostParamsBuilder {
             getFeature.setAttribute(
                 "startIndex", String.valueOf(ofs));
             getFeature.setAttribute(wfs2
-                ? "count"
-                : "maxFeatures",
+                    ? "count"
+                    : "maxFeatures",
                 String.valueOf(count));
         }
 
@@ -205,15 +201,15 @@ public class WFSPostParamsBuilder {
             appendParameters(doc, sqEl, params.entrySet());
             getFeature.appendChild(sqEl);
         } else {
-            int idx = dataset.indexOf(':');
-            String namespaces = idx >= 0
-                ? meta.getNamespaces()
-                      .getNamespaceURI(dataset.substring(0, idx))
-                : "";
-
             Element queryEl = doc.createElementNS(WFS_NS, "wfs:Query");
             queryEl.setAttribute("typeNames", dataset);
-            queryEl.setAttribute("xmlns:bvv", namespaces);
+            int idx = dataset.indexOf(':');
+            if (idx >= 0) {
+                String namespacePrefix = dataset.substring(0, idx);
+                String namespaceUri = meta.getNamespaces()
+                    .getNamespaceURI(namespacePrefix);
+                queryEl.setAttribute("xmlns:" + namespacePrefix, namespaceUri);
+            }
             queryEl.setAttribute(SRS_NAME, srsName);
             appendBBox(doc, bbox, queryEl);
             getFeature.appendChild(queryEl);
@@ -238,10 +234,10 @@ public class WFSPostParamsBuilder {
 
     private static void appendParameters(
         Document doc,
-        Element  parent,
+        Element parent,
         Set<Map.Entry<String, String>> params
     ) {
-        for (Map.Entry<String, String> p: params) {
+        for (Map.Entry<String, String> p : params) {
             Element child = doc.createElementNS(WFS_NS, "wfs:Parameter");
             child.setAttribute("name", p.getKey());
             child.setTextContent(p.getValue());
@@ -251,10 +247,10 @@ public class WFSPostParamsBuilder {
 
     private static void appendBBox(
         Document doc,
-        String   bbox,
-        Element  parent
+        String bbox,
+        Element parent
     ) {
-        String [] bboxArr = bbox.split(",");
+        String[] bboxArr = bbox.split(",");
         if (bboxArr.length == FIVE) {
             Element filterEl = doc.createElementNS(FES_NS, "fes:Filter");
             Element bboxEl = doc.createElementNS(FES_NS, "fes:BBOX");

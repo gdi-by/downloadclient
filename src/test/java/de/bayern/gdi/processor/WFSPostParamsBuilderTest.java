@@ -64,6 +64,8 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
 
     private DownloadStep downloadStep;
 
+    private String queryResource;
+
     /**
      * @return DownloadSteps to tests
      * @throws IOException if creation of a DownloadStep failed
@@ -71,20 +73,33 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
     @Parameterized.Parameters
     public static Collection<Object[]> downloadSteps() throws IOException {
         return Arrays.asList(new Object[][] {
-            {"SimpleExample", createDownloadStep("bvv:gmd_ex")},
-            {"Example1", createDownloadStep("bvv:gmd_ex (Filter)",
-                "\"bvv:sch\" = '09774135'")},
-            {"Example2", createDownloadStep("bvv:gmd_ex (Filter)",
-                "\"bvv:sch\" LIKE '09774%'")},
-            {"Example3", createDownloadStep(
+            {"SimpleExampleGeoserver",
+                createDownloadStep("bvv:gmd_ex"),
+                "/wfs20/geoserver/geoserver-capabilities.xml"},
+            {"SimpleExampleXtraserver",
+                createDownloadStep("adv:AP_LTO"),
+                "/wfs20/xtraserver/xtraserver-capabilities.xml"},
+            {"Example1",
+                createDownloadStep("bvv:gmd_ex (Filter)",
+                "\"bvv:sch\" = '09774135'"),
+                "/wfs20/geoserver/geoserver-capabilities.xml"},
+            {"Example2",
+                createDownloadStep("bvv:gmd_ex (Filter)",
+                "\"bvv:sch\" LIKE '09774%'"),
+                "/wfs20/geoserver/geoserver-capabilities.xml"},
+            {"Example3",
+                createDownloadStep(
                 "Typübergreifende Abfrage (Filter)",
                 "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'")},
-            {"Example4", createDownloadStep(
+                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'"),
+                "/wfs20/geoserver/geoserver-capabilities.xml"},
+            {"Example4",
+                createDownloadStep(
                 "Typübergreifende Abfrage (Filter)",
                 "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
                     + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
-                    + "('09161000', '09161000')")}
+                    + "('09161000', '09161000')"),
+                "/wfs20/geoserver/geoserver-capabilities.xml"}
         });
     }
 
@@ -93,11 +108,14 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      *
      * @param testName     name of the test
      * @param downloadStep DownloadStep to test
+     * @param queryResource path to the capabilities
      */
     public WFSPostParamsBuilderTest(String testName,
-                                    DownloadStep downloadStep) {
+                                    DownloadStep downloadStep,
+                                    String queryResource ) {
         this.testName = testName;
         this.downloadStep = downloadStep;
+        this.queryResource = queryResource;
     }
 
     /**
@@ -132,8 +150,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
     private WFSMeta parseMeta()
         throws IOException, URISyntaxException {
         int port = port();
-        String queryPath = "/geoserver/wfs";
-        String queryResource = "/wfs20/geoserver/geoserver-capabilities.xml";
+        String queryPath = "/wfs";
         prepareCapabilities(queryResource, queryPath, port);
         prepareDescribeStoredQueries();
 
