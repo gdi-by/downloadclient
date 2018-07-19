@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Geotools 16.1 FilterEncoder (eCQL Filter).
@@ -45,9 +44,8 @@ public class FilterEncoder {
     private List<String> queries;
     private String inputs;
     private static final int INDENTSIZE = 3;
-    private ArrayList<Query> entireQueries;
     private ArrayList<Query> complexQueries;
-    private List<Document> filters = new ArrayList<>();
+    private final List<Document> filters = new ArrayList<>();
 
 
     public FilterEncoder() {
@@ -109,12 +107,10 @@ public class FilterEncoder {
 
     /**
      * Collect all the entire queries.
-     * @return help - a map
      */
     private void collectEntireQueries() {
 
         List<String> newQueries = new ArrayList<>();
-        entireQueries = new ArrayList<>();
         complexQueries = new ArrayList<>();
 
         for (String query: this.queries) {
@@ -127,7 +123,6 @@ public class FilterEncoder {
 
                     if (wheres.length != 0) {
                         Query aQuery = initializeQueryObject(wheres);
-                        entireQueries.add(aQuery);
                         complexQueries.add(aQuery);
                         newQueries.add(wheres[1]);
                     }
