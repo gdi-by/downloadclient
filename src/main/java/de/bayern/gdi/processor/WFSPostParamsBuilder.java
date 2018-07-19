@@ -255,8 +255,7 @@ public class WFSPostParamsBuilder {
                                                String dataset) {
         try {
             FilterEncoder filterEncoder = new FilterEncoder();
-            filterEncoder.initializeQueries(cql);
-            List<Document> filters = filterEncoder.getFilters();
+            List<Document> filters = filterEncoder.initializeQueries(cql);
             for (Document filter : filters) {
                 Element queryElement = createQueryElement(meta
                     , doc, srsName, dataset);

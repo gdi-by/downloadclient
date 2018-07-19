@@ -1511,7 +1511,7 @@ public class Controller {
             }
             try {
                 FilterEncoder filterEncoder = new FilterEncoder();
-                filterEncoder.initializeQueries(sqlInput);
+                filterEncoder.validateCql(sqlInput);
                 this.dataBean.addAttribute("CQL", sqlInput,  "");
             } catch (CQLException e) {
                 logHistoryParent.setStyle("-fx-text-fill: #FF0000");

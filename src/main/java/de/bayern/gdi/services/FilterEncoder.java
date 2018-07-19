@@ -41,90 +41,67 @@ import java.util.List;
  */
 public class FilterEncoder {
 
-    private List<String> queries;
-    private String inputs;
     private static final int INDENTSIZE = 3;
-    private ArrayList<Query> complexQueries;
-    private final List<Document> filters = new ArrayList<>();
 
-
-    public FilterEncoder() {
-        identifySoloQuery();
+    /**
+     * Validates the userInput.
+     *
+     * @param userInput the queries to validate
+     * @throws CQLException if the CQL is not valid
+     */
+    public void validateCql(String userInput)
+        throws CQLException {
+        initializeQueries(userInput);
     }
 
+    /**
+     * We want to hold all the queries.
+     *
+     * @param userInput extract all queries
+     * @return the encoder filters
+     * @throws CQLException something went wrong.
+     */
+    public List<Document> initializeQueries(String userInput)
+        throws CQLException {
+        List<String> queries = identifySoloQuery(userInput);
+        List<Query> complexQueries = cleanUpQueries(queries);
+        return doProduceEcqlFilters(complexQueries);
+    }
 
     /**
      * Identify every single query.
      * (Coming from the textarea)
+     *
+     * @param inputs
      */
-    private void identifySoloQuery() {
-        if (inputs != null) {
-            String[] queriesString = inputs.split("\\r\\n|\\n|\\r");
-            queries = Arrays.asList(queriesString);
+    private List<String> identifySoloQuery(String inputs) {
+        if (inputs == null) {
+            throw new IllegalArgumentException("CQL must not be null");
         }
-    }
 
-    /**
-     * Generate the eCQL-Filter.
-     * (based on the query list that has been establish)
-     */
-    private void doProduceEcqlFilters() throws CQLException {
-
-        ArrayList<Query> queryList = new ArrayList<>();
-
-        if (complexQueries != null && complexQueries.size() > 0) {
-            for (Query query: complexQueries) {
-                try {
-                    Filter filter = ECQL.toFilter(query.getValue());
-                    Configuration configuration =
-                            new org.geotools.filter.v2_0.FESConfiguration();
-                    Encoder encoder = new Encoder(configuration);
-                    encoder.setIndenting(true);
-                    encoder.setIndentSize(INDENTSIZE);
-                    encoder.setOmitXMLDeclaration(true);
-
-                    Document filterDocument = encoder.encodeAsDOM(
-                        filter, FES.Filter);
-                    if (filterDocument != null) {
-                        filters.add(filterDocument);
-                        //query.seteCQLFilter(filterString);
-                        //queryList.add(query);
-                    }
-                } catch (IOException e) {
-                    // log.log(log.getLevel(), e.getMessage(), e.getCause());
-                    e.printStackTrace();
-                } catch (TransformerException e) {
-                    // TODO
-                    e.printStackTrace();
-                } catch (SAXException e) {
-                    // TODO
-                    e.printStackTrace();
-                }
-            }
-            complexQueries = queryList;
-        }
+        String[] queriesString = inputs.split("\\r\\n|\\n|\\r");
+        return Arrays.asList(queriesString);
     }
 
     /**
      * Collect all the entire queries.
+     *
+     * @param queries
      */
-    private void collectEntireQueries() {
+    private List<Query> cleanUpQueries(List<String> queries) {
+        List<Query> complexQueries = new ArrayList<>();
 
-        List<String> newQueries = new ArrayList<>();
-        complexQueries = new ArrayList<>();
-
-        for (String query: this.queries) {
+        for (String query : queries) {
             if (query != null) {
                 if (query.contains("WHERE")
-                        || query.contains("Where")
-                        || query.contains("where")) {
+                    || query.contains("Where")
+                    || query.contains("where")) {
 
                     String[] wheres = splitCQLRequest(query);
 
                     if (wheres.length != 0) {
                         Query aQuery = initializeQueryObject(wheres);
                         complexQueries.add(aQuery);
-                        newQueries.add(wheres[1]);
                     }
                 } else {
                     Query aQuery = new Query("", query, false);
@@ -132,14 +109,49 @@ public class FilterEncoder {
                 }
             }
         }
+        return complexQueries;
+    }
 
-        if (newQueries.size() > 0) {
-            queries = newQueries;
+    /**
+     * Generate the eCQL-Filter.
+     * (based on the query list that has been establish)
+     *
+     * @param complexQueries
+     */
+    private List<Document> doProduceEcqlFilters(List<Query> complexQueries)
+        throws CQLException {
+        List<Document> filters = new ArrayList<>();
+        for (Query query : complexQueries) {
+            try {
+                Filter filter = ECQL.toFilter(query.getValue());
+                Configuration configuration =
+                    new org.geotools.filter.v2_0.FESConfiguration();
+                Encoder encoder = new Encoder(configuration);
+                encoder.setIndenting(true);
+                encoder.setIndentSize(INDENTSIZE);
+                encoder.setOmitXMLDeclaration(true);
+
+                Document filterDocument = encoder.encodeAsDOM(
+                    filter, FES.Filter);
+                if (filterDocument != null) {
+                    filters.add(filterDocument);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TransformerException e) {
+                // TODO
+                e.printStackTrace();
+            } catch (SAXException e) {
+                // TODO
+                e.printStackTrace();
+            }
         }
+        return filters;
     }
 
     /**
      * Initialize the query Object.
+     *
      * @param wheres an array.
      * @return aQuery - An Object from type Query.
      */
@@ -156,6 +168,7 @@ public class FilterEncoder {
 
     /**
      * Retrieve the Where-Part of the eCQL-Request.
+     *
      * @param query is suppose to be the entire eCQL
      * @return wheres, an array of two elements.
      */
@@ -168,27 +181,6 @@ public class FilterEncoder {
             wheres = query.split("where");
         }
         return wheres;
-    }
-
-    /**
-     * We want to hold all the queries.
-     * @param userInput extract all queries
-     * @throws CQLException something went wrong.
-     */
-    public void initializeQueries(String userInput) throws CQLException {
-        this.inputs = userInput;
-        identifySoloQuery();
-        collectEntireQueries();
-        doProduceEcqlFilters();
-    }
-
-    /**
-     * @return one Document encoded as "Filter Encoding Specification"
-     * per query line, an empty list if the input is not parsed yet,
-     * never <code></code>
-     */
-    public List<Document> getFilters() {
-        return filters;
     }
 
 }

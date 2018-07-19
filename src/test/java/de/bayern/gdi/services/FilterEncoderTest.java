@@ -39,7 +39,6 @@ import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
  */
 public class FilterEncoderTest {
 
-
     /**
      * Test validation of valid CQL.
      *
@@ -48,7 +47,7 @@ public class FilterEncoderTest {
     @Test
     public void testValidateValidCql() throws Exception {
         FilterEncoder filterEncoder = new FilterEncoder();
-        filterEncoder.initializeQueries("\"bvv:sch\" LIKE '09774%'");
+        filterEncoder.validateCql("\"bvv:sch\" LIKE '09774%'");
     }
 
     /**
@@ -59,7 +58,7 @@ public class FilterEncoderTest {
     @Test(expected = CQLException.class)
     public void testValidateInvalidCql() throws Exception {
         FilterEncoder filterEncoder = new FilterEncoder();
-        filterEncoder.initializeQueries("\"bvv:sch\" IS LIKE '09774%'");
+        filterEncoder.validateCql("\"bvv:sch\" IS LIKE '09774%'");
     }
 
     /**
@@ -70,9 +69,9 @@ public class FilterEncoderTest {
     @Test
     public void testFilter() throws Exception {
         FilterEncoder filterEncoder = new FilterEncoder();
-        filterEncoder.initializeQueries("\"bvv:sch\" LIKE '09774%'");
+        List<Document> filters = filterEncoder.initializeQueries(
+            "\"bvv:sch\" LIKE '09774%'");
 
-        List<Document> filters = filterEncoder.getFilters();
         assertThat(filters.size(), is(1));
 
         Document filter = filters.get(0);
@@ -90,9 +89,8 @@ public class FilterEncoderTest {
         FilterEncoder filterEncoder = new FilterEncoder();
         String userInput = "\"bvv:lkr_ex\" WHERE \"bvv:sch\" LIKE '09774'\n"
             + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09161000'";
-        filterEncoder.initializeQueries(userInput);
+        List<Document> filters = filterEncoder.initializeQueries(userInput);
 
-        List<Document> filters = filterEncoder.getFilters();
         assertThat(filters.size(), is(2));
 
         Document firstFilter = filters.get(0);
