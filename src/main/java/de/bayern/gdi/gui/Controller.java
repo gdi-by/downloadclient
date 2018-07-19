@@ -1517,6 +1517,11 @@ public class Controller {
                 logHistoryParent.setStyle("-fx-text-fill: #FF0000");
                 setStatusTextUI(e.getSyntaxError());
                 return;
+            } catch (ConverterException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.validation.failed", e.getMessage()));
+                return;
             }
         }
 

@@ -21,6 +21,7 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.processor.DownloadStepConverter.QueryType;
 import de.bayern.gdi.services.FilterEncoder;
+import de.bayern.gdi.services.FilterEncoder.QueryToFeatureType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.I18n;
 import org.geotools.filter.text.cql2.CQLException;
@@ -255,20 +256,25 @@ public class WFSPostParamsBuilder {
                                                String dataset) {
         try {
             FilterEncoder filterEncoder = new FilterEncoder();
-            List<Document> filters = filterEncoder.initializeQueries(cql);
-            for (Document filter : filters) {
+            List<QueryToFeatureType> filters =
+                filterEncoder.initializeQueries(cql);
+            for (QueryToFeatureType filter : filters) {
+                String typeName = filter.getFeatureType();
+                if (typeName == null) {
+                    typeName = dataset;
+                }
+                Document filterDoc = filter.getFilter();
                 Element queryElement = createQueryElement(meta
-                    , doc, srsName, dataset);
-                Node filterElement = filter.getFirstChild().cloneNode(true);
+                    , doc, srsName, typeName);
+                Node filterElement = filterDoc.getFirstChild().cloneNode(true);
                 Node copiedFilterElement = doc.importNode(filterElement, true);
                 queryElement.appendChild(copiedFilterElement);
                 getFeature.appendChild(queryElement);
             }
-        } catch (CQLException e) {
+        } catch (CQLException | ConverterException e) {
             e.printStackTrace();
             // TODO
         }
-
     }
 
     private static Element createQueryElement(WFSMeta meta,

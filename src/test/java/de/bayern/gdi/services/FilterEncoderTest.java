@@ -69,12 +69,12 @@ public class FilterEncoderTest {
     @Test
     public void testFilter() throws Exception {
         FilterEncoder filterEncoder = new FilterEncoder();
-        List<Document> filters = filterEncoder.initializeQueries(
-            "\"bvv:sch\" LIKE '09774%'");
+        List<FilterEncoder.QueryToFeatureType> filters =
+            filterEncoder.initializeQueries("\"bvv:sch\" LIKE '09774%'");
 
         assertThat(filters.size(), is(1));
 
-        Document filter = filters.get(0);
+        Document filter = filters.get(0).getFilter();
         assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
         assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
     }
@@ -89,16 +89,43 @@ public class FilterEncoderTest {
         FilterEncoder filterEncoder = new FilterEncoder();
         String userInput = "\"bvv:lkr_ex\" WHERE \"bvv:sch\" LIKE '09774'\n"
             + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09161000'";
-        List<Document> filters = filterEncoder.initializeQueries(userInput);
+        List<FilterEncoder.QueryToFeatureType> filters =
+            filterEncoder.initializeQueries(userInput);
 
         assertThat(filters.size(), is(2));
 
-        Document firstFilter = filters.get(0);
+        Document firstFilter = filters.get(0).getFilter();
         assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
         assertThat(the(firstFilter), hasXPath("/fes:Filter",
             namespaceContext()));
 
-        Document secondFilter = filters.get(1);
+        Document secondFilter = filters.get(1).getFilter();
+        assertThat(the(secondFilter), conformsTo(w3cXmlSchemaFrom(fes())));
+        assertThat(the(secondFilter), hasXPath("/fes:Filter",
+            namespaceContext()));
+    }
+
+    /**
+     * Test creation of valid CQL.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testFilterMultipleLinesWhere() throws Exception {
+        FilterEncoder filterEncoder = new FilterEncoder();
+        String userInput = "\"bvv:lkr_ex\" where \"bvv:sch\" LIKE '09774'\n"
+            + "\"bvv:gmd_ex\" WHeRE \"bvv:sch\" LIKE '09161000'";
+        List<FilterEncoder.QueryToFeatureType> filters =
+            filterEncoder.initializeQueries(userInput);
+
+        assertThat(filters.size(), is(2));
+
+        Document firstFilter = filters.get(0).getFilter();
+        //assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
+        assertThat(the(firstFilter), hasXPath("/fes:Filter",
+            namespaceContext()));
+
+        Document secondFilter = filters.get(1).getFilter();
         assertThat(the(secondFilter), conformsTo(w3cXmlSchemaFrom(fes())));
         assertThat(the(secondFilter), hasXPath("/fes:Filter",
             namespaceContext()));
