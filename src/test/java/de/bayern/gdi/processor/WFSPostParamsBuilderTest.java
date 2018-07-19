@@ -112,7 +112,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     public WFSPostParamsBuilderTest(String testName,
                                     DownloadStep downloadStep,
-                                    String queryResource ) {
+                                    String queryResource) {
         this.testName = testName;
         this.downloadStep = downloadStep;
         this.queryResource = queryResource;

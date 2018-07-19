@@ -407,21 +407,10 @@ public class DataBean extends Observable {
                 ItemModel itemModel = getDatatype();
                 if (itemModel instanceof StoredQueryModel) {
                     serviceTypeStr = "WFS2_SIMPLE";
+                } else if (isFilterType()) {
+                    serviceTypeStr = "WFS2_SQL";
                 } else {
-                    FeatureModel fm = (FeatureModel)itemModel;
-                    WFSMeta.Feature feature = (WFSMeta.Feature)fm.getItem();
-                    String fname = feature.getName();
-                    if (fname != null
-                    && fname.endsWith(FEATURE_TYPE_NAME_SUFFIX)) {
-                        serviceTypeStr = "WFS2_SQL";
-                        /* TODO Dead code: What is this for?
-                        if (wfsService != null) {
-                            nameSpace = wfsService.namespaces;
-                        }
-                        */
-                    } else {
-                        serviceTypeStr = "WFS2_BASIC";
-                    }
+                    serviceTypeStr = "WFS2_BASIC";
                 }
                 break;
             case ATOM:

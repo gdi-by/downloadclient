@@ -19,6 +19,7 @@ package de.bayern.gdi.processor;
 
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.processor.DownloadStepConverter.QueryType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.I18n;
 import org.w3c.dom.Document;
@@ -166,35 +167,15 @@ public class WFSPostParamsBuilder {
             }
         }
 
-        Element getFeature = doc.createElementNS(
-            WFS_NS, "wfs:GetFeature");
-
-        getFeature.setAttribute("service", "WFS");
-
-        getFeature.setAttribute("version",
-            meta.highestVersion(WFSMeta.WFS2_0_0).toString());
-
-        getFeature.setAttribute("outputFormat", outputFormat);
-
-        if (hits) {
-            getFeature.setAttribute("resultType", "hits");
-        }
-
-        if (ofs != -1) {
-            getFeature.setAttribute(
-                "startIndex", String.valueOf(ofs));
-            getFeature.setAttribute(wfs2
-                    ? "count"
-                    : "maxFeatures",
-                String.valueOf(count));
-        }
+        Element getFeature = createGetFeatureElement(meta, hits, ofs,
+            count, wfs2, doc, outputFormat);
 
         String dataset = dls.getDataset();
 
-        String queryType = DownloadStepConverter.findQueryType(
+        QueryType queryType = DownloadStepConverter.findQueryType(
             dls.getServiceType());
 
-        boolean storedQuery = queryType.equals(STOREDQUERY_ID);
+        boolean storedQuery = queryType.equals(QueryType.STOREDQUERY);
         if (storedQuery) {
             Element sqEl = doc.createElementNS(WFS_NS, "wfs:StoredQuery");
             sqEl.setAttribute("id", dataset);
@@ -218,6 +199,38 @@ public class WFSPostParamsBuilder {
         doc.appendChild(getFeature);
 
         return doc;
+    }
+
+    private static Element createGetFeatureElement(WFSMeta meta,
+                                                   boolean hits,
+                                                   int ofs,
+                                                   int count,
+                                                   boolean wfs2,
+                                                   Document doc,
+                                                   String outputFormat) {
+        Element getFeature = doc.createElementNS(
+            WFS_NS, "wfs:GetFeature");
+
+        getFeature.setAttribute("service", "WFS");
+
+        getFeature.setAttribute("version",
+            meta.highestVersion(WFSMeta.WFS2_0_0).toString());
+
+        getFeature.setAttribute("outputFormat", outputFormat);
+
+        if (hits) {
+            getFeature.setAttribute("resultType", "hits");
+        }
+
+        if (ofs != -1) {
+            getFeature.setAttribute(
+                "startIndex", String.valueOf(ofs));
+            getFeature.setAttribute(wfs2
+                    ? "count"
+                    : "maxFeatures",
+                String.valueOf(count));
+        }
+        return getFeature;
     }
 
     private static Document newDocument() throws ConverterException {

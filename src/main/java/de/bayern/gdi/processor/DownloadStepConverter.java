@@ -47,23 +47,36 @@ import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
+import static de.bayern.gdi.processor.DownloadStepConverter.QueryType.DATASET;
+import static de.bayern.gdi.processor.DownloadStepConverter.
+    QueryType.SQLQUERY;
+import static de.bayern.gdi.processor.DownloadStepConverter.
+    QueryType.STOREDQUERY;
+
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
     private static final Logger log
         = Logger.getLogger(DownloadStepConverter.class.getName());
 
-    private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
-    private static final String DATASET = "DATASET";
-    private static final String GETFEATURE = "GetFeature";
+    /**
+     * Type of a Query.
+     */
+    public enum QueryType {
+        /**
+         * StoredQuery.
+         */
+        STOREDQUERY,
+        /**
+         * Dataset.
+         */
+        DATASET,
+        /**
+         * SQL Query.
+         */
+        SQLQUERY }
 
-    private static final String[][] SERVICE2TYPE = {
-        {"ATOM", STOREDQUERY_ID}, // XXX: NOT CORRECT!
-        {"WFS2_BASIC", DATASET},
-        {"WFS2_SIMPLE", STOREDQUERY_ID},
-        {"WFS1", DATASET},
-        {"WFS", DATASET}
-    };
+    private static final String GETFEATURE = "GetFeature";
 
     private String user;
     private String password;
@@ -153,16 +166,19 @@ public class DownloadStepConverter {
     /**
      * Finds WFS service type for given dataset.
      * @param type The dataset type.
-     * @return The WFS type.
+     * @return The query type.
      */
-    protected static String findQueryType(String type) {
-        String t = type.toUpperCase();
-        for (String []pair: SERVICE2TYPE) {
-            if (t.equals(pair[0])) {
-                return pair[1];
-            }
+    protected static QueryType findQueryType(String type) {
+
+        switch (type) {
+            case "ATOM":
+            case "WFS2_SIMPLE":
+                return STOREDQUERY;
+            case "WFS2_SQL":
+                return SQLQUERY;
+            default:
+                return DATASET;
         }
-        return type;
     }
 
     private static String encodeParameters(
@@ -232,7 +248,7 @@ public class DownloadStepConverter {
             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         String dataset = dls.getDataset();
-        String queryType = findQueryType(dls.getServiceType());
+        QueryType queryType = findQueryType(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
         sb.append(base);
@@ -243,7 +259,7 @@ public class DownloadStepConverter {
           .append("request=GetFeature&")
           .append("version=").append(version);
 
-        if (queryType.equals(STOREDQUERY_ID)) {
+        if (queryType.equals(STOREDQUERY)) {
             sb.append("&STOREDQUERY_ID=")
               .append(StringUtils.urlEncode(dataset));
         } else {
