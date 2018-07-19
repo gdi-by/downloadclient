@@ -42,12 +42,7 @@ import java.util.logging.Logger;
  */
 public class FilterEncoder {
 
-    private static final Logger log =
-            Logger.getLogger(FilterEncoder.class.getName());
-    private static final String PERCENT_NUMBER = "\u0025";
-    private static final String ASTERISK = "\u002A";
     private List<String> queries;
-    private List<String> eCQLFilters;
     private String inputs;
     private static final int INDENTSIZE = 3;
     private ArrayList<Query> entireQueries;
@@ -181,79 +176,15 @@ public class FilterEncoder {
     }
 
     /**
-     * Give back the list of all produced eCQL-Filters.
-     * @return eCQLFilters
-     */
-    public List<String> geteCQLFilters() {
-        return eCQLFilters;
-    }
-
-    /**
-     * Save all the eCQL-Filters.
-     * @param eCQLFilters the list of all eCQL-Filter
-     */
-    public void seteCQLFilters(List<String> eCQLFilters) {
-        this.eCQLFilters = eCQLFilters;
-    }
-
-    /**
-     * Give back a list of every single lines introduce by the user.
-     * @return queries This represents every single line \n
-     */
-    public List<String> getQueries() {
-        return queries;
-    }
-
-    /**
      * We want to hold all the queries.
      * @param userInput extract all queries
      * @throws CQLException something went wrong.
      */
     public void initializeQueries(String userInput) throws CQLException {
         this.inputs = userInput;
-        this.eCQLFilters = new ArrayList<>();
         identifySoloQuery();
         collectEntireQueries();
         doProduceEcqlFilters();
-/*
-        if (entireQueries != null && entireQueries.size() > 0) {
-            queries = new ArrayList<>();
-           for (Query query: entireQueries) {
-               queries.add(query.getValue());
-           }
-        } */
-    }
-
-    /**
-     * Form the entire queries.
-     * @return entireQueries Map
-     */
-    public ArrayList<Query> getEntireQueries() {
-        return entireQueries;
-    }
-
-    /**
-     * Initialize the entire queries.
-     * @param entireQueries a Map
-     */
-    public void setEntireQueries(ArrayList<Query> entireQueries) {
-        this.entireQueries = entireQueries;
-    }
-
-    /**
-     * Set the complexe queries objects.
-     * @return complexQueries list
-     */
-    public ArrayList<Query> getComplexQueries() {
-        return complexQueries;
-    }
-
-    /**
-     * Initialize the entire queries.
-     * @param complexQueries a List of Objects
-     */
-    public void setComplexQueries(ArrayList<Query> complexQueries) {
-        this.complexQueries = complexQueries;
     }
 
     /**
