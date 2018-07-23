@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 
 /**
@@ -32,6 +33,8 @@ public class CloseLogJob implements DeferredJob {
 
     @Override
     public void run(Processor p) {
+        String msg = I18n.getMsg("gml.end.of.protocol");
+        logger.log(msg);
         logger.close();
     }
 }
