@@ -235,6 +235,15 @@ public class DownloadConfig {
         return parameters.get("srsName");
     }
 
+    /**
+     * Returns the CQL.
+     *
+     * @return The CQL
+     */
+    public String getCql() {
+        return parameters.get("CQL");
+    }
+
    /**
     * Returns the value of a tag by the name of the Tag.
     *

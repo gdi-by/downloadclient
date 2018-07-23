@@ -527,7 +527,7 @@ public class Controller {
             List<ItemModel> datasets = serviceTypeChooser.
                     getItems();
             for (ItemModel iItem : datasets) {
-                if (iItem.getDataset().equals(dataset)) {
+                if (isFeatureTypeToSelect(iItem, conf)) {
                     serviceTypeChooser.
                             getSelectionModel().select(iItem);
                     datasetAvailable = true;
@@ -581,6 +581,19 @@ public class Controller {
         loadGUIComponents();
     }
 
+    private boolean isFeatureTypeToSelect(ItemModel iItem,
+                                          DownloadConfig config) {
+        boolean isSameFeatureTypeName =
+            iItem.getDataset().equals(config.getDataset());
+        if (!isSameFeatureTypeName) {
+            return false;
+        }
+        if (iItem instanceof FeatureModel && config.getCql() != null) {
+            return FILTER.equals(((FeatureModel) iItem).getFilterType());
+        }
+        return true;
+    }
+
     private void loadGUIComponents() {
         switch (downloadConfig.getServiceType()) {
             case "ATOM":
@@ -593,6 +606,11 @@ public class Controller {
                 break;
             case "WFS2_SIMPLE":
                 loadWfsSimple();
+                break;
+            case "WFS2_SQL":
+                initialiseCrsChooser();
+                initializeDataFormatChooser();
+                initializeCqlTextArea();
                 break;
             default:
                 setStatusTextUI(I18n.format("status.config.invalid-xml"));
@@ -666,6 +684,13 @@ public class Controller {
             setStatusTextUI(I18n.format("status.config.invalid-epsg"));
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void initializeCqlTextArea() {
+        if (downloadConfig != null) {
+            String cql = downloadConfig.getCql();
+            sqlTextarea.setText(cql);
         }
     }
 
