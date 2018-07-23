@@ -21,7 +21,6 @@ package de.bayern.gdi.gui;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
-import de.bayern.gdi.model.Query;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.Service;
@@ -63,8 +62,6 @@ public class DataBean extends Observable {
     private CatalogService catalogService;
 
     private String featureTypeModel;
-
-    private List<Query> complexQueries;
 
     /**
      * Attribute representation.
@@ -424,8 +421,7 @@ public class DataBean extends Observable {
             serviceTypeStr,
             serviceURL,
             savePath,
-            processingSteps,
-            complexQueries);
+            processingSteps);
     }
 
     /**
