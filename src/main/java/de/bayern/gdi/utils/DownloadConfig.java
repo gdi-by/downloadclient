@@ -28,6 +28,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.bayern.gdi.gui.FeatureModel;
+import de.bayern.gdi.gui.FeatureModel.FilterType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -86,7 +88,7 @@ public class DownloadConfig {
             throw new NoServiceURLException();
         }
         try {
-            dataset = getValueByTagName("Dataset", root);
+            dataset = parseDataset(root);
         } catch (Exception ex) {
             dataset = null;
         }
@@ -136,7 +138,7 @@ public class DownloadConfig {
         }
     }
 
-   /**
+    /**
     * Returns the atom variation type as string.
     *
     * @return The variation string
@@ -260,6 +262,21 @@ public class DownloadConfig {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private String parseDataset(Element root) {
+        String dataset = getValueByTagName("Dataset", root);
+        if (dataset != null
+            && !I18n.getMsg("typ.overall.query").equals(dataset)) {
+            for (FilterType filterType : FilterType.values()) {
+                String labelSuffix = filterType.getLabelSuffix();
+                if (dataset.endsWith(labelSuffix)) {
+                    int endIndex = dataset.indexOf(labelSuffix) - 1;
+                    return dataset.substring(0, endIndex);
+                }
+            }
+        }
+        return dataset;
     }
 
     /**
