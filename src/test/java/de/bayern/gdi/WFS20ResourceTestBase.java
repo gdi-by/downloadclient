@@ -32,6 +32,8 @@ import static net.jadler.Jadler.onRequest;
 import static org.apache.http.HttpStatus.SC_OK;
 
 /**
+ * Base class which provides methods to prepare WFS 2.0 requests.
+ *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 public abstract class WFS20ResourceTestBase {

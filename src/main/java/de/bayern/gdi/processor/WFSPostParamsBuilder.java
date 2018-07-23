@@ -40,7 +40,7 @@ import java.util.Set;
 /**
  * A builder for WFS POST request bodies.
  */
-public class WFSPostParamsBuilder {
+public final class WFSPostParamsBuilder {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;

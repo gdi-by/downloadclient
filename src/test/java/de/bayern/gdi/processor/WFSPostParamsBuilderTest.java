@@ -54,6 +54,8 @@ import static org.xmlmatchers.xpath.XpathReturnType.returningABoolean;
 import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
 
 /**
+ * Test class to verify WFS GetFeature request builder.
+ *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
