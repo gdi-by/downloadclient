@@ -42,6 +42,13 @@ public class FeatureModel implements ItemModel {
         FilterType(String labelSuffix) {
             this.labelSuffix = labelSuffix;
         }
+
+        /**
+         * @return the label suffix of the filter type
+         */
+        public String getLabelSuffix() {
+            return labelSuffix;
+        }
     }
 
     private WFSMeta.Feature feature;
