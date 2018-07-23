@@ -2064,7 +2064,12 @@ public class Controller {
             this.basicWFSContainer.setVisible(true);
 
             if (data.getItem() instanceof WFSMeta.Feature) {
-                setCrsAndExtent(data);
+                setCrsAndExtent((WFSMeta.Feature) data.getItem());
+            } else if (data.getItem() instanceof List
+                && !((List) data.getItem()).isEmpty()) {
+                List items = (List) data.getItem();
+                setCrsAndExtent((WFSMeta.Feature)
+                    items.get(items.size() - 1));
             }
             List<String> outputFormats = this
                 .dataBean.getWFSService()
@@ -2130,8 +2135,7 @@ public class Controller {
         }
     }
 
-    private void setCrsAndExtent(ItemModel data) {
-        WFSMeta.Feature feature = (WFSMeta.Feature) data.getItem();
+    private void setCrsAndExtent(WFSMeta.Feature feature) {
         mapWFS.setExtend(feature.getBBox());
         ArrayList<String> list = new ArrayList<>();
         list.add(feature.getDefaultCRS());
