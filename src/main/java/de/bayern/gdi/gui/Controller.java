@@ -1408,7 +1408,9 @@ public class Controller {
 
     private void extractCql() {
         String sqlInput = sqlTextarea.getText();
-        if (dataBean.isFilterType() && sqlInput != null && !sqlInput.isEmpty()) {
+        if (dataBean.isFilterType()
+            && sqlInput != null
+            && !sqlInput.isEmpty()) {
             this.dataBean.addAttribute("CQL", sqlInput, "");
         }
     }
