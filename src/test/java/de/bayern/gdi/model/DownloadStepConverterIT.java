@@ -71,9 +71,9 @@ public class DownloadStepConverterIT {
     @Parameters
     public static Collection<Object[]> downloadSteps() throws IOException {
         return Arrays.asList(new Object[][] {
-            {"Example1", createDownloadStep("bvv:gmd_ex (Filter)",
+            {"Example1", createDownloadStep("bvv:gmd_ex",
                 "\"bvv:sch\" = '09774135'")},
-            {"Example2", createDownloadStep("bvv:gmd_ex (Filter)",
+            {"Example2", createDownloadStep("bvv:gmd_ex",
                 "\"bvv:sch\" LIKE '09774%'")},
             {"Example3", createDownloadStep(
                 "Typübergreifende Abfrage (Filter)",
