@@ -1406,6 +1406,13 @@ public class Controller {
         this.dataBean.addAttribute("bbox", bbox.toString(), "");
     }
 
+    private void extractCql() {
+        String sqlInput = sqlTextarea.getText();
+        if (dataBean.isFilterType() && sqlInput != null && !sqlInput.isEmpty()) {
+            this.dataBean.addAttribute("CQL", sqlInput, "");
+        }
+    }
+
     private boolean validateInput() {
         final StringBuilder failed = new StringBuilder();
 
@@ -1538,41 +1545,10 @@ public class Controller {
      */
     @FXML
     protected void handleDownload(ActionEvent event) {
-        if (dataBean.isFilterType()) {
-            String sqlInput = sqlTextarea.getText();
-            logHistoryParent.setStyle(null);
-
-            if (sqlInput == null || sqlInput.isEmpty()) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(I18n
-                    .format("status.sql.input.empty"));
-                return;
-            }
-            boolean multipleQuery = dataBean.isMultipleQuery();
-            boolean isValidCql = validateEcqlUserInput(sqlInput,
-                multipleQuery);
-            if (!isValidCql) {
-                return;
-            }
-            try {
-                FilterEncoder filterEncoder = new FilterEncoder();
-                filterEncoder.validateCql(sqlInput);
-                this.dataBean.addAttribute("CQL", sqlInput,  "");
-            } catch (CQLException e) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(e.getSyntaxError());
-                return;
-            } catch (ConverterException e) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(I18n
-                    .format("status.sql.validation.failed", e.getMessage()));
-                return;
-            }
-        }
-
         extractStoredQuery();
         extractBoundingBox();
-        if (validateInput()) {
+        extractCql();
+        if (validateInput() && validateCqlInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             if (downloadConfig != null
@@ -1613,6 +1589,39 @@ public class Controller {
             };
             new Thread(convertTask).start();
         }
+    }
+
+    private boolean validateCqlInput() {
+        if (dataBean.isFilterType()) {
+            String sqlInput = sqlTextarea.getText();
+            logHistoryParent.setStyle(null);
+            if (sqlInput == null || sqlInput.isEmpty()) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.input.empty"));
+                return false;
+            }
+            boolean multipleQuery = dataBean.isMultipleQuery();
+            boolean isValidCql = validateEcqlUserInput(sqlInput,
+                multipleQuery);
+            if (!isValidCql) {
+                return false;
+            }
+            try {
+                FilterEncoder filterEncoder = new FilterEncoder();
+                filterEncoder.validateCql(sqlInput);
+            } catch (CQLException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(e.getSyntaxError());
+                return false;
+            } catch (ConverterException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.validation.failed", e.getMessage()));
+                return false;
+            }
+        }
+        return true;
     }
 
     private void resetGui() {
@@ -1664,7 +1673,8 @@ public class Controller {
     protected void handleSaveConfig(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if (validateInput()) {
+        extractCql();
+        if (validateInput() && validateCqlInput()) {
             FileChooser fileChooser = new FileChooser();
             DirectoryChooser dirChooser = new DirectoryChooser();
             File downloadDir;
