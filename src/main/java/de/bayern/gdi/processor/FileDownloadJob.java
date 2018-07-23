@@ -71,7 +71,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     @Override
     public void bytesCounted(long count) {
-        broadcastMessage(I18n.format("file.download.bytes", count));
+        broadcastMessage(I18n.format("file.download.bytes", count), false);
     }
 
     @Override

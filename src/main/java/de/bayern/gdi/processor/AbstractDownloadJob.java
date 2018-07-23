@@ -88,7 +88,18 @@ public abstract class AbstractDownloadJob
      * @param message The message to broadcast.
      */
     protected void broadcastMessage(String message) {
-        log(message);
+        broadcastMessage(message, false);
+    }
+
+    /**
+     * Broadcasts a message to a processor if set.
+     * @param message The message to broadcast.
+     * @param logMessage <code>true</code> if the message should be logged.
+     */
+    protected void broadcastMessage(String message, boolean logMessage) {
+        if (logMessage) {
+            log(message);
+        }
         if (this.processor != null) {
             this.processor.broadcastMessage(message);
         }
