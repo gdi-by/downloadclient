@@ -584,132 +584,15 @@ public class Controller {
     private void loadGUIComponents() {
         switch (downloadConfig.getServiceType()) {
             case "ATOM":
-                boolean variantAvailable = false;
-                for (ItemModel i: atomVariationChooser.getItems()) {
-                    Atom.Field field = (Atom.Field) i.getItem();
-                    if (field.getType()
-                            .equals(downloadConfig.getAtomVariation())) {
-                        variantAvailable = true;
-                        atomVariationChooser.getSelectionModel().select(i);
-                    }
-                }
-                if (!variantAvailable) {
-                    MiscItemModel errorVariant = new MiscItemModel();
-                    errorVariant.setItem(downloadConfig.getAtomVariation());
-                    atomVariationChooser.getItems().add(errorVariant);
-                    atomVariationChooser.getSelectionModel()
-                            .select(errorVariant);
-                }
+                loadAtom();
                 break;
             case "WFS2_BASIC":
-                try {
-                    CoordinateReferenceSystem targetCRS =
-                            CRS.decode(downloadConfig.getSRSName());
-                    boolean crsAvailable = false;
-                    for (CRSModel crsModel: referenceSystemChooser.getItems()) {
-                        if (CRS.equalsIgnoreMetadata(targetCRS,
-                                    crsModel.getCRS())) {
-                            crsAvailable = true;
-                            referenceSystemChooser.getSelectionModel()
-                                    .select(crsModel);
-                        }
-                    }
-                    if (!crsAvailable) {
-                        CRSModel crsErrorModel = new CRSModel(targetCRS);
-                        crsErrorModel.setAvailable(false);
-                        referenceSystemChooser.getItems().add(crsErrorModel);
-                        referenceSystemChooser.getSelectionModel()
-                                .select(crsErrorModel);
-                    }
-                } catch (NoSuchAuthorityCodeException nsace) {
-                    setStatusTextUI(I18n.format("status.config.invalid-epsg"));
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-                if (downloadConfig.getBoundingBox() != null) {
-                    String[] bBox = downloadConfig.getBoundingBox().split(",");
-                    basicX1.setText(bBox[BBOX_X1_INDEX]);
-                    basicY1.setText(bBox[BBOX_Y1_INDEX]);
-                    basicX2.setText(bBox[BBOX_X2_INDEX]);
-                    basicY2.setText(bBox[BBOX_Y2_INDEX]);
-                }
-                boolean outputFormatAvailable = false;
-                for (OutputFormatModel i: dataFormatChooser.getItems()) {
-                    if (i.getItem().equals(downloadConfig.getOutputFormat())) {
-                        dataFormatChooser.getSelectionModel().select(i);
-                        outputFormatAvailable = true;
-                    }
-                }
-                if (!outputFormatAvailable) {
-                    OutputFormatModel output = new OutputFormatModel();
-                    output.setAvailable(false);
-                    output.setItem(downloadConfig.getOutputFormat());
-                    dataFormatChooser.getItems().add(output);
-                    dataFormatChooser.getSelectionModel().select(output);
-                }
+                initialiseCrsChooser();
+                initializeBoundingBox();
+                initializeDataFormatChooser();
                 break;
             case "WFS2_SIMPLE":
-                ObservableList<Node> children
-                         = simpleWFSContainer.getChildren();
-                Map<String, String> parameters = downloadConfig.getParams();
-                for (Node node: children) {
-                    if (node instanceof HBox) {
-                        HBox hb = (HBox) node;
-                        Node n1 = hb.getChildren().get(0);
-                        Node n2 = hb.getChildren().get(1);
-                        if (n1 instanceof Label && n2 instanceof TextField) {
-                            Label paramLabel = (Label) n1;
-                            TextField paramBox = (TextField) n2;
-                            String targetValue = parameters.get(paramLabel
-                                    .getText());
-                            if (targetValue != null) {
-                                paramBox.setText(targetValue);
-                            }
-                        }
-                        if (n2 instanceof ComboBox) {
-                            ComboBox<OutputFormatModel> cb
-                                    = (ComboBox<OutputFormatModel>) n2;
-                            cb.setCellFactory(
-                                    new Callback<ListView<OutputFormatModel>,
-                                    ListCell<OutputFormatModel>>() {
-                                @Override
-                                public ListCell<OutputFormatModel>
-                                        call(ListView<OutputFormatModel> list) {
-                                    return new CellTypes.StringCell();
-                                }
-                            });
-                            cb.setOnAction(event -> {
-                                if (cb.getValue().isAvailable()) {
-                                    cb.setStyle(FX_BORDER_COLOR_NULL);
-                                } else {
-                                    cb.setStyle(FX_BORDER_COLOR_RED);
-                                }
-                            });
-                            boolean formatAvailable = false;
-                            for (OutputFormatModel i: cb.getItems()) {
-                                if (i.getItem().equals(downloadConfig
-                                        .getOutputFormat())) {
-                                    cb.getSelectionModel().select(i);
-                                    formatAvailable = true;
-                                }
-                            }
-                            if (!formatAvailable) {
-                                String format = downloadConfig
-                                        .getOutputFormat();
-                                OutputFormatModel m = new OutputFormatModel();
-                                m.setItem(format);
-                                m.setAvailable(false);
-                                cb.getItems().add(m);
-                                cb.getSelectionModel().select(m);
-                            }
-                            if (cb.getValue().isAvailable()) {
-                                cb.setStyle(FX_BORDER_COLOR_NULL);
-                            } else {
-                                cb.setStyle(FX_BORDER_COLOR_RED);
-                            }
-                        }
-                    }
-                }
+                loadWfsSimple();
                 break;
             default:
                 setStatusTextUI(I18n.format("status.config.invalid-xml"));
@@ -729,6 +612,143 @@ public class Controller {
         } else {
             chkChain.setSelected(false);
             handleChainCheckbox(new ActionEvent());
+        }
+    }
+
+    private void initializeBoundingBox() {
+        if (downloadConfig.getBoundingBox() != null) {
+            String[] bBox = downloadConfig.getBoundingBox().split(",");
+            basicX1.setText(bBox[BBOX_X1_INDEX]);
+            basicY1.setText(bBox[BBOX_Y1_INDEX]);
+            basicX2.setText(bBox[BBOX_X2_INDEX]);
+            basicY2.setText(bBox[BBOX_Y2_INDEX]);
+        }
+    }
+
+    private void initializeDataFormatChooser() {
+        boolean outputFormatAvailable = false;
+        for (OutputFormatModel i: dataFormatChooser.getItems()) {
+            if (i.getItem().equals(downloadConfig.getOutputFormat())) {
+                dataFormatChooser.getSelectionModel().select(i);
+                outputFormatAvailable = true;
+            }
+        }
+        if (!outputFormatAvailable) {
+            OutputFormatModel output = new OutputFormatModel();
+            output.setAvailable(false);
+            output.setItem(downloadConfig.getOutputFormat());
+            dataFormatChooser.getItems().add(output);
+            dataFormatChooser.getSelectionModel().select(output);
+        }
+    }
+
+    private void initialiseCrsChooser() {
+        try {
+            CoordinateReferenceSystem targetCRS =
+                    CRS.decode(downloadConfig.getSRSName());
+            boolean crsAvailable = false;
+            for (CRSModel crsModel: referenceSystemChooser.getItems()) {
+                if (CRS.equalsIgnoreMetadata(targetCRS,
+                            crsModel.getCRS())) {
+                    crsAvailable = true;
+                    referenceSystemChooser.getSelectionModel()
+                            .select(crsModel);
+                }
+            }
+            if (!crsAvailable) {
+                CRSModel crsErrorModel = new CRSModel(targetCRS);
+                crsErrorModel.setAvailable(false);
+                referenceSystemChooser.getItems().add(crsErrorModel);
+                referenceSystemChooser.getSelectionModel()
+                        .select(crsErrorModel);
+            }
+        } catch (NoSuchAuthorityCodeException nsace) {
+            setStatusTextUI(I18n.format("status.config.invalid-epsg"));
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void loadAtom() {
+        boolean variantAvailable = false;
+        for (ItemModel i: atomVariationChooser.getItems()) {
+            Atom.Field field = (Atom.Field) i.getItem();
+            if (field.getType()
+                    .equals(downloadConfig.getAtomVariation())) {
+                variantAvailable = true;
+                atomVariationChooser.getSelectionModel().select(i);
+            }
+        }
+        if (!variantAvailable) {
+            MiscItemModel errorVariant = new MiscItemModel();
+            errorVariant.setItem(downloadConfig.getAtomVariation());
+            atomVariationChooser.getItems().add(errorVariant);
+            atomVariationChooser.getSelectionModel()
+                    .select(errorVariant);
+        }
+    }
+
+    private void loadWfsSimple() {
+        ObservableList<Node> children
+            = simpleWFSContainer.getChildren();
+        Map<String, String> parameters = downloadConfig.getParams();
+        for (Node node: children) {
+            if (node instanceof HBox) {
+                HBox hb = (HBox) node;
+                Node n1 = hb.getChildren().get(0);
+                Node n2 = hb.getChildren().get(1);
+                if (n1 instanceof Label && n2 instanceof TextField) {
+                    Label paramLabel = (Label) n1;
+                    TextField paramBox = (TextField) n2;
+                    String targetValue = parameters.get(paramLabel
+                        .getText());
+                    if (targetValue != null) {
+                        paramBox.setText(targetValue);
+                    }
+                }
+                if (n2 instanceof ComboBox) {
+                    ComboBox<OutputFormatModel> cb
+                        = (ComboBox<OutputFormatModel>) n2;
+                    cb.setCellFactory(
+                        new Callback<ListView<OutputFormatModel>,
+                            ListCell<OutputFormatModel>>() {
+                            @Override
+                            public ListCell<OutputFormatModel>
+                            call(ListView<OutputFormatModel> list) {
+                                return new CellTypes.StringCell();
+                            }
+                        });
+                    cb.setOnAction(event -> {
+                        if (cb.getValue().isAvailable()) {
+                            cb.setStyle(FX_BORDER_COLOR_NULL);
+                        } else {
+                            cb.setStyle(FX_BORDER_COLOR_RED);
+                        }
+                    });
+                    boolean formatAvailable = false;
+                    for (OutputFormatModel i: cb.getItems()) {
+                        if (i.getItem().equals(downloadConfig
+                            .getOutputFormat())) {
+                            cb.getSelectionModel().select(i);
+                            formatAvailable = true;
+                        }
+                    }
+                    if (!formatAvailable) {
+                        String format = downloadConfig
+                            .getOutputFormat();
+                        OutputFormatModel m = new OutputFormatModel();
+                        m.setItem(format);
+                        m.setAvailable(false);
+                        cb.getItems().add(m);
+                        cb.getSelectionModel().select(m);
+                    }
+                    if (cb.getValue().isAvailable()) {
+                        cb.setStyle(FX_BORDER_COLOR_NULL);
+                    } else {
+                        cb.setStyle(FX_BORDER_COLOR_RED);
+                    }
+                }
+            }
         }
     }
 
