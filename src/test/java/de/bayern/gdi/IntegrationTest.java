@@ -23,6 +23,7 @@ import static de.bayern.gdi.utils.SceneConstants.ACTIVATE_FURTHER_PROCESSING;
 import static de.bayern.gdi.utils.SceneConstants.ADD_PROCESSING_STEP;
 import static de.bayern.gdi.utils.SceneConstants.AUTH;
 import static de.bayern.gdi.utils.SceneConstants.CALLING_SERVICE;
+import static de.bayern.gdi.utils.SceneConstants.CQL_INPUT;
 import static de.bayern.gdi.utils.SceneConstants.DOWNLOAD_BUTTON;
 import static de.bayern.gdi.utils.SceneConstants.NO_FORMAT_CHOSEN;
 import static de.bayern.gdi.utils.SceneConstants.NO_URL;
@@ -294,6 +295,24 @@ public class IntegrationTest extends TestBase {
         selectNthService(2);
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
+    }
+
+    /**
+     * Test the input of CQL.
+     */
+    @Test
+    public void testCqlInputAndDownload() {
+        clickOn(SEARCH).write(VERWALTUNGSGRENZEN);
+        waitForPopulatedServiceList();
+        assertFalse(isEmpty(SERVICE_LIST));
+        setServiceUrl(VERWALTUNGSGRENZEN_URL);
+        clickOn(SERVICE_SELECTION);
+        waitUntilReady();
+        assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
+        assertTrue(isEmpty(CQL_INPUT));
+        setCqlInput("\"bvv:sch\" LIKE '09162*'");
+        clickOn(DOWNLOAD_BUTTON);
+        waitUntilReady();
     }
 
     /**
