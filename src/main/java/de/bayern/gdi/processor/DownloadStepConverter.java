@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.HttpEntity;
@@ -315,6 +316,7 @@ public class DownloadStepConverter {
 
         FileDownloadJob fdj = null;
         if (usePost) {
+            logGetFeatureRequest(params);
             HttpEntity ent = new EntityTemplate(
                 XML.toContentProducer(params));
 
@@ -497,6 +499,7 @@ public class DownloadStepConverter {
         if (usePost) {
             wfsURL = getFeatureOp.getPOST();
             params = WFSPostParamsBuilder.create(dls, usedVars, meta, true);
+            logGetFeatureRequest(params);
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
@@ -537,6 +540,7 @@ public class DownloadStepConverter {
                 URL wfs = newURL(wfsURL);
                 Document pagedParams = WFSPostParamsBuilder.create(
                     dls, usedVars, meta, ofs, fpp, wfs2);
+                logGetFeatureRequest(params);
                 fdj.add(file, wfs,
                     new EntityTemplate(XML.toContentProducer(pagedParams)));
             }
@@ -580,5 +584,17 @@ public class DownloadStepConverter {
             this.user, this.password,
             this.logger);
         jl.addJob(job);
+    }
+
+    private void logGetFeatureRequest(Document params) {
+        log.log(Level.INFO, () -> {
+            try {
+                return "WFS GetFeature Request: "
+                    + XML.documentToString(params);
+            } catch (TransformerException e) {
+                // nothing to do
+            }
+            return "WFS GetFeature Request cannot be logged";
+        });
     }
 }
