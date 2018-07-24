@@ -1623,6 +1623,7 @@ public class Controller {
                 return false;
             }
         }
+        setStatusTextUI(I18n.format("status.ready"));
         return true;
     }
 
