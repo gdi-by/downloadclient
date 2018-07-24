@@ -1993,6 +1993,7 @@ public class Controller {
             list.add(afm);
         }
         this.atomVariationChooser.setItems(list);
+        this.atomVariationChooser.getSelectionModel().selectFirst();
         WebEngine engine = this.valueAtomDescr.getEngine();
         java.lang.reflect.Field f;
         try {
@@ -2089,6 +2090,7 @@ public class Controller {
             ObservableList<OutputFormatModel> formats =
                     FXCollections.observableArrayList(formatModels);
             this.dataFormatChooser.setItems(formats);
+            this.dataFormatChooser.getSelectionModel().selectFirst();
         } else if (data instanceof StoredQueryModel
                 || (!datasetAvailable
                 && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))) {
