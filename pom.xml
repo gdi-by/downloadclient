@@ -346,7 +346,7 @@
     </repositories>
     <profiles>
         <profile>
-            <id>web-tests</id>
+            <id>integration-tests</id>
             <build>
                 <plugins>
                     <plugin>
