@@ -142,6 +142,12 @@ public class SceneConstants {
     public static final String USERNAME =
         "#serviceUser";
 
+    /**
+     * CQL input field.
+     */
+    public static final String CQL_INPUT =
+        "#sqlTextarea";
+
     // MESSAGES
 
     /**

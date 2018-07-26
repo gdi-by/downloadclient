@@ -33,6 +33,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
+import de.bayern.gdi.services.FilterEncoder;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
@@ -97,6 +98,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
@@ -114,6 +116,7 @@ import javafx.util.Callback;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -125,6 +128,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import org.apache.commons.io.IOUtils;
+
+import static de.bayern.gdi.gui.FeatureModel.FilterType.BBOX;
+import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
+import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 
 
 /**
@@ -292,6 +299,13 @@ public class Controller {
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
+
+    @FXML
+    private TextArea sqlTextarea;
+    @FXML
+    private VBox sqlWFSArea;
+    @FXML
+    private HBox basicWFSFirstRows;
 
     /**
      * Creates the Controller.
@@ -513,7 +527,7 @@ public class Controller {
             List<ItemModel> datasets = serviceTypeChooser.
                     getItems();
             for (ItemModel iItem : datasets) {
-                if (iItem.getDataset().equals(dataset)) {
+                if (isFeatureTypeToSelect(iItem, conf)) {
                     serviceTypeChooser.
                             getSelectionModel().select(iItem);
                     datasetAvailable = true;
@@ -567,135 +581,36 @@ public class Controller {
         loadGUIComponents();
     }
 
+    private boolean isFeatureTypeToSelect(ItemModel iItem,
+                                          DownloadConfig config) {
+        boolean isSameFeatureTypeName =
+            iItem.getDataset().equals(config.getDataset());
+        if (!isSameFeatureTypeName) {
+            return false;
+        }
+        if (iItem instanceof FeatureModel && config.getCql() != null) {
+            return FILTER.equals(((FeatureModel) iItem).getFilterType());
+        }
+        return true;
+    }
+
     private void loadGUIComponents() {
         switch (downloadConfig.getServiceType()) {
             case "ATOM":
-                boolean variantAvailable = false;
-                for (ItemModel i: atomVariationChooser.getItems()) {
-                    Atom.Field field = (Atom.Field) i.getItem();
-                    if (field.getType()
-                            .equals(downloadConfig.getAtomVariation())) {
-                        variantAvailable = true;
-                        atomVariationChooser.getSelectionModel().select(i);
-                    }
-                }
-                if (!variantAvailable) {
-                    MiscItemModel errorVariant = new MiscItemModel();
-                    errorVariant.setItem(downloadConfig.getAtomVariation());
-                    atomVariationChooser.getItems().add(errorVariant);
-                    atomVariationChooser.getSelectionModel()
-                            .select(errorVariant);
-                }
+                loadAtom();
                 break;
             case "WFS2_BASIC":
-                try {
-                    CoordinateReferenceSystem targetCRS =
-                            CRS.decode(downloadConfig.getSRSName());
-                    boolean crsAvailable = false;
-                    for (CRSModel crsModel: referenceSystemChooser.getItems()) {
-                        if (CRS.equalsIgnoreMetadata(targetCRS,
-                                    crsModel.getCRS())) {
-                            crsAvailable = true;
-                            referenceSystemChooser.getSelectionModel()
-                                    .select(crsModel);
-                        }
-                    }
-                    if (!crsAvailable) {
-                        CRSModel crsErrorModel = new CRSModel(targetCRS);
-                        crsErrorModel.setAvailable(false);
-                        referenceSystemChooser.getItems().add(crsErrorModel);
-                        referenceSystemChooser.getSelectionModel()
-                                .select(crsErrorModel);
-                    }
-                } catch (NoSuchAuthorityCodeException nsace) {
-                    setStatusTextUI(I18n.format("status.config.invalid-epsg"));
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-                if (downloadConfig.getBoundingBox() != null) {
-                    String[] bBox = downloadConfig.getBoundingBox().split(",");
-                    basicX1.setText(bBox[BBOX_X1_INDEX]);
-                    basicY1.setText(bBox[BBOX_Y1_INDEX]);
-                    basicX2.setText(bBox[BBOX_X2_INDEX]);
-                    basicY2.setText(bBox[BBOX_Y2_INDEX]);
-                }
-                boolean outputFormatAvailable = false;
-                for (OutputFormatModel i: dataFormatChooser.getItems()) {
-                    if (i.getItem().equals(downloadConfig.getOutputFormat())) {
-                        dataFormatChooser.getSelectionModel().select(i);
-                        outputFormatAvailable = true;
-                    }
-                }
-                if (!outputFormatAvailable) {
-                    OutputFormatModel output = new OutputFormatModel();
-                    output.setAvailable(false);
-                    output.setItem(downloadConfig.getOutputFormat());
-                    dataFormatChooser.getItems().add(output);
-                    dataFormatChooser.getSelectionModel().select(output);
-                }
+                initialiseCrsChooser();
+                initializeBoundingBox();
+                initializeDataFormatChooser();
                 break;
             case "WFS2_SIMPLE":
-                ObservableList<Node> children
-                         = simpleWFSContainer.getChildren();
-                Map<String, String> parameters = downloadConfig.getParams();
-                for (Node node: children) {
-                    if (node instanceof HBox) {
-                        HBox hb = (HBox) node;
-                        Node n1 = hb.getChildren().get(0);
-                        Node n2 = hb.getChildren().get(1);
-                        if (n1 instanceof Label && n2 instanceof TextField) {
-                            Label paramLabel = (Label) n1;
-                            TextField paramBox = (TextField) n2;
-                            String targetValue = parameters.get(paramLabel
-                                    .getText());
-                            if (targetValue != null) {
-                                paramBox.setText(targetValue);
-                            }
-                        }
-                        if (n2 instanceof ComboBox) {
-                            ComboBox<OutputFormatModel> cb
-                                    = (ComboBox<OutputFormatModel>) n2;
-                            cb.setCellFactory(
-                                    new Callback<ListView<OutputFormatModel>,
-                                    ListCell<OutputFormatModel>>() {
-                                @Override
-                                public ListCell<OutputFormatModel>
-                                        call(ListView<OutputFormatModel> list) {
-                                    return new CellTypes.StringCell();
-                                }
-                            });
-                            cb.setOnAction(event -> {
-                                if (cb.getValue().isAvailable()) {
-                                    cb.setStyle(FX_BORDER_COLOR_NULL);
-                                } else {
-                                    cb.setStyle(FX_BORDER_COLOR_RED);
-                                }
-                            });
-                            boolean formatAvailable = false;
-                            for (OutputFormatModel i: cb.getItems()) {
-                                if (i.getItem().equals(downloadConfig
-                                        .getOutputFormat())) {
-                                    cb.getSelectionModel().select(i);
-                                    formatAvailable = true;
-                                }
-                            }
-                            if (!formatAvailable) {
-                                String format = downloadConfig
-                                        .getOutputFormat();
-                                OutputFormatModel m = new OutputFormatModel();
-                                m.setItem(format);
-                                m.setAvailable(false);
-                                cb.getItems().add(m);
-                                cb.getSelectionModel().select(m);
-                            }
-                            if (cb.getValue().isAvailable()) {
-                                cb.setStyle(FX_BORDER_COLOR_NULL);
-                            } else {
-                                cb.setStyle(FX_BORDER_COLOR_RED);
-                            }
-                        }
-                    }
-                }
+                loadWfsSimple();
+                break;
+            case "WFS2_SQL":
+                initialiseCrsChooser();
+                initializeDataFormatChooser();
+                initializeCqlTextArea();
                 break;
             default:
                 setStatusTextUI(I18n.format("status.config.invalid-xml"));
@@ -715,6 +630,150 @@ public class Controller {
         } else {
             chkChain.setSelected(false);
             handleChainCheckbox(new ActionEvent());
+        }
+    }
+
+    private void initializeBoundingBox() {
+        if (downloadConfig.getBoundingBox() != null) {
+            String[] bBox = downloadConfig.getBoundingBox().split(",");
+            basicX1.setText(bBox[BBOX_X1_INDEX]);
+            basicY1.setText(bBox[BBOX_Y1_INDEX]);
+            basicX2.setText(bBox[BBOX_X2_INDEX]);
+            basicY2.setText(bBox[BBOX_Y2_INDEX]);
+        }
+    }
+
+    private void initializeDataFormatChooser() {
+        boolean outputFormatAvailable = false;
+        for (OutputFormatModel i: dataFormatChooser.getItems()) {
+            if (i.getItem().equals(downloadConfig.getOutputFormat())) {
+                dataFormatChooser.getSelectionModel().select(i);
+                outputFormatAvailable = true;
+            }
+        }
+        if (!outputFormatAvailable) {
+            OutputFormatModel output = new OutputFormatModel();
+            output.setAvailable(false);
+            output.setItem(downloadConfig.getOutputFormat());
+            dataFormatChooser.getItems().add(output);
+            dataFormatChooser.getSelectionModel().select(output);
+        }
+    }
+
+    private void initialiseCrsChooser() {
+        try {
+            CoordinateReferenceSystem targetCRS =
+                    CRS.decode(downloadConfig.getSRSName());
+            boolean crsAvailable = false;
+            for (CRSModel crsModel: referenceSystemChooser.getItems()) {
+                if (CRS.equalsIgnoreMetadata(targetCRS,
+                            crsModel.getCRS())) {
+                    crsAvailable = true;
+                    referenceSystemChooser.getSelectionModel()
+                            .select(crsModel);
+                }
+            }
+            if (!crsAvailable) {
+                CRSModel crsErrorModel = new CRSModel(targetCRS);
+                crsErrorModel.setAvailable(false);
+                referenceSystemChooser.getItems().add(crsErrorModel);
+                referenceSystemChooser.getSelectionModel()
+                        .select(crsErrorModel);
+            }
+        } catch (NoSuchAuthorityCodeException nsace) {
+            setStatusTextUI(I18n.format("status.config.invalid-epsg"));
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void initializeCqlTextArea() {
+        if (downloadConfig != null) {
+            String cql = downloadConfig.getCql();
+            sqlTextarea.setText(cql);
+        }
+    }
+
+    private void loadAtom() {
+        boolean variantAvailable = false;
+        for (ItemModel i: atomVariationChooser.getItems()) {
+            Atom.Field field = (Atom.Field) i.getItem();
+            if (field.getType()
+                    .equals(downloadConfig.getAtomVariation())) {
+                variantAvailable = true;
+                atomVariationChooser.getSelectionModel().select(i);
+            }
+        }
+        if (!variantAvailable) {
+            MiscItemModel errorVariant = new MiscItemModel();
+            errorVariant.setItem(downloadConfig.getAtomVariation());
+            atomVariationChooser.getItems().add(errorVariant);
+            atomVariationChooser.getSelectionModel()
+                    .select(errorVariant);
+        }
+    }
+
+    private void loadWfsSimple() {
+        ObservableList<Node> children
+            = simpleWFSContainer.getChildren();
+        Map<String, String> parameters = downloadConfig.getParams();
+        for (Node node: children) {
+            if (node instanceof HBox) {
+                HBox hb = (HBox) node;
+                Node n1 = hb.getChildren().get(0);
+                Node n2 = hb.getChildren().get(1);
+                if (n1 instanceof Label && n2 instanceof TextField) {
+                    Label paramLabel = (Label) n1;
+                    TextField paramBox = (TextField) n2;
+                    String targetValue = parameters.get(paramLabel
+                        .getText());
+                    if (targetValue != null) {
+                        paramBox.setText(targetValue);
+                    }
+                }
+                if (n2 instanceof ComboBox) {
+                    ComboBox<OutputFormatModel> cb
+                        = (ComboBox<OutputFormatModel>) n2;
+                    cb.setCellFactory(
+                        new Callback<ListView<OutputFormatModel>,
+                            ListCell<OutputFormatModel>>() {
+                            @Override
+                            public ListCell<OutputFormatModel>
+                            call(ListView<OutputFormatModel> list) {
+                                return new CellTypes.StringCell();
+                            }
+                        });
+                    cb.setOnAction(event -> {
+                        if (cb.getValue().isAvailable()) {
+                            cb.setStyle(FX_BORDER_COLOR_NULL);
+                        } else {
+                            cb.setStyle(FX_BORDER_COLOR_RED);
+                        }
+                    });
+                    boolean formatAvailable = false;
+                    for (OutputFormatModel i: cb.getItems()) {
+                        if (i.getItem().equals(downloadConfig
+                            .getOutputFormat())) {
+                            cb.getSelectionModel().select(i);
+                            formatAvailable = true;
+                        }
+                    }
+                    if (!formatAvailable) {
+                        String format = downloadConfig
+                            .getOutputFormat();
+                        OutputFormatModel m = new OutputFormatModel();
+                        m.setItem(format);
+                        m.setAvailable(false);
+                        cb.getItems().add(m);
+                        cb.getSelectionModel().select(m);
+                    }
+                    if (cb.getValue().isAvailable()) {
+                        cb.setStyle(FX_BORDER_COLOR_NULL);
+                    } else {
+                        cb.setStyle(FX_BORDER_COLOR_RED);
+                    }
+                }
+            }
         }
     }
 
@@ -1347,6 +1406,15 @@ public class Controller {
         this.dataBean.addAttribute("bbox", bbox.toString(), "");
     }
 
+    private void extractCql() {
+        String sqlInput = sqlTextarea.getText();
+        if (dataBean.isFilterType()
+            && sqlInput != null
+            && !sqlInput.isEmpty()) {
+            this.dataBean.addAttribute("CQL", sqlInput, "");
+        }
+    }
+
     private boolean validateInput() {
         final StringBuilder failed = new StringBuilder();
 
@@ -1415,6 +1483,64 @@ public class Controller {
     }
 
     /**
+     * Validates the input in the SQL-Textbox for ECQL pattern.
+     *
+     * @param userInput      the ECQL to validate
+     * @param overallQueries if the query is over all feature types
+     * @return <code>true</code> if the ECQL is valid,
+     * <code>false</code> otherwise
+     */
+    public boolean validateEcqlUserInput(String userInput,
+                                         boolean overallQueries) {
+        if (overallQueries) {
+            String[] userInputLines = userInput.split("\n");
+            for (String userInputLine : userInputLines) {
+                boolean lineContainsNoWhere = !userInputLine
+                    .toLowerCase().contains("where");
+                if (lineContainsNoWhere) {
+                    setStatusTextUI(I18n.format(
+                        "status.sql.validation.error.overall.where"));
+                    return false;
+                }
+                boolean lineContainsSupportedFeatureType =
+                    featureTypeWithNameExists(userInputLine);
+                if (!lineContainsSupportedFeatureType) {
+                    setStatusTextUI(I18n.format(
+                        "status.sql.validation.error.overall.featureTypes"));
+                    return false;
+                }
+            }
+        } else {
+            boolean filterContainsWhere = userInput
+                .toLowerCase().contains("where");
+            if (filterContainsWhere) {
+                setStatusTextUI(I18n.format(
+                    "status.sql.validation.error.simple.where"));
+                return false;
+            }
+            boolean filterContiansLineBreak = userInput
+                .toLowerCase().contains("\n");
+            if (filterContiansLineBreak) {
+                setStatusTextUI(I18n.format(
+                    "status.sql.validation.error.simple.lineBreak"));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean featureTypeWithNameExists(String userInputLine) {
+        List<WFSMeta.Feature> featureTypes = dataBean.getWFSService()
+            .getFeatures();
+        for (WFSMeta.Feature feature : featureTypes) {
+            if (userInputLine.contains(feature.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Start the download.
      *
      * @param event The event
@@ -1423,7 +1549,8 @@ public class Controller {
     protected void handleDownload(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if (validateInput()) {
+        extractCql();
+        if (validateInput() && validateCqlInput()) {
             DirectoryChooser dirChooser = new DirectoryChooser();
             dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
             if (downloadConfig != null
@@ -1466,20 +1593,60 @@ public class Controller {
         }
     }
 
+    private boolean validateCqlInput() {
+        if (dataBean.isFilterType()) {
+            String sqlInput = sqlTextarea.getText();
+            logHistoryParent.setStyle(null);
+            if (sqlInput == null || sqlInput.isEmpty()) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.input.empty"));
+                return false;
+            }
+            boolean multipleQuery = dataBean.isMultipleQuery();
+            boolean isValidCql = validateEcqlUserInput(sqlInput,
+                multipleQuery);
+            if (!isValidCql) {
+                return false;
+            }
+            try {
+                FilterEncoder filterEncoder = new FilterEncoder();
+                filterEncoder.validateCql(sqlInput);
+            } catch (CQLException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(e.getSyntaxError());
+                return false;
+            } catch (ConverterException e) {
+                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
+                setStatusTextUI(I18n
+                    .format("status.sql.validation.failed", e.getMessage()));
+                return false;
+            }
+        }
+        setStatusTextUI(I18n.format("status.ready"));
+        return true;
+    }
+
     private void resetGui() {
         Platform.runLater(() ->
             this.serviceTypeChooser.getItems().retainAll()
         );
         this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
         this.dataBean.reset();
-        this.mapAtom.reset();
-        this.mapWFS.reset();
+        if (mapWFS != null) {
+            this.mapWFS.reset();
+        }
+        if (mapAtom != null) {
+            this.mapAtom.reset();
+        }
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
         this.atomContainer.setVisible(false);
         this.basicWFSX1Y1.setVisible(false);
         this.basicWFSX2Y2.setVisible(false);
+        this.sqlWFSArea.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
         resetProcessingChainContainer();
@@ -1509,7 +1676,8 @@ public class Controller {
     protected void handleSaveConfig(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if (validateInput()) {
+        extractCql();
+        if (validateInput() && validateCqlInput()) {
             FileChooser fileChooser = new FileChooser();
             DirectoryChooser dirChooser = new DirectoryChooser();
             File downloadDir;
@@ -1689,31 +1857,10 @@ public class Controller {
             switch (dataBean.getServiceType()) {
                 case WFS_ONE:
                 case WFS_TWO:
-                    ReferencedEnvelope extendWFS = null;
-                    List<WFSMeta.Feature> features =
-                            dataBean.getWFSService().getFeatures();
-                    List<WFSMeta.StoredQuery> queries =
-                            dataBean.getWFSService().getStoredQueries();
+                    boolean isWfs2 = WFS_TWO.equals(dataBean.getServiceType());
                     ObservableList<ItemModel> types =
-                            FXCollections.observableArrayList();
-                    if (!dataBean.getWFSService().isSimple()) {
-                        for (WFSMeta.Feature f : features) {
-                            types.add(new FeatureModel(f));
-                            if (f.getBBox() != null) {
-                                if (extendWFS == null) {
-                                    extendWFS = f.getBBox();
-                                } else {
-                                    extendWFS.expandToInclude(f.getBBox());
-                                }
-                            }
-                        }
-                    }
-                    if (extendWFS != null) {
-                        mapWFS.setExtend(extendWFS);
-                    }
-                    for (WFSMeta.StoredQuery s : queries) {
-                        types.add(new StoredQueryModel(s));
-                    }
+                        collectServiceTypes(isWfs2);
+                    addStoredQueries(types);
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(types);
                     serviceTypeChooser.setValue(types.get(0));
@@ -1772,6 +1919,44 @@ public class Controller {
         }
     }
 
+    private ObservableList<ItemModel> collectServiceTypes(boolean isWfs2) {
+        ReferencedEnvelope extendWFS = null;
+        List<WFSMeta.Feature> features =
+                dataBean.getWFSService().getFeatures();
+        ObservableList<ItemModel> types =
+                FXCollections.observableArrayList();
+        if (!dataBean.getWFSService().isSimple()) {
+            for (WFSMeta.Feature f : features) {
+                if (isWfs2) {
+                    types.add(new FeatureModel(f, FILTER));
+                    types.add(new FeatureModel(f, BBOX));
+                } else {
+                    types.add(new FeatureModel(f));
+                }
+                if (f.getBBox() != null) {
+                    if (extendWFS == null) {
+                        extendWFS = f.getBBox();
+                    } else {
+                        extendWFS.expandToInclude(f.getBBox());
+                    }
+                }
+            }
+            types.add(new OverallFeatureTypeModel(features));
+        }
+        if (extendWFS != null) {
+            mapWFS.setExtend(extendWFS);
+        }
+        return types;
+    }
+
+    private void addStoredQueries(ObservableList<ItemModel> types) {
+        List<WFSMeta.StoredQuery> queries =
+            dataBean.getWFSService().getStoredQueries();
+        for (WFSMeta.StoredQuery s : queries) {
+            types.add(new StoredQueryModel(s));
+        }
+    }
+
     private void chooseAtomType(ItemModel data, boolean datasetAvailable) {
         Atom.Item item;
         if (datasetAvailable) {
@@ -1809,6 +1994,7 @@ public class Controller {
             list.add(afm);
         }
         this.atomVariationChooser.setItems(list);
+        this.atomVariationChooser.getSelectionModel().selectFirst();
         WebEngine engine = this.valueAtomDescr.getEngine();
         java.lang.reflect.Field f;
         try {
@@ -1833,74 +2019,59 @@ public class Controller {
                 + item.getDescription() + "</div>");
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.atomContainer.setVisible(true);
     }
 
     private void chooseWFSType(ItemModel data, boolean datasetAvailable) {
         if (data instanceof FeatureModel
+            || data instanceof  OverallFeatureTypeModel
             || (!datasetAvailable
             && downloadConfig.getServiceType() == "WFS2_BASIC")) {
+            boolean isSqlFilterType = false;
+            if (data instanceof OverallFeatureTypeModel) {
+                isSqlFilterType = true;
+            }
+            if (data instanceof FeatureModel) {
+                FeatureModel.FilterType filterType =
+                    ((FeatureModel) data).getFilterType();
+                isSqlFilterType = FILTER.equals(filterType);
+            }
+
+            if (isSqlFilterType) {
+                this.sqlWFSArea.setVisible(true);
+                this.sqlWFSArea.setManaged(true);
+                this.basicWFSFirstRows.setVisible(false);
+                this.basicWFSX1Y1.setVisible(false);
+                this.basicWFSX1Y1.setManaged(false);
+                this.basicWFSX2Y2.setVisible(false);
+                this.basicWFSX2Y2.setManaged(false);
+                this.mapNodeWFS.setVisible(false);
+                this.mapNodeWFS.setManaged(false);
+            } else {
+                this.sqlWFSArea.setVisible(false);
+                this.sqlWFSArea.setManaged(false);
+                this.basicWFSFirstRows.setVisible(true);
+                this.basicWFSX1Y1.setVisible(true);
+                this.basicWFSX1Y1.setManaged(true);
+                this.basicWFSX2Y2.setVisible(true);
+                this.basicWFSX2Y2.setManaged(true);
+                this.mapNodeWFS.setVisible(true);
+                this.mapNodeWFS.setManaged(true);
+            }
             this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(true);
-            this.mapNodeWFS.setVisible(true);
             this.atomContainer.setVisible(false);
-            this.basicWFSX1Y1.setVisible(true);
-            this.basicWFSX2Y2.setVisible(true);
             this.referenceSystemChooser.setVisible(true);
             this.referenceSystemChooserLabel.setVisible(true);
-            WFSMeta.Feature feature;
-            if (datasetAvailable) {
-                feature = (WFSMeta.Feature) data.getItem();
-            } else {
-                feature = new WFSMeta.Feature();
-            }
-            mapWFS.setExtend(feature.getBBox());
-            ArrayList<String> list = new ArrayList<>();
-            list.add(feature.getDefaultCRS());
-            list.addAll(feature.getOtherCRSs());
-            ObservableList<CRSModel> crsList =
-                    FXCollections.observableArrayList();
-            for (String crsStr : list) {
-                try {
-                    String newcrsStr = crsStr;
-                    String seperator = null;
-                    if (newcrsStr.contains("::")) {
-                        seperator = "::";
-                    } else if (newcrsStr.contains("/")) {
-                        seperator = "/";
-                    }
-                    if (seperator != null) {
-                        newcrsStr = "EPSG:"
-                                + newcrsStr.substring(
-                                newcrsStr.lastIndexOf(seperator)
-                                        + seperator.length(),
-                                newcrsStr.length());
-                    }
-                    CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
-                    CRSModel crsm = new CRSModel(crs);
-                    crsm.setOldName(crsStr);
-                    crsList.add(crsm);
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-            }
-            if (!crsList.isEmpty()) {
-                this.referenceSystemChooser.setItems(crsList);
-                CRSModel crsm = crsList.get(0);
-                try {
-                    CoordinateReferenceSystem initCRS = CRS.decode(
-                            INITIAL_CRS_DISPLAY);
-                    CRSModel initCRSM = new CRSModel(initCRS);
-                    for (int i = 0; i < crsList.size(); i++) {
-                        if (crsList.get(i).equals(initCRSM)) {
-                            crsm = crsList.get(i);
-                            break;
-                        }
-                    }
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-                this.referenceSystemChooser.setValue(crsm);
+            this.basicWFSContainer.setVisible(true);
+
+            if (data.getItem() instanceof WFSMeta.Feature) {
+                setCrsAndExtent((WFSMeta.Feature) data.getItem());
+            } else if (data.getItem() instanceof List
+                && !((List) data.getItem()).isEmpty()) {
+                List items = (List) data.getItem();
+                setCrsAndExtent((WFSMeta.Feature)
+                    items.get(items.size() - 1));
             }
             List<String> outputFormats = this
                 .dataBean.getWFSService()
@@ -1920,6 +2091,7 @@ public class Controller {
             ObservableList<OutputFormatModel> formats =
                     FXCollections.observableArrayList(formatModels);
             this.dataFormatChooser.setItems(formats);
+            this.dataFormatChooser.getSelectionModel().selectFirst();
         } else if (data instanceof StoredQueryModel
                 || (!datasetAvailable
                 && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))) {
@@ -1962,6 +2134,58 @@ public class Controller {
             this.atomContainer.setVisible(false);
             this.simpleWFSContainer.setVisible(true);
             this.basicWFSContainer.setVisible(false);
+            this.basicWFSFirstRows.setVisible(false);
+        }
+    }
+
+    private void setCrsAndExtent(WFSMeta.Feature feature) {
+        mapWFS.setExtend(feature.getBBox());
+        ArrayList<String> list = new ArrayList<>();
+        list.add(feature.getDefaultCRS());
+        list.addAll(feature.getOtherCRSs());
+        ObservableList<CRSModel> crsList =
+            FXCollections.observableArrayList();
+        for (String crsStr : list) {
+            try {
+                String newcrsStr = crsStr;
+                String seperator = null;
+                if (newcrsStr.contains("::")) {
+                    seperator = "::";
+                } else if (newcrsStr.contains("/")) {
+                    seperator = "/";
+                }
+                if (seperator != null) {
+                    newcrsStr = "EPSG:"
+                        + newcrsStr.substring(
+                        newcrsStr.lastIndexOf(seperator)
+                            + seperator.length(),
+                        newcrsStr.length());
+                }
+                CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                CRSModel crsm = new CRSModel(crs);
+                crsm.setOldName(crsStr);
+                crsList.add(crsm);
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        if (!crsList.isEmpty()) {
+            this.referenceSystemChooser.setItems(crsList);
+            CRSModel crsm = crsList.get(0);
+            try {
+                CoordinateReferenceSystem initCRS = CRS.decode(
+                    INITIAL_CRS_DISPLAY);
+                CRSModel initCRSM = new CRSModel(initCRS);
+                for (int i = 0; i < crsList.size(); i++) {
+                    if (crsList.get(i).equals(initCRSM)) {
+                        crsm = crsList.get(i);
+                        break;
+                    }
+                }
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+            this.referenceSystemChooser.setValue(crsm);
         }
     }
 
@@ -1978,7 +2202,7 @@ public class Controller {
         }
         if (type == ServiceType.ATOM) {
             chooseAtomType(data, datasetAvailable);
-        } else if (type == ServiceType.WFS_TWO) {
+        } else if (type == WFS_TWO) {
             chooseWFSType(data, datasetAvailable);
         }
     }
@@ -2048,6 +2272,7 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
+        this.basicWFSFirstRows.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
         this.processStepContainter.setVisible(false);
@@ -2201,6 +2426,7 @@ public class Controller {
             setStatusTextUI(I18n.format(STATUS_READY));
         }
     }
+
 
     /**
      * Handels the Action, when a polygon is selected.

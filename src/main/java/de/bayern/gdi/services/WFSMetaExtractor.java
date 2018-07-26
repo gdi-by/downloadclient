@@ -394,7 +394,7 @@ public class WFSMetaExtractor {
 
             feature.bbox = getBounds(el, NAMESPACES);
 
-            meta.features.add(feature);
+            meta.addFeature(feature);
         }
     }
 }

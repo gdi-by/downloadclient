@@ -1,4 +1,4 @@
-# GDI-BY DownloadClient 
+# GDI-BY DownloadClient
 [![Build Status](https://travis-ci.org/gdi-by/downloadclient.svg?branch=master)](https://travis-ci.org/gdi-by/downloadclient)
 
 
@@ -18,7 +18,7 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 
 ## Hinweise für Entwickler
 
-### Anwendung bauen 
+### Anwendung bauen
 
     $ mvn clean compile
 
@@ -58,6 +58,7 @@ Mehr Hinweise unter [Troubleshooting Locally in a Docker Image](https://docs.tra
 $ docker run -it travisci/ci-garnet:packer-1503972846 /bin/bash
 $ su - travis
 $ git clone https://github.com/gdi-by/downloadclient
+$ cd downloadclient
 $ mvn clean compile
 ```
 

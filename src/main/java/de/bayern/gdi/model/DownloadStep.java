@@ -67,11 +67,6 @@ public class DownloadStep {
     @XmlElement(name = "Parameter")
     private List<Parameter> parameters;
 
-    @XmlElementWrapper(name = "complexQueries")
-    @XmlElement(name = "ComplexQuery")
-    private List<Query> complexQueries;
-
-
     public DownloadStep() {
     }
 
@@ -80,15 +75,13 @@ public class DownloadStep {
                         String serviceType,
                         String serviceURL,
                         String path,
-                        List<ProcessingStep> processingSteps,
-                        List<Query> complexQueries) {
+                        List<ProcessingStep> processingSteps) {
         this.dataset = dataset;
         this.parameters = parameters;
         this.serviceType = serviceType;
         this.serviceURL = serviceURL;
         this.path = path;
         this.processingSteps = processingSteps;
-        this.complexQueries = complexQueries;
     }
 
 
@@ -96,15 +89,13 @@ public class DownloadStep {
                         List<Parameter> parameters,
                         String serviceType,
                         String serviceURL,
-                        String path,
-                        List<Query> complexQueries) {
+                        String path) {
         this(dataset,
             parameters,
             serviceType,
             serviceURL,
             path,
-            new ArrayList<ProcessingStep>(),
-            complexQueries);
+            new ArrayList<ProcessingStep>());
     }
 
     /**
@@ -230,17 +221,6 @@ public class DownloadStep {
         }
 
         sb.append("]\n");
-        sb.append("\tSQL request:\n");
-        for (int i = 0,
-            n = complexQueries != null ? complexQueries.size() : 0;
-             i < n; i++) {
-            if (i > 0) {
-               sb.append(", ");
-            }
-            sb.append(complexQueries.get(i).getValue());
-        }
-
-        sb.append("]\n");
         sb.append("\tprocessing steps:\n");
         for (int i = 0,
              n = processingSteps != null ? processingSteps.size() : 0;
@@ -312,21 +292,6 @@ public class DownloadStep {
         }
     }
 
-    /**
-     * Set the complex queries objects.
-     * @return complexQueries list
-     */
-    public List<Query> getComplexQueries() {
-        return complexQueries;
-    }
-
-    /**
-     * Initialize the entire queries.
-     * @param complexQueries a List of Objects
-     */
-    public void setComplexQueries(List<Query> complexQueries) {
-        this.complexQueries = complexQueries;
-    }
 }
 
 

@@ -15,26 +15,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.gui;
 
+import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Log;
+
+import java.util.List;
 
 /**
- * A deferred job which ensures that a download logger is closed.
+ * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
-public class CloseLogJob implements DeferredJob {
+public class OverallFeatureTypeModel implements ItemModel {
 
-    private Log logger;
+    private List<WFSMeta.Feature> features;
 
-    public CloseLogJob(Log logger) {
-        this.logger = logger;
+    /**
+     * Constructor.
+     *
+     * @param features encapsulated feature types
+     */
+    public OverallFeatureTypeModel(List<WFSMeta.Feature> features) {
+        this.features = features;
     }
 
     @Override
-    public void run(Processor p) {
-        String msg = I18n.getMsg("gml.end.of.protocol");
-        logger.log(msg);
-        logger.close();
+    public Object getItem() {
+        return features;
+    }
+
+    @Override
+    public String getDataset() {
+        return I18n.getMsg("typ.overall.query");
+    }
+
+    @Override
+    public String toString() {
+        return getDataset();
     }
 }

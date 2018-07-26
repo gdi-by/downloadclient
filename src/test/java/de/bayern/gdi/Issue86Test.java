@@ -20,7 +20,6 @@ package de.bayern.gdi;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +34,9 @@ import static net.jadler.Jadler.closeJadler;
 import static net.jadler.Jadler.initJadler;
 import static net.jadler.Jadler.onRequest;
 import static net.jadler.Jadler.port;
+import static org.apache.commons.httpclient.HttpStatus.SC_OK;
 import static org.hamcrest.Matchers.isOneOf;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Unit tests, using TestFX to test controller functions.
@@ -44,23 +45,17 @@ import static org.hamcrest.Matchers.isOneOf;
  */
 public class Issue86Test extends TestBase {
 
-    /**
-     * Constant for HTTP_OKAY.
-     */
-    private static final int HTTP_OKAY = 200;
     private static final String QUERY_RESOURCE =
             "/issues/issue86.xml";
     private static final String QUERY_PATH =
             "/issues/issue86";
 
-    private void prepareServer(String queryPath, String body)
-            throws IOException {
-
+    private void prepareServer(String queryPath, String body) {
         onRequest()
                 .havingMethod(isOneOf("GET", "HEAD", "POST"))
                 .havingPathEqualTo(queryPath)
                 .respond()
-                .withStatus(HTTP_OKAY)
+                .withStatus(SC_OK)
                 .withBody(body)
                 .withEncoding(Charset.forName("UTF-8"))
                 .withContentType("application/xml; charset=UTF-8");
@@ -107,7 +102,7 @@ public class Issue86Test extends TestBase {
         waitUntilReady();
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);
-        Assert.assertTrue(titlePaneShows(NO_FORMAT_CHOSEN));
+        assertFalse(titlePaneShows(NO_FORMAT_CHOSEN));
     }
 
 

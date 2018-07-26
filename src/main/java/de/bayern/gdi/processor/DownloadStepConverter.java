@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 
 import org.apache.http.HttpEntity;
@@ -47,23 +48,36 @@ import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;
 
+import static de.bayern.gdi.processor.DownloadStepConverter.QueryType.DATASET;
+import static de.bayern.gdi.processor.DownloadStepConverter.
+    QueryType.SQLQUERY;
+import static de.bayern.gdi.processor.DownloadStepConverter.
+    QueryType.STOREDQUERY;
+
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
     private static final Logger log
         = Logger.getLogger(DownloadStepConverter.class.getName());
 
-    private static final String STOREDQUERY_ID = "STOREDQUERY_ID";
-    private static final String DATASET = "DATASET";
-    private static final String GETFEATURE = "GetFeature";
+    /**
+     * Type of a Query.
+     */
+    public enum QueryType {
+        /**
+         * StoredQuery.
+         */
+        STOREDQUERY,
+        /**
+         * Dataset.
+         */
+        DATASET,
+        /**
+         * SQL Query.
+         */
+        SQLQUERY }
 
-    private static final String[][] SERVICE2TYPE = {
-        {"ATOM", STOREDQUERY_ID}, // XXX: NOT CORRECT!
-        {"WFS2_BASIC", DATASET},
-        {"WFS2_SIMPLE", STOREDQUERY_ID},
-        {"WFS1", DATASET},
-        {"WFS", DATASET}
-    };
+    private static final String GETFEATURE = "GetFeature";
 
     private String user;
     private String password;
@@ -153,16 +167,19 @@ public class DownloadStepConverter {
     /**
      * Finds WFS service type for given dataset.
      * @param type The dataset type.
-     * @return The WFS type.
+     * @return The query type.
      */
-    protected static String findQueryType(String type) {
-        String t = type.toUpperCase();
-        for (String []pair: SERVICE2TYPE) {
-            if (t.equals(pair[0])) {
-                return pair[1];
-            }
+    protected static QueryType findQueryType(String type) {
+
+        switch (type) {
+            case "ATOM":
+            case "WFS2_SIMPLE":
+                return STOREDQUERY;
+            case "WFS2_SQL":
+                return SQLQUERY;
+            default:
+                return DATASET;
         }
-        return type;
     }
 
     private static String encodeParameters(
@@ -232,7 +249,7 @@ public class DownloadStepConverter {
             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
         String dataset = dls.getDataset();
-        String queryType = findQueryType(dls.getServiceType());
+        QueryType queryType = findQueryType(dls.getServiceType());
 
         StringBuilder sb = new StringBuilder();
         sb.append(base);
@@ -243,7 +260,7 @@ public class DownloadStepConverter {
           .append("request=GetFeature&")
           .append("version=").append(version);
 
-        if (queryType.equals(STOREDQUERY_ID)) {
+        if (queryType.equals(STOREDQUERY)) {
             sb.append("&STOREDQUERY_ID=")
               .append(StringUtils.urlEncode(dataset));
         } else {
@@ -299,6 +316,7 @@ public class DownloadStepConverter {
 
         FileDownloadJob fdj = null;
         if (usePost) {
+            logGetFeatureRequest(params);
             HttpEntity ent = new EntityTemplate(
                 XML.toContentProducer(params));
 
@@ -481,6 +499,7 @@ public class DownloadStepConverter {
         if (usePost) {
             wfsURL = getFeatureOp.getPOST();
             params = WFSPostParamsBuilder.create(dls, usedVars, meta, true);
+            logGetFeatureRequest(params);
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
@@ -521,6 +540,7 @@ public class DownloadStepConverter {
                 URL wfs = newURL(wfsURL);
                 Document pagedParams = WFSPostParamsBuilder.create(
                     dls, usedVars, meta, ofs, fpp, wfs2);
+                logGetFeatureRequest(params);
                 fdj.add(file, wfs,
                     new EntityTemplate(XML.toContentProducer(pagedParams)));
             }
@@ -564,5 +584,17 @@ public class DownloadStepConverter {
             this.user, this.password,
             this.logger);
         jl.addJob(job);
+    }
+
+    private void logGetFeatureRequest(Document params) {
+        log.log(Level.INFO, () -> {
+            try {
+                return "WFS GetFeature Request: "
+                    + XML.documentToString(params);
+            } catch (TransformerException e) {
+                // nothing to do
+            }
+            return "WFS GetFeature Request cannot be logged";
+        });
     }
 }

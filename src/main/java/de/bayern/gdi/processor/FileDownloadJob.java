@@ -71,11 +71,11 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
     @Override
     public void bytesCounted(long count) {
-        broadcastMessage(I18n.format("file.download.bytes", count));
+        broadcastMessage(I18n.format("file.download.bytes", count), false);
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    public void download() throws JobExecutionException {
         URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
@@ -126,4 +126,12 @@ public class FileDownloadJob extends AbstractDownloadJob {
         }
         broadcastMessage(I18n.getMsg("file.download.finished"));
     }
+
+    /**
+     * @return the HttpEntity used a POST body.
+     */
+    public HttpEntity getPostParams() {
+        return postParams;
+    }
+
 }

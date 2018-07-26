@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DownloadSchritt>
+    <ServiceTyp>WFS2_SIMPLE</ServiceTyp>
+    <URL>http://geoserv.weichand.de:8080/geoserver/wfs?SERVICE=WFS&amp;REQUEST=GetCapabilities</URL>
+    <DownloadPfad>%s</DownloadPfad>
+    <Dataset>bvv:gmd_ex (Filter)</Dataset>
+    <Verarbeitungskette/>
+    <Parameters>
+        <Parameter>
+            <Name>srsName</Name>
+            <Wert>urn:ogc:def:crs:EPSG::31468</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>outputformat</Name>
+            <Wert>text/xml; subtype=gml/3.2</Wert>
+        </Parameter>
+        <Parameter>
+            <Name>CQL</Name>
+            <Wert>"bvv:sch" = '09774135'</Wert>
+        </Parameter>
+    </Parameters>
+</DownloadSchritt>

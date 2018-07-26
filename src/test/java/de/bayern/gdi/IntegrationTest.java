@@ -23,6 +23,7 @@ import static de.bayern.gdi.utils.SceneConstants.ACTIVATE_FURTHER_PROCESSING;
 import static de.bayern.gdi.utils.SceneConstants.ADD_PROCESSING_STEP;
 import static de.bayern.gdi.utils.SceneConstants.AUTH;
 import static de.bayern.gdi.utils.SceneConstants.CALLING_SERVICE;
+import static de.bayern.gdi.utils.SceneConstants.CQL_INPUT;
 import static de.bayern.gdi.utils.SceneConstants.DOWNLOAD_BUTTON;
 import static de.bayern.gdi.utils.SceneConstants.NO_FORMAT_CHOSEN;
 import static de.bayern.gdi.utils.SceneConstants.NO_URL;
@@ -78,9 +79,21 @@ public class IntegrationTest extends TestBase {
     private static final int TWO_ELEMENTS = 2;
 
     /**
-     * Total number of services.
+     * Total number of FeatureTypes provided by service
+     * VERWALTUNGSGRENZEN_URL.
      */
-    private static final int TOTAL_NUMBER_OF_SERVICES = 13;
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES = 5;
+
+    /**
+     * Total number of StoredQueries provided by service
+     * VERWALTUNGSGRENZEN_URL.
+     */
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 8;
+
+    /**
+     * Number of services overall FeatureTypes.
+     */
+    private static final int  VERWALTUNGSGRENZEN_NUMBER_OF_OVERALL = 1;
 
     /**
      * Verwaltungsgrenzen.
@@ -182,7 +195,12 @@ public class IntegrationTest extends TestBase {
         clickOn(SERVICE_SELECTION);
         waitUntilReady();
         assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
-        assertTrue(hasSize(SERVICE_TYPE_CHOOSER, TOTAL_NUMBER_OF_SERVICES));
+        int numberOfExpectedServices =
+            VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES
+                + VERWALTUNGSGRENZEN_NUMBER_OF_OVERALL;
+        assertTrue(hasSize(SERVICE_TYPE_CHOOSER, numberOfExpectedServices));
         selectDataFormatByNumber(0);
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);
@@ -274,9 +292,27 @@ public class IntegrationTest extends TestBase {
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
-        selectNthService(0);
+        selectNthService(2);
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
+    }
+
+    /**
+     * Test the input of CQL.
+     */
+    @Test
+    public void testCqlInputAndDownload() {
+        clickOn(SEARCH).write(VERWALTUNGSGRENZEN);
+        waitForPopulatedServiceList();
+        assertFalse(isEmpty(SERVICE_LIST));
+        setServiceUrl(VERWALTUNGSGRENZEN_URL);
+        clickOn(SERVICE_SELECTION);
+        waitUntilReady();
+        assertFalse(isEmpty(SERVICE_TYPE_CHOOSER));
+        assertTrue(isEmpty(CQL_INPUT));
+        setCqlInput("\"bvv:sch\" LIKE '09162*'");
+        clickOn(DOWNLOAD_BUTTON);
+        waitUntilReady();
     }
 
     /**
@@ -322,6 +358,23 @@ public class IntegrationTest extends TestBase {
     public void testDownloadNuremburg() throws Exception {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getNuremburgConfig
+        );
+        String username = "";
+        String password = "";
+        int result = Headless.runHeadless(username, password, steps);
+        assertTrue(result == 0);
+    }
+
+
+    /**
+     * Start CQL download.
+     *
+     * @throws Exception just in case
+     */
+    @Test
+    public void testDownloadCql() throws Exception {
+        List<DownloadStep> steps = prepareStep(
+            DOWNLOAD_CONFIGURATION::getCqlConfig
         );
         String username = "";
         String password = "";

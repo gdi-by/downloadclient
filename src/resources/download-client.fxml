@@ -244,17 +244,16 @@
                                                                 <Group fx:id="mapNodeWFS"
                                                                        VBox.vgrow="ALWAYS">
                                                                     <VBox.margin>
-                                                                        <Insets bottom="5.0"
+                                                                        <Insets bottom="2.0"
                                                                                 left="20.0"
                                                                                 right="0.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
                                                                 </Group>
-                                                                <VBox HBox.hgrow="SOMETIMES">
+                                                                <HBox fx:id="basicWFSFirstRows">
                                                                     <children>
-                                                                        <HBox>
                                                                             <VBox fx:id="basicWFSX1Y1"
-                                                                                  alignment="CENTER_LEFT"
+                                                                                  alignment="TOP_LEFT"
                                                                                   prefHeight="30.0"
                                                                                   prefWidth="200.0"
                                                                                   VBox.vgrow="SOMETIMES">
@@ -374,7 +373,40 @@
                                                                                     </NumberTextField>
                                                                                 </HBox>
                                                                             </VBox>
+                                                                            </children>
+                                                                            <VBox.margin>
+                                                                                <Insets bottom="15.0"
+                                                                                        left="0.0"
+                                                                                        right="0.0"
+                                                                                        top="4.0"/>
+                                                                            </VBox.margin>
                                                                         </HBox>
+                                                                        <VBox fx:id="sqlWFSArea" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
+                                                                            <children>
+                                                                                <HBox  prefHeight="245.0" prefWidth="400.0" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                                                                                    <children>
+                                                                                        <TextArea fx:id="sqlTextarea"
+                                                                                                  maxWidth="1.7976931348623157E308"
+                                                                                                  prefHeight="253.0"
+                                                                                                  prefWidth="367.0"
+                                                                                                  promptText="&quot;hk:ags&quot; = '09162000'"
+                                                                                                  style="-fx-background-color: ffffff;"
+                                                                                                  HBox.hgrow="ALWAYS" >
+                                                                                            <tooltip>
+                                                                                                <Tooltip text="%tooltip.sql" />
+                                                                                            </tooltip>
+                                                                                        </TextArea>
+                                                                                    </children>
+                                                                                    <VBox.margin>
+                                                                                        <Insets bottom="50.0"
+                                                                                                left="20.0"
+                                                                                                right="10.0"
+                                                                                                top="0.0"/>
+                                                                                    </VBox.margin>
+                                                                                </HBox>
+
+                                                                            </children>
+                                                                        </VBox>
                                                                         <Separator
                                                                                 prefWidth="200.0"/>
                                                                         <VBox alignment="CENTER_LEFT"
@@ -445,8 +477,6 @@
                                                                                 </HBox>
                                                                             </children>
                                                                         </VBox>
-                                                                    </children>
-                                                                </VBox>
                                                             </children>
                                                         </VBox>
                                                         <VBox fx:id="simpleWFSContainer"/>

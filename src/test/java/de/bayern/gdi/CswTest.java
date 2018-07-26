@@ -152,7 +152,7 @@ public class CswTest extends TestCase {
             throws IOException {
 
         String body = IOUtils.toString(
-                WfsTest.class.getResourceAsStream(capResource), "UTF-8"
+                CswTest.class.getResourceAsStream(capResource), "UTF-8"
         );
 
         body = body.replace("{GETRECORDS_URL}",

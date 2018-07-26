@@ -28,6 +28,8 @@ import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.SceneConstants;
+
+import static de.bayern.gdi.utils.SceneConstants.CQL_INPUT;
 import static de.bayern.gdi.utils.SceneConstants.DATAFORMATCHOOSER;
 import static de.bayern.gdi.utils.SceneConstants.HEIGHT;
 import static de.bayern.gdi.utils.SceneConstants.HISTORY_PARENT;
@@ -46,12 +48,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import static org.awaitility.Awaitility.await;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -65,7 +70,7 @@ import org.testfx.framework.junit.ApplicationTest;
  *
  * @author thomas
  */
-public class TestBase extends ApplicationTest {
+public abstract class TestBase extends ApplicationTest {
 
     // Constants
 
@@ -85,11 +90,18 @@ public class TestBase extends ApplicationTest {
      * The Scene.
      */
     private Scene scene;
+
+    /**
+     * The Controller.
+     */
+    protected Controller controller;
+
     /**
      * The logger.
      */
     private Logger log = Logger.getLogger(
         this.getClass().getName());
+
 
     // Overrides and Annotated Methods
 
@@ -121,8 +133,8 @@ public class TestBase extends ApplicationTest {
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
         Parent root = fxmlLoader.load();
         scene = new Scene(root, WIDTH, HEIGHT);
-        Controller controller = fxmlLoader.getController();
-        controller.setDataBean(new DataBean());
+        controller = fxmlLoader.getController();
+        controller.setDataBean(getDataBean());
         controller.setPrimaryStage(primaryStage);
         Unauthorized unauthorized = new WarningPopup();
         FileResponseHandler.setUnauthorized(unauthorized);
@@ -132,6 +144,14 @@ public class TestBase extends ApplicationTest {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    /**
+     * @return the DataBean to pass to the Controller.
+     * @throws IOException if an exception occurred
+     */
+    protected DataBean getDataBean() throws IOException {
+        return new DataBean();
     }
 
     // Methods
@@ -195,6 +215,10 @@ public class TestBase extends ApplicationTest {
                 HBox b = getElementById(element, HBox.class);
                 result = b.getChildren().isEmpty();
                 break;
+            case CQL_INPUT:
+                TextArea ta = getElementById(element, TextArea.class);
+                result = ta.getText().isEmpty();
+                break;
             default:
                 TextField t = getElementById(element, TextField.class);
                 result = t.getText().isEmpty();
@@ -257,6 +281,16 @@ public class TestBase extends ApplicationTest {
      */
     private void setTextField(String fieldId, String text) {
         TextField field = getElementById(fieldId, TextField.class);
+        field.setText(text);
+    }
+
+    /**
+     * Sets CQL to TextArea.
+     *
+     * @param text    content
+     */
+    void setCqlInput(String text) {
+        TextArea field = getElementById(CQL_INPUT, TextArea.class);
         field.setText(text);
     }
 
@@ -349,7 +383,7 @@ public class TestBase extends ApplicationTest {
     /**
      * Waits until UI has settled down.
      */
-    void waitUntilReady() {
+    protected void waitUntilReady() {
         waitFor(READY_STATUS);
     }
 }

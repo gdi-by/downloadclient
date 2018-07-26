@@ -75,8 +75,8 @@
         <ows:Operation name="GetFeature">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://localhost/geoserver/wfs"/>
-                    <ows:Post xlink:href="http://localhost/geoserver/wfs"/>
+                    <ows:Get xlink:href="{GETFEATURE_URL}"/>
+                    <ows:Post xlink:href="{GETFEATURE_URL}"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="resultType">

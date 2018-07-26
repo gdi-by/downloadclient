@@ -18,18 +18,20 @@
 
 package de.bayern.gdi.services;
 
-import de.bayern.gdi.model.Query;
+import de.bayern.gdi.processor.ConverterException;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.filter.text.ecql.ECQL;
 import org.geotools.filter.v2_0.FES;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.opengis.filter.Filter;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Geotools 16.1 FilterEncoder (eCQL Filter).
@@ -38,211 +40,138 @@ import java.util.logging.Logger;
  */
 public class FilterEncoder {
 
-    private static final Logger log =
-            Logger.getLogger(FilterEncoder.class.getName());
-    private static final String PERCENT_NUMBER = "\u0025";
-    private static final String ASTERISK = "\u002A";
-    private List<String> queries;
-    private List<String> eCQLFilters;
-    private String inputs;
     private static final int INDENTSIZE = 3;
-    private ArrayList<Query> entireQueries;
-    private ArrayList<Query> complexQueries;
-
-
-    public FilterEncoder() {
-        identifySoloQuery();
-    }
-
 
     /**
-     * Identify every single query.
-     * (Coming from the textarea)
+     * Validates the userInput.
+     *
+     * @param userInput the queries to validate
+     * @throws CQLException       if the CQL is not valid
+     * @throws ConverterException if the validation fails unexpected
      */
-    private void identifySoloQuery() {
-        if (inputs != null) {
-            String[] queriesString = inputs.split("\\r\\n|\\n|\\r");
-            queries = Arrays.asList(queriesString);
-        }
-    }
-
-    /**
-     * Generate the eCQL-Filter.
-     * (based on the query list that has been establish)
-     */
-    private void doProduceEcqlFilters() throws CQLException {
-
-        ArrayList<Query> queryList = new ArrayList<>();
-
-        if (complexQueries != null && complexQueries.size() > 0) {
-            for (Query query: complexQueries) {
-                try {
-                    Filter filter = ECQL.toFilter(query.getValue());
-                    Configuration configuration =
-                            new org.geotools.filter.v2_0.FESConfiguration();
-                    Encoder encoder = new Encoder(configuration);
-                    encoder.setIndenting(true);
-                    encoder.setIndentSize(INDENTSIZE);
-                    encoder.setOmitXMLDeclaration(true);
-
-                    String filterString = null;
-                    filterString = encoder.encodeAsString(filter, FES.Filter);
-
-                    if (filterString != null) {
-                        eCQLFilters.add(filterString);
-                        query.seteCQLFilter(filterString);
-                        queryList.add(query);
-                    }
-                } catch (IOException e) {
-                    // log.log(log.getLevel(), e.getMessage(), e.getCause());
-                    e.printStackTrace();
-                }
-            }
-            complexQueries = queryList;
-        }
-    }
-
-    /**
-     * Collect all the entire queries.
-     * @return help - a map
-     */
-    private void collectEntireQueries() {
-
-        List<String> newQueries = new ArrayList<>();
-        entireQueries = new ArrayList<>();
-        complexQueries = new ArrayList<>();
-
-        for (String query: this.queries) {
-            if (query != null) {
-                if (query.contains("WHERE")
-                        || query.contains("Where")
-                        || query.contains("where")) {
-
-                    String[] wheres = splitCQLRequest(query);
-
-                    if (wheres.length != 0) {
-                        Query aQuery = initializeQueryObject(wheres);
-                        entireQueries.add(aQuery);
-                        complexQueries.add(aQuery);
-                        newQueries.add(wheres[1]);
-                    }
-                } else {
-                    Query aQuery = new Query("", query, false);
-                    complexQueries.add(aQuery);
-                }
-            }
-        }
-
-        if (newQueries.size() > 0) {
-            queries = newQueries;
-        }
-    }
-
-    /**
-     * Initialize the query Object.
-     * @param wheres an array.
-     * @return aQuery - An Object from type Query.
-     */
-    private Query initializeQueryObject(String[] wheres) {
-        Query aQuery = new Query();
-        String key = wheres[0];
-        key = key.replace("\"", "");
-        key = key.trim();
-        aQuery.setKey(key);
-        aQuery.setValue(wheres[1]);
-        aQuery.setECQLEntireRequest(true);
-        return aQuery;
-    }
-
-    /**
-     * Retrieve the Where-Part of the eCQL-Request.
-     * @param query is suppose to be the entire eCQL
-     * @return wheres, an array of two elements.
-     */
-    private String[] splitCQLRequest(String query) {
-        String[] wheres = query.split("WHERE");
-        if (wheres == null) {
-            wheres = query.split("Where");
-        }
-        if (wheres == null) {
-            wheres = query.split("where");
-        }
-        return wheres;
-    }
-
-    /**
-     * Give back the list of all produced eCQL-Filters.
-     * @return eCQLFilters
-     */
-    public List<String> geteCQLFilters() {
-        return eCQLFilters;
-    }
-
-    /**
-     * Save all the eCQL-Filters.
-     * @param eCQLFilters the list of all eCQL-Filter
-     */
-    public void seteCQLFilters(List<String> eCQLFilters) {
-        this.eCQLFilters = eCQLFilters;
-    }
-
-    /**
-     * Give back a list of every single lines introduce by the user.
-     * @return queries This represents every single line \n
-     */
-    public List<String> getQueries() {
-        return queries;
+    public void validateCql(String userInput)
+        throws CQLException, ConverterException {
+        initializeQueries(userInput);
     }
 
     /**
      * We want to hold all the queries.
+     *
      * @param userInput extract all queries
-     * @throws CQLException something went wrong.
+     * @return the encoder filters
+     * @throws CQLException       CQL was not valid
+     * @throws ConverterException if the creation of the filter fails
      */
-    public void initializeQueries(String userInput) throws CQLException {
-        this.inputs = userInput;
-        this.eCQLFilters = new ArrayList<>();
-        identifySoloQuery();
-        collectEntireQueries();
-        doProduceEcqlFilters();
-/*
-        if (entireQueries != null && entireQueries.size() > 0) {
-            queries = new ArrayList<>();
-           for (Query query: entireQueries) {
-               queries.add(query.getValue());
-           }
-        } */
+    public List<QueryToFeatureType> initializeQueries(String userInput)
+        throws CQLException, ConverterException {
+        if (userInput == null) {
+            throw new IllegalArgumentException("CQL must not be null");
+        }
+        return cleanUpQueries(userInput);
     }
 
-    /**
-     * Form the entire queries.
-     * @return entireQueries Map
-     */
-    public ArrayList<Query> getEntireQueries() {
-        return entireQueries;
-    }
-
-    /**
-     * Initialize the entire queries.
-     * @param entireQueries a Map
-     */
-    public void setEntireQueries(ArrayList<Query> entireQueries) {
-        this.entireQueries = entireQueries;
-    }
-
-    /**
-     * Set the complexe queries objects.
-     * @return complexQueries list
-     */
-    public ArrayList<Query> getComplexQueries() {
+    private List<QueryToFeatureType> cleanUpQueries(String inputs)
+        throws CQLException, ConverterException {
+        List<QueryToFeatureType> complexQueries = new ArrayList<>();
+        String[] queries = inputs.split("\\r\\n|\\n|\\r");
+        for (String query : queries) {
+            if (query != null) {
+                if (query.toLowerCase().contains("where")) {
+                    QueryToFeatureType queryToFeatureType =
+                        createFilterForQueryWithFeatureType(query);
+                    complexQueries.add(queryToFeatureType);
+                } else {
+                    Document filter = createFilter(query);
+                    QueryToFeatureType queryToFeatureType =
+                        new QueryToFeatureType(filter);
+                    complexQueries.add(queryToFeatureType);
+                }
+            }
+        }
         return complexQueries;
     }
 
-    /**
-     * Initialize the entire queries.
-     * @param complexQueries a List of Objects
-     */
-    public void setComplexQueries(ArrayList<Query> complexQueries) {
-        this.complexQueries = complexQueries;
+    private QueryToFeatureType createFilterForQueryWithFeatureType(
+        String query)
+        throws CQLException, ConverterException {
+
+        String[] wheres = query.split("(?i)WHERE");
+        if (wheres.length > 1) {
+            String featureType = cleanUpFeatureTypeName(wheres[0]);
+            String cqlQuery = wheres[1];
+            Document filter = createFilter(cqlQuery);
+            return new QueryToFeatureType(featureType, filter);
+        }
+        return null;
     }
+
+    private Document createFilter(String cqlQuery)
+        throws CQLException, ConverterException {
+        try {
+            Filter filter = ECQL.toFilter(cqlQuery);
+            Configuration configuration =
+                new org.geotools.filter.v2_0.FESConfiguration();
+            Encoder encoder = new Encoder(configuration);
+            encoder.setIndenting(true);
+            encoder.setIndentSize(INDENTSIZE);
+            encoder.setOmitXMLDeclaration(true);
+
+            return encoder.encodeAsDOM(filter, FES.Filter);
+        } catch (IOException | TransformerException | SAXException e) {
+            throw new ConverterException(
+                "Converting from CQL to Filter failed", e);
+        }
+    }
+
+    private String cleanUpFeatureTypeName(String where) {
+        return where.replace("\"", "").trim();
+    }
+
+    /**
+     * Encapsulates the feature type and filter.
+     */
+    public class QueryToFeatureType {
+
+        private final String featureType;
+
+        private final Document filter;
+
+        /**
+         * Instantiates a QueryToFeatureType without feature type,
+         * if not parseable from the CQL.
+         *
+         * @param filter the created filter. never <code>null</code>
+         */
+        public QueryToFeatureType(Document filter) {
+            this(null, filter);
+        }
+
+        /**
+         * Instantiates a QueryToFeatureType with feature type.
+         *
+         * @param featureType name of the fetaure type
+         * @param filter      the created filter. never <code>null</code>
+         */
+        public QueryToFeatureType(String featureType, Document filter) {
+            this.featureType = featureType;
+            this.filter = filter;
+        }
+
+        /**
+         * @return the name of the feature type, may be <code>null</code>
+         * if not parseable from CQL
+         */
+        public String getFeatureType() {
+            return featureType;
+        }
+
+        /**
+         * @return the parsed filter, never <code>null</code>
+         */
+        public Document getFilter() {
+            return filter;
+        }
+
+    }
+
 }

@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.bayern.gdi.gui.FeatureModel.FilterType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -61,7 +62,7 @@ public class DownloadConfig {
     /**
     * Constructor.
     *
-    * @param path The config xml file.
+    * @param configFile The config xml file.
     */
     public DownloadConfig(File configFile)
             throws IOException, ParserConfigurationException,
@@ -86,7 +87,7 @@ public class DownloadConfig {
             throw new NoServiceURLException();
         }
         try {
-            dataset = getValueByTagName("Dataset", root);
+            dataset = parseDataset(root);
         } catch (Exception ex) {
             dataset = null;
         }
@@ -136,7 +137,7 @@ public class DownloadConfig {
         }
     }
 
-   /**
+    /**
     * Returns the atom variation type as string.
     *
     * @return The variation string
@@ -235,6 +236,15 @@ public class DownloadConfig {
         return parameters.get("srsName");
     }
 
+    /**
+     * Returns the CQL.
+     *
+     * @return The CQL
+     */
+    public String getCql() {
+        return parameters.get("CQL");
+    }
+
    /**
     * Returns the value of a tag by the name of the Tag.
     *
@@ -251,6 +261,21 @@ public class DownloadConfig {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private String parseDataset(Element root) {
+        String datasetValue = getValueByTagName("Dataset", root);
+        if (datasetValue != null
+            && !I18n.getMsg("typ.overall.query").equals(datasetValue)) {
+            for (FilterType filterType : FilterType.values()) {
+                String labelSuffix = filterType.getLabelSuffix();
+                if (datasetValue.endsWith(labelSuffix)) {
+                    int endIndex = datasetValue.indexOf(labelSuffix) - 1;
+                    return datasetValue.substring(0, endIndex);
+                }
+            }
+        }
+        return datasetValue;
     }
 
     /**

@@ -21,7 +21,6 @@ package de.bayern.gdi.gui;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
-import de.bayern.gdi.model.Query;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.Service;
@@ -39,6 +38,8 @@ import java.util.Map;
 import java.util.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -61,8 +62,6 @@ public class DataBean extends Observable {
     private CatalogService catalogService;
 
     private String featureTypeModel;
-
-    private List<Query> complexQueries;
 
     /**
      * Attribute representation.
@@ -405,21 +404,10 @@ public class DataBean extends Observable {
                 ItemModel itemModel = getDatatype();
                 if (itemModel instanceof StoredQueryModel) {
                     serviceTypeStr = "WFS2_SIMPLE";
+                } else if (isFilterType()) {
+                    serviceTypeStr = "WFS2_SQL";
                 } else {
-                    FeatureModel fm = (FeatureModel)itemModel;
-                    WFSMeta.Feature feature = (WFSMeta.Feature)fm.getItem();
-                    String fname = feature.getName();
-                    if (fname != null
-                    && fname.endsWith(FEATURE_TYPE_NAME_SUFFIX)) {
-                        serviceTypeStr = "WFS2_SQL";
-                        /* TODO Dead code: What is this for?
-                        if (wfsService != null) {
-                            nameSpace = wfsService.namespaces;
-                        }
-                        */
-                    } else {
-                        serviceTypeStr = "WFS2_BASIC";
-                    }
+                    serviceTypeStr = "WFS2_BASIC";
                 }
                 break;
             case ATOM:
@@ -433,23 +421,32 @@ public class DataBean extends Observable {
             serviceTypeStr,
             serviceURL,
             savePath,
-            processingSteps,
-            complexQueries);
+            processingSteps);
     }
 
     /**
-     * Set the complexe queries objects.
-     * @return complexQueries list
+     * @return <code>true</code> if it is a CQLFilter request,
+     * <code>false</code> otherwise
      */
-    public List<Query> getComplexQueries() {
-        return complexQueries;
+    public boolean isFilterType() {
+        if (dataType != null && dataType instanceof OverallFeatureTypeModel) {
+            return true;
+        }
+        if (dataType != null && dataType instanceof FeatureModel) {
+            return FILTER.equals(((FeatureModel) dataType).getFilterType());
+        }
+        return false;
     }
 
     /**
-     * Initialize the entire queries.
-     * @param complexQueries a List of Objects
+     * @return <code>true</code> if it is a CQLFilter request over
+     * all feature types, <code>false</code> otherwise
      */
-    public void setComplexQueries(List<Query> complexQueries) {
-        this.complexQueries = complexQueries;
+    public boolean isMultipleQuery() {
+        if (dataType != null && dataType instanceof OverallFeatureTypeModel) {
+            return true;
+        }
+        return false;
     }
+
 }
