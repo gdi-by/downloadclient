@@ -53,14 +53,42 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class DownloadStepConverterIT {
 
-    private static final String GEOSERVER_BASEURL =
-        "http://geoserv.weichand.de:8080/geoserver/wfs";
+    /**
+     * Service under test.
+     */
+    private enum TestService {
+        GEOSERVER("http://geoserv.weichand.de:8080/geoserver/wfs",
+            "text/xml; subtype=gml/3.2",
+            "urn:ogc:def:crs:EPSG::31468"),
+
+        DEEGREE("http://demo.deegree.org:80/utah-workspace/services/wfs",
+            "text/xml; subtype=\"gml/3.2.1\"",
+            "EPSG:26912");
+
+        private final String baseUrl;
+        private final String outputFormat;
+        private final String srsName;
+
+        TestService(String baseUrl, String outputFormat, String srsName) {
+            this.baseUrl = baseUrl;
+            this.outputFormat = outputFormat;
+            this.srsName = srsName;
+        }
+    }
+
 
     private static final String GEMEINDEN_DATASET = "bvv:gmd_ex";
 
+    private static final String RAILROADS_DATASET = "SGID100_RailroadsDLG100";
+
+    private static final String SPRINGS_DATASET = "SGID024_Springs";
+
     private static final String OVERALL_DATASET =
         "Typübergreifende Abfrage (Filter)";
+
+
     private String testName;
+
     private DownloadStep downloadStep;
 
     /**
@@ -81,37 +109,62 @@ public class DownloadStepConverterIT {
     public static Collection<Object[]> downloadSteps() throws IOException {
         return Arrays.asList(new Object[][] {
             {"Example1", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example1.cql"))},
             {"Example2", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example2.cql"))},
             {"Example3", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 OVERALL_DATASET,
                 resourceAsString("/cql/example3.cql"))},
             {"Example4", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 OVERALL_DATASET,
                 resourceAsString("/cql/example4.cql"))},
             {"Equals", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_equals.cql"))},
             {"Within", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_within.cql"))},
             {"Intersects", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_intersects.cql"))},
             {"Disjoint", createDownloadStep(
-                GEOSERVER_BASEURL,
+                TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
-                resourceAsString("/cql/cql_disjoint.cql"))}
+                resourceAsString("/cql/cql_disjoint.cql"))},
+            // fails cause of invalid GetFeature request (ANY instead of Any)
+            //{"deegree-PropertyIsEqualTo", createDownloadStep(
+            //    TestService.DEEGREE,
+            //    RAILROADS_DATASET,
+            //    resourceAsString("/cql/dee-equalTo.cql"))},
+            {"deegree-PropertyIsLike", createDownloadStep(
+                TestService.DEEGREE,
+                RAILROADS_DATASET,
+                resourceAsString("/cql/dee-isLike.cql"))},
+            {"deegree-Equals", createDownloadStep(
+                TestService.DEEGREE,
+                SPRINGS_DATASET,
+                resourceAsString("/cql/dee-equals.cql"))},
+            {"deegree-Within", createDownloadStep(
+                TestService.DEEGREE,
+                SPRINGS_DATASET,
+                resourceAsString("/cql/dee-within.cql"))},
+            {"deegree-Intersects", createDownloadStep(
+                TestService.DEEGREE,
+                SPRINGS_DATASET,
+                resourceAsString("/cql/dee-intersects.cql"))},
+            {"deegree-Disjoint", createDownloadStep(
+                TestService.DEEGREE,
+                SPRINGS_DATASET,
+                resourceAsString("/cql/dee-disjoint.cql"))}
         });
     }
 
@@ -134,7 +187,8 @@ public class DownloadStepConverterIT {
      */
     @Test
     public void testConvert() throws Exception {
-        System.out.println("Start test " + testName + "...");
+        System.out.println("Start test " + testName + " Test directory: "
+            + downloadStep.getPath() + " ...");
 
         DownloadStepConverter downloadStepConverter =
             new DownloadStepConverter();
@@ -153,20 +207,18 @@ public class DownloadStepConverterIT {
         assertThat(iterator.hasNext(), is(true));
     }
 
-    private static DownloadStep createDownloadStep(String baseUrl,
+    private static DownloadStep createDownloadStep(TestService service,
                                                    String dataset,
                                                    String cql)
         throws IOException {
         ArrayList<Parameter> parameters = new ArrayList<>();
-        parameters.add(new Parameter("srsName",
-            "urn:ogc:def:crs:EPSG::31468"));
-        parameters.add(new Parameter("outputformat",
-            "text/xml; subtype=gml/3.2"));
+        parameters.add(new Parameter("srsName", service.srsName));
+        parameters.add(new Parameter("outputformat", service.outputFormat));
         parameters.add(new Parameter("CQL", cql));
         String path = Files.createTempDirectory("DownloadStepConverterIT")
             .toString();
         return new DownloadStep(dataset, parameters, "WFS2_SQL",
-            baseUrl, path, new ArrayList<>());
+            service.baseUrl, path, new ArrayList<>());
     }
 
     private FileDownloadJob findFileDownloadJob(JobList jobList) {
