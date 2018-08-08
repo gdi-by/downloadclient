@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.opengis.net/wfs/2.0"
+        xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+        version="3.2.2">
+    <include schemaLocation="http://schemas.opengis.net/wfs/2.0/wfs.xsd"/>
+    <import namespace="http://www.opengis.net/gml/3.2"
+            schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+</schema>

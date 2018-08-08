@@ -22,19 +22,14 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xmlmatchers.namespace.SimpleNamespaceContext;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -52,6 +47,7 @@ import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
 import static org.xmlmatchers.xpath.XpathReturnType.returningABoolean;
 import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
+import static org.xmlmatchers.xpath.XpathReturnType.returningAString;
 
 /**
  * Test class to verify WFS GetFeature request builder.
@@ -80,7 +76,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(GEOSERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
@@ -108,7 +103,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(XTRASERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
@@ -137,7 +131,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(GEOSERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         // Fails cause of ANY (instead of Any)
         // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
@@ -167,7 +160,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(GEOSERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
@@ -199,7 +191,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(GEOSERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         // Fails cause of ANY (instead of Any)
         // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
@@ -239,7 +230,6 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         WFSMeta meta = parseMeta(GEOSERVER);
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
-        printDocument(wfsRequest);
 
         // Fails cause of ANY (instead of Any)
         // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
@@ -257,6 +247,180 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
             is(true)));
         assertThat(the(wfsRequest), hasXPath(
             "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+    }
+
+    /**
+     * Test with spatial operator EQUALS.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testCreateEquals() throws Exception {
+        String cql = resourceAsString("cql_equals.wkt");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
+
+        Set<String> usedVars = new HashSet<>();
+        WFSMeta meta = parseMeta(GEOSERVER);
+        Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
+            usedVars, meta);
+
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)",
+            namespaceContext(),
+            returningANumber(),
+            is(1d)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/"
+                + "fes:Equals/fes:ValueReference",
+            namespaceContext(),
+            returningAString(),
+            is("bvv:geom")));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Equals/gml:Polygon",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+
+    }
+
+    /**
+     * Test with spatial operator WITHIN.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testCreateWithin() throws Exception {
+        String cql = resourceAsString("cql_within.wkt");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
+
+        Set<String> usedVars = new HashSet<>();
+        WFSMeta meta = parseMeta(GEOSERVER);
+        Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
+            usedVars, meta);
+
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)",
+            namespaceContext(),
+            returningANumber(),
+            is(1d)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/"
+                + "fes:Within/fes:ValueReference",
+            namespaceContext(),
+            returningAString(),
+            is("bvv:geom")));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Within/gml:Polygon",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+    }
+
+    /**
+     * Test with spatial operator INTERSECTS.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testCreateIntersects() throws Exception {
+        String cql = resourceAsString("cql_intersects.wkt");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
+
+        Set<String> usedVars = new HashSet<>();
+        WFSMeta meta = parseMeta(GEOSERVER);
+        Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
+            usedVars, meta);
+
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)",
+            namespaceContext(),
+            returningANumber(),
+            is(1d)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/"
+                + "fes:Intersects/fes:ValueReference",
+            namespaceContext(),
+            returningAString(),
+            is("bvv:geom")));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Intersects/gml:Point",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+    }
+
+
+    /**
+     * Test with spatial operator DISJOINT.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testCreateDisjoint() throws Exception {
+        String cql = resourceAsString("cql_disjoint.wkt");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
+
+        Set<String> usedVars = new HashSet<>();
+        WFSMeta meta = parseMeta(GEOSERVER);
+        Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
+            usedVars, meta);
+
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)",
+            namespaceContext(),
+            returningANumber(),
+            is(1d)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
+            namespaceContext(),
+            returningABoolean(),
+            is(true)));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/"
+                + "fes:Disjoint/fes:ValueReference",
+            namespaceContext(),
+            returningAString(),
+            is("bvv:geom")));
+
+        assertThat(the(wfsRequest), hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Disjoint/gml:Polygon",
             namespaceContext(),
             returningABoolean(),
             is(true)));
@@ -302,30 +466,26 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         return null;
     }
 
-    private static void printDocument(Node doc)
-        throws Exception {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty(
-            "{http://xml.apache.org/xslt}indent-amount", "4");
-
-        transformer.transform(new DOMSource(doc),
-            new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
-    }
-
-
     private URL wfs() throws MalformedURLException {
         return new URL("http://schemas.opengis.net/wfs/2.0/wfs.xsd");
+    }
+
+    private URL wfsAndGml() {
+        return getClass().getResource("/xsd/wfs20gml32.xsd");
     }
 
     private NamespaceContext namespaceContext() {
         SimpleNamespaceContext namespaceContext = new SimpleNamespaceContext();
         namespaceContext.bind("wfs", "http://www.opengis.net/wfs/2.0");
+        namespaceContext.bind("fes", "http://www.opengis.net/fes/2.0");
+        namespaceContext.bind("gml", "http://www.opengis.net/gml/3.2");
         return namespaceContext;
     }
 
+    private String resourceAsString(String resourceName) throws IOException {
+        InputStream resource = getClass().getResourceAsStream(resourceName);
+        String s = IOUtils.toString(resource).trim();
+        resource.close();
+        return s;
+    }
 }
