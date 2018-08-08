@@ -259,7 +259,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateEquals() throws Exception {
-        String cql = resourceAsString("cql_equals.wkt");
+        String cql = resourceAsString("/cql/cql_equals.cql");
         DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
@@ -303,7 +303,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateWithin() throws Exception {
-        String cql = resourceAsString("cql_within.wkt");
+        String cql = resourceAsString("/cql/cql_within.cql");
         DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
@@ -346,7 +346,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateIntersects() throws Exception {
-        String cql = resourceAsString("cql_intersects.wkt");
+        String cql = resourceAsString("/cql/cql_intersects.cql");
         DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
@@ -390,7 +390,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateDisjoint() throws Exception {
-        String cql = resourceAsString("cql_disjoint.wkt");
+        String cql = resourceAsString("/cql/cql_disjoint.cql");
         DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
