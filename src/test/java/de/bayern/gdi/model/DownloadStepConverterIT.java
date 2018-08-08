@@ -22,6 +22,7 @@ import de.bayern.gdi.processor.FileDownloadJob;
 import de.bayern.gdi.processor.Job;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.utils.Config;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +55,9 @@ public class DownloadStepConverterIT {
 
     private static final String BASEURL =
         "http://geoserv.weichand.de:8080/geoserver/wfs";
+    private static final String GEMEINDEN_DATASET = "bvv:gmd_ex";
+    private static final String OVERALL_DATASET =
+        "Typübergreifende Abfrage (Filter)";
     private String testName;
     private DownloadStep downloadStep;
 
@@ -73,19 +78,31 @@ public class DownloadStepConverterIT {
     @Parameters
     public static Collection<Object[]> downloadSteps() throws IOException {
         return Arrays.asList(new Object[][] {
-            {"Example1", createDownloadStep("bvv:gmd_ex",
+            {"Example1", createDownloadStep(GEMEINDEN_DATASET,
                 "\"bvv:sch\" = '09774135'")},
-            {"Example2", createDownloadStep("bvv:gmd_ex",
+            {"Example2", createDownloadStep(GEMEINDEN_DATASET,
                 "\"bvv:sch\" LIKE '09774%'")},
             {"Example3", createDownloadStep(
-                "Typübergreifende Abfrage (Filter)",
+                OVERALL_DATASET,
                 "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
                     + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'")},
             {"Example4", createDownloadStep(
                 "Typübergreifende Abfrage (Filter)",
                 "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
                     + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
-                    + "('09161000', '09161000')")}
+                    + "('09161000', '09161000')")},
+            {"Equals", createDownloadStep(
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/cql_equals.cql"))},
+            {"Within", createDownloadStep(
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/cql_within.cql"))},
+            {"Intersects", createDownloadStep(
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/cql_intersects.cql"))},
+            {"Disjoint", createDownloadStep(
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/cql_disjoint.cql"))}
         });
     }
 
@@ -149,6 +166,15 @@ public class DownloadStepConverterIT {
             }
         }
         return null;
+    }
+
+    private static String resourceAsString(String resourceName)
+        throws IOException {
+        InputStream resource = DownloadStepConverterIT.class.
+            getResourceAsStream(resourceName);
+        String s = IOUtils.toString(resource).trim();
+        resource.close();
+        return s;
     }
 
 }
