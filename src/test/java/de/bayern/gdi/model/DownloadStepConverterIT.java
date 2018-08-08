@@ -53,9 +53,11 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class DownloadStepConverterIT {
 
-    private static final String BASEURL =
+    private static final String GEOSERVER_BASEURL =
         "http://geoserv.weichand.de:8080/geoserver/wfs";
+
     private static final String GEMEINDEN_DATASET = "bvv:gmd_ex";
+
     private static final String OVERALL_DATASET =
         "Typübergreifende Abfrage (Filter)";
     private String testName;
@@ -78,29 +80,36 @@ public class DownloadStepConverterIT {
     @Parameters
     public static Collection<Object[]> downloadSteps() throws IOException {
         return Arrays.asList(new Object[][] {
-            {"Example1", createDownloadStep(GEMEINDEN_DATASET,
-                "\"bvv:sch\" = '09774135'")},
-            {"Example2", createDownloadStep(GEMEINDEN_DATASET,
-                "\"bvv:sch\" LIKE '09774%'")},
+            {"Example1", createDownloadStep(
+                GEOSERVER_BASEURL,
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/example1.cql"))},
+            {"Example2", createDownloadStep(
+                GEOSERVER_BASEURL,
+                GEMEINDEN_DATASET,
+                resourceAsString("/cql/example2.cql"))},
             {"Example3", createDownloadStep(
+                GEOSERVER_BASEURL,
                 OVERALL_DATASET,
-                "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'")},
+                resourceAsString("/cql/example3.cql"))},
             {"Example4", createDownloadStep(
-                "Typübergreifende Abfrage (Filter)",
-                "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                    + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
-                    + "('09161000', '09161000')")},
+                GEOSERVER_BASEURL,
+                OVERALL_DATASET,
+                resourceAsString("/cql/example4.cql"))},
             {"Equals", createDownloadStep(
+                GEOSERVER_BASEURL,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_equals.cql"))},
             {"Within", createDownloadStep(
+                GEOSERVER_BASEURL,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_within.cql"))},
             {"Intersects", createDownloadStep(
+                GEOSERVER_BASEURL,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_intersects.cql"))},
             {"Disjoint", createDownloadStep(
+                GEOSERVER_BASEURL,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_disjoint.cql"))}
         });
@@ -144,7 +153,9 @@ public class DownloadStepConverterIT {
         assertThat(iterator.hasNext(), is(true));
     }
 
-    private static DownloadStep createDownloadStep(String dataset, String cql)
+    private static DownloadStep createDownloadStep(String baseUrl,
+                                                   String dataset,
+                                                   String cql)
         throws IOException {
         ArrayList<Parameter> parameters = new ArrayList<>();
         parameters.add(new Parameter("srsName",
@@ -155,7 +166,7 @@ public class DownloadStepConverterIT {
         String path = Files.createTempDirectory("DownloadStepConverterIT")
             .toString();
         return new DownloadStep(dataset, parameters, "WFS2_SQL",
-            BASEURL, path, new ArrayList<>());
+            baseUrl, path, new ArrayList<>());
     }
 
     private FileDownloadJob findFileDownloadJob(JobList jobList) {

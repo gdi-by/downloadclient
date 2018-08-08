@@ -124,8 +124,8 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateExample1() throws Exception {
-        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex",
-            "\"bvv:sch\" = '09774135'");
+        String cql = resourceAsString("/cql/example1.cql");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
         WFSMeta meta = parseMeta(GEOSERVER);
@@ -153,8 +153,8 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateExample2() throws Exception {
-        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex",
-            "\"bvv:sch\" LIKE '09774%'");
+        String cql = resourceAsString("/cql/example2.cql");
+        DownloadStep downloadStep = createDownloadStep("bvv:gmd_ex", cql);
 
         Set<String> usedVars = new HashSet<>();
         WFSMeta meta = parseMeta(GEOSERVER);
@@ -182,10 +182,9 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateExample3() throws Exception {
+        String cql = resourceAsString("/cql/example3.cql");
         DownloadStep downloadStep = createDownloadStep(
-            "Typübergreifende Abfrage (Filter)",
-            "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" LIKE '09774%'");
+            "Typübergreifende Abfrage (Filter)", cql);
 
         Set<String> usedVars = new HashSet<>();
         WFSMeta meta = parseMeta(GEOSERVER);
@@ -220,11 +219,9 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
      */
     @Test
     public void testCreateExample4() throws Exception {
+        String cql = resourceAsString("/cql/example4.cql");
         DownloadStep downloadStep = createDownloadStep(
-            "Typübergreifende Abfrage (Filter)",
-            "\"bvv:lkr_ex\" WHERE \"bvv:sch\" = '09774'\n"
-                + "\"bvv:gmd_ex\" WHERE \"bvv:sch\" IN "
-                + "('09161000', '09161000')");
+            "Typübergreifende Abfrage (Filter)", cql);
 
         Set<String> usedVars = new HashSet<>();
         WFSMeta meta = parseMeta(GEOSERVER);
