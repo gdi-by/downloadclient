@@ -81,6 +81,45 @@ public class FilterEncoderTest {
         assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
     }
 
+
+    /**
+     * Test creation of valid CQL.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testFilterEqual() throws Exception {
+        FilterEncoder filterEncoder = new FilterEncoder();
+        List<FilterEncoder.QueryToFeatureType> filters =
+            filterEncoder.initializeQueries("\"bvv:sch\" = '09774'");
+
+        assertThat(filters.size(), is(1));
+
+        Document filter = filters.get(0).getFilter();
+        assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
+        assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
+    }
+
+
+    /**
+     * Test creation of valid CQL.
+     *
+     * @throws Exception e
+     */
+    @Test
+    public void testFilterEqualAndLessThan() throws Exception {
+        FilterEncoder filterEncoder = new FilterEncoder();
+        List<FilterEncoder.QueryToFeatureType> filters =
+            filterEncoder.initializeQueries(
+                "\"bvv:sch\" = '09774' AND \"bvv:abc\" <= 9");
+
+        assertThat(filters.size(), is(1));
+
+        Document filter = filters.get(0).getFilter();
+        assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
+        assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
+    }
+
     /**
      * Test creation of valid CQL.
      *
@@ -123,7 +162,7 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(2));
 
         Document firstFilter = filters.get(0).getFilter();
-        //assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
+        assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
         assertThat(the(firstFilter), hasXPath("/fes:Filter",
             namespaceContext()));
 
