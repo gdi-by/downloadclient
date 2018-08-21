@@ -140,11 +140,10 @@ public class DownloadStepConverterIT {
                 TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/cql_disjoint.cql"))},
-            // fails cause of invalid GetFeature request (ANY instead of Any)
-            //{"deegree-PropertyIsEqualTo", createDownloadStep(
-            //    TestService.DEEGREE,
-            //    RAILROADS_DATASET,
-            //    resourceAsString("/cql/dee-equalTo.cql"))},
+            {"deegree-PropertyIsEqualTo", createDownloadStep(
+                TestService.DEEGREE,
+                RAILROADS_DATASET,
+                resourceAsString("/cql/dee-equalTo.cql"))},
             {"deegree-PropertyIsLike", createDownloadStep(
                 TestService.DEEGREE,
                 RAILROADS_DATASET,
