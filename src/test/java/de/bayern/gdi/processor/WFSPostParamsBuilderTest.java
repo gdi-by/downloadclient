@@ -132,8 +132,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Fails cause of ANY (instead of Any)
-        // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
         assertThat(the(wfsRequest), hasXPath(
             "/wfs:GetFeature/wfs:Query/@srsName",
@@ -191,8 +190,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Fails cause of ANY (instead of Any)
-        // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
         assertThat(the(wfsRequest), hasXPath(
             "count(/wfs:GetFeature/wfs:Query)",
@@ -228,8 +226,7 @@ public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Fails cause of ANY (instead of Any)
-        // assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
 
         assertThat(the(wfsRequest), hasXPath(
             "count(/wfs:GetFeature/wfs:Query)",
