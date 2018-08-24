@@ -1,0 +1,1 @@
+EQUALS(POINT(466192.203 4530005.050),"app:geometry")
