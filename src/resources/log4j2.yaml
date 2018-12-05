@@ -1,0 +1,58 @@
+Configuration:
+    name: DownloadClient
+    appenders:
+        Console:
+            name: STDOUT
+            PatternLayout:
+                Pattern: "%d{HH:mm:ss,SSS} %p %c %m%n"
+            target: SYSTEM_OUT
+        File:
+            name: File
+            fileName: logdlc_yyyymmddhhmm.txt
+            PatternLayout:
+                Pattern: "%d %p %C{1.} [%t] %m%n"
+            Filters:
+                ThresholdFilter:
+                    level: info
+    Loggers:
+        logger:
+            -
+                name: Application_Log
+                level: info
+                additivity: false
+                AppenderRef:
+                    ref: File
+            -
+                name: de.bayern.gdi
+                level: info
+            -
+                name: de.bayern.gdi.Headless
+                level: warn
+            -
+                name: org.geotools
+                level: warn
+            -
+                name: org.geotools.swing
+                level: off
+            -
+                name: org.apache
+                level: warn
+            -
+                name: org.apache.http
+                level: info
+            -
+                name: net.refractions
+                level: warn
+            -
+                name: org.hsqldb
+                level: warn
+            -
+                name: hsqldb.db
+                level: off
+            -
+                name: javafx
+                level: warn
+        Root:
+            level: info
+            AppenderRef:
+                ref: STDOUT

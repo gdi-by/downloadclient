@@ -60,8 +60,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -99,9 +101,7 @@ public abstract class TestBase extends ApplicationTest {
     /**
      * The logger.
      */
-    private Logger log = Logger.getLogger(
-        this.getClass().getName());
-
+    private static final Logger log = LoggerFactory.getLogger(TestBase.class);
 
     // Overrides and Annotated Methods
 
@@ -110,7 +110,7 @@ public abstract class TestBase extends ApplicationTest {
      */
     @BeforeClass
     public static void initTests() {
-        System.err.println("init tests ....");
+        log.debug("init tests ....");
         System.setProperty("testfx.robot", "glass");
         System.setProperty("testfx.headless", "true");
         System.setProperty("prism.order", "sw");
@@ -124,10 +124,10 @@ public abstract class TestBase extends ApplicationTest {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        System.err.println("start stage ...");
+        log.debug("start stage ...");
         Config.initialize(null);
 
-        log.log(Level.INFO, "Preparing app for controller tests");
+        log.debug("Preparing app for controller tests");
         ClassLoader classLoader = Start.class.getClassLoader();
         URL url = classLoader.getResource("download-client.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());

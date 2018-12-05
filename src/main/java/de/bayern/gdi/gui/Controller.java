@@ -53,22 +53,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-import java.util.logging.Formatter;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -125,9 +115,12 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import org.apache.commons.io.IOUtils;
+
+import org.slf4j.Logger;
 
 import static de.bayern.gdi.gui.FeatureModel.FilterType.BBOX;
 import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
@@ -164,9 +157,10 @@ public class Controller {
     private static final int BBOX_Y2_INDEX = 3;
     private static final int MAX_APP_LOG_BYTES = 8096;
     private static final Logger log
-            = Logger.getLogger(Controller.class.getName());
+            = LoggerFactory.getLogger(Controller.class.getName());
     //Application log
-    private static final Logger APP_LOG = Logger.getLogger("Application Log");
+    private static final Logger APP_LOG
+            = LoggerFactory.getLogger("Application_Log");
     private static boolean appLogInit = false;
 
     // DataBean
@@ -315,28 +309,6 @@ public class Controller {
         Processor.getInstance().addListener(new DownloadListener());
     }
 
-    private static void initAppLog() {
-        try {
-            APP_LOG.setUseParentHandlers(false);
-            //Open file in append mode
-            File logPath = new File(System.getProperty("java.io.tmpdir")
-                    + "/downloadclient");
-            logPath.mkdirs();
-
-            FileHandler appLogFileHandler = new FileHandler(
-                    logPath.getAbsolutePath()
-                    + "/downloadclient_app_log.txt",
-                    MAX_APP_LOG_BYTES, 1, true);
-            AppLogFormatter appLogFormatter = new AppLogFormatter();
-            appLogFileHandler.setFormatter(appLogFormatter);
-            APP_LOG.addHandler(appLogFileHandler);
-            appLogInit = true;
-        } catch (IOException ioex) {
-            log.log(Level.SEVERE, "Could not open application log file",
-                    ioex);
-        }
-    }
-
     /**
      * Initializes gui elements.
      */
@@ -364,19 +336,7 @@ public class Controller {
      * @param msg Message to log
      */
     public static void logToAppLog(String msg) {
-        try {
-            Platform.runLater(() -> {
-                if (!appLogInit) {
-                    initAppLog();
-                }
-                APP_LOG.info(msg);
-            });
-        } catch (Exception e) {
-            if (!appLogInit) {
-                initAppLog();
-            }
             APP_LOG.info(msg);
-        }
     }
 
     /**
@@ -392,7 +352,7 @@ public class Controller {
                 + ".html";
             displayHTMLFileAsPopup(I18n.getMsg("menu.about"), path);
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -420,7 +380,7 @@ public class Controller {
         try {
             openLinkFromFile(pathToFile);
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -492,7 +452,7 @@ public class Controller {
         } catch (IOException
                     | ParserConfigurationException
                     | SAXException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
             setStatusTextUI(
                     I18n.format("status.config.invalid-xml"));
             return;
@@ -514,7 +474,7 @@ public class Controller {
         try {
             configFile = openConfigFileOpenDialog();
         } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return;
         }
         loadConfigFromFile(configFile);
@@ -683,7 +643,7 @@ public class Controller {
         } catch (NoSuchAuthorityCodeException nsace) {
             setStatusTextUI(I18n.format("status.config.invalid-epsg"));
         } catch (Exception e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -875,7 +835,7 @@ public class Controller {
             } catch (MalformedURLException e) {
                 setStatusTextUI(
                         I18n.format("status.no-url"));
-                log.log(Level.SEVERE, e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 serviceSelection.setDisable(false);
                 serviceURL.getScene()
                         .setCursor(Cursor.DEFAULT);
@@ -978,7 +938,7 @@ public class Controller {
             try {
                 service.load();
             } catch (IOException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 Platform.runLater(() ->
                     setStatusTextUI(
                             I18n.format(STATUS_SERVICE_BROKEN))
@@ -1185,7 +1145,7 @@ public class Controller {
                 this.mapWFS.setDisplayCRS(
                         this.dataBean.getAttributeValue("srsName"));
             } catch (FactoryException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -1730,7 +1690,7 @@ public class Controller {
             try {
                 ds.write(configFile);
             } catch (IOException ex) {
-                log.log(Level.WARNING, ex.getMessage(), ex);
+                log.warn(ex.getMessage(), ex);
             }
         }
     }
@@ -1759,7 +1719,7 @@ public class Controller {
                         | URISyntaxException
                         | ParserConfigurationException
                         | IOException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN)
@@ -1787,7 +1747,7 @@ public class Controller {
                     metaOne = wfsOne.parse();
                 } catch (IOException
                         | URISyntaxException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN)
@@ -1813,7 +1773,7 @@ public class Controller {
                     meta = extractor.parse();
                 } catch (IOException
                         | URISyntaxException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     Platform.runLater(() ->
                         setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN))
@@ -1824,7 +1784,7 @@ public class Controller {
                 }
                 break;
             default:
-                log.log(Level.WARNING,
+                log.warn(
                         "Could not determine URL",
                         dataBean.getSelectedService());
                 Platform.runLater(() ->
@@ -1902,7 +1862,7 @@ public class Controller {
                             mapAtom.drawPolygons(polygonList);
                         }
                     } catch (FactoryException e) {
-                        log.log(Level.SEVERE, e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                     }
                     serviceTypeChooser.getItems().retainAll();
                     serviceTypeChooser.setItems(opts);
@@ -1967,7 +1927,7 @@ public class Controller {
                     | SAXException
                     | ParserConfigurationException
                     | IOException e) {
-                log.log(Level.SEVERE, "Could not Load Item\n"
+                log.error("Could not Load Item\n"
                         + e.getMessage(), item);
                 return;
             }
@@ -2166,7 +2126,7 @@ public class Controller {
                 crsm.setOldName(crsStr);
                 crsList.add(crsm);
             } catch (FactoryException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
         if (!crsList.isEmpty()) {
@@ -2183,7 +2143,7 @@ public class Controller {
                     }
                 }
             } catch (FactoryException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
             this.referenceSystemChooser.setValue(crsm);
         }
@@ -2224,7 +2184,7 @@ public class Controller {
         try {
             url = new URL(serviceSetting.getWMSUrl());
         } catch (MalformedURLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         if (url != null
                 && ServiceChecker.isReachable(
@@ -2510,25 +2470,4 @@ public class Controller {
         }
     }
 
-    /**
-     * Application log formatting.
-     */
-    private static class AppLogFormatter extends Formatter {
-        /**
-         * Formats log record.
-         *
-         * @return Formatted log entry
-         */
-        @Override
-        public String format(LogRecord record) {
-            LocalDateTime time = Instant.ofEpochMilli(record.getMillis())
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-            return time.format(DateTimeFormatter
-                            .ofPattern("E, dd.MM.yyyy - kk:mm:ss"))
-                            + " "
-                            + record.getMessage()
-                            + System.lineSeparator();
-        }
-    }
 }
