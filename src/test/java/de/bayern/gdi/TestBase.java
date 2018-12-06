@@ -101,7 +101,7 @@ public abstract class TestBase extends ApplicationTest {
     /**
      * The logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(TestBase.class);
+    protected static final Logger log = LoggerFactory.getLogger(TestBase.class);
 
     // Overrides and Annotated Methods
 

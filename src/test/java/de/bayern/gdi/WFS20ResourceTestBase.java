@@ -40,7 +40,11 @@ import static org.apache.http.HttpStatus.SC_OK;
  */
 public abstract class WFS20ResourceTestBase {
 
-    protected static final Logger log = LoggerFactory.getLogger(WFS20ResourceTestBase.class);
+    /**
+     * Logger instance to be used.
+     */
+    protected static final Logger log
+        = LoggerFactory.getLogger(WFS20ResourceTestBase.class);
 
     /**
      * Init Jadler and Config.
