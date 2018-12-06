@@ -39,28 +39,29 @@ Configuration:
             AppenderRef:
                 - ref: STDOUT
         Logger:
-            - name: Application_Log
+            -
+                name: Application_Log
                 level: info
                 additivity: false
                 AppenderRef:
                     ref: File
-            - name: de.bayern.gdi
+            -   name: de.bayern.gdi
                 level: info
-            - name: de.bayern.gdi.Headless
+            -   name: de.bayern.gdi.Headless
                 level: warn
-            - name: org.geotools
+            -   name: org.geotools
                 level: warn
-            - name: org.geotools.swing
+            -   name: org.geotools.swing
                 level: off
-            - name: org.apache
+            -   name: org.apache
                 level: warn
-            - name: org.apache.http
+            -   name: org.apache.http
                 level: info
-            - name: net.refractions
+            -   name: net.refractions
                 level: warn
-            - name: org.hsqldb
+            -   name: org.hsqldb
                 level: warn
-            - name: hsqldb.db
+            -   name: hsqldb.db
                 level: off
-            - name: javafx
+            -   name: javafx
                 level: warn
