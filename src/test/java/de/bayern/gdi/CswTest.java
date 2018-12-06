@@ -37,12 +37,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import junit.framework.TestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Juergen Weichand
  */
 public class CswTest extends TestCase {
+
+    private static final Logger log = LoggerFactory.getLogger(CswTest.class);
 
     private static final int THREE = 3;
 
@@ -64,7 +68,7 @@ public class CswTest extends TestCase {
     @Override
     @Before
     public void setUp() throws IOException {
-        System.err.println("Start jadler ...");
+        log.debug("Start jadler ...");
         Config.initialize(null);
         initJadler();
     }
@@ -72,7 +76,7 @@ public class CswTest extends TestCase {
     @Override
     @After
     public void tearDown() {
-        System.err.println("Stop jadler ...");
+        log.debug("Stop jadler ...");
         closeJadler();
     }
 
@@ -83,7 +87,7 @@ public class CswTest extends TestCase {
      */
     @Test
     public void testCswClient1() throws IOException, URISyntaxException {
-        System.out.println("... Testing virtuell search");
+        log.debug("... Testing virtuell search");
         run("/csw/atom-feeds",
             "/csw202/atom-feeds.xml",
             "/csw202/csw-capabilities-1.xml");
@@ -96,7 +100,7 @@ public class CswTest extends TestCase {
      */
     @Test
     public void testCswClient2() throws IOException, URISyntaxException {
-        System.out.println("... Testing virtuell search");
+        log.debug("... Testing virtuell search");
         run("/csw/atom-feeds",
             "/csw202/atom-feeds.xml",
             "/csw202/csw-capabilities-2.xml");
@@ -120,7 +124,7 @@ public class CswTest extends TestCase {
                 getServicesByFilter("not-required-because-mocked");
 
 
-        System.out.println("Anzahl der ermittelten Dienste: "
+        log.debug("Anzahl der ermittelten Dienste: "
                 + services.size());
 
         assertTrue(services.size() == THREE);
@@ -170,7 +174,7 @@ public class CswTest extends TestCase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(PATH_GETCAPABILITIES);
-        System.out.println("GetCapabilities-URL: " + sb.toString());
+        log.debug("GetCapabilities-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -181,7 +185,7 @@ public class CswTest extends TestCase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        System.out.println("GetRecords-URL: " + sb.toString());
+        log.debug("GetRecords-URL: " + sb.toString());
         return sb.toString();
     }
 

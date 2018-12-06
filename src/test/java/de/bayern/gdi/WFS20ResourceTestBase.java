@@ -21,6 +21,8 @@ import de.bayern.gdi.utils.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ import static org.apache.http.HttpStatus.SC_OK;
  */
 public abstract class WFS20ResourceTestBase {
 
+    protected static final Logger log = LoggerFactory.getLogger(WFS20ResourceTestBase.class);
 
     /**
      * Init Jadler and Config.
@@ -49,7 +52,7 @@ public abstract class WFS20ResourceTestBase {
         try {
             initJadler();
         } catch (IllegalStateException ise) {
-            System.out.println("Jadler is already initialized");
+            log.error("Jadler is already initialized");
         }
         Config.initialize(null);
     }
@@ -115,7 +118,7 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        System.out.println("Service-URL: " + sb.toString());
+        log.debug("Service-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -130,7 +133,7 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append("/wfs/gf");
-        System.out.println("GetFeature-URL: " + sb.toString());
+        log.debug("GetFeature-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -145,14 +148,14 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append("/wfs/wfs");
-        System.out.println("DescribeStoredQueries-URL: " + sb.toString());
+        log.debug("DescribeStoredQueries-URL: " + sb.toString());
         return sb.toString();
     }
 
     private void prepareResource(String method,
                                  String queryPath,
                                  String body) {
-        System.out.println("Method: " + method + " QueryPath: " + queryPath);
+        log.debug("Method: " + method + " QueryPath: " + queryPath);
         onRequest()
             .havingMethodEqualTo(method)
             .havingPathEqualTo(queryPath)
