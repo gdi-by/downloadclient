@@ -23,8 +23,6 @@ import java.net.URISyntaxException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -41,6 +39,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Helper for HTTP. */
 public final class HTTP {
@@ -48,8 +48,8 @@ public final class HTTP {
     private static final int DEFAULT_TIMEOUT = 10000;
     private static final int S_TO_MS = 1000;
 
-    private static final Logger log
-        = Logger.getLogger(HTTP.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(HTTP.class.getName());
 
     private HTTP() {
     }
@@ -75,7 +75,7 @@ public final class HTTP {
             try {
                 timeout = S_TO_MS * Integer.parseInt(ts);
             } catch (NumberFormatException nfe) {
-                log.log(Level.SEVERE, nfe.getMessage());
+                LOG.error(nfe.getMessage());
             }
         }
 
@@ -131,8 +131,7 @@ public final class HTTP {
             client.close();
         } catch (IOException ioe) {
             // Only log this.
-            log.log(Level.SEVERE,
-                "Closing HTTP client failed: " + ioe.getMessage(), ioe);
+            LOG.error("Closing HTTP client failed: " + ioe.getMessage(), ioe);
         }
     }
 

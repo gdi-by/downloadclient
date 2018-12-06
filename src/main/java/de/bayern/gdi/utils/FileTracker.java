@@ -18,6 +18,9 @@
 
 package de.bayern.gdi.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
@@ -26,14 +29,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /** Tracks files in a directory. */
 public class FileTracker {
 
-    private static final Logger log
-        = Logger.getLogger(FileTracker.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(FileTracker.class.getName());
 
     private File directory;
     private Map<File, Long> last;
@@ -53,8 +54,7 @@ public class FileTracker {
     public boolean scan() {
         File[] files = this.directory.listFiles();
         if (files == null) {
-            log.log(Level.SEVERE,
-                () -> "Cannot read files from '" + directory + "'.");
+            LOG.error("Cannot read files from '{}'.", directory);
             return false;
         }
 

@@ -17,21 +17,22 @@
  */
 package de.bayern.gdi.processor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Processor runs job out of a queue.
  */
 public class Processor implements Runnable {
 
-    private static final Logger log
-        = Logger.getLogger(Processor.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(Processor.class.getName());
 
     private static final long WAIT_TIME = 1000;
 
@@ -150,7 +151,7 @@ public class Processor implements Runnable {
             try {
                 job.run(this);
             } catch (JobExecutionException jee) {
-                log.log(Level.SEVERE, jee.getMessage(), jee);
+                LOG.error(jee.getMessage(), jee);
                 broadcastException(jee);
             }
         }

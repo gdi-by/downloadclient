@@ -18,9 +18,11 @@
 
 package de.bayern.gdi.processor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 /**
@@ -28,8 +30,8 @@ import java.util.logging.Logger;
  */
 public class JobList implements Job {
 
-    private static final Logger log
-        = Logger.getLogger(JobList.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(JobList.class.getName());
 
     private List<Job> jobs;
 
@@ -55,7 +57,7 @@ public class JobList implements Job {
 
     @Override
     public void run(Processor p) throws JobExecutionException {
-        log.info("Executing job list");
+        LOG.info("Executing job list");
         int i = 0;
         try {
             for (; i < jobs.size(); i++) {

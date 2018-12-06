@@ -26,9 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -36,6 +33,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File handler for HttpClient.
@@ -61,8 +60,8 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         }
     }
 
-    private static final Logger log
-        = Logger.getLogger(FileResponseHandler.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(FileResponseHandler.class.getName());
 
     private static final int BUF_SIZE = 4096;
 
@@ -134,9 +133,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         try {
             Files.delete(this.file.toPath());
         } catch (IOException ioe) {
-            log.log(
-                Level.WARNING,
-                () -> "delete failed: " + ioe.getMessage());
+            LOG.warn("delete failed: {}", ioe.getMessage());
         }
     }
 }

@@ -18,6 +18,8 @@
 package de.bayern.gdi.utils;
 
 import de.bayern.gdi.gui.WarningPopup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +27,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /** Misc helper functions. */
 public final class Misc {
@@ -41,8 +41,8 @@ public final class Misc {
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
 
-    private static final Logger log
-            = Logger.getLogger(Misc.class.getName());
+    private static final Logger LOG
+            = LoggerFactory.getLogger(Misc.class.getName());
 
     private Misc() {
     }
@@ -197,11 +197,11 @@ public final class Misc {
                 } catch (IOException exc) {
                     WarningPopup wp = new WarningPopup();
                     wp.popup(I18n.format("gui.link-fail", url));
-                    log.log(Level.SEVERE, "First Call"
-                             + e.getMessage() + "\n\n\n" + "Second Call"
-                                    + ex.getMessage() + "\n\n\n" + "Third Call"
-                                    + exc.getMessage(),
-                            exc);
+                    LOG.error("First Call"
+                            + e.getMessage() + "\n\n\n" + "Second Call"
+                            + ex.getMessage() + "\n\n\n" + "Third Call"
+                            + exc.getMessage(),
+                        exc);
                 }
             }
         }

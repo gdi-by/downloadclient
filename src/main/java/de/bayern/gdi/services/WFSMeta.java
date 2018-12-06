@@ -19,19 +19,19 @@ package de.bayern.gdi.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Stores meta data about WFS. */
 public class WFSMeta {
 
-    private static final Logger log
-        = Logger.getLogger(WFSMeta.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(WFSMeta.class.getName());
 
     private static final String TAB_NEWLINE = "\t}\n";
 
@@ -257,7 +257,7 @@ public class WFSMeta {
                 }
                 this.parsed = converted;
             } catch (NumberFormatException nfe) {
-                log.log(Level.SEVERE, nfe.getMessage(), nfe);
+                LOG.error(nfe.getMessage(), nfe);
             }
         }
 

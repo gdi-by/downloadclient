@@ -29,17 +29,16 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
 
-    private static final Logger log
-        = Logger.getLogger(App.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(App.class.getName());
 
     private App() {
         // Not to be instantiated.
@@ -73,8 +72,7 @@ public class App {
             Config.initialize(dir);
         } catch (NullPointerException | IOException ex) {
             // TODO: Remove the NPE above!
-            log.log(Level.SEVERE,
-                () -> "Loading config failed: " + ex.getMessage());
+            LOG.error("Loading config failed: {}", ex.getMessage());
             System.exit(1);
         }
     }
@@ -142,7 +140,7 @@ public class App {
             startGUI();
 
         } catch (ParseException pe) {
-            log.log(Level.SEVERE, pe.getMessage());
+            LOG.error(pe.getMessage());
             usage(options, 1);
         }
     }

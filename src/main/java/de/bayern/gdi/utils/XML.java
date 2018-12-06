@@ -30,8 +30,6 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -58,6 +56,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.ContentProducer;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -66,8 +66,8 @@ import org.xml.sax.SAXException;
  */
 public class XML {
 
-    private static final Logger log
-            = Logger.getLogger(XML.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(XML.class.getName());
 
     private static final String UTF8 = "UTF-8";
 
@@ -451,7 +451,7 @@ public class XML {
                 return xpath.evaluate(query, root, returnType);
             }
         } catch (XPathExpressionException xpee) {
-            log.log(Level.SEVERE, xpee.getLocalizedMessage(), xpee);
+            LOG.error(xpee.getLocalizedMessage(), xpee);
         }
 
         return null;
@@ -514,7 +514,7 @@ public class XML {
                     new StreamResult(new OutputStreamWriter(out, UTF8)));
         } catch (IOException
                 | TransformerException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 

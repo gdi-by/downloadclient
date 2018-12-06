@@ -28,11 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.xml.xpath.XPathConstants;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,8 +43,8 @@ import org.w3c.dom.NodeList;
  */
 public class ServiceSettings {
 
-    private static final Logger log
-        = Logger.getLogger(ServiceSettings.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(ServiceSettings.class.getName());
 
     private List<Service> services;
     private Map<String, String> catalogues;
@@ -78,7 +79,7 @@ public class ServiceSettings {
             String cat = getCatalogue();
             return cat != null ? new URL(cat) : null;
         } catch (MalformedURLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return null;
     }
@@ -262,7 +263,7 @@ public class ServiceSettings {
                                 restricted);
                         servicesList.add(service);
                     } catch (MalformedURLException e) {
-                        log.log(Level.SEVERE, e.getMessage(), e);
+                        LOG.error(e.getMessage(), e);
                     }
                 }
             }

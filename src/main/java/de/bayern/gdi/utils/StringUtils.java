@@ -17,14 +17,15 @@
  */
 package de.bayern.gdi.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,8 +35,10 @@ import java.util.stream.Stream;
  * Common string operations.
  */
 public class StringUtils {
-    private static final Logger log =
-            Logger.getLogger(StringUtils.class.getName());
+
+    private static final Logger LOG
+        = LoggerFactory.getLogger(StringUtils.class.getName());
+
     private static final int TEN = 10;
 
     private StringUtils() {
@@ -62,7 +65,7 @@ public class StringUtils {
         try {
             return URLEncoder.encode(s, enc);
         } catch (UnsupportedEncodingException e) {
-            log.log(Level.SEVERE, "encoding problem", e);
+            LOG.error("encoding problem", e);
         }
         return s;
     }

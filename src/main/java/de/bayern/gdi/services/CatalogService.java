@@ -30,11 +30,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -56,8 +56,8 @@ public class CatalogService {
             "http://www.isotc211.org/2005/gco";
     private static final String CSW_QUERY_FILEPATH =
             "csw_searchQuery.xml";
-    private static final Logger log
-            = Logger.getLogger(CatalogService.class.getName());
+    private static final Logger LOG
+            = LoggerFactory.getLogger(CatalogService.class.getName());
     private URL catalogURL;
     private String userName;
     private static final int MIN_SEARCHLENGTH = 2;
@@ -224,7 +224,7 @@ public class CatalogService {
                 excpetion += "\texceptionCode: " + exceptionCode + "\n";
                 excpetion += "\tlocator: " + exceptionlocator + "\n";
                 excpetion += "\texceptiontext: " + exceptiontext + "\n";
-                log.log(Level.SEVERE, excpetion, xml);
+                LOG.error(excpetion, xml);
                 return services;
             }
             String nodeListOfServicesExpr =
@@ -421,7 +421,7 @@ public class CatalogService {
                     Misc.getResource(CSW_QUERY_FILEPATH);
             IOUtils.copy(stream, writer, "UTF-8");
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         String xmlStr = writer.toString();
         return xmlStr.replace("{SUCHBEGRIFF}", search);
