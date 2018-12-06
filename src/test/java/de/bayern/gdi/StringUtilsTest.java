@@ -134,7 +134,6 @@ public class StringUtilsTest {
      */
     @Test
     public void testPlaces() {
-        System.err.println(StringUtils.places(M1000));
         Assert.assertEquals("" + ZERO, ONE, StringUtils.places(ZERO));
         Assert.assertEquals("" + M1000, FOUR, StringUtils.places(M1000));
         Assert.assertEquals("" + M999, THREE, StringUtils.places(M999));
