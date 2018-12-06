@@ -61,6 +61,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import de.bayern.gdi.utils.Version;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -314,6 +315,7 @@ public class Controller {
      */
     @FXML
     protected void initialize() {
+        logToAppLog(I18n.format("dcl.start", Version.getVersion()));
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue o, Object oldVal,
