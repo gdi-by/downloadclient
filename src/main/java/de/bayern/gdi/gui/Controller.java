@@ -41,6 +41,7 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Info;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSettings;
@@ -61,7 +62,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import de.bayern.gdi.utils.Version;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -315,7 +315,7 @@ public class Controller {
      */
     @FXML
     protected void initialize() {
-        logToAppLog(I18n.format("dcl.start", Version.getVersion()));
+        logToAppLog(I18n.format("dcl.start", Info.getVersion()));
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue o, Object oldVal,
