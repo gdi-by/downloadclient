@@ -56,7 +56,7 @@ public abstract class WFS20ResourceTestBase {
         try {
             initJadler();
         } catch (IllegalStateException ise) {
-            log.error("Jadler is already initialized");
+            log.debug("Jadler is already initialized");
         }
         Config.initialize(null);
     }
