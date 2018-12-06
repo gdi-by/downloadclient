@@ -1,6 +1,14 @@
 Configuration:
     name: DownloadClient
-    appenders:
+
+    Properties:
+        Property:
+        -   name: log.file
+            value: logdlc_yyyymmddhhmm.txt
+        -   name: log.path
+            value: ${java.io.tmpdir}
+
+    Appenders:
         Console:
             name: STDOUT
             PatternLayout:
@@ -8,51 +16,51 @@ Configuration:
             target: SYSTEM_OUT
         File:
             name: File
-            fileName: logdlc_yyyymmddhhmm.txt
+            fileName: ${log.file}
             PatternLayout:
                 Pattern: "%d %p %C{1.} [%t] %m%n"
             Filters:
                 ThresholdFilter:
                     level: info
+        RollingFile:
+            name: RollingFile_Appender
+            fileName: ${log.path}/rollingfile.log
+            filePattern: "logs/archive/rollingfile.log.%d{yyyy-MM-dd-hh-mm}.gz"
+            PatternLayout:
+                pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c{1} [%t]: %msg%n"
+            Policies:
+                SizeBasedTriggeringPolicy:
+                    size: 1 MB
+            DefaultRollOverStrategy:
+                max: 30
     Loggers:
-        logger:
-            -
-                name: Application_Log
+        Root:
+            level: info
+            AppenderRef:
+                - ref: STDOUT
+        Logger:
+            - name: Application_Log
                 level: info
                 additivity: false
                 AppenderRef:
                     ref: File
-            -
-                name: de.bayern.gdi
+            - name: de.bayern.gdi
                 level: info
-            -
-                name: de.bayern.gdi.Headless
+            - name: de.bayern.gdi.Headless
                 level: warn
-            -
-                name: org.geotools
+            - name: org.geotools
                 level: warn
-            -
-                name: org.geotools.swing
+            - name: org.geotools.swing
                 level: off
-            -
-                name: org.apache
+            - name: org.apache
                 level: warn
-            -
-                name: org.apache.http
+            - name: org.apache.http
                 level: info
-            -
-                name: net.refractions
+            - name: net.refractions
                 level: warn
-            -
-                name: org.hsqldb
+            - name: org.hsqldb
                 level: warn
-            -
-                name: hsqldb.db
+            - name: hsqldb.db
                 level: off
-            -
-                name: javafx
+            - name: javafx
                 level: warn
-        Root:
-            level: info
-            AppenderRef:
-                ref: STDOUT
