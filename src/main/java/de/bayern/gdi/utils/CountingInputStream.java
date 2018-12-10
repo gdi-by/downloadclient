@@ -26,6 +26,9 @@ import java.io.InputStream;
  */
 public class CountingInputStream extends FilterInputStream {
 
+    /** Bytes per kB. */
+    public static final int BYTES_PER_KB = 1000;
+
     /** An interface to report the number of bytes counted. */
     public interface CountListener {
         /** bytesCounted is called to report the number of bytes already copied.
@@ -60,7 +63,9 @@ public class CountingInputStream extends FilterInputStream {
 
     private void reportCount() {
         if (this.listener != null) {
-            this.listener.bytesCounted(this.counter);
+            if (this.counter % BYTES_PER_KB == 0) {
+                this.listener.bytesCounted(this.counter);
+            }
         }
     }
 
