@@ -146,6 +146,8 @@ public class Controller {
             = "gui.process.format.not.found";
     private static final String GUI_PROCESS_NOT_COMPATIBLE
             = "gui.process.not.compatible";
+    private static final String GUI_FORMAT_NOT_SELECTED
+            = "gui.no-format-selected";
     private static final int MAP_WIDTH = 350;
     private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
@@ -1316,9 +1318,16 @@ public class Controller {
                         if (cb != null && (l1 != null || l2 != null)
                         && cb.getId().equals(UIFactory.getDataFormatID())) {
                             name = OUTPUTFORMAT;
-                            value = cb.getSelectionModel()
+                            if (cb.getSelectionModel() != null
+                                && cb.getSelectionModel().getSelectedItem()
+                                != null) {
+                                value = cb.getSelectionModel()
                                     .getSelectedItem().toString();
-                            type = "";
+                                type = "";
+                            } else {
+                                Platform.runLater(() -> setStatusTextUI(
+                                    I18n.getMsg(GUI_FORMAT_NOT_SELECTED)));
+                            }
                         }
                         if (!name.isEmpty() && !value.isEmpty()) {
                             this.dataBean.addAttribute(
