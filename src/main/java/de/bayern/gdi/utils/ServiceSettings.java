@@ -313,4 +313,14 @@ public class ServiceSettings {
         }
         return servicesMap;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceSettings: {"
+            + "services=" + services
+            + ", catalogues=" + catalogues
+            + ", wms=" + wms
+            + ", checkWithGET=" + checkWithGET
+            + "}";
+    }
 }

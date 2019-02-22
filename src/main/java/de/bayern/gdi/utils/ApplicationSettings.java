@@ -73,4 +73,11 @@ public class ApplicationSettings {
     public String getApplicationSetting(String name) {
         return settings.get(name);
     }
+
+    @Override
+    public String toString() {
+        return "ApplicationSettings: {"
+            +  settings
+            + "}";
+    }
 }

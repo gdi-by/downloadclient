@@ -139,6 +139,14 @@ public class ProcessingConfiguration {
         this.processingSteps = processingSteps;
     }
 
+    @Override
+    public String toString() {
+        return "ProcessingConfiguration: {"
+            + "inputElements=" + inputElements
+            + ", processingSteps=" + processingSteps
+            + "}";
+    }
+
     /**
      * Loads ProcessingConfiguration from a file.
      * @param file The file to load the ProcessingConfiguration from.

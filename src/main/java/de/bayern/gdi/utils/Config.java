@@ -113,6 +113,15 @@ public class Config {
         return proxyConfig;
     }
 
+    @Override
+    public String toString() {
+        return (proxyConfig == null ? "Proxy Settings: {}" : getProxyConfig())
+            + ",\n " + getApplicationSettings()
+            + ",\n " + getProcessingConfig()
+            + ",\n " + getServices()
+            + ",\n MIME-Types: " + getMimeTypes();
+    }
+
     private static Settings loadSettings(File file)
         throws IOException {
         try {

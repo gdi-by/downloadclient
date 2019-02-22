@@ -316,6 +316,7 @@ public class Controller {
     @FXML
     protected void initialize() {
         logToAppLog(I18n.format("dlc.start", Info.getVersion()));
+        logToAppLog(I18n.format("dlc.config", Config.getInstance()));
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue o, Object oldVal,

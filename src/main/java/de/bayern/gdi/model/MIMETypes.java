@@ -79,7 +79,7 @@ public class MIMETypes {
 
     @Override
     public String toString() {
-        return "[" + StringUtils.join(types, ", ") + "]";
+        return "{" + StringUtils.join(types, ", ") + "}";
     }
 
     /**
