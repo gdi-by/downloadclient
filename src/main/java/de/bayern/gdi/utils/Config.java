@@ -158,7 +158,7 @@ public class Config {
                 "org.apache.logging.log4j.jul.LogManager");
             try {
                 Logging.GEOTOOLS.setLoggerFactory(
-                    "org.geotools.util.logging.CommonsLoggerFactory");
+                    "org.geotools.util.logging.Log4JLoggerFactory");
             } catch (ClassNotFoundException e) {
                 log.warn("Failed to initialize GeoTools logging subsystem: "
                     + e.getLocalizedMessage());
