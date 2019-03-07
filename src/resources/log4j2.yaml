@@ -15,7 +15,7 @@ Configuration:
                 Pattern: "%d{HH:mm:ss,SSS} %p %c %m%n"
             target: SYSTEM_OUT
         File:
-            name: File
+            name: File_Appender
             fileName: ${log.file}
             PatternLayout:
                 Pattern: "%d %p %C{1.} [%t] %m%n"
@@ -38,13 +38,16 @@ Configuration:
             level: info
             AppenderRef:
                 - ref: STDOUT
+                  level: error
+                - ref: File_Appender
+                  level: info
         Logger:
             -
                 name: Application_Log
                 level: info
                 additivity: false
                 AppenderRef:
-                    ref: File
+                    ref: File_Appender
             -   name: de.bayern.gdi
                 level: info
             -   name: de.bayern.gdi.Headless
