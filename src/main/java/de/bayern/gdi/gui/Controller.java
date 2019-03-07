@@ -417,6 +417,7 @@ public class Controller {
         closeDialog.getButtonTypes().setAll(confirm, cancel);
         Optional<ButtonType> res = closeDialog.showAndWait();
         if (res.isPresent() && res.get() == confirm) {
+            logToAppLog(I18n.format("dlc.stop"));
             Stage stage = (Stage) buttonClose.getScene().getWindow();
             stage.fireEvent(new WindowEvent(
                     stage,
