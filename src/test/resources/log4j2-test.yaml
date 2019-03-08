@@ -9,12 +9,13 @@ Configuration:
             target: SYSTEM_OUT
     Loggers:
         Root:
-            level: info
             AppenderRef:
                 - ref: Console_Appender
         Logger:
+        -   name: Application_Log
+            level: warn
         -   name: de.bayern.gdi
-            level: info
+            level: warn
         -   name: de.bayern.gdi.Headless
             level: off
         -   name: org.geotools
@@ -24,6 +25,8 @@ Configuration:
         -   name: net.refractions
             level: warn
         -   name: org.hsqldb
+            level: warn
+        -   name: org.eclipse.jetty
             level: warn
         -   name: javafx
             level: warn

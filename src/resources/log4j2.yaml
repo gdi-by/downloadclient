@@ -19,9 +19,6 @@ Configuration:
             fileName: ${log.file}
             PatternLayout:
                 Pattern: "%d %p %C{1.} [%t] %m%n"
-            Filters:
-                ThresholdFilter:
-                    level: info
         RollingFile:
             name: RollingFile_Appender
             fileName: ${log.path}/rollingfile.log
@@ -35,11 +32,11 @@ Configuration:
                 max: 30
     Loggers:
         Root:
-            level: info
             AppenderRef:
                 - ref: STDOUT
                   level: error
                 - ref: File_Appender
+                  # to log all messages set to 'all'
                   level: info
         Logger:
             -
@@ -68,3 +65,11 @@ Configuration:
                 level: off
             -   name: javafx
                 level: warn
+            -   name: org.apache.http.wire
+                # to enable logging of all HTTP traffic set to 'all'
+                level: off
+            -   name: org.apache.http.headers
+                # to enable logging of all HTTP HEADER set to 'all'
+                level: off
+            -   name: org.apache.http.client.protocol.HttpClientContext
+                level: info
