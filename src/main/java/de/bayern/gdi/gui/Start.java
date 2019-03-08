@@ -125,6 +125,7 @@ public class Start extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent e) {
+                    LOG.info(I18n.format("dlc.stop"));
                     Platform.exit();
                     System.exit(0);
                 }

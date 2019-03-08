@@ -38,7 +38,7 @@ public class Log {
 
 
     /**
-     * @param The writer to log to.
+     * @param file The file to log to.
      */
     public Log(File file) {
         this.file = file;

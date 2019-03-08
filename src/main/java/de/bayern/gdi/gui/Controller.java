@@ -1534,7 +1534,7 @@ public class Controller {
                         dirChooser.setInitialDirectory(dir);
                     }
                 } catch (Exception e) {
-
+                    log.warn(e.getLocalizedMessage());
                 }
             }
             File selectedDir = dirChooser.showDialog(getPrimaryStage());
@@ -1558,6 +1558,7 @@ public class Controller {
                     p.addJob(jl);
                 } catch (ConverterException ce) {
                     setStatusTextUI(ce.getMessage());
+                    logToAppLog(ce.getMessage());
                 } finally {
                     this.buttonDownload.setDisable(false);
                 }
@@ -2284,6 +2285,7 @@ public class Controller {
         } else {
             logText = logHistory.getText();
         }
+        logToAppLog(msg);
 
         Platform.runLater(() -> {
             logHistoryParent.setText(msg);

@@ -592,7 +592,8 @@ public class DownloadStepConverter {
             LOG.info("WFS GetFeature Request: {}", xmlAsString);
         } catch (TransformerException e) {
             // nothing to do
+            LOG.info("WFS GetFeature Request cannot be logged: "
+                + e.getLocalizedMessage());
         }
-        LOG.info("WFS GetFeature Request cannot be logged");
     }
 }
