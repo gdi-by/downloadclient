@@ -19,7 +19,7 @@
 package de.bayern.gdi.gui;
 
 
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.HTTP;
 import java.awt.Color;
@@ -528,12 +528,12 @@ public class WMSMapSwing extends Parent {
             CoordinateReferenceSystem sourceCRS,
             CoordinateReferenceSystem targetCRS
     ) throws TransformException, FactoryException {
-        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+        org.locationtech.jts.geom.Point p1 = convertDoublesToPoint(
                 x1,
                 y1,
                 sourceCRS,
                 targetCRS);
-        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+        org.locationtech.jts.geom.Point p2 = convertDoublesToPoint(
                 x2,
                 y2,
                 sourceCRS,
@@ -604,20 +604,20 @@ public class WMSMapSwing extends Parent {
         }
     }
 
-    private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
+    private org.locationtech.jts.geom.Point convertDoublesToPoint(
             Double x,
             Double y,
             CoordinateReferenceSystem sourceCRS,
             CoordinateReferenceSystem targetCRS)
     throws TransformException, FactoryException {
-        com.vividsolutions.jts.geom.GeometryFactory gf = new
-                com.vividsolutions.jts.geom.GeometryFactory();
-        com.vividsolutions.jts.geom.Coordinate coo = new com
-                .vividsolutions.jts.geom.Coordinate(x, y);
-        com.vividsolutions.jts.geom.Point p = gf.createPoint(coo);
+        org.locationtech.jts.geom.GeometryFactory gf = new
+                org.locationtech.jts.geom.GeometryFactory();
+        org.locationtech.jts.geom.Coordinate coo = new
+                org.locationtech.jts.geom.Coordinate(x, y);
+        org.locationtech.jts.geom.Point p = gf.createPoint(coo);
         MathTransform transform = CRS.findMathTransform(
                 sourceCRS, targetCRS);
-        return (com.vividsolutions.jts.geom.Point) JTS.transform(p, transform);
+        return (org.locationtech.jts.geom.Point) JTS.transform(p, transform);
     }
 
     private void clearCoordinateDisplay() {

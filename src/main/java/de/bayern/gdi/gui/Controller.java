@@ -18,7 +18,7 @@
 
 package de.bayern.gdi.gui;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
