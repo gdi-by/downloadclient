@@ -129,7 +129,8 @@ Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format
 FeatureTypes
 ************
 
-Handelt es sich um ein FeatureType, so kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck aufziehen und so den Bereich wählen, für welchen er Daten beziehen möchte. 
+Für jeden über den ausgewählten WFS bereitgestellten FeatureType wird ein Eintrag in der Auswahlliste mit dem Zusatz *"(BBOX)"* angegeben.
+So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so den Abfragebereich definieren, für welchen er Daten beziehen möchte.
 Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden. 
 
 **Beispiel:**
@@ -138,6 +139,34 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
+
+***********************
+Abfragen mit CQL-Filter
+***********************
+
+Neben der Auswahl über ein Begrenzungsrechteck (BBOX) wird für jeden bereitgestellten FeatureType ein Eintrag in der Auswahlliste mit dem Zusatz *"(Filter)"* angegeben.
+So kann der Benutzer mit Angabe eines CQL-Ausdrucks[2_] im Textfeld die Ausgabe des WFS filtern.
+
+**Beispiel:**
+
+
+.. image:: img/V1.2_cqlfilter_WFS.PNG
+
+Im oben dargestellten Beispiel wird der FeatureType *"Gemeinden"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
+
+************************
+Typübergreifende Abfrage
+************************
+
+Zusätzlich zu der Filterfunktion je FeatureType kann auch ein typübergreifender Filter definiert werden. Dazu muss in der Auswahl der Eintrag "Typübergreifende Abfrage (Filter)" ausgewählt werden.
+Im Textfeld kann der Benutzer einen oder mehrere CQL-Ausdrücke[2_] eingeben und somit die Ausgabe des WFS filtern.
+
+
+.. image:: img/V1.2_complex_cqlfilter_WFS.PNG
+
+Im oben dargestellten Beispiel wird der FeatureType *"bvv:gmd_ex"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
+
+.. [2] Ein Common Query Language (CQL) Ausdruck ist vergleichbar mit einer SQL-Abfrage für Datenbanken. Beispiele für CQL-Ausdrücke gibt es im GeoTools Handbuch http://docs.geotools.org/latest/userguide/library/cql/index.html und im uDig Handbuch http://udig.github.io/docs/user/concepts/Constraint%20Query%20Language.html
 
 Download von Datensätzen eines predefined ATOM Downloaddienstes
 ------------------------------------------------------------------
