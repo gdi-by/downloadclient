@@ -194,8 +194,38 @@ Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m
 Download-Logfiles
 -------------------
 
-Für jeden Download, der über den Button „Download start…“ angestoßen wurde, wird im Ordner, der als Speicherort für den Download angegeben wurde, automatisch ein Logfile (Dateiname download_<DatumUhrzeitNr>.log) gespeichert. 
+Für jeden Download, der über den Button „Download start…“ angestoßen wurde, wird im Ordner, der als Speicherort für den Download angegeben wurde, automatisch ein Logfile (Dateiname download_<DatumUhrzeitNr>.log) gespeichert.
 
+Anwendungs-Logfile
+-------------------
+Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt) in dem die Aktionen der Anwendung Download-Client protokolliert werden.
+Diese Log-Datei kann zur Fehleranalyse oder zur Auswertung der HTTP-Anfragen genutzt werden.
+
+Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig.
+Dazu muss folgende Zeile unterhalb des Elements ``Configuration:Loggers:Logger`` aktiviert werden:
+
+.. code-block:: yaml
+
+  - name: org.apache.http.wire
+    level: all
+
+Sollen nur die HTTP-HEADER Informationen ausgegeben werden, so ist folgende Konfiguration zu verwenden:
+
+.. code-block:: yaml
+
+  - name: org.apache.http.headers
+    level: all
+
+Damit die HTTP-Anfragen auch im Anwendungs-Logfile ausgegeben werden, muss zusätzlich auch noch unterhalb von
+``Configuration:Loggers:Root:AppenderRef`` folgende Einstellung vorgenommen werden:
+
+.. code-block:: yaml
+
+  - ref: File_Appender
+    level: all
+
+Da die Ausgabe des vollständigen Netzwerkverkehrs auch Auswirkung auf die Performanz der Anwendung hat und zu einer
+schnell wachsenden Anwendungs-Logfile führt, muss diese Funktion wie oben beschrieben erst aktiviert werden.
 
 Ausführungswiederholung
 ---------------------------
