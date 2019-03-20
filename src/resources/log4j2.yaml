@@ -39,7 +39,7 @@ Configuration:
                 level: info
                 additivity: false
                 AppenderRef:
-                    ref: File_Appender
+                    ref: RollingFile_Appender
             -   name: de.bayern.gdi
                 level: info
             -   name: de.bayern.gdi.Headless
