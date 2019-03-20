@@ -4,7 +4,7 @@ Configuration:
     Properties:
         Property:
         -   name: log.file
-            value: logdlc_yyyymmddhhmm.txt
+            value: logdlc.txt
         -   name: log.path
             value: ${sys:java.io.tmpdir:-/var/tmp/}
 
@@ -14,28 +14,23 @@ Configuration:
             PatternLayout:
                 Pattern: "%d{HH:mm:ss,SSS} %p %c %m%n"
             target: SYSTEM_OUT
-        File:
-            name: File_Appender
-            fileName: ${log.file}
-            PatternLayout:
-                Pattern: "%d %p %C{1.} [%t] %m%n"
         RollingFile:
             name: RollingFile_Appender
-            fileName: ${log.path}/rollingfile.log
-            filePattern: "logs/archive/rollingfile.log.%d{yyyy-MM-dd-hh-mm}.gz"
+            fileName: ${log.file}
+            filePattern: ${log.file}.%d{yyyy-MM-dd-hh-mm}
             PatternLayout:
                 pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %p %c{1} [%t]: %msg%n"
             Policies:
                 SizeBasedTriggeringPolicy:
-                    size: 1 MB
+                    size: 10 MB
             DefaultRollOverStrategy:
-                max: 30
+                max: 10
     Loggers:
         Root:
             AppenderRef:
                 - ref: STDOUT
                   level: error
-                - ref: File_Appender
+                - ref: RollingFile_Appender
                   # to log all messages set to 'all'
                   level: info
         Logger:
