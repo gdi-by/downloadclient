@@ -317,6 +317,12 @@ public class Controller {
      */
     @FXML
     protected void initialize() {
+        log.trace("System Properties:");
+        System.getProperties().keySet().stream().map(
+            k -> (String)k).sorted().forEach(k -> {
+            log.trace(String.format("\t%s=%s", k,
+                System.getProperty(k)));
+        });
         logToAppLog(I18n.format("dlc.start", Info.getVersion()));
         logToAppLog(I18n.format("dlc.config", Config.getInstance()));
         logHistoryParent.expandedProperty().addListener(new ChangeListener() {
