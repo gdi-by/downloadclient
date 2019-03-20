@@ -256,6 +256,14 @@ Damit die HTTP-Anfragen auch im Anwendungs-Logfile ausgegeben werden, muss zusä
 Da die Ausgabe des vollständigen Netzwerkverkehrs auch Auswirkung auf die Performanz der Anwendung hat und zu einer
 schnell wachsenden Anwendungs-Logfile führt, muss diese Funktion wie oben beschrieben erst aktiviert werden.
 
+Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. Dazu muss in der Konfigurationsdatei unterhalb des Elements
+``Configuration:Loggers:Logger`` der Log-Level für den Logger ``de.bayern.gdi`` auf ``trace`` geändert werden:
+
+.. code-block:: yaml
+
+  - name: de.bayern.gdi
+    level: trace
+
 Ausführungswiederholung
 ---------------------------
 
