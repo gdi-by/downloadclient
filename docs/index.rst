@@ -66,7 +66,7 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten [#f1]_ vom Download-Clie
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
 +=====================================+================================+============================+
-| Pre-defined Dataset Downlaod        | Web Feature Service (WFS)  2.0 |  Simple WFS                |
+| Pre-defined Dataset Download        | Web Feature Service (WFS)  2.0 |  Simple WFS                |
 +-------------------------------------+--------------------------------+----------------------------+
 | Direct Access Download              | WFS 2.0                        |  Basic WFS                 |
 +-------------------------------------+--------------------------------+----------------------------+
