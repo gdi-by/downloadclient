@@ -145,7 +145,7 @@ Abfragen mit CQL-Filter
 ***********************
 
 Neben der Auswahl über ein Begrenzungsrechteck (BBOX) wird für jeden bereitgestellten FeatureType ein Eintrag in der Auswahlliste mit dem Zusatz *"(Filter)"* angegeben.
-So kann der Benutzer mit Angabe eines CQL-Ausdrucks [f2]_ im Textfeld die Ausgabe des WFS filtern.
+So kann der Benutzer mit Angabe eines CQL-Ausdrucks [#f2]_ im Textfeld die Ausgabe des WFS filtern.
 
 **Beispiel:**
 
