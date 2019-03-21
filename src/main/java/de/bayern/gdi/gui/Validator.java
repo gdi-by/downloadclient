@@ -35,7 +35,7 @@ public class Validator {
             "java.lang.",
             "java.util.",
             "javax.xml.namespace.",
-            "com.vividsolutions.jts.geom."
+            "org.locationtech.jts.geom."
     };
 
 
