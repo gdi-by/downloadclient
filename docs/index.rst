@@ -66,7 +66,7 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten [#f1]_ vom Download-Clie
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
 +=====================================+================================+============================+
-| Pre-defined Dataset Downlaod        | Web Featrue Service (WFS)  2.0 |  Simple WFS                |
+| Pre-defined Dataset Downlaod        | Web Feature Service (WFS)  2.0 |  Simple WFS                |
 +-------------------------------------+--------------------------------+----------------------------+
 | Direct Access Download              | WFS 2.0                        |  Basic WFS                 |
 +-------------------------------------+--------------------------------+----------------------------+
@@ -227,7 +227,7 @@ Für jeden Download, der über den Button „Download start…“ angestoßen wu
 
 Anwendungs-Logfile
 -------------------
-Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt) in dem die Aktionen der Anwendung Download-Client protokolliert werden.
+Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt), in dem die Aktionen der Anwendung Download-Client protokolliert werden.
 Diese Log-Datei kann zur Fehleranalyse oder zur Auswertung der HTTP-Anfragen genutzt werden.
 
 Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig.
@@ -254,7 +254,7 @@ Damit die HTTP-Anfragen auch im Anwendungs-Logfile ausgegeben werden, muss zusä
     level: all
 
 Da die Ausgabe des vollständigen Netzwerkverkehrs auch Auswirkung auf die Performanz der Anwendung hat und zu einer
-schnell wachsenden Anwendungs-Logfile führt, muss diese Funktion wie oben beschrieben erst aktiviert werden.
+schnell wachsenden Anwendungs-Logfile führt, muss diese Funktion, wie oben beschrieben, erst aktiviert werden.
 
 Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. Dazu muss in der Konfigurationsdatei unterhalb des Elements
 ``Configuration:Loggers:Logger`` der Log-Level für den Logger ``de.bayern.gdi`` auf ``trace`` geändert werden:
@@ -264,7 +264,7 @@ Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. 
   - name: de.bayern.gdi
     level: trace
 
-Weitere Informationen wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
+Weitere Informationen, wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
 
 .. [#f3] Apache Log4j2 Dokumentation https://logging.apache.org/log4j/2.x/manual/configuration.html
 
