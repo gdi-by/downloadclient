@@ -26,15 +26,11 @@ import org.geotools.xml.Configuration;
 import org.geotools.xml.Encoder;
 import org.opengis.filter.Filter;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -120,9 +116,7 @@ public class FilterEncoder {
             encoder.setIndentSize(INDENTSIZE);
             encoder.setOmitXMLDeclaration(true);
 
-            Document fesFilter = encoder.encodeAsDOM(filter, FES.Filter);
-            fixFilterIfRequired(fesFilter);
-            return fesFilter;
+            return encoder.encodeAsDOM(filter, FES.Filter);
         } catch (IOException | TransformerException | SAXException e) {
             throw new ConverterException(
                 "Converting from CQL to Filter failed", e);
@@ -131,44 +125,6 @@ public class FilterEncoder {
 
     private String cleanUpFeatureTypeName(String where) {
         return where.replace("\"", "").trim();
-    }
-
-
-    private List<String> binaryComparisonOpTypes = Arrays.asList(
-        "PropertyIsEqualTo",
-        "PropertyIsNotEqualTo",
-        "PropertyIsLessThan",
-        "PropertyIsGreaterThan",
-        "PropertyIsLessThanOrEqualTo",
-        "PropertyIsGreaterThanOrEqualTo");
-
-    private void fixFilterIfRequired(Document fesFilter) {
-        Node filter = fesFilter.getFirstChild();
-        if (filter != null && filter.hasChildNodes()) {
-            NodeList childNodes = filter.getChildNodes();
-            fixChilds(childNodes);
-        }
-    }
-
-    private void fixChilds(NodeList childNodes) {
-        if (childNodes != null && childNodes.getLength() > 0) {
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node child = childNodes.item(i);
-                String localName = child.getLocalName();
-                if (child instanceof Element
-                    && binaryComparisonOpTypes.contains(localName)) {
-                    String matchActionValue = ((Element) child).
-                        getAttribute("matchAction");
-                    if ("ANY".equals(matchActionValue)) {
-                        ((Element) child).setAttribute("matchAction",
-                            "Any");
-                    }
-                }
-                if (child.hasChildNodes()) {
-                    fixChilds(child.getChildNodes());
-                }
-            }
-        }
     }
 
     /**
