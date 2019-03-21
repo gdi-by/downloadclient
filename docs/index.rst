@@ -61,7 +61,7 @@ Funktionalität
 Unterstützte Downloaddienstvarianten
 ---------------------------------------
 
-Aktuell werden folgende INSPIRE-Downloaddienstvarianten[1_] vom Download-Client unterstützt:
+Aktuell werden folgende INSPIRE-Downloaddienstvarianten [#f1]_ vom Download-Client unterstützt:
 
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
@@ -73,7 +73,7 @@ Aktuell werden folgende INSPIRE-Downloaddienstvarianten[1_] vom Download-Client 
 | Pre-defined Dataset Download        | predefined ATOM                |                            |
 +-------------------------------------+--------------------------------+----------------------------+
 
-.. [1] gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf
+.. [#f1] gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf
 
 Benutzeroberfläche 
 -------------------
@@ -145,7 +145,7 @@ Abfragen mit CQL-Filter
 ***********************
 
 Neben der Auswahl über ein Begrenzungsrechteck (BBOX) wird für jeden bereitgestellten FeatureType ein Eintrag in der Auswahlliste mit dem Zusatz *"(Filter)"* angegeben.
-So kann der Benutzer mit Angabe eines CQL-Ausdrucks[2_] im Textfeld die Ausgabe des WFS filtern.
+So kann der Benutzer mit Angabe eines CQL-Ausdrucks [f2]_ im Textfeld die Ausgabe des WFS filtern.
 
 **Beispiel:**
 
@@ -159,14 +159,14 @@ Typübergreifende Abfrage
 ************************
 
 Zusätzlich zu der Filterfunktion je FeatureType kann auch ein typübergreifender Filter definiert werden. Dazu muss in der Auswahl der Eintrag "Typübergreifende Abfrage (Filter)" ausgewählt werden.
-Im Textfeld kann der Benutzer einen oder mehrere CQL-Ausdrücke[2_] eingeben und somit die Ausgabe des WFS filtern.
+Im Textfeld kann der Benutzer einen oder mehrere CQL-Ausdrücke [#f2]_ eingeben und somit die Ausgabe des WFS filtern.
 
 
 .. image:: img/V1.2_complex_cqlfilter_WFS.PNG
 
 Im oben dargestellten Beispiel wird der FeatureType *"bvv:gmd_ex"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
 
-.. [2] Ein Common Query Language (CQL) Ausdruck ist vergleichbar mit einer SQL-Abfrage für Datenbanken. Beispiele für CQL-Ausdrücke gibt es im GeoTools Handbuch http://docs.geotools.org/latest/userguide/library/cql/index.html und im uDig Handbuch http://udig.github.io/docs/user/concepts/Constraint%20Query%20Language.html
+.. [#f2] Ein Common Query Language (CQL) Ausdruck ist vergleichbar mit einer SQL-Abfrage für Datenbanken. Beispiele für CQL-Ausdrücke gibt es im GeoTools Handbuch http://docs.geotools.org/latest/userguide/library/cql/index.html und im uDig Handbuch http://udig.github.io/docs/user/concepts/Constraint%20Query%20Language.html
 
 Download von Datensätzen eines predefined ATOM Downloaddienstes
 ------------------------------------------------------------------
@@ -263,6 +263,10 @@ Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. 
 
   - name: de.bayern.gdi
     level: trace
+
+Weitere Informationen wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
+
+.. [#f3] Apache Log4j2 Dokumentation https://logging.apache.org/log4j/2.x/manual/configuration.html
 
 Ausführungswiederholung
 ---------------------------
