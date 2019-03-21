@@ -32,7 +32,7 @@ Configuration:
                   level: error
                 - ref: RollingFile_Appender
                   # to log all messages set to 'all'
-                  level: info
+                  level: debug
         Logger:
             -
                 name: Application_Log
@@ -41,13 +41,13 @@ Configuration:
                 AppenderRef:
                     ref: RollingFile_Appender
             -   name: de.bayern.gdi
-                level: info
+                level: debug
             -   name: de.bayern.gdi.Headless
-                level: warn
+                level: info
             -   name: org.geotools
                 level: warn
             -   name: org.geotools.swing
-                level: off
+                level: error
             -   name: org.apache
                 level: warn
             -   name: org.apache.http

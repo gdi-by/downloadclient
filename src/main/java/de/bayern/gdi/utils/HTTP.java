@@ -85,7 +85,7 @@ public final class HTTP {
 
         RequestConfig requestConfig = RequestConfig.
                 custom().
-                setSocketTimeout(timeout).build();
+                setSocketTimeout(timeout).setConnectTimeout(timeout).build();
         HttpClientBuilder builder = HttpClientBuilder.create()
                 .setDefaultRequestConfig(requestConfig);
         builder.setRetryHandler(new StandardHttpRequestRetryHandler(1, true));
@@ -115,8 +115,11 @@ public final class HTTP {
             builder.setDefaultCredentialsProvider(credsProv);
         }
 
+        CloseableHttpClient httpClient = builder.build();
+        LOG.debug("Using HTTP client configuration:" + requestConfig.toString()
+            + " for URL connection " + url.toExternalForm());
 
-        return builder.build();
+        return httpClient;
     }
 
     /**

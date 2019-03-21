@@ -314,6 +314,8 @@ public class ServiceChecker {
             return retcode == HttpStatus.SC_OK
                 || retcode == HttpStatus.SC_UNAUTHORIZED;
         } catch (IOException e) {
+            LOG.warn("URL " + url.toExternalForm()
+                + " not reachable: " + e.getLocalizedMessage());
             return false;
         }
     }
