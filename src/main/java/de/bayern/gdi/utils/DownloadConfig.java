@@ -247,16 +247,16 @@ public class DownloadConfig {
 
     @Override
     public String toString() {
-        return "DownloadConfig [" +
-            "configDoc=" + configDoc +
-            ", configFile=" + configFile +
-            ", dataset='" + dataset + '\'' +
-            ", downloadPath='" + downloadPath + '\'' +
-            ", serviceType='" + serviceType + '\'' +
-            ", serviceURL='" + serviceURL + '\'' +
-            ", parameters=" + parameters +
-            ", procSteps=" + procSteps +
-            ']';
+        return "DownloadConfig ["
+            + "configDoc=" + configDoc
+            + ", configFile=" + configFile
+            + ", dataset='" + dataset + '\''
+            + ", downloadPath='" + downloadPath + '\''
+            + ", serviceType='" + serviceType + '\''
+            + ", serviceURL='" + serviceURL + '\''
+            + ", parameters=" + parameters
+            + ", procSteps=" + procSteps
+            + ']';
     }
 
     /**

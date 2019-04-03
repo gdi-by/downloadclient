@@ -47,6 +47,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -111,6 +112,12 @@ public class IntegrationTest extends TestBase {
      * WFS.
      */
     private static final String WFS = "WFS";
+
+    /**
+     * Position of a protected WFS service in the selection list. This value
+     * is very likely to change over time!
+     */
+    private static final int POS_OF_PROTECTED_SERVICE = 3;
 
     // DATA MEMBERS
 
@@ -274,7 +281,6 @@ public class IntegrationTest extends TestBase {
     /**
      * Test a protected service.
      *
-     * @throws Exception in case
      *                   <p>
      *                   TODO selectNthService is a brittle solution
      *                   which circumvents a problem of selecting a
@@ -292,7 +298,9 @@ public class IntegrationTest extends TestBase {
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
-        selectNthService(3); // FIXME This magic number shall select a protected service, but this is instable!
+        // FIXME This magic number shall select a protected service,
+        //  but this is selection is instable!
+        selectNthService(POS_OF_PROTECTED_SERVICE); // TODO brittle solution
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
     }
