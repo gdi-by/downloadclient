@@ -191,7 +191,7 @@ public class DownloadStepConverterIT {
      */
     @Test
     public void testConvert() throws Exception {
-        LOG.debug("Start test {}  Test directory: {} ...",
+        LOG.debug("Start test '{}' in test directory: {}",
             testName, downloadStep.getPath());
         DownloadStepConverter downloadStepConverter =
             new DownloadStepConverter();
