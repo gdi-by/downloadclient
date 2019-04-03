@@ -88,7 +88,7 @@ public class IntegrationTest extends TestBase {
      * Total number of StoredQueries provided by service
      * VERWALTUNGSGRENZEN_URL.
      */
-    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 8;
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 10;
 
     /**
      * Number of services overall FeatureTypes.
