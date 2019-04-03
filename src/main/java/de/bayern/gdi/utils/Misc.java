@@ -160,6 +160,7 @@ public final class Misc {
      * @param url url
      */
     public static void startExternalBrowser(String url) {
+        LOG.info("Starting external browser with address:" + url);
         try {
             new ProcessBuilder("x-www-browser", url).start();
         } catch (IOException e) {

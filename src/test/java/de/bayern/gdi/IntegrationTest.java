@@ -272,7 +272,7 @@ public class IntegrationTest extends TestBase {
     }
 
     /**
-     * Test a protected serivce.
+     * Test a protected service.
      *
      * @throws Exception in case
      *                   <p>
@@ -287,12 +287,12 @@ public class IntegrationTest extends TestBase {
      *                   Works for **now**. tj
      */
     @Test
-    public void testProtected() throws Exception {
+    public void testProtected() {
         clickOn(SEARCH).write(WFS);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
-        selectNthService(2);
+        selectNthService(3); // FIXME This magic number shall select a protected service, but this is instable!
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
     }

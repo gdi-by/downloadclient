@@ -776,6 +776,7 @@ public class Controller {
     *    from an URL or the service List
     */
     protected void doSelectService(DownloadConfig downloadConf) {
+        log.info("Using download config: " + downloadConf);
         dataBean.resetSelectedService();
         serviceSelection.setDisable(true);
         serviceURL.getScene().setCursor(Cursor.WAIT);
@@ -946,6 +947,7 @@ public class Controller {
     }
 
     private boolean selectService(Service service) {
+        log.info("User selected: " + service.toString());
         if (ServiceChecker.isReachable(service.getServiceURL())) {
             try {
                 service.load();
