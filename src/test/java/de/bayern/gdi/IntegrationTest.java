@@ -279,8 +279,21 @@ public class IntegrationTest extends TestBase {
     }
 
     /**
-     * Test a protected service.
+     * This integration test shall verify that the user selects a WFS service
+     * which is protected and requires login credentials.
+     * The test simulates that:
+     * <ul>
+     *     <li>The user enters 'WFS' and clicks on search button</li>
+     *     <li>The result is displayed in the list view</li>
+     *     <li>The user selects a protected service (which is 3rd element)</li>
+     *     <li>The status log shows the message that username and password
+     *     are required</li>
+     * </ul>
      *
+     * <p>Precondition for this test is:
+     * That the third element is WFS service
+     * https://www.geodaten.bayern.de/wfs/ogc_flurkarte.cgi
+     * </p>
      *                   <p>
      *                   TODO selectNthService is a brittle solution
      *                   which circumvents a problem of selecting a
