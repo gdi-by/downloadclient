@@ -43,7 +43,7 @@ import static org.junit.Assert.assertFalse;
  *
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
-public class Issue86Test extends TestBase {
+public class Issue86IT extends TestBase {
 
     private static final String QUERY_RESOURCE =
             "/issues/issue86.xml";
@@ -114,7 +114,7 @@ public class Issue86Test extends TestBase {
      */
     private String getResponseBody() throws IOException {
         return IOUtils.toString(
-                Issue86Test.class.getResourceAsStream(QUERY_RESOURCE),
+                Issue86IT.class.getResourceAsStream(QUERY_RESOURCE),
                 "UTF-8");
     }
 }

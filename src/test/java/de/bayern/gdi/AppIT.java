@@ -52,13 +52,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Basic integrative tests for the UI component.
+ * Basic integration tests for the UI component.
  * Tests are not exhaustive although helpful for
  * covering the basic testing needs.
  *
  * @author thomas
  */
-public class IntegrationTest extends TestBase {
+public class AppIT extends TestBase {
 
     // CONSTANTS
 

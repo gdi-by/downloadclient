@@ -34,7 +34,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Juergen Weichand
  */
-public class WFSMetaExtractorTest extends WFS20ResourceTestBase {
+public class WFSMetaExtractorIT extends WFS20ResourceTestBase {
 
     private static final int FEATURES_PER_PAGE = 1037;
 

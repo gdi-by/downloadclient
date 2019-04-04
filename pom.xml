@@ -404,6 +404,9 @@
     <profiles>
         <profile>
             <id>integration-tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

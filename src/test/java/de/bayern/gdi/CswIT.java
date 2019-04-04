@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Juergen Weichand
  */
-public class CswTest extends TestCase {
+public class CswIT extends TestCase {
 
-    private static final Logger log = LoggerFactory.getLogger(CswTest.class);
+    private static final Logger log = LoggerFactory.getLogger(CswIT.class);
 
     private static final int THREE = 3;
 
@@ -61,7 +61,7 @@ public class CswTest extends TestCase {
     public static final String
             PATH_GETCAPABILITIES = "/csw/csw-getcapabilities";
 
-    public CswTest(String testName) {
+    public CswIT(String testName) {
         super(testName);
     }
 
@@ -111,7 +111,7 @@ public class CswTest extends TestCase {
                 throws IOException, URISyntaxException {
 
         String body = IOUtils.toString(
-                CswTest.class.getResourceAsStream(queryResource), "UTF-8"
+                CswIT.class.getResourceAsStream(queryResource), "UTF-8"
         );
 
         prepareGetCapabilities(queryPath, capResource);
@@ -156,7 +156,7 @@ public class CswTest extends TestCase {
             throws IOException {
 
         String body = IOUtils.toString(
-                CswTest.class.getResourceAsStream(capResource), "UTF-8"
+                CswIT.class.getResourceAsStream(capResource), "UTF-8"
         );
 
         body = body.replace("{GETRECORDS_URL}",
