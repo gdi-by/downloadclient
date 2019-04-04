@@ -117,14 +117,14 @@ public class DownloadStepConverterIT {
                 TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example1.cql"))},
-            {"Example2", createDownloadStep(
+            /*{"Example2", createDownloadStep(
                 TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example2.cql"))},
             {"Example3", createDownloadStep(
                 TestService.GEOSERVER,
                 OVERALL_DATASET,
-                resourceAsString("/cql/example3.cql"))},
+                resourceAsString("/cql/example3.cql"))},*/
             {"Example4", createDownloadStep(
                 TestService.GEOSERVER,
                 OVERALL_DATASET,
