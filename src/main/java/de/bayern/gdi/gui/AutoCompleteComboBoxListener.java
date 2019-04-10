@@ -22,13 +22,10 @@ package de.bayern.gdi.gui;
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
-
 import javafx.collections.ObservableList;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.IndexRange;
-import javafx.scene.control.ListView;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -148,9 +145,8 @@ public class AutoCompleteComboBoxListener<T> {
             for (int i = 0; i < items.size(); i++) {
                 if (isItemTextEqualSelectedText(items, selectedText, i)) {
                     try {
-                        ListView lv = getListView();
-                        lv.getSelectionModel().clearAndSelect(i);
-                        lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
+                        comboBox.getSelectionModel().clearAndSelect(i);
+                        comboBox.getSelectionModel().getSelectedIndex();
                         found = true;
                         break;
                     } catch (Exception ignored) {
@@ -192,11 +188,6 @@ public class AutoCompleteComboBoxListener<T> {
             , String selectedText, int i) {
         return item.get(i) != null
                 && selectedText.equalsIgnoreCase(item.get(i).toString());
-    }
-
-    private ListView getListView() {
-        return ((ComboBoxListViewSkin) this.comboBox.getSkin())
-                .getListView();
     }
 
 }
