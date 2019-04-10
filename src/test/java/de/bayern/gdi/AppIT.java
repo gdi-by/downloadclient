@@ -109,15 +109,15 @@ public class AppIT extends TestBase {
             + "&request=GetCapabilities";
 
     /**
-     * WFS.
+     * PASSWORD_PROTECTED_WFS.
      */
-    private static final String WFS = "WFS";
+    private static final String PASSWORD_PROTECTED_WFS = "Passwort";
 
     /**
      * Position of a protected WFS service in the selection list. This value
      * is very likely to change over time!
      */
-    private static final int POS_OF_PROTECTED_SERVICE = 3;
+    private static final int POS_OF_PROTECTED_SERVICE = 0;
 
     // DATA MEMBERS
 
@@ -307,7 +307,7 @@ public class AppIT extends TestBase {
      */
     @Test
     public void testProtected() {
-        clickOn(SEARCH).write(WFS);
+        clickOn(SEARCH).write(PASSWORD_PROTECTED_WFS);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
