@@ -18,6 +18,33 @@
 
 package de.bayern.gdi.gui;
 
+import com.sothawo.mapjfx.MapView;
+import de.bayern.gdi.gui.map.FeaturePolygon;
+import de.bayern.gdi.gui.map.PolygonClickedEvent;
+import de.bayern.gdi.gui.map.PolygonInfos;
+import de.bayern.gdi.gui.map.MapHandler;
+import de.bayern.gdi.gui.map.MapHandlerBuilder;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.text.Text;
 import org.locationtech.jts.geom.Geometry;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
@@ -73,25 +100,8 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -127,7 +137,6 @@ import static de.bayern.gdi.gui.FeatureModel.FilterType.BBOX;
 import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
 import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 
-
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
@@ -148,8 +157,6 @@ public class Controller {
             = "gui.process.not.compatible";
     private static final String GUI_FORMAT_NOT_SELECTED
             = "gui.no-format-selected";
-    private static final int MAP_WIDTH = 350;
-    private static final int MAP_HEIGHT = 250;
     private static final int BGCOLOR = 244;
     private static final String EPSG4326 = "EPSG:4326";
     private static final String INITIAL_CRS_DISPLAY = EPSG4326;
@@ -171,8 +178,6 @@ public class Controller {
     private Stage primaryStage;
     private UIFactory factory;
     private boolean catalogReachable;
-    private WMSMapSwing mapAtom;
-    private WMSMapSwing mapWFS;
     private DownloadConfig downloadConfig;
 
     @FXML
@@ -220,9 +225,9 @@ public class Controller {
     @FXML
     private VBox chainContainer;
     @FXML
-    private Group mapNodeWFS;
+    private VBox mapNodeWFS;
     @FXML
-    private Group mapNodeAtom;
+    private VBox mapNodeAtom;
     @FXML
     private TextField basicX1;
     @FXML
@@ -303,6 +308,48 @@ public class Controller {
     private VBox sqlWFSArea;
     @FXML
     private HBox basicWFSFirstRows;
+    @FXML
+    private Menu menuFile;
+    @FXML
+    private MenuItem menuLoadConfig;
+    @FXML
+    private MenuItem menuQuit;
+    @FXML
+    private Text searchHeadlineText;
+    @FXML
+    private Label labelAtomVariation;
+    @FXML
+    private VBox containerChain;
+    @FXML
+    private Tab tabMap;
+    @FXML
+    private Tab tabFilter;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private MapView wfsMapView;
+    @FXML
+    private Label wfsMapWmsSource;
+    @FXML
+    private ToggleButton wfsMapBboxButton;
+    @FXML
+    private ToggleButton wfsMapInfoButton;
+    @FXML
+    private Button wfsMapResizeButton;
+    @FXML
+    private MapView atomMapView;
+    @FXML
+    private Label atomMapWmsSource;
+    @FXML
+    private ToggleButton atomMapSelectButton;
+    @FXML
+    private ToggleButton atomMapInfoButton;
+    @FXML
+    private Button atomMapResizeButton;
+
+    private MapHandler wmsWfsMapHandler;
+
+    private MapHandler wmsAtomMapHandler;
 
     /**
      * Creates the Controller.
@@ -340,6 +387,8 @@ public class Controller {
             }
         });
     }
+
+
 
     /**
      * Logs a message to the application log.
@@ -1151,12 +1200,13 @@ public class Controller {
                         getValue().getOldName()
                         : EPSG4326,
                 "");
-        if (mapWFS != null && referenceSystemChooser.getValue() != null) {
-            this.mapWFS.setDisplayCRS(
+        if (wmsWfsMapHandler != null
+            && referenceSystemChooser.getValue() != null) {
+            this.wmsWfsMapHandler.setDisplayCRS(
                     referenceSystemChooser.getValue().getCRS());
-        } else if (mapWFS != null) {
+        } else if (wmsWfsMapHandler != null) {
             try {
-                this.mapWFS.setDisplayCRS(
+                this.wmsWfsMapHandler.setDisplayCRS(
                         this.dataBean.getAttributeValue("srsName"));
             } catch (FactoryException e) {
                 log.error(e.getMessage(), e);
@@ -1358,8 +1408,8 @@ public class Controller {
                 break;
             case WFS_ONE:
             case WFS_TWO:
-                if (mapWFS != null) {
-                    envelope = this.mapWFS.getBounds(
+                if (wmsWfsMapHandler != null) {
+                    envelope = this.wmsWfsMapHandler.getBounds(
                             referenceSystemChooser.
                                     getSelectionModel().
                                     getSelectedItem().
@@ -1615,20 +1665,17 @@ public class Controller {
         );
         this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
         this.dataBean.reset();
-        if (mapWFS != null) {
-            this.mapWFS.reset();
+        if (wmsWfsMapHandler != null) {
+            this.wmsWfsMapHandler.reset();
         }
-        if (mapAtom != null) {
-            this.mapAtom.reset();
+        if (wmsAtomMapHandler != null) {
+            this.wmsAtomMapHandler.reset();
         }
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
         this.mapNodeWFS.setVisible(false);
         this.atomContainer.setVisible(false);
-        this.basicWFSX1Y1.setVisible(false);
-        this.basicWFSX2Y2.setVisible(false);
         this.sqlWFSArea.setVisible(false);
-        this.basicWFSFirstRows.setVisible(false);
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
         resetProcessingChainContainer();
@@ -1853,7 +1900,7 @@ public class Controller {
                             dataBean.getAtomService().getItems();
                     ObservableList<ItemModel> opts =
                             FXCollections.observableArrayList();
-                    List<WMSMapSwing.FeaturePolygon> polygonList
+                    List<FeaturePolygon> polygonList
                         = new ArrayList<>();
                     //Polygons are always epsg:4326
                     // (http://www.georss.org/gml.html)
@@ -1864,8 +1911,8 @@ public class Controller {
                         Geometry all = null;
                         for (Atom.Item i : items) {
                             opts.add(new AtomItemModel(i));
-                            WMSMapSwing.FeaturePolygon polygon =
-                                    new WMSMapSwing.FeaturePolygon(
+                            FeaturePolygon polygon =
+                                    new FeaturePolygon(
                                             i.getPolygon(),
                                             i.getTitle(),
                                             i.getID(),
@@ -1875,13 +1922,13 @@ public class Controller {
                                 ? i.getPolygon()
                                 : all.union(i.getPolygon());
                         }
-                        if (mapAtom != null) {
+                        if (wmsAtomMapHandler != null) {
                             if (all != null) {
                                 extendATOM = new ReferencedEnvelope(
                                         all.getEnvelopeInternal(), atomCRS);
-                                mapAtom.setExtend(extendATOM);
+                                wmsAtomMapHandler.setExtend(extendATOM);
                             }
-                            mapAtom.drawPolygons(polygonList);
+                            wmsAtomMapHandler.drawPolygons(polygonList);
                         }
                     } catch (FactoryException e) {
                         log.error(e.getMessage(), e);
@@ -1892,9 +1939,6 @@ public class Controller {
                         serviceTypeChooser.setValue(opts.get(0));
                         chooseType(serviceTypeChooser.getValue());
                     }
-                    Platform.runLater(() ->
-                        mapAtom.repaint()
-                    );
                     break;
                 default:
             }
@@ -1926,7 +1970,7 @@ public class Controller {
             types.add(new OverallFeatureTypeModel(features));
         }
         if (extendWFS != null) {
-            mapWFS.setExtend(extendWFS);
+            wmsWfsMapHandler.setExtend(extendWFS);
         }
         return types;
     }
@@ -1962,11 +2006,8 @@ public class Controller {
                 return;
             }
         }
-        if (mapAtom != null) {
-            mapAtom.highlightSelectedPolygon(item.getID());
-            Platform.runLater(() ->
-                mapAtom.repaint()
-            );
+        if (wmsAtomMapHandler != null) {
+            wmsAtomMapHandler.highlightSelectedPolygon(item.getID());
         }
         List<Atom.Field> fields = item.getFields();
         ObservableList<ItemModel> list =
@@ -2001,7 +2042,6 @@ public class Controller {
                 + item.getDescription() + "</div>");
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
-        this.basicWFSFirstRows.setVisible(false);
         this.atomContainer.setVisible(true);
     }
 
@@ -2020,32 +2060,22 @@ public class Controller {
                 isSqlFilterType = FILTER.equals(filterType);
             }
 
-            if (isSqlFilterType) {
-                this.sqlWFSArea.setVisible(true);
-                this.sqlWFSArea.setManaged(true);
-                this.basicWFSFirstRows.setVisible(false);
-                this.basicWFSX1Y1.setVisible(false);
-                this.basicWFSX1Y1.setManaged(false);
-                this.basicWFSX2Y2.setVisible(false);
-                this.basicWFSX2Y2.setManaged(false);
-                this.mapNodeWFS.setVisible(false);
-                this.mapNodeWFS.setManaged(false);
-            } else {
-                this.sqlWFSArea.setVisible(false);
-                this.sqlWFSArea.setManaged(false);
-                this.basicWFSFirstRows.setVisible(true);
-                this.basicWFSX1Y1.setVisible(true);
-                this.basicWFSX1Y1.setManaged(true);
-                this.basicWFSX2Y2.setVisible(true);
-                this.basicWFSX2Y2.setManaged(true);
-                this.mapNodeWFS.setVisible(true);
-                this.mapNodeWFS.setManaged(true);
-            }
             this.simpleWFSContainer.setVisible(false);
             this.atomContainer.setVisible(false);
             this.referenceSystemChooser.setVisible(true);
             this.referenceSystemChooserLabel.setVisible(true);
             this.basicWFSContainer.setVisible(true);
+            if (isSqlFilterType) {
+                this.sqlWFSArea.setVisible(true);
+                this.sqlWFSArea.setManaged(true);
+                this.mapNodeWFS.setVisible(false);
+                this.mapNodeWFS.setManaged(false);
+            } else {
+                this.sqlWFSArea.setVisible(false);
+                this.sqlWFSArea.setManaged(false);
+                this.mapNodeWFS.setVisible(true);
+                this.mapNodeWFS.setManaged(true);
+            }
 
             if (data.getItem() instanceof WFSMeta.Feature) {
                 setCrsAndExtent((WFSMeta.Feature) data.getItem());
@@ -2113,15 +2143,11 @@ public class Controller {
                 });
             }
 
-            this.atomContainer.setVisible(false);
-            this.simpleWFSContainer.setVisible(true);
-            this.basicWFSContainer.setVisible(false);
-            this.basicWFSFirstRows.setVisible(false);
         }
     }
 
     private void setCrsAndExtent(WFSMeta.Feature feature) {
-        mapWFS.setExtend(feature.getBBox());
+        wmsWfsMapHandler.setExtend(feature.getBBox());
         ArrayList<String> list = new ArrayList<>();
         list.add(feature.getDefaultCRS());
         list.addAll(feature.getOtherCRSs());
@@ -2208,45 +2234,38 @@ public class Controller {
         } catch (MalformedURLException e) {
             log.error(e.getMessage(), e);
         }
-        if (url != null
-                && ServiceChecker.isReachable(
-                WMSMapSwing.getCapabiltiesURL(url))
-                ) {
-            mapWFS = new WMSMapSwing(url,
-                    MAP_WIDTH,
-                    MAP_HEIGHT,
-                    serviceSetting.getWMSLayer(),
-                    serviceSetting.getWMSSource());
-            mapWFS.setCoordinateDisplay(basicX1,
-                    basicY1,
+        if (url != null && ServiceChecker
+            .isReachable(wmsWfsMapHandler.getCapabiltiesURL(url))) {
+            this.wmsWfsMapHandler = MapHandlerBuilder
+                .newBuilder(serviceSetting)
+                .withEventTarget(mapNodeWFS)
+                .withMapView(wfsMapView)
+                .withWmsSourceLabel(wfsMapWmsSource)
+                .withBboxButton(wfsMapBboxButton)
+                .withInfoButton(wfsMapInfoButton)
+                .withResizeButtton(wfsMapResizeButton)
+                .withCoordinateDisplay(
+                    basicX1,
                     basicX2,
-                    basicY2);
-            mapWFS.setCoordinateLabel(lablbasicx1,
+                    basicY1,
+                    basicY2)
+                .withCoordinateLabel(
+                    lablbasicx1,
                     lablbasicx2,
                     lablbasicy1,
-                    lablbasicy2);
-            this.mapNodeWFS.getChildren().add(mapWFS);
-            this.mapNodeWFS.setAutoSizeChildren(false);
-
-            mapAtom = new WMSMapSwing(url,
-                    MAP_WIDTH,
-                    MAP_HEIGHT,
-                    serviceSetting.getWMSLayer(),
-                    serviceSetting.getWMSSource());
-            mapAtom.addEventHandler(PolygonClickedEvent.ANY,
-                    new SelectedAtomPolygon());
-            mapAtom.setCoordinateDisplay(atomX1,
-                    atomY1,
-                    atomX2,
-                    atomY2);
-            this.mapNodeAtom.getChildren().add(mapAtom);
-            this.mapNodeAtom.setAutoSizeChildren(false);
-
-            this.mapSplitPane.widthProperty().addListener(
-                    (obs, oldVal, newVal) -> {
-                mapWFS.resizeSwingContent(newVal.doubleValue());
-                mapAtom.resizeSwingContent(newVal.doubleValue());
-            });
+                    lablbasicy2)
+                .build();
+            this.wmsAtomMapHandler = MapHandlerBuilder
+                .newBuilder(serviceSetting)
+                .withEventTarget(mapNodeAtom)
+                .withMapView(atomMapView)
+                .withWmsSourceLabel(atomMapWmsSource)
+                .withSelectButton(atomMapSelectButton)
+                .withInfoButton(atomMapInfoButton)
+                .withResizeButtton(atomMapResizeButton)
+                .build();
+            mapNodeAtom.addEventHandler(PolygonClickedEvent.ANY,
+                new SelectedAtomPolygon());
         } else {
             setStatusTextUI(I18n.format("status.wms-not-available"));
         }
@@ -2254,7 +2273,6 @@ public class Controller {
         this.progressSearch.setVisible(false);
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
-        this.basicWFSFirstRows.setVisible(false);
         this.serviceUser.setDisable(true);
         this.servicePW.setDisable(true);
         this.processStepContainter.setVisible(false);
@@ -2418,10 +2436,11 @@ public class Controller {
             EventHandler<Event> {
         @Override
         public void handle(Event event) {
-            if (mapAtom != null && event instanceof PolygonClickedEvent) {
+            if (wmsAtomMapHandler != null
+                && event instanceof PolygonClickedEvent) {
 
                 PolygonClickedEvent pce = (PolygonClickedEvent) event;
-                WMSMapSwing.PolygonInfos polygonInfos =
+                PolygonInfos polygonInfos =
                         pce.getPolygonInfos();
                 String polygonName = polygonInfos.getName();
                 String polygonID = polygonInfos.getID();

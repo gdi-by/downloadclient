@@ -107,6 +107,8 @@ public class Start extends Application {
         try {
             ClassLoader classLoader = Start.class.getClassLoader();
             URL url = classLoader.getResource("download-client.fxml");
+            FXMLLoader.setDefaultClassLoader(
+                Thread.currentThread().getContextClassLoader());
             FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
             Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
