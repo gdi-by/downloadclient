@@ -22,10 +22,11 @@ import de.bayern.gdi.utils.XML;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
 
 /**
  * Test for ServiceSettings.
@@ -76,10 +77,30 @@ public class ServiceSettingsTest extends TestCase {
         = HEADER
         + FOOTER;
 
+    private static final String BASEDIR
+        = "<basedir>/var/tmp</basedir>";
+
+    private static final String EMPTY_BASEDIR
+        = "<basedir></basedir>";
+
+    private static final String WITHOUT_BASEDIR
+        = HEADER
+        + FOOTER;
+
+    private static final String WITH_EMPTY_BASEDIR
+        = HEADER
+        + EMPTY_BASEDIR
+        + FOOTER;
+
+    private static final String WITH_BASEDIR
+        = HEADER
+        + BASEDIR
+        + FOOTER;
+
     /**
      * test extractCheckWithGET.
      * @throws Exception something went wrong.
-     * */
+     */
     @Test
     public void testExtractCheckWithGET() throws Exception {
 
@@ -90,8 +111,16 @@ public class ServiceSettingsTest extends TestCase {
 
         assertFalse(
             settings.checkRestrictionWithGET("http://example.net"));
+    }
 
-        settings = new ServiceSettings(
+    /**
+     * test checkRestrictionWithGET.
+     * @throws Exception something went wrong.
+     */
+    @Test
+    public void testCheckRestrictionWithGET() throws Exception {
+
+        ServiceSettings settings = new ServiceSettings(
             XML.getDocument(
                 new ByteArrayInputStream(
                     CORRECT_CHECK_GET.getBytes("UTF-8"))));
@@ -106,7 +135,14 @@ public class ServiceSettingsTest extends TestCase {
             settings.checkRestrictionWithGET("https://example.com/example"));
         assertFalse(
             settings.checkRestrictionWithGET("http://example.net"));
+    }
 
+    /**
+     * test wrong check.
+     * @throws Exception something went wrong.
+     */
+    @Test
+    public void testWrongCheckWithGET() throws Exception {
         try {
             new ServiceSettings(
                 XML.getDocument(
@@ -117,5 +153,68 @@ public class ServiceSettingsTest extends TestCase {
         } catch (IOException ioe) {
             // Test passed.
         }
+    }
+
+    /**
+     * test parsing basedirectory from settings file.
+     * @throws IOException not expected
+     * @throws SAXException not expected
+     * @throws ParserConfigurationException not expected
+     */
+    @Test
+    public void testThatBaseDirectoryCanBeParsedFromFile()
+        throws IOException, SAXException, ParserConfigurationException {
+        ServiceSettings settings = new ServiceSettings(
+            XML.getDocument(
+                ServiceSettings.class.getResourceAsStream("/settings.xml")));
+        assertEquals("", settings.getBaseDirectory());
+    }
+
+    /**
+     * test parsing basedirectory from existing element.
+     * @throws IOException not expected
+     * @throws SAXException not expected
+     * @throws ParserConfigurationException not expected
+     */
+    @Test
+    public void testThatBaseDirectoryCanBeExtracted()
+        throws IOException, SAXException, ParserConfigurationException {
+        ServiceSettings settings = new ServiceSettings(
+            XML.getDocument(
+                new ByteArrayInputStream(
+                    WITH_BASEDIR.getBytes("UTF-8"))));
+        assertEquals("/var/tmp", settings.getBaseDirectory());
+    }
+
+    /**
+     * test parsing basedirectory from empty element.
+     * @throws IOException not expected
+     * @throws SAXException not expected
+     * @throws ParserConfigurationException not expected
+     */
+    @Test
+    public void testThatBaseDirectoryCanBeExtractedWhenEmpty()
+        throws IOException, SAXException, ParserConfigurationException {
+        ServiceSettings settings = new ServiceSettings(
+            XML.getDocument(
+                new ByteArrayInputStream(
+                    WITH_EMPTY_BASEDIR.getBytes("UTF-8"))));
+        assertEquals("", settings.getBaseDirectory());
+    }
+
+    /**
+     * test parsing basedirectory from missing element.
+     * @throws IOException not expected
+     * @throws SAXException not expected
+     * @throws ParserConfigurationException not expected
+     */
+    @Test
+    public void testThatBaseDirectoryCanBeMissing()
+        throws IOException, SAXException, ParserConfigurationException {
+        ServiceSettings settings = new ServiceSettings(
+            XML.getDocument(
+                new ByteArrayInputStream(
+                    WITHOUT_BASEDIR.getBytes("UTF-8"))));
+        assertEquals("", settings.getBaseDirectory());
     }
 }

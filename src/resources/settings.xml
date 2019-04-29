@@ -17,4 +17,5 @@
     <application>
         <requestTimeout_s>35</requestTimeout_s>
     </application>
+    <basedir></basedir>
 </settings>

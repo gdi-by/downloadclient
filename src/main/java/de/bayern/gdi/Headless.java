@@ -96,6 +96,8 @@ public class Headless implements ProcessorListener {
         Thread thread = new Thread(processor);
         thread.start();
 
+        log.info("Executing download steps " + steps);
+
         for (DownloadStep step : steps) {
             try {
                 DownloadStepConverter dsc =

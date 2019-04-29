@@ -20,6 +20,7 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.io.IOException;
 
+import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
@@ -154,15 +155,6 @@ public class Config {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
             Holder.INSTANCE.initialized = true;
             Holder.INSTANCE.notifyAll();
-            System.setProperty("java.util.logging.manager",
-                "org.apache.logging.log4j.jul.LogManager");
-            try {
-                Logging.GEOTOOLS.setLoggerFactory(
-                    "org.geotools.util.logging.Log4JLoggerFactory");
-            } catch (ClassNotFoundException e) {
-                log.warn("Failed to initialize GeoTools logging subsystem: "
-                    + e.getLocalizedMessage());
-            }
         }
     }
 
@@ -172,6 +164,16 @@ public class Config {
      * @throws IOException If something went wrong.
      */
     public static void initialize(String dirname) throws IOException {
+        Controller.logToAppLog(I18n.format("dlc.start", Info.getVersion()));
+        System.setProperty("java.util.logging.manager",
+            "org.apache.logging.log4j.jul.LogManager");
+        try {
+            Logging.GEOTOOLS.setLoggerFactory(
+                "org.geotools.util.logging.Log4JLoggerFactory");
+        } catch (ClassNotFoundException e) {
+            log.warn("Failed to initialize GeoTools logging subsystem: "
+                + e.getLocalizedMessage());
+        }
         if (dirname == null) {
             uninitialized();
         } else {
@@ -184,6 +186,13 @@ public class Config {
                 }
             }
         }
+        log.trace("System Properties:");
+        System.getProperties().keySet().stream().map(
+            k -> (String)k).sorted().forEach(k -> {
+            log.trace(String.format("\t%s=%s", k,
+                System.getProperty(k)));
+        });
+        Controller.logToAppLog(I18n.format("dlc.config", Config.getInstance()));
     }
 
     private static void load(String dirname) throws IOException {

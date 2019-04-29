@@ -4,7 +4,7 @@ Configuration:
     Properties:
         Property:
         -   name: log.file
-            value: logdlc.txt
+            value: ${sys:logfilename:-logdlc.txt}
         -   name: log.path
             value: ${sys:java.io.tmpdir:-/var/tmp/}
 

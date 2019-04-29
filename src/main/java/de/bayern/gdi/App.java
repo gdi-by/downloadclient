@@ -21,6 +21,7 @@ import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.utils.Config;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.CommandLine;
@@ -29,16 +30,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
-
-    private static final Logger LOG
-        = LoggerFactory.getLogger(App.class.getName());
 
     private App() {
         // Not to be instantiated.
@@ -47,7 +43,7 @@ public class App {
     private static void usage(Options options, int exitCode) {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(
-            "java -jar downloader.jar",
+            "java -jar downloadclient.jar",
             "", options,
             "Without options (except '--config')"
             + " the GUI application is started.",
@@ -70,9 +66,8 @@ public class App {
     private static void initConfig(String dir) {
         try {
             Config.initialize(dir);
-        } catch (NullPointerException | IOException ex) {
-            // TODO: Remove the NPE above!
-            LOG.error("Loading config failed: {}", ex.getMessage());
+        } catch (IOException ex) {
+            System.err.println("Loading config failed: " + ex.getMessage());
             System.exit(1);
         }
     }
@@ -128,6 +123,13 @@ public class App {
                 usage(options, 0);
             }
 
+            if (line.hasOption("h")) {
+                // First initialize log4j for headless execution
+                final String pid = getProcessId("0");
+                System.setProperty("logfilename", "logdlc-" + pid + ".txt");
+            }
+
+            // use configuration for gui and headless mode
             initConfig(line.getOptionValue("c"));
 
             if (line.hasOption("h")) {
@@ -140,8 +142,38 @@ public class App {
             startGUI();
 
         } catch (ParseException pe) {
-            LOG.error(pe.getMessage());
+            System.err.println("Cannot parse input: " + pe.getMessage());
             usage(options, 1);
         }
+    }
+
+    /**
+     * As of Java 9 the method <code>ProcessHandle.current().pid()</code>
+     * can be used.
+     * This is a workaround for Java 8 which should work for Oracle and
+     * OpenJDK.
+     *
+     * @param fallback the given id returned in case PID can not determined
+     * @return the PID (process identifier) for the JVM running this class
+     */
+    private static String getProcessId(final String fallback) {
+        // Note: may fail in some JVM implementations
+        // therefore fallback has to be provided
+
+        // something like '<pid>@<hostname>', at least in SUN / Oracle JVMs
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final int index = jvmName.indexOf('@');
+
+        if (index < 1) {
+            // part before '@' empty (index = 0) / '@' not found (index = -1)
+            return fallback;
+        }
+
+        try {
+            return Long.toString(Long.parseLong(jvmName.substring(0, index)));
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+        return fallback;
     }
 }

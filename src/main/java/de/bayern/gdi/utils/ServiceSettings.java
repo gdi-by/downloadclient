@@ -50,6 +50,7 @@ public class ServiceSettings {
     private Map<String, String> catalogues;
     private Map<String, String> wms;
     private Pattern checkWithGET;
+    private String baseDirectory;
 
     private static final String NAME =
             "ServiceSetting";
@@ -83,6 +84,7 @@ public class ServiceSettings {
         }
         return null;
     }
+
     /**
      * returns a map of Strings with service Names und URLS.
      * @return Map of Strings with <Name, URL> of Services
@@ -115,7 +117,6 @@ public class ServiceSettings {
         return this.wms.get("name");
     }
 
-
     /**
      * gets the WMS Name.
      * @return the WMS Name
@@ -132,6 +133,9 @@ public class ServiceSettings {
         return this.wms.get("layer");
     }
 
+    public String getBaseDirectory() {
+        return this.baseDirectory;
+    }
 
     private void parseDocument(Document xmlDocument) throws IOException {
         this.services = parseService(xmlDocument);
@@ -143,6 +147,7 @@ public class ServiceSettings {
                 "layer",
                 "name",
                 "source");
+        this.baseDirectory = parseBaseDirectory(xmlDocument);
     }
 
     /**
@@ -199,6 +204,8 @@ public class ServiceSettings {
 
     private static final String SERVICE_XPATH =
         "//*[local-name() = $NODE]/service/*[local-name() = $NAME]/text()";
+
+    private static final String BASEDIR_XPATH = "//basedir/text()";
 
     private Map<String, String> parseSchema(Document xmlDocument, String
             nodeName, String... names) throws IOException {
@@ -308,10 +315,15 @@ public class ServiceSettings {
             }
         }
         if (servicesMap.isEmpty()) {
-            throw new IOException(nodeName + " seeems to be empty - Config "
+            throw new IOException(nodeName + " seems to be empty - Config "
                     + "broken");
         }
         return servicesMap;
+    }
+
+    private String parseBaseDirectory(Document xmlDocument) {
+        return (String) XML.xpath(
+            xmlDocument, BASEDIR_XPATH, XPathConstants.STRING, null);
     }
 
     @Override
@@ -321,6 +333,7 @@ public class ServiceSettings {
             + ", catalogues=" + catalogues
             + ", wms=" + wms
             + ", checkWithGET=" + checkWithGET
+            + ", basedir=" + baseDirectory
             + "}";
     }
 }
