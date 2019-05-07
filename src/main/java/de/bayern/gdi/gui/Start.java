@@ -38,17 +38,16 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Start extends Application {
 
-    private static final Logger log
-        = Logger.getLogger(Start.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(Start.class.getName());
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
     private static Start start;
@@ -65,7 +64,7 @@ public class Start extends Application {
         try {
             LATCH.await();
         } catch (InterruptedException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
         return getInstance();
@@ -91,7 +90,7 @@ public class Start extends Application {
         try {
             return new DataBean();
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, ioe.getMessage(), ioe);
+            LOG.error(ioe.getMessage(), ioe);
             System.exit(1);
         }
         // Not reached.
@@ -126,14 +125,14 @@ public class Start extends Application {
             primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent e) {
+                    LOG.info(I18n.format("dlc.stop"));
                     Platform.exit();
                     System.exit(0);
                 }
             });
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, ioe,
-                () -> "Could not find UI description file: "
-                + ioe.getMessage());
+            LOG.error("Could not find UI description file: "
+                + ioe.getMessage(), ioe);
         }
     }
 }

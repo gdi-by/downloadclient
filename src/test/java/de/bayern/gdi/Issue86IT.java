@@ -43,7 +43,7 @@ import static org.junit.Assert.assertFalse;
  *
  * @author Alexander Woestmann (awoestmann@intevation.de)
  */
-public class Issue86Test extends TestBase {
+public class Issue86IT extends TestBase {
 
     private static final String QUERY_RESOURCE =
             "/issues/issue86.xml";
@@ -66,7 +66,7 @@ public class Issue86Test extends TestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        System.out.println("GetCapabilities-URL: " + sb.toString());
+        log.debug("GetCapabilities-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -75,7 +75,7 @@ public class Issue86Test extends TestBase {
      */
     @Before
     public void startJadler() {
-        System.err.println("Start jadler ...");
+        log.debug("Start jadler ...");
         initJadler();
     }
 
@@ -84,7 +84,7 @@ public class Issue86Test extends TestBase {
      */
     @After
     public void stopJadler() {
-        System.err.println("Stop jadler ...");
+        log.debug("Stop jadler ...");
         closeJadler();
     }
 
@@ -114,7 +114,7 @@ public class Issue86Test extends TestBase {
      */
     private String getResponseBody() throws IOException {
         return IOUtils.toString(
-                Issue86Test.class.getResourceAsStream(QUERY_RESOURCE),
+                Issue86IT.class.getResourceAsStream(QUERY_RESOURCE),
                 "UTF-8");
     }
 }

@@ -19,12 +19,14 @@ package de.bayern.gdi.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
+
+import org.geotools.util.logging.Logging;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.xml.sax.SAXException;
 
@@ -37,7 +39,7 @@ public class Config {
     }
 
     private static final Logger log
-        = Logger.getLogger(Config.class.getName());
+        = LoggerFactory.getLogger(Config.class.getName());
 
     /** Inner class to implicit synchronize the instance access. */
     private static final class Holder {
@@ -111,6 +113,15 @@ public class Config {
         return proxyConfig;
     }
 
+    @Override
+    public String toString() {
+        return (proxyConfig == null ? "Proxy Settings: {}" : getProxyConfig())
+            + ",\n " + getApplicationSettings()
+            + ",\n " + getProcessingConfig()
+            + ",\n " + getServices()
+            + ",\n MIME-Types: " + getMimeTypes();
+    }
+
     private static Settings loadSettings(File file)
         throws IOException {
         try {
@@ -121,7 +132,7 @@ public class Config {
         } catch (SAXException
                 | ParserConfigurationException
                 | IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
+            log.error(e.getMessage(), Holder.INSTANCE);
             throwConfigFailureException(Settings.getName());
         }
         // Not reached.
@@ -143,6 +154,15 @@ public class Config {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
             Holder.INSTANCE.initialized = true;
             Holder.INSTANCE.notifyAll();
+            System.setProperty("java.util.logging.manager",
+                "org.apache.logging.log4j.jul.LogManager");
+            try {
+                Logging.GEOTOOLS.setLoggerFactory(
+                    "org.geotools.util.logging.Log4JLoggerFactory");
+            } catch (ClassNotFoundException e) {
+                log.warn("Failed to initialize GeoTools logging subsystem: "
+                    + e.getLocalizedMessage());
+            }
         }
     }
 
@@ -167,7 +187,7 @@ public class Config {
     }
 
     private static void load(String dirname) throws IOException {
-        log.info(() -> "config directory: " + dirname);
+        log.info("config directory: " + dirname);
 
         File dir = new File(dirname);
 

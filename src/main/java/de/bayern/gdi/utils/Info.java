@@ -18,8 +18,10 @@
 package de.bayern.gdi.utils;
 
 import de.bayern.gdi.App;
-import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,8 +37,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -55,17 +55,16 @@ public class Info {
     private static final String UNKNOWN = "unknown";
 
     private static final Logger log
-            = Logger.getLogger(Info.class.getName());
+        = LoggerFactory.getLogger(Info.class.getName());
 
     private Info() {
         try {
             version = pullVersion();
             name = pullName();
         } catch (URISyntaxException
-                | IOException e) {
-            log.log(Level.SEVERE,
-                    "Reading of Version or Name failed: " + e.getMessage(),
-                    e);
+            | IOException e) {
+            log.error("Reading of Version or Name failed: " + e.getMessage(),
+                e);
             version = UNKNOWN;
             name = UNKNOWN;
         }
@@ -85,6 +84,7 @@ public class Info {
 
     /**
      * gets the Name.
+     *
      * @return name
      */
     public static String getName() {
@@ -96,6 +96,7 @@ public class Info {
 
     /**
      * gets the Comment.
+     *
      * @return comment
      */
     public static String getComment() {
@@ -103,51 +104,66 @@ public class Info {
     }
 
     private synchronized String pullName() throws URISyntaxException,
-            IOException {
-        String n = parseXPathInPom("/project/name");
+        IOException {
+        String n = getNameFromManifestFile();
         if (!n.isEmpty()) {
-            return n;
+            return n.trim();
+        }
+
+        n = parseXPathInPom("/project/name");
+        if (!n.isEmpty()) {
+            return n.trim();
         }
 
         n = getTagFromProperties("name");
-        if (!n.isEmpty()) {
-            return n;
-        }
-
-        Package pkg = App.class.getPackage();
-        if (pkg != null) {
-            n = pkg.getImplementationTitle();
-            if (n == null) {
-                n = pkg.getSpecificationTitle();
-            }
-        }
-        n = n == null ? "" : n.trim();
         return n.isEmpty() ? UNKNOWN : n;
     }
 
+
     private synchronized String pullVersion() throws URISyntaxException,
-            IOException {
-        String v = parseXPathInPom("/project/version");
+        IOException {
+        String v = getVersionFromManifestFile();
         if (!v.isEmpty()) {
-            return v;
-        }
-        // Try to get version number from maven properties in jar's META-INF
-        v = getTagFromProperties("version");
-        if (!v.isEmpty()) {
-            return v;
+            return v.trim();
         }
 
-        // Fallback to using Java API to get version from MANIFEST.MF
-        v = null;
+        v = parseXPathInPom("/project/version");
+        if (!v.isEmpty()) {
+            return v.trim();
+        }
+
+        v = getTagFromProperties("version");
+        return v.isEmpty() ? UNKNOWN : v.trim();
+    }
+
+    private String getNameFromManifestFile() {
         Package pkg = App.class.getPackage();
         if (pkg != null) {
-            v = pkg.getImplementationVersion();
-            if (v == null) {
-                v = pkg.getSpecificationVersion();
+            String n = pkg.getImplementationTitle();
+            if (n != null) {
+                return n;
+            }
+            n = pkg.getSpecificationTitle();
+            if (n != null) {
+                return n;
             }
         }
-        v = v == null ? "" : v.trim();
-        return v.isEmpty() ? UNKNOWN : v;
+        return "";
+    }
+
+    private String getVersionFromManifestFile() {
+        Package pkg = App.class.getPackage();
+        if (pkg != null) {
+            String v = pkg.getImplementationVersion();
+            if (v != null) {
+                return v;
+            }
+            v = pkg.getSpecificationVersion();
+            if (v != null) {
+                return v;
+            }
+        }
+        return "";
     }
 
     private Path getPomPath() throws URISyntaxException {
@@ -157,9 +173,9 @@ public class Info {
             URL classfileResource = getClass().getResource(classfileName);
             if (classfileResource != null) {
                 Path absolutePackagePath = Paths.get(classfileResource.toURI())
-                        .getParent();
+                    .getParent();
                 int packagePathSegments = className.length()
-                        - className.replace(".", "").length();
+                    - className.replace(".", "").length();
                 Path path = absolutePackagePath;
                 for (int i = 0, segmentsToRemove = packagePathSegments + 2;
                      i < segmentsToRemove; i++) {
@@ -168,34 +184,32 @@ public class Info {
                 return path.resolve("pom.xml");
             }
         } catch (FileSystemNotFoundException e) {
-            log.log(Level.INFO,
-                    "Not in Filesystem-Mode: "
-                            + e.getMessage(), e);
+            log.info("Not in Filesystem-Mode: "
+                + e.getMessage(), e);
         }
         return null;
     }
 
     private String parseXPathInPom(String xPath) throws URISyntaxException,
-    IOException {
+        IOException {
         Path pom = getPomPath();
         if (pom == null) {
             return "";
         }
         try (InputStream is = Files.newInputStream(pom)) {
             Document doc = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder().parse(is);
+                .newDocumentBuilder().parse(is);
             doc.getDocumentElement().normalize();
             String v = (String) XPathFactory.newInstance()
-                    .newXPath().compile(xPath)
-                    .evaluate(doc, XPathConstants.STRING);
+                .newXPath().compile(xPath)
+                .evaluate(doc, XPathConstants.STRING);
 
             return v != null ? v.trim() : "";
         } catch (ParserConfigurationException
-                | XPathExpressionException
-                | SAXException e) {
-            log.log(Level.SEVERE,
-                    "Parsing of " + xPath + " in Pom failed: "
-                            + e.getMessage(), e);
+            | XPathExpressionException
+            | SAXException e) {
+            log.error("Parsing of " + xPath + " in Pom failed: "
+                + e.getMessage(), e);
             return "";
         }
     }
@@ -203,8 +217,8 @@ public class Info {
     private String getTagFromProperties(String tag) {
         String value;
         InputStream is = getClass()
-                .getResourceAsStream("/META-INF/maven/" + MAVEN_PACKAGE + "/"
-                        + MAVEN_ARTIFACT + "/pom.properties");
+            .getResourceAsStream("/META-INF/maven/" + MAVEN_PACKAGE + "/"
+                + MAVEN_ARTIFACT + "/pom.properties");
         if (is != null) {
             Properties p = new Properties();
             try {
@@ -214,9 +228,8 @@ public class Info {
                     return value;
                 }
             } catch (IOException e) {
-                log.log(Level.SEVERE,
-                        "Parsing of " + tag + " in Properties failed: "
-                                + e.getMessage(), e);
+                log.error("Parsing of " + tag + " in Properties failed: "
+                    + e.getMessage(), e);
             }
         }
         return "";

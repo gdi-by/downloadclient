@@ -54,7 +54,7 @@ import static org.xmlmatchers.xpath.XpathReturnType.returningAString;
  *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
-public class WFSPostParamsBuilderTest extends WFS20ResourceTestBase {
+public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
 
     private static final String GEOSERVER =
         "/wfs20/geoserver/geoserver-capabilities.xml";

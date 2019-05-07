@@ -320,10 +320,24 @@ public class Service extends Object {
     }
 
     /**
-     * checks if the object is loded.
+     * checks if the object is loaded.
      * @return true if loaded; false if not
      */
     public boolean isLoaded() {
         return this.loaded;
+    }
+
+    @Override
+    public String toString() {
+        return "Service ["
+            + "serviceURL=" + serviceURL
+            + ", serviceType=" + serviceType
+            + ", additionalMessage='" + additionalMessage + '\''
+            + ", username='" + username + '\''
+            + ", password='" + password + '\''
+            + ", name='" + name + '\''
+            + ", restricted=" + restricted
+            + ", loaded=" + loaded
+            + "]";
     }
 }

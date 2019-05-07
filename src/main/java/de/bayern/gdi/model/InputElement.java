@@ -87,4 +87,13 @@ public class InputElement {
     public void setOptions(List<Option> options) {
         this.options = options;
     }
+
+    @Override
+    public String toString() {
+        return "InputElement{"
+            + "name='" + name + "'"
+            + ", type='" + type + "'"
+            + ", options=" + options
+            + "}";
+    }
 }

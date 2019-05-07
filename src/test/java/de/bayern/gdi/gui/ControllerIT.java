@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
-public class ControllerTest extends TestBase {
+public class ControllerIT extends TestBase {
 
     @Override
     protected DataBean getDataBean() throws IOException {

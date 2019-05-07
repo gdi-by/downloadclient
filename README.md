@@ -26,9 +26,13 @@ Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.read
 
     $ mvn clean compile exec:java
 
-### Anwendung explizit testen
+### Anwendung testen
 
     $ mvn test
+
+#### Integrationstest ausführen 
+
+    $ mvn verify
 
 ### Bundle erstellen
 

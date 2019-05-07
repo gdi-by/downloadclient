@@ -307,6 +307,24 @@ public class ProxyConfiguration {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ProxyConfiguration: {"
+            + " httpProxyHost='" + httpProxyHost
+            + ", httpProxyPort=" + httpProxyPort
+            + ", httpProxyUser='" + httpProxyUser
+            + ", httpProxyPasswort='" + httpProxyPasswort
+            + ", httpNonProxyHosts='" + httpNonProxyHosts
+            + ", httpsProxyHost='" + httpsProxyHost
+            + ", httpsProxyPort=" + httpsProxyPort
+            + ", httpsProxyUser='" + httpsProxyUser
+            + ", httpsProxyPasswort='" + httpsProxyPasswort
+            + ", httpsNonProxyHosts='" + httpsNonProxyHosts
+            + ", overrideSystemSettings=" + overrideSystemSettings
+            + ", enableSNIExtension=" + enableSNIExtension
+            + "}";
+    }
+
     /**
      * Loads ProxyConfiguration from a file.
      * @param file The file to load the ProxyConfiguration from.

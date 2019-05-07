@@ -18,16 +18,15 @@
 
 package de.bayern.gdi.utils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public final class UnauthorizedLog implements Unauthorized {
 
-    private static final Logger log
-            = Logger.getLogger(UnauthorizedLog.class.getName());
+    private static final org.slf4j.Logger LOG
+        = LoggerFactory.getLogger(UnauthorizedLog.class.getName());
 
     /**
      * Constructor.
@@ -41,6 +40,6 @@ public final class UnauthorizedLog implements Unauthorized {
      */
     @Override
     public void unauthorized() {
-        log.log(Level.SEVERE, I18n.getMsg("gui.wrong.user.and.pw"), this);
+        LOG.error(I18n.getMsg("gui.wrong.user.and.pw"), this);
     }
 }

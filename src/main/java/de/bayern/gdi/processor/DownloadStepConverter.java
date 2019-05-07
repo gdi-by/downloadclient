@@ -25,8 +25,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
@@ -34,6 +32,8 @@ import javax.xml.xpath.XPathConstants;
 import org.apache.http.HttpEntity;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.EntityTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import de.bayern.gdi.model.DownloadStep;
@@ -57,8 +57,8 @@ import static de.bayern.gdi.processor.DownloadStepConverter.
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
-    private static final Logger log
-        = Logger.getLogger(DownloadStepConverter.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(DownloadStepConverter.class.getName());
 
     /**
      * Type of a Query.
@@ -307,12 +307,12 @@ public class DownloadStepConverter {
             ? WFSPostParamsBuilder.create(dls, usedVars, meta)
             : null;
 
-        log.log(Level.INFO, () -> "url: " + url);
+        LOG.info("url: {}", url);
 
         String ext = extension();
 
         File gml = new File(workingDir, "download." + ext);
-        log.info(() -> "Download to file \"" + gml + "\"");
+        LOG.info("Download to file '{}'", gml);
 
         FileDownloadJob fdj = null;
         if (usePost) {
@@ -512,7 +512,7 @@ public class DownloadStepConverter {
             return;
         }
 
-        log.info(() -> "total number of features: " + numFeatures);
+        LOG.info("total number of features: {}", numFeatures);
 
         FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob(logger);
@@ -533,7 +533,7 @@ public class DownloadStepConverter {
         for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
-            log.info(() -> "download to file: " + file);
+            LOG.info("download to file: {}", file);
             if (!usePost) {
                 fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             } else {
@@ -587,14 +587,13 @@ public class DownloadStepConverter {
     }
 
     private void logGetFeatureRequest(Document params) {
-        log.log(Level.INFO, () -> {
-            try {
-                return "WFS GetFeature Request: "
-                    + XML.documentToString(params);
-            } catch (TransformerException e) {
-                // nothing to do
-            }
-            return "WFS GetFeature Request cannot be logged";
-        });
+        try {
+            String xmlAsString = XML.documentToString(params);
+            LOG.info("WFS GetFeature Request: {}", xmlAsString);
+        } catch (TransformerException e) {
+            // nothing to do
+            LOG.info("WFS GetFeature Request cannot be logged: "
+                + e.getLocalizedMessage());
+        }
     }
 }

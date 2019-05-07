@@ -18,12 +18,12 @@
 
 package de.bayern.gdi.services;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
@@ -36,13 +36,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -54,8 +54,8 @@ import org.xml.sax.SAXException;
  */
 public class Atom {
 
-    private static final Logger log
-            = Logger.getLogger(Atom.class.getName());
+    private static final Logger LOG
+            = LoggerFactory.getLogger(Atom.class.getName());
 
     private String serviceURL;
     private String username;
@@ -312,7 +312,7 @@ public class Atom {
                             targetURL.getFile().lastIndexOf('.') + 1,
                             targetURL.getFile().length());
                 } catch (URISyntaxException | MalformedURLException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
             return itemformat;
@@ -433,7 +433,7 @@ public class Atom {
         try {
             url = new URL(this.serviceURL);
         } catch (MalformedURLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         this.nscontext = new NamespaceContextMap(
                 null, "http://www.w3.org/2005/Atom",
@@ -567,10 +567,10 @@ public class Atom {
                 try {
                     polygon = reader.read(bboxStr);
                 } catch (ParseException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                     continue;
                 } catch (IllegalArgumentException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                     throw e;
                 }
 

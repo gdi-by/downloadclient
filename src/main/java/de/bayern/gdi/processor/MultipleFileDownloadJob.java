@@ -29,19 +29,19 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Abstract class to do multiple file downloads. */
 public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
     private static final Logger log
-        = Logger.getLogger(MultipleFileDownloadJob.class.getName());
+        = LoggerFactory.getLogger(MultipleFileDownloadJob.class);
 
     /** Number to re-tries for a failed download. */
     protected static final int MAX_TRIES = 5;
@@ -111,7 +111,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         String msg = I18n.format("download.file", dlf.url, dlf.file);
         log(msg);
-        log.log(Level.INFO, msg);
+        log.info(msg);
         this.currentCount = 0;
 
 
@@ -211,7 +211,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         String msg =
             I18n.format("atom.bytes.downloaded.total", this.totalCount);
         log(msg);
-        log.log(Level.INFO, msg);
+        log.info(msg);
 
         if (!failed.isEmpty()) {
             msg = I18n.format(

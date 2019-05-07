@@ -245,7 +245,21 @@ public class DownloadConfig {
         return parameters.get("CQL");
     }
 
-   /**
+    @Override
+    public String toString() {
+        return "DownloadConfig ["
+            + "configDoc=" + configDoc
+            + ", configFile=" + configFile
+            + ", dataset='" + dataset + '\''
+            + ", downloadPath='" + downloadPath + '\''
+            + ", serviceType='" + serviceType + '\''
+            + ", serviceURL='" + serviceURL + '\''
+            + ", parameters=" + parameters
+            + ", procSteps=" + procSteps
+            + ']';
+    }
+
+    /**
     * Returns the value of a tag by the name of the Tag.
     *
     * @param tagName The name of the tag.

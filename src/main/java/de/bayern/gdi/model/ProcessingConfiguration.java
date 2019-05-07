@@ -18,6 +18,8 @@
 package de.bayern.gdi.model;
 
 import de.bayern.gdi.utils.Misc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -26,8 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingConfiguration {
 
-    private static final Logger log
-        = Logger.getLogger(ProcessingStepConfiguration.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(ProcessingStepConfiguration.class.getName());
 
     /** Name of the config file. */
     public static final String PROCESSING_CONFIG_FILE =
@@ -139,6 +139,14 @@ public class ProcessingConfiguration {
         this.processingSteps = processingSteps;
     }
 
+    @Override
+    public String toString() {
+        return "ProcessingConfiguration: {"
+            + "inputElements=" + inputElements
+            + ", processingSteps=" + processingSteps
+            + "}";
+    }
+
     /**
      * Loads ProcessingConfiguration from a file.
      * @param file The file to load the ProcessingConfiguration from.
@@ -179,13 +187,12 @@ public class ProcessingConfiguration {
         try {
             in = Misc.getResource(PROCESSING_CONFIG_FILE_RES);
             if (in == null) {
-                log.log(Level.SEVERE,
-                    () -> PROCESSING_CONFIG_FILE + " not found");
+                LOG.error("{} not found", PROCESSING_CONFIG_FILE);
                 return new ProcessingConfiguration();
             }
             return read(in);
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, "Failed to load configuration", ioe);
+            LOG.error("Failed to load configuration", ioe);
         } finally {
             closeGraceful(in);
         }
@@ -197,7 +204,7 @@ public class ProcessingConfiguration {
             try {
                 in.close();
             } catch (IOException ioe) {
-                log.log(Level.INFO, "Failed to close file", ioe);
+                LOG.error("Failed to close file", ioe);
             }
         }
     }

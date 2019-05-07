@@ -79,8 +79,8 @@ public class MIMETypesTest extends TestCase {
         MIMETypes expectedMimeTypes = new MIMETypes();
         expectedMimeTypes.setTypes(expectedMimeType);
 
-        assertEquals("[" + StringUtils.join(expectedMimeTypes.getTypes(), ", ")
-            + "]", actualMimeTypes.toString());
+        assertEquals("{" + StringUtils.join(expectedMimeTypes.getTypes(), ", ")
+            + "}", actualMimeTypes.toString());
     }
 
     /** Test the findExtensions with typeName and default. */

@@ -35,9 +35,8 @@ import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Starts an external process with optional arguments and
@@ -45,8 +44,8 @@ import java.util.logging.Logger;
  */
 public class ExternalProcessJob implements Job {
 
-    private static final Logger log
-        = Logger.getLogger(ExternalProcessJob.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(ExternalProcessJob.class.getName());
 
     /** An argument for an external call. */
     public static class Arg {
@@ -261,7 +260,7 @@ public class ExternalProcessJob implements Job {
                     try {
                         in.close();
                     } catch (IOException ioe) {
-                        log.log(Level.INFO, ioe.getMessage(), ioe);
+                        LOG.info(ioe.getMessage(), ioe);
                     }
                 }
             };

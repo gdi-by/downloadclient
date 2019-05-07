@@ -19,7 +19,7 @@
 package de.bayern.gdi.gui;
 
 
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.Polygon;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.HTTP;
 import java.awt.Color;
@@ -38,8 +38,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
@@ -113,6 +111,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -120,8 +120,8 @@ import org.opengis.referencing.operation.TransformException;
 
 public class WMSMapSwing extends Parent {
 
-    private static final Logger log
-            = Logger.getLogger(WMSMapSwing.class.getName());
+    private static final Logger LOG
+            = LoggerFactory.getLogger(WMSMapSwing.class.getName());
 
     private WebMapServer wms;
     private WMSLayer wmslayer;
@@ -305,7 +305,7 @@ public class WMSMapSwing extends Parent {
             }
             httpClient.getConnectTimeout();
         } catch (IOException | ServiceException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return url;
     }
@@ -371,7 +371,7 @@ public class WMSMapSwing extends Parent {
             displayMap(baseLayer);
 
         } catch (IOException | ServiceException | FactoryException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -435,7 +435,7 @@ public class WMSMapSwing extends Parent {
                                 this.displayCRS);
                     } catch (FactoryException | TransformException e) {
                         clearCoordinateDisplay();
-                        log.log(Level.SEVERE, e.getMessage(), e);
+                        LOG.error(e.getMessage(), e);
                     }
                 } else {
                     clearCoordinateDisplay();
@@ -516,7 +516,7 @@ public class WMSMapSwing extends Parent {
                     this.displayCRS);
         } catch (FactoryException | TransformException e) {
             clearCoordinateDisplay();
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -528,12 +528,12 @@ public class WMSMapSwing extends Parent {
             CoordinateReferenceSystem sourceCRS,
             CoordinateReferenceSystem targetCRS
     ) throws TransformException, FactoryException {
-        com.vividsolutions.jts.geom.Point p1 = convertDoublesToPoint(
+        org.locationtech.jts.geom.Point p1 = convertDoublesToPoint(
                 x1,
                 y1,
                 sourceCRS,
                 targetCRS);
-        com.vividsolutions.jts.geom.Point p2 = convertDoublesToPoint(
+        org.locationtech.jts.geom.Point p2 = convertDoublesToPoint(
                 x2,
                 y2,
                 sourceCRS,
@@ -604,20 +604,20 @@ public class WMSMapSwing extends Parent {
         }
     }
 
-    private com.vividsolutions.jts.geom.Point convertDoublesToPoint(
+    private org.locationtech.jts.geom.Point convertDoublesToPoint(
             Double x,
             Double y,
             CoordinateReferenceSystem sourceCRS,
             CoordinateReferenceSystem targetCRS)
     throws TransformException, FactoryException {
-        com.vividsolutions.jts.geom.GeometryFactory gf = new
-                com.vividsolutions.jts.geom.GeometryFactory();
-        com.vividsolutions.jts.geom.Coordinate coo = new com
-                .vividsolutions.jts.geom.Coordinate(x, y);
-        com.vividsolutions.jts.geom.Point p = gf.createPoint(coo);
+        org.locationtech.jts.geom.GeometryFactory gf = new
+                org.locationtech.jts.geom.GeometryFactory();
+        org.locationtech.jts.geom.Coordinate coo = new
+                org.locationtech.jts.geom.Coordinate(x, y);
+        org.locationtech.jts.geom.Point p = gf.createPoint(coo);
         MathTransform transform = CRS.findMathTransform(
                 sourceCRS, targetCRS);
-        return (com.vividsolutions.jts.geom.Point) JTS.transform(p, transform);
+        return (org.locationtech.jts.geom.Point) JTS.transform(p, transform);
     }
 
     private void clearCoordinateDisplay() {
@@ -765,8 +765,7 @@ public class WMSMapSwing extends Parent {
                                     }
 
                                 } catch (Exception e) {
-                                    log.log(Level.SEVERE, e.getMessage(),
-                                            e);
+                                    LOG.error(e.getMessage(), e);
                                 }
 
                             }
@@ -1060,7 +1059,7 @@ public class WMSMapSwing extends Parent {
                 + resp.getStatusLine().getReasonPhrase() + " "
                 + "GET";
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return "";
     }
@@ -1110,7 +1109,7 @@ public class WMSMapSwing extends Parent {
                     SimpleFeature feature = featureBuilder.buildFeature(null);
                     polygonFeatureCollection.add(feature);
                 } catch (FactoryException | TransformException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
             org.geotools.map.Layer polygonLayer = new FeatureLayer(
@@ -1125,7 +1124,7 @@ public class WMSMapSwing extends Parent {
             }
             mapContent.addLayer(polygonLayer);
         } catch (SchemaException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -1158,7 +1157,7 @@ public class WMSMapSwing extends Parent {
             mapPane.deleteGraphics();
             mapPane.setDisplayArea(envelope);
         } catch (FactoryException | TransformException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -1174,7 +1173,7 @@ public class WMSMapSwing extends Parent {
                             y2, coordinateReferenceSystem);
             setExtend(initExtend);
         } catch (FactoryException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
 
     }

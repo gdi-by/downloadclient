@@ -23,14 +23,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.xpath.XPathConstants;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -41,8 +41,8 @@ import org.w3c.dom.NodeList;
  */
 public class ServiceChecker {
 
-    private static final Logger log
-            = Logger.getLogger(ServiceChecker.class.getName());
+    private static final Logger LOG
+            = LoggerFactory.getLogger(ServiceChecker.class.getName());
 
     private static final String COULD_NOT_GET_DOCUMENT_OF_URL
             = "Could not get Document of URL: ";
@@ -78,7 +78,7 @@ public class ServiceChecker {
         try {
             return checkService(new URL(serviceURL), user, password);
         } catch (MalformedURLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return null;
     }
@@ -129,7 +129,7 @@ public class ServiceChecker {
             }
         } catch (URISyntaxException
                 | IOException e) {
-            log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
+            LOG.error(COULD_NOT_GET_DOCUMENT_OF_URL
                     + serviceURL.toString(), e);
             return null;
         }
@@ -194,7 +194,7 @@ public class ServiceChecker {
                 mainXML = XML.getDocument(url, false);
             } catch (URISyntaxException
                     | IOException e) {
-                log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
+                LOG.error(COULD_NOT_GET_DOCUMENT_OF_URL
                         + url.toString(), e);
                 return true;
             }
@@ -216,7 +216,7 @@ public class ServiceChecker {
                      entryDoc = XML.getDocument(entryURL, false);
                 } catch (URISyntaxException
                     | IOException e) {
-                    log.log(Level.SEVERE, COULD_NOT_GET_DOCUMENT_OF_URL
+                    LOG.error(COULD_NOT_GET_DOCUMENT_OF_URL
                         + entryURL.toString(), e);
                     return true;
                 }
@@ -231,7 +231,7 @@ public class ServiceChecker {
                 URL downloadURL = HTTP.buildAbsoluteURL(url, downloadURLStr);
                 return simpleRestricted(downloadURL);
             } catch (URISyntaxException | MalformedURLException e) {
-                log.log(Level.SEVERE, e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
         } else {
             return simpleRestricted(url);
@@ -252,7 +252,7 @@ public class ServiceChecker {
                 return true;
             }
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return false;
     }
@@ -279,7 +279,7 @@ public class ServiceChecker {
                 return statusLine.getStatusCode();
             }
         } catch (URISyntaxException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         return -1;
     }
@@ -294,7 +294,7 @@ public class ServiceChecker {
         try {
             return isReachable(new URL(url));
         } catch (MalformedURLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             return false;
         }
     }
@@ -314,6 +314,8 @@ public class ServiceChecker {
             return retcode == HttpStatus.SC_OK
                 || retcode == HttpStatus.SC_UNAUTHORIZED;
         } catch (IOException e) {
+            LOG.warn("URL " + url.toExternalForm()
+                + " not reachable: " + e.getLocalizedMessage());
             return false;
         }
     }

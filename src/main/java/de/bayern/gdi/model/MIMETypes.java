@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,14 +35,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Model for mapping MIME types to file name extensions. */
 @XmlRootElement(name = "MIMETypes")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MIMETypes {
 
-    private static final Logger log
-        = Logger.getLogger(MIMETypes.class.getName());
+    private static final Logger LOG
+        = LoggerFactory.getLogger(MIMETypes.class.getName());
 
     /** Name of the config file. */
     public static final String MIME_TYPES_FILE =
@@ -79,7 +79,7 @@ public class MIMETypes {
 
     @Override
     public String toString() {
-        return "[" + StringUtils.join(types, ", ") + "]";
+        return "{" + StringUtils.join(types, ", ") + "}";
     }
 
     /**
@@ -173,19 +173,18 @@ public class MIMETypes {
         try {
             in = Misc.getResource(MIME_TYPES_FILE_RES);
             if (in == null) {
-                log.log(Level.SEVERE,
-                    () -> MIME_TYPES_FILE + " not found");
+                LOG.error("{} not found", MIME_TYPES_FILE);
                 return new MIMETypes();
             }
             return read(in);
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, "Failed to load mimetypes", ioe);
+            LOG.error("Failed to load mimetypes", ioe);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException ioe) {
-                    log.log(Level.SEVERE, "Failed to close mimetypes", ioe);
+                    LOG.error("Failed to close mimetypes", ioe);
                 }
             }
         }

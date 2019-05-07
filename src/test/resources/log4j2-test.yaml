@@ -1,0 +1,33 @@
+Configuration:
+    name: DownloadClient
+
+    Appenders:
+        Console:
+            name: Console_Appender
+            PatternLayout:
+                Pattern: "%d{HH:mm:ss,SSS} %p %c %m%n"
+            target: SYSTEM_OUT
+    Loggers:
+        Root:
+            AppenderRef:
+                - ref: Console_Appender
+        Logger:
+        -   name: Application_Log
+            level: warn
+        -   name: de.bayern.gdi
+            level: warn
+        -   name: de.bayern.gdi.Headless
+            level: off
+        -   name: org.geotools
+            level: warn
+        -   name: org.apache
+            level: warn
+        -   name: net.refractions
+            level: warn
+        -   name: org.hsqldb
+            level: warn
+        -   name: org.eclipse.jetty
+            level: warn
+        -   name: javafx
+            level: warn
+

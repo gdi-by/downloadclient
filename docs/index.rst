@@ -61,19 +61,19 @@ Funktionalität
 Unterstützte Downloaddienstvarianten
 ---------------------------------------
 
-Aktuell werden folgende INSPIRE-Downloaddienstvarianten[1_] vom Download-Client unterstützt:
+Aktuell werden folgende INSPIRE-Downloaddienstvarianten [#f1]_ vom Download-Client unterstützt:
 
 +-------------------------------------+--------------------------------+----------------------------+
 | Variante                            | Standard                       | Konformitätsklasse         |
 +=====================================+================================+============================+
-| Pre-defined Dataset Downlaod        | Web Featrue Service (WFS)  2.0 |  Simple WFS                |
+| Pre-defined Dataset Download        | Web Feature Service (WFS)  2.0 |  Simple WFS                |
 +-------------------------------------+--------------------------------+----------------------------+
 | Direct Access Download              | WFS 2.0                        |  Basic WFS                 |
 +-------------------------------------+--------------------------------+----------------------------+
 | Pre-defined Dataset Download        | predefined ATOM                |                            |
 +-------------------------------------+--------------------------------+----------------------------+
 
-.. [1] gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf
+.. [#f1] gemäß der Technical Guidance for the Implementation of INSPIRE Download Services, Version 3.1, s. http://inspire.jrc.ec.europa.eu/documents/Network_Services/Technical_Guidance_Download_Services_v3.1.pdf
 
 Benutzeroberfläche 
 -------------------
@@ -129,7 +129,8 @@ Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format
 FeatureTypes
 ************
 
-Handelt es sich um ein FeatureType, so kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck aufziehen und so den Bereich wählen, für welchen er Daten beziehen möchte. 
+Für jeden über den ausgewählten WFS bereitgestellten FeatureType wird ein Eintrag in der Auswahlliste mit dem Zusatz *"(BBOX)"* angegeben.
+So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so den Abfragebereich definieren, für welchen er Daten beziehen möchte.
 Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden. 
 
 **Beispiel:**
@@ -138,6 +139,34 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
+
+***********************
+Abfragen mit CQL-Filter
+***********************
+
+Neben der Auswahl über ein Begrenzungsrechteck (BBOX) wird für jeden bereitgestellten FeatureType ein Eintrag in der Auswahlliste mit dem Zusatz *"(Filter)"* angegeben.
+So kann der Benutzer mit Angabe eines CQL-Ausdrucks [#f2]_ im Textfeld die Ausgabe des WFS filtern.
+
+**Beispiel:**
+
+
+.. image:: img/V1.2_cqlfilter_WFS.PNG
+
+Im oben dargestellten Beispiel wird der FeatureType *"Gemeinden"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
+
+************************
+Typübergreifende Abfrage
+************************
+
+Zusätzlich zu der Filterfunktion je FeatureType kann auch ein typübergreifender Filter definiert werden. Dazu muss in der Auswahl der Eintrag "Typübergreifende Abfrage (Filter)" ausgewählt werden.
+Im Textfeld kann der Benutzer einen oder mehrere CQL-Ausdrücke [#f2]_ eingeben und somit die Ausgabe des WFS filtern.
+
+
+.. image:: img/V1.2_complex_cqlfilter_WFS.PNG
+
+Im oben dargestellten Beispiel wird der FeatureType *"bvv:gmd_ex"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
+
+.. [#f2] Ein Common Query Language (CQL) Ausdruck ist vergleichbar mit einer SQL-Abfrage für Datenbanken. Beispiele für CQL-Ausdrücke gibt es im GeoTools Handbuch http://docs.geotools.org/latest/userguide/library/cql/index.html und im uDig Handbuch http://udig.github.io/docs/user/concepts/Constraint%20Query%20Language.html
 
 Download von Datensätzen eines predefined ATOM Downloaddienstes
 ------------------------------------------------------------------
@@ -194,8 +223,50 @@ Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m
 Download-Logfiles
 -------------------
 
-Für jeden Download, der über den Button „Download start…“ angestoßen wurde, wird im Ordner, der als Speicherort für den Download angegeben wurde, automatisch ein Logfile (Dateiname download_<DatumUhrzeitNr>.log) gespeichert. 
+Für jeden Download, der über den Button „Download start…“ angestoßen wurde, wird im Ordner, der als Speicherort für den Download angegeben wurde, automatisch ein Logfile (Dateiname download_<DatumUhrzeitNr>.log) gespeichert.
 
+Anwendungs-Logfile
+-------------------
+Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt), in dem die Aktionen der Anwendung Download-Client protokolliert werden.
+Diese Log-Datei kann zur Fehleranalyse oder zur Auswertung der HTTP-Anfragen genutzt werden.
+
+Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig.
+Dazu muss folgende Zeile unterhalb des Elements ``Configuration:Loggers:Logger`` aktiviert werden:
+
+.. code-block:: yaml
+
+  - name: org.apache.http.wire
+    level: all
+
+Sollen nur die HTTP-HEADER Informationen ausgegeben werden, so ist folgende Konfiguration zu verwenden:
+
+.. code-block:: yaml
+
+  - name: org.apache.http.headers
+    level: all
+
+Damit die HTTP-Anfragen auch im Anwendungs-Logfile ausgegeben werden, muss zusätzlich auch noch unterhalb von
+``Configuration:Loggers:Root:AppenderRef`` folgende Einstellung vorgenommen werden:
+
+.. code-block:: yaml
+
+  - ref: File_Appender
+    level: all
+
+Da die Ausgabe des vollständigen Netzwerkverkehrs auch Auswirkung auf die Performanz der Anwendung hat und zu einer
+schnell wachsenden Anwendungs-Logfile führt, muss diese Funktion, wie oben beschrieben, erst aktiviert werden.
+
+Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. Dazu muss in der Konfigurationsdatei unterhalb des Elements
+``Configuration:Loggers:Logger`` der Log-Level für den Logger ``de.bayern.gdi`` auf ``trace`` geändert werden:
+
+.. code-block:: yaml
+
+  - name: de.bayern.gdi
+    level: trace
+
+Weitere Informationen, wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
+
+.. [#f3] Apache Log4j2 Dokumentation https://logging.apache.org/log4j/2.x/manual/configuration.html
 
 Ausführungswiederholung
 ---------------------------

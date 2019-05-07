@@ -47,17 +47,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Basic integrative tests for the UI component.
+ * Basic integration tests for the UI component.
  * Tests are not exhaustive although helpful for
  * covering the basic testing needs.
  *
  * @author thomas
  */
-public class IntegrationTest extends TestBase {
+public class AppIT extends TestBase {
 
     // CONSTANTS
 
@@ -88,7 +89,7 @@ public class IntegrationTest extends TestBase {
      * Total number of StoredQueries provided by service
      * VERWALTUNGSGRENZEN_URL.
      */
-    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 8;
+    private static final int VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES = 10;
 
     /**
      * Number of services overall FeatureTypes.
@@ -108,9 +109,15 @@ public class IntegrationTest extends TestBase {
             + "&request=GetCapabilities";
 
     /**
-     * WFS.
+     * PASSWORD_PROTECTED_WFS.
      */
-    private static final String WFS = "WFS";
+    private static final String PASSWORD_PROTECTED_WFS = "Passwort";
+
+    /**
+     * Position of a protected WFS service in the selection list. This value
+     * is very likely to change over time!
+     */
+    private static final int POS_OF_PROTECTED_SERVICE = 0;
 
     // DATA MEMBERS
 
@@ -272,9 +279,21 @@ public class IntegrationTest extends TestBase {
     }
 
     /**
-     * Test a protected serivce.
+     * This integration test shall verify that the user selects a WFS service
+     * which is protected and requires login credentials.
+     * The test simulates that:
+     * <ul>
+     *     <li>The user enters 'WFS' and clicks on search button</li>
+     *     <li>The result is displayed in the list view</li>
+     *     <li>The user selects a protected service (which is 3rd element)</li>
+     *     <li>The status log shows the message that username and password
+     *     are required</li>
+     * </ul>
      *
-     * @throws Exception in case
+     * <p>Precondition for this test is:
+     * That the third element is WFS service
+     * https://www.geodaten.bayern.de/wfs/ogc_flurkarte.cgi
+     * </p>
      *                   <p>
      *                   TODO selectNthService is a brittle solution
      *                   which circumvents a problem of selecting a
@@ -287,12 +306,14 @@ public class IntegrationTest extends TestBase {
      *                   Works for **now**. tj
      */
     @Test
-    public void testProtected() throws Exception {
-        clickOn(SEARCH).write(WFS);
+    public void testProtected() {
+        clickOn(SEARCH).write(PASSWORD_PROTECTED_WFS);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
         assertTrue(size(SERVICE_LIST, x -> x > 0));
-        selectNthService(2);
+        // FIXME This magic number shall select a protected service,
+        //  but this is selection is instable!
+        selectNthService(POS_OF_PROTECTED_SERVICE); // TODO brittle solution
         waitFor(PROTECTED_STATE);
         assertTrue(isChecked(AUTH));
     }

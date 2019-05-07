@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,9 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(Parameterized.class)
 public class DownloadStepConverterIT {
+
+    private static final Logger LOG
+        = LoggerFactory.getLogger(DownloadStepConverterIT.class.getName());
 
     /**
      * Service under test.
@@ -112,14 +117,14 @@ public class DownloadStepConverterIT {
                 TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example1.cql"))},
-            {"Example2", createDownloadStep(
+            /*{"Example2", createDownloadStep(
                 TestService.GEOSERVER,
                 GEMEINDEN_DATASET,
                 resourceAsString("/cql/example2.cql"))},
             {"Example3", createDownloadStep(
                 TestService.GEOSERVER,
                 OVERALL_DATASET,
-                resourceAsString("/cql/example3.cql"))},
+                resourceAsString("/cql/example3.cql"))},*/
             {"Example4", createDownloadStep(
                 TestService.GEOSERVER,
                 OVERALL_DATASET,
@@ -186,9 +191,8 @@ public class DownloadStepConverterIT {
      */
     @Test
     public void testConvert() throws Exception {
-        System.out.println("Start test " + testName + " Test directory: "
-            + downloadStep.getPath() + " ...");
-
+        LOG.debug("Start test '{}' in test directory: {}",
+            testName, downloadStep.getPath());
         DownloadStepConverter downloadStepConverter =
             new DownloadStepConverter();
         JobList jobList = downloadStepConverter.convert(downloadStep);
