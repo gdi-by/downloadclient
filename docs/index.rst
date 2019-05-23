@@ -337,6 +337,13 @@ Hier können folgende Einstellungen angepasst werden:
      <use-get-url>(http|https)://example2.com/.*$</use-get-url>
    </check-restriction>
 
+- im Element ``<basedir>`` kann das Verzeichnis angegeben werden, das beim Öffnen der Dialoge zum Laden und Speichern einer Download-Konfiguration für die
+  Ausführungswiederholung verwendet wird.
+
+.. code-block:: xml
+
+   <basedir>C:/TEMP/config</basedir>
+
 
 verarbeitungsschritte.xml
 ---------------------------
