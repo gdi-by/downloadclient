@@ -21,9 +21,10 @@ Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier b
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
-**Für die Ausführung des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
+**Für die Ausführung des Download-Clients wird mindestens Java 1.8.0 oder Java 11.0 mit JavaFX benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
 
 Inbetriebnahme
 --------------
