@@ -15,32 +15,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package de.bayern.gdi;
 
-package de.bayern.gdi.utils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 
 /**
- * @author Jochen Saalfeld (jochen@intevation.de)
+ * Integrationtest verifing start of CLI.
  */
-public final class UnauthorizedLog implements Unauthorized {
+public class HeadlessIT {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(UnauthorizedLog.class.getName());
+    private static String[] cliargs = new String[0];
 
     /**
-     * Constructor.
+     * Start CLI with property for log4j.
+     *
+     * @param args none
      */
-    public UnauthorizedLog() {
-        // Do nothing.
+    public static void main(String[] args) {
+        cliargs = args;
+        new HeadlessIT().testExecutionOfCLI();
     }
 
     /**
-     * writes to the log, when user and pw is wrong.
+     * Simple test to verify that CLI is executable.
      */
-    @Override
-    public void unauthorized() {
-        LOG.error(I18n.getMsg("gui.wrong.user.and.pw"), this);
+    @Test
+    public void testExecutionOfCLI() {
+        System.setProperty("logfilename", "logdlc-TEST.txt");
+        Headless.main(cliargs, null, null);
     }
 }

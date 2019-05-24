@@ -1,6 +1,5 @@
 #https://docs.travis-ci.com/user/reference/overview/
 language: java
-sudo: false
 dist: trusty
 before_script:
 - "export DISPLAY=:99.0"
@@ -8,10 +7,8 @@ before_script:
 - sleep 3 # give xvfb some time to start
 jdk:
 - oraclejdk8
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
+- oraclejdk11
+- openjdk11
 script:
 - java -version
 - mvn install

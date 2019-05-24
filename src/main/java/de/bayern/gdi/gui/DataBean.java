@@ -134,7 +134,7 @@ public class DataBean extends Observable {
                         new CatalogService(serviceSetting.getCatalogueURL());
             } catch (URISyntaxException | IOException e) {
                 throw new IOException(
-                        "Failed to Initialize Calatalog Service: '"
+                        "Failed to Initialize Catalog Service: '"
                                 + serviceSetting.getCatalogueURL()
                                 + "'");
             }

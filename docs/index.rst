@@ -18,12 +18,36 @@ Installation
 
 Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: http://www.gdi.bayern/downloadclient
 
+Für beide Betriebssysteme steht je eine Version des Download-Client für die Java Version 1.8 und Java 11.0 zur Verfügung.
+
+Prüfen Sie vor dem Download der Datei die installierte Java-Version mit dem Befehl `java -version` und wählen Sie entsprechend
+der angezeigten Java-Version das passende Installationspaket für den Download-Client aus.
+
+Wenn kein Java installiert ist, dann installieren Sie wie
+im folgenden Kapitel beschrieben eine für das Betriebssystem passende Java-Version.
+
+
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
-**Für die Ausführung des Download-Clients wird mindestens Java 1.8.0.40 benötigt.**
+**Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX benötigt.**
 
-Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+Aktuelle Java-Versionen können hier heruntergeladen werden:
+- Oracle JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- OpenJDK: https://adoptopenjdk.net/
+
+Installationspakete für Windows:
+- Oracle JDK 1.8 oder OpenJDK 1.8:
+    - `downloadclient-X.Y_Windows_jdk8.zip`
+- Oracle JDK 11.0 oder OpenJDK 11.0:
+    - `downloadclient-X.Y_Windows_jdk11.zip`
+
+Installationspakete für Linux:
+- Oracle JDK 1.8 oder OpenJDK 1.8:
+    - `downloadclient-X.Y_Linux_jdk8.zip`
+- Oracle JDK 11.0 oder OpenJDK 11.0:
+    - `downloadclient-X.Y_Linux_jdk11.zip`
+
 
 Inbetriebnahme
 --------------
@@ -33,7 +57,8 @@ Das Zip-Archiv an einen geeigneten Ort entpacken.
 Starten der Anwendung
 ----------------------
 
-Die Datei ``startup.bat`` ausführen.
+Unter Windows die Datei ``startup.bat`` ausführen.
+Unter Linux die Datei ``startup.sh`` ausführen.
 
 Proxy-Einstellungen
 --------------------
@@ -335,6 +360,13 @@ Hier können folgende Einstellungen angepasst werden:
      <use-get-url>http://example1.com/.*$</use-get-url>
      <use-get-url>(http|https)://example2.com/.*$</use-get-url>
    </check-restriction>
+
+- im Element ``<basedir>`` kann das Verzeichnis angegeben werden, das beim Öffnen der Dialoge zum Laden und Speichern einer Download-Konfiguration für die
+  Ausführungswiederholung verwendet wird.
+
+.. code-block:: xml
+
+   <basedir>C:/TEMP/config</basedir>
 
 
 verarbeitungsschritte.xml
