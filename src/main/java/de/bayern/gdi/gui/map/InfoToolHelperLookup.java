@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.map;
 
 import java.util.ArrayList;
 import java.util.List;

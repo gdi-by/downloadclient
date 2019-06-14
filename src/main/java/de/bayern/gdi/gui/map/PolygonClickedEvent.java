@@ -17,7 +17,7 @@
  */
 
 
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.map;
 
 import javafx.event.Event;
 import javafx.event.EventTarget;
@@ -29,21 +29,23 @@ import javafx.event.EventType;
 
 public class PolygonClickedEvent extends Event {
 
-    private WMSMapSwing.PolygonInfos polyInf;
+    private PolygonInfos polyInf;
 
     /**
      * the event type.
      */
     public static final EventType<PolygonClickedEvent> NOTIFY =
-            new EventType(EventType.ROOT, "NOTIFY");
+        new EventType(EventType.ROOT, "NOTIFY");
 
     /**
      * Constructor.
+     *
      * @param polygonInfos about the clicked polygon
      */
-    public PolygonClickedEvent(WMSMapSwing.PolygonInfos polygonInfos) {
+    public PolygonClickedEvent(PolygonInfos polygonInfos) {
         this(NOTIFY, polygonInfos);
     }
+
     /**
      * Constructor.
      */
@@ -53,17 +55,19 @@ public class PolygonClickedEvent extends Event {
 
     /**
      * Constructor.
-     * @param arg0 the event source
+     *
+     * @param arg0         the event source
      * @param polygonInfos the infos about the clicked polygon
      */
     public PolygonClickedEvent(EventType<? extends Event> arg0,
-                               WMSMapSwing.PolygonInfos polygonInfos) {
+                               PolygonInfos polygonInfos) {
         super(arg0);
         this.polyInf = polygonInfos;
     }
 
     /**
      * Constructor.
+     *
      * @param arg0 the event source
      * @param arg1 the event target
      * @param arg2 the event type
@@ -75,9 +79,10 @@ public class PolygonClickedEvent extends Event {
 
     /**
      * gets the polygon Infos.
+     *
      * @return Polygon Infos
      */
-    public WMSMapSwing.PolygonInfos getPolygonInfos() {
+    public PolygonInfos getPolygonInfos() {
         return this.polyInf;
     }
 }

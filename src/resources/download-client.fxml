@@ -10,6 +10,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import de.bayern.gdi.gui.NumberTextField?>
+<?import com.sothawo.mapjfx.MapView?>
 
 <VBox prefHeight="622.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -87,7 +88,7 @@
                                             </graphic>
                                             <tooltip>
                                                 <Tooltip text="%tooltip.search"
-                                                    wrapText="true" />
+                                                         wrapText="true" />
                                             </tooltip>
                                             <HBox.margin>
                                                 <Insets left="5.0" right="5.0"/>
@@ -95,14 +96,14 @@
                                         </Button>
 
                                         <ProgressIndicator
-                                                fx:id="progressSearch"
-                                                prefHeight="23"
-                                                prefWidth="23"
-                                                visible="false"
-                                                managed="false"
-                                                HBox.hgrow="NEVER">
+                                            fx:id="progressSearch"
+                                            prefHeight="23"
+                                            prefWidth="23"
+                                            visible="false"
+                                            managed="false"
+                                            HBox.hgrow="NEVER">
                                             <HBox.margin>
-                                                    <Insets left="10.5" right="10.4" bottom="1.5" top="0.0"/>
+                                                <Insets left="10.5" right="10.4" bottom="1.5" top="0.0"/>
                                             </HBox.margin>
                                         </ProgressIndicator>
                                     </children>
@@ -148,7 +149,7 @@
                                     </VBox.margin>
                                     <tooltip>
                                         <Tooltip
-                                                text="%tooltip.choose_service"/>
+                                            text="%tooltip.choose_service"/>
                                     </tooltip>
                                 </Button>
                                 <Separator prefWidth="200.0"/>
@@ -225,7 +226,7 @@
                                     </VBox.margin>
                                     <tooltip>
                                         <Tooltip
-                                                text="%tooltip.choose_dataset"/>
+                                            text="%tooltip.choose_dataset"/>
                                     </tooltip>
                                 </ComboBox>
                                 <SplitPane fx:id="mapSplitPane"
@@ -241,138 +242,152 @@
                                                     <children>
                                                         <VBox fx:id="basicWFSContainer">
                                                             <children>
-                                                                <Group fx:id="mapNodeWFS"
-                                                                       VBox.vgrow="ALWAYS">
-                                                                    <VBox.margin>
-                                                                        <Insets bottom="2.0"
-                                                                                left="20.0"
-                                                                                right="0.0"
-                                                                                top="5.0"/>
-                                                                    </VBox.margin>
-                                                                </Group>
-                                                                <HBox fx:id="basicWFSFirstRows">
+                                                                <VBox fx:id="mapNodeWFS" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
                                                                     <children>
-                                                                            <VBox fx:id="basicWFSX1Y1"
-                                                                                  alignment="TOP_LEFT"
-                                                                                  prefHeight="30.0"
-                                                                                  prefWidth="200.0"
-                                                                                  VBox.vgrow="SOMETIMES">
-                                                                                <HBox>
-                                                                                    <Label
+                                                                        <HBox spacing="2.0" >
+                                                                            <fx:define>
+                                                                                <ToggleGroup fx:id="wmsMapActionGrp"/>
+                                                                            </fx:define>
+                                                                            <children>
+                                                                                <ToggleButton fx:id="wfsMapBboxButton" toggleGroup="$wmsMapActionGrp"/>
+                                                                                <ToggleButton fx:id="wfsMapInfoButton" toggleGroup="$wmsMapActionGrp"/>
+                                                                                <Button fx:id="wfsMapResizeButton"/>
+                                                                            </children>
+                                                                            <VBox.margin>
+                                                                                <Insets bottom="5.0"
+                                                                                        top="2.0"/>
+                                                                            </VBox.margin>
+                                                                        </HBox>
+                                                                        <MapView fx:id="wfsMapView" prefHeight="300.0" prefWidth="400.0" VBox.vgrow="ALWAYS"/>
+                                                                        <Label fx:id="wfsMapWmsSource" VBox.vgrow="NEVER">
+                                                                            <font>
+                                                                                <Font name="System Bold"
+                                                                                      size="13.0"/>
+                                                                            </font>
+                                                                        </Label>
+                                                                        <HBox fx:id="basicWFSFirstRows" >
+                                                                            <children>
+                                                                                <VBox fx:id="basicWFSX1Y1"
+                                                                                      alignment="TOP_LEFT"
+                                                                                      prefHeight="30.0"
+                                                                                      prefWidth="200.0"
+                                                                                      VBox.vgrow="SOMETIMES">
+                                                                                    <HBox>
+                                                                                        <Label
                                                                                             text="%gui.bottom">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="20.0"
-                                                                                                    right="20.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                </HBox>
-                                                                                <HBox>
-                                                                                    <Label text="%gui.x1"
-                                                                                           fx:id="lablbasicx1"
-                                                                                           prefWidth="175"
-                                                                                           minWidth="120">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="20.0"
-                                                                                                    right="5.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                    <NumberTextField
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="20.0"
+                                                                                                        right="20.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                    </HBox>
+                                                                                    <HBox>
+                                                                                        <Label text="%gui.x1"
+                                                                                               fx:id="lablbasicx1"
+                                                                                               prefWidth="175"
+                                                                                               minWidth="120">
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="20.0"
+                                                                                                        right="5.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                        <NumberTextField
                                                                                             fx:id="basicX1"
                                                                                             minWidth="-Infinity"
                                                                                             prefWidth="140.0">
-                                                                                        <tooltip>
-                                                                                            <Tooltip
+                                                                                            <tooltip>
+                                                                                                <Tooltip
                                                                                                     text="%tooltip.x1"/>
-                                                                                        </tooltip>
-                                                                                    </NumberTextField>
-                                                                                </HBox>
-                                                                                <HBox>
-                                                                                    <Label text="%gui.y1"
-                                                                                           fx:id="lablbasicy1"
-                                                                                           prefWidth="175"
-                                                                                           minWidth="120">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="20.0"
-                                                                                                    right="5.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                    <NumberTextField
+                                                                                            </tooltip>
+                                                                                        </NumberTextField>
+                                                                                    </HBox>
+                                                                                    <HBox>
+                                                                                        <Label text="%gui.y1"
+                                                                                               fx:id="lablbasicy1"
+                                                                                               prefWidth="175"
+                                                                                               minWidth="120">
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="20.0"
+                                                                                                        right="5.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                        <NumberTextField
                                                                                             fx:id="basicY1"
                                                                                             minWidth="-Infinity"
                                                                                             prefWidth="140.0">
-                                                                                        <tooltip>
-                                                                                            <Tooltip
+                                                                                            <tooltip>
+                                                                                                <Tooltip
                                                                                                     text="%tooltip.y1"/>
-                                                                                        </tooltip>
-                                                                                    </NumberTextField>
-                                                                                </HBox>
-                                                                            </VBox>
-                                                                            <VBox fx:id="basicWFSX2Y2"
-                                                                                  prefHeight="31.0"
-                                                                                  prefWidth="200.0"
-                                                                                  VBox.vgrow="SOMETIMES">
-                                                                                <HBox>
-                                                                                    <Label
+                                                                                            </tooltip>
+                                                                                        </NumberTextField>
+                                                                                    </HBox>
+                                                                                </VBox>
+                                                                                <VBox fx:id="basicWFSX2Y2"
+                                                                                      prefHeight="31.0"
+                                                                                      prefWidth="200.0"
+                                                                                      VBox.vgrow="SOMETIMES">
+                                                                                    <HBox>
+                                                                                        <Label
                                                                                             text="%gui.top">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="15.0"
-                                                                                                    right="5.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                </HBox>
-                                                                                <HBox>
-                                                                                    <Label text="%gui.x2"
-                                                                                           fx:id="lablbasicx2"
-                                                                                           prefWidth="175"
-                                                                                           minWidth="120">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="15.0"
-                                                                                                    right="5.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                    <NumberTextField
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="15.0"
+                                                                                                        right="5.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                    </HBox>
+                                                                                    <HBox>
+                                                                                        <Label text="%gui.x2"
+                                                                                               fx:id="lablbasicx2"
+                                                                                               prefWidth="175"
+                                                                                               minWidth="120">
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="15.0"
+                                                                                                        right="5.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                        <NumberTextField
                                                                                             fx:id="basicX2"
                                                                                             minWidth="-Infinity"
                                                                                             prefWidth="140.0">
-                                                                                        <tooltip>
-                                                                                            <Tooltip
+                                                                                            <tooltip>
+                                                                                                <Tooltip
                                                                                                     text="%tooltip.x2"/>
-                                                                                        </tooltip>
-                                                                                    </NumberTextField>
-                                                                                </HBox>
-                                                                                <HBox>
-                                                                                    <Label text="%gui.y2"
-                                                                                           fx:id="lablbasicy2"
-                                                                                           prefWidth="175"
-                                                                                           minWidth="120">
-                                                                                        <HBox.margin>
-                                                                                            <Insets bottom="5.0"
-                                                                                                    left="15.0"
-                                                                                                    right="5.0"
-                                                                                                    top="5.0"/>
-                                                                                        </HBox.margin>
-                                                                                    </Label>
-                                                                                    <NumberTextField
+                                                                                            </tooltip>
+                                                                                        </NumberTextField>
+                                                                                    </HBox>
+                                                                                    <HBox>
+                                                                                        <Label text="%gui.y2"
+                                                                                               fx:id="lablbasicy2"
+                                                                                               prefWidth="175"
+                                                                                               minWidth="120">
+                                                                                            <HBox.margin>
+                                                                                                <Insets bottom="5.0"
+                                                                                                        left="15.0"
+                                                                                                        right="5.0"
+                                                                                                        top="5.0"/>
+                                                                                            </HBox.margin>
+                                                                                        </Label>
+                                                                                        <NumberTextField
                                                                                             fx:id="basicY2"
                                                                                             minWidth="-Infinity"
                                                                                             prefWidth="140.0">
-                                                                                        <tooltip>
-                                                                                            <Tooltip
+                                                                                            <tooltip>
+                                                                                                <Tooltip
                                                                                                     text="%tooltip.y2"/>
-                                                                                        </tooltip>
-                                                                                    </NumberTextField>
-                                                                                </HBox>
-                                                                            </VBox>
+                                                                                            </tooltip>
+                                                                                        </NumberTextField>
+                                                                                    </HBox>
+                                                                                </VBox>
                                                                             </children>
                                                                             <VBox.margin>
                                                                                 <Insets bottom="15.0"
@@ -381,118 +396,148 @@
                                                                                         top="4.0"/>
                                                                             </VBox.margin>
                                                                         </HBox>
-                                                                        <VBox fx:id="sqlWFSArea" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
+                                                                    </children>
+                                                                    <VBox.margin>
+                                                                        <Insets bottom="5.0"
+                                                                                left="20.0"
+                                                                                right="10.0"
+                                                                                top="5.0"/>
+                                                                    </VBox.margin>
+                                                                </VBox>
+                                                                <VBox fx:id="sqlWFSArea" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
+                                                                    <children>
+                                                                        <HBox  prefHeight="245.0" prefWidth="400.0" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
                                                                             <children>
-                                                                                <HBox  prefHeight="245.0" prefWidth="400.0" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
-                                                                                    <children>
-                                                                                        <TextArea fx:id="sqlTextarea"
-                                                                                                  maxWidth="1.7976931348623157E308"
-                                                                                                  prefHeight="253.0"
-                                                                                                  prefWidth="367.0"
-                                                                                                  promptText="&quot;hk:ags&quot; = '09162000'"
-                                                                                                  style="-fx-background-color: ffffff;"
-                                                                                                  HBox.hgrow="ALWAYS" >
-                                                                                            <tooltip>
-                                                                                                <Tooltip text="%tooltip.sql" />
-                                                                                            </tooltip>
-                                                                                        </TextArea>
-                                                                                    </children>
-                                                                                    <VBox.margin>
-                                                                                        <Insets bottom="50.0"
-                                                                                                left="20.0"
-                                                                                                right="10.0"
-                                                                                                top="0.0"/>
-                                                                                    </VBox.margin>
-                                                                                </HBox>
+                                                                                <TextArea fx:id="sqlTextarea"
+                                                                                          maxWidth="1.7976931348623157E308"
+                                                                                          prefHeight="253.0"
+                                                                                          prefWidth="367.0"
+                                                                                          promptText="&quot;hk:ags&quot; = '09162000'"
+                                                                                          style="-fx-background-color: ffffff;"
+                                                                                          HBox.hgrow="ALWAYS" >
+                                                                                    <tooltip>
+                                                                                        <Tooltip text="%tooltip.sql" />
+                                                                                    </tooltip>
+                                                                                </TextArea>
+                                                                            </children>
+                                                                            <VBox.margin>
+                                                                                <Insets bottom="50.0"
+                                                                                        left="20.0"
+                                                                                        right="10.0"
+                                                                                        top="0.0"/>
+                                                                            </VBox.margin>
+                                                                        </HBox>
 
-                                                                            </children>
-                                                                        </VBox>
-                                                                        <Separator
-                                                                                prefWidth="200.0"/>
-                                                                        <VBox alignment="CENTER_LEFT"
-                                                                              VBox.vgrow="NEVER">
+                                                                    </children>
+                                                                </VBox>
+                                                                <Separator
+                                                                    prefWidth="200.0"/>
+                                                                <VBox alignment="CENTER_LEFT"
+                                                                      VBox.vgrow="NEVER">
+                                                                    <children>
+                                                                        <HBox VBox.vgrow="NEVER">
                                                                             <children>
-                                                                                <HBox VBox.vgrow="NEVER">
-                                                                                    <children>
-                                                                                        <Label minWidth="-Infinity"
-                                                                                               prefWidth="120.0"
-                                                                                               text="%gui.data-format">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="20.0"
-                                                                                                        right="5.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                        </Label>
-                                                                                        <ComboBox
-                                                                                                fx:id="dataFormatChooser"
-                                                                                                minWidth="-Infinity"
-                                                                                                onAction="#handleDataformatSelect"
-                                                                                                HBox.hgrow="ALWAYS">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="5.0"
-                                                                                                        right="15.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                            <tooltip>
-                                                                                                <Tooltip
-                                                                                                        text="%tooltip.wfs.dataformat"
-                                                                                                        wrapText="true"/>
-                                                                                            </tooltip>
-                                                                                        </ComboBox>
-                                                                                    </children>
-                                                                                </HBox>
-                                                                                <HBox VBox.vgrow="NEVER">
-                                                                                    <children>
-                                                                                        <Label fx:id="referenceSystemChooserLabel"
-                                                                                               minWidth="-Infinity"
-                                                                                               prefWidth="120.0"
-                                                                                               text="%gui.reference-system">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="20.0"
-                                                                                                        right="5.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                        </Label>
-                                                                                        <ComboBox
-                                                                                                fx:id="referenceSystemChooser"
-                                                                                                minWidth="-Infinity"
-                                                                                                onAction="#handleReferenceSystemSelect"
-                                                                                                HBox.hgrow="ALWAYS">
-                                                                                            <HBox.margin>
-                                                                                                <Insets bottom="5.0"
-                                                                                                        left="5.0"
-                                                                                                        right="15.0"
-                                                                                                        top="5.0"/>
-                                                                                            </HBox.margin>
-                                                                                            <tooltip>
-                                                                                                <Tooltip
-                                                                                                        text="%tooltip.wfs.refsys"
-                                                                                                        wrapText="true"/>
-                                                                                            </tooltip>
-                                                                                        </ComboBox>
-                                                                                    </children>
-                                                                                </HBox>
+                                                                                <Label minWidth="-Infinity"
+                                                                                       prefWidth="120.0"
+                                                                                       text="%gui.data-format">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="20.0"
+                                                                                                right="5.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                </Label>
+                                                                                <ComboBox
+                                                                                    fx:id="dataFormatChooser"
+                                                                                    minWidth="-Infinity"
+                                                                                    onAction="#handleDataformatSelect"
+                                                                                    HBox.hgrow="ALWAYS">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="5.0"
+                                                                                                right="15.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                    <tooltip>
+                                                                                        <Tooltip
+                                                                                            text="%tooltip.wfs.dataformat"
+                                                                                            wrapText="true"/>
+                                                                                    </tooltip>
+                                                                                </ComboBox>
                                                                             </children>
-                                                                        </VBox>
+                                                                        </HBox>
+                                                                        <HBox VBox.vgrow="NEVER">
+                                                                            <children>
+                                                                                <Label fx:id="referenceSystemChooserLabel"
+                                                                                       minWidth="-Infinity"
+                                                                                       prefWidth="120.0"
+                                                                                       text="%gui.reference-system">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="20.0"
+                                                                                                right="5.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                </Label>
+                                                                                <ComboBox
+                                                                                    fx:id="referenceSystemChooser"
+                                                                                    minWidth="-Infinity"
+                                                                                    onAction="#handleReferenceSystemSelect"
+                                                                                    HBox.hgrow="ALWAYS">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="5.0"
+                                                                                                right="15.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                    <tooltip>
+                                                                                        <Tooltip
+                                                                                            text="%tooltip.wfs.refsys"
+                                                                                            wrapText="true"/>
+                                                                                    </tooltip>
+                                                                                </ComboBox>
+                                                                            </children>
+                                                                        </HBox>
+                                                                    </children>
+                                                                </VBox>
                                                             </children>
                                                         </VBox>
                                                         <VBox fx:id="simpleWFSContainer"/>
                                                         <VBox fx:id="atomContainer">
                                                             <children>
-                                                                <Group fx:id="mapNodeAtom"
-                                                                       VBox.vgrow="ALWAYS">
+                                                                <VBox fx:id="mapNodeAtom" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS" >
+                                                                    <children>
+                                                                        <HBox spacing="2.0">
+                                                                            <fx:define>
+                                                                                <ToggleGroup fx:id="atomMapActionGrp"/>
+                                                                            </fx:define>
+                                                                            <children>
+                                                                                <ToggleButton fx:id="atomMapSelectButton" toggleGroup="$atomMapActionGrp"/>
+                                                                                <ToggleButton fx:id="atomMapInfoButton" toggleGroup="$atomMapActionGrp"/>
+                                                                                <Button fx:id="atomMapResizeButton"/>
+                                                                            </children>
+                                                                            <VBox.margin>
+                                                                                <Insets bottom="5.0"
+                                                                                        top="2.0"/>
+                                                                            </VBox.margin>
+                                                                        </HBox>
+                                                                        <MapView fx:id="atomMapView" prefHeight="300.0" prefWidth="400.0" VBox.vgrow="ALWAYS"/>
+                                                                        <Label fx:id="atomMapWmsSource" VBox.vgrow="NEVER">
+                                                                            <font>
+                                                                                <Font name="System Bold"
+                                                                                      size="13.0"/>
+                                                                            </font>
+                                                                        </Label>
+                                                                    </children>
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
                                                                                 left="20.0"
-                                                                                right="0.0"
+                                                                                right="10.0"
                                                                                 top="5.0"/>
                                                                     </VBox.margin>
-                                                                </Group>
+                                                                </VBox>
                                                                 <Separator
-                                                                        VBox.vgrow="NEVER"/>
+                                                                    VBox.vgrow="NEVER"/>
                                                                 <Label text="%gui.description"
                                                                        VBox.vgrow="NEVER">
                                                                     <font>
@@ -506,13 +551,13 @@
                                                                     </VBox.margin>
                                                                 </Label>
                                                                 <WebView
-                                                                        fx:id="valueAtomDescr"
-                                                                        fontScale="0.8"
-                                                                        minHeight="10.0"
-                                                                        minWidth="200.0"
-                                                                        prefHeight="100.0"
-                                                                        prefWidth="-1.0"
-                                                                        VBox.vgrow="ALWAYS">
+                                                                    fx:id="valueAtomDescr"
+                                                                    fontScale="0.8"
+                                                                    minHeight="10.0"
+                                                                    minWidth="200.0"
+                                                                    prefHeight="100.0"
+                                                                    prefWidth="-1.0"
+                                                                    VBox.vgrow="ALWAYS">
                                                                     <VBox.margin>
                                                                         <Insets bottom="5.0"
                                                                                 left="20.0"
@@ -521,7 +566,7 @@
                                                                     </VBox.margin>
                                                                 </WebView>
                                                                 <Separator
-                                                                        VBox.vgrow="NEVER"/>
+                                                                    VBox.vgrow="NEVER"/>
                                                                 <HBox minHeight="-Infinity"
                                                                       VBox.vgrow="NEVER">
                                                                     <children>
@@ -537,16 +582,16 @@
                                                                             </HBox.margin>
                                                                         </Label>
                                                                         <ComboBox
-                                                                                fx:id="atomVariationChooser"
-                                                                                onAction="#handleVariationSelect"
-                                                                                HBox.hgrow="ALWAYS">
+                                                                            fx:id="atomVariationChooser"
+                                                                            onAction="#handleVariationSelect"
+                                                                            HBox.hgrow="ALWAYS">
                                                                             <HBox.margin>
                                                                                 <Insets right="20.0"/>
                                                                             </HBox.margin>
                                                                             <tooltip>
                                                                                 <Tooltip
-                                                                                        text="%tooltip.atom.variation"
-                                                                                        wrapText="true"/>
+                                                                                    text="%tooltip.atom.variation"
+                                                                                    wrapText="true"/>
                                                                             </tooltip>
                                                                         </ComboBox>
                                                                     </children>
@@ -614,17 +659,17 @@
                                                 <VBox fx:id="chainContainer">
                                                     <children>
                                                         <CheckBox
-                                                                fx:id="chkChain"
-                                                                mnemonicParsing="false"
-                                                                onAction="#handleChainCheckbox"
-                                                                text="%gui.post_process">
+                                                            fx:id="chkChain"
+                                                            mnemonicParsing="false"
+                                                            onAction="#handleChainCheckbox"
+                                                            text="%gui.post_process">
                                                             <VBox.margin>
                                                                 <Insets left="20.0"
                                                                         top="5.0"/>
                                                             </VBox.margin>
                                                             <tooltip>
                                                                 <Tooltip
-                                                                        text="%tooltip.post_process"/>
+                                                                    text="%tooltip.post_process"/>
                                                             </tooltip>
                                                         </CheckBox>
                                                         <VBox fx:id="containerChain">
@@ -653,7 +698,7 @@
                                                                                 text="%gui.add">
                                                                             <tooltip>
                                                                                 <Tooltip
-                                                                                        text="%tooltip.add_post_process"/>
+                                                                                    text="%tooltip.add_post_process"/>
                                                                             </tooltip>
                                                                         </Button>
                                                                     </children>
@@ -683,7 +728,7 @@
                                             </HBox.margin>
                                             <tooltip>
                                                 <Tooltip
-                                                        text="%tooltip.start_download"/>
+                                                    text="%tooltip.start_download"/>
                                             </tooltip>
                                         </Button>
                                         <Button fx:id="buttonSaveConfig"
@@ -701,7 +746,7 @@
                                             </HBox.margin>
                                             <tooltip>
                                                 <Tooltip
-                                                        text="%tooltip.save_config"/>
+                                                    text="%tooltip.save_config"/>
                                             </tooltip>
                                         </Button>
                                         <Pane HBox.hgrow="ALWAYS"/>
