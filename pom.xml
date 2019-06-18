@@ -438,6 +438,9 @@
             </activation>
             <properties>
                 <openjdk.version>11</openjdk.version>
+                <maven.compiler.source>${openjdk.version}</maven.compiler.source>
+                <maven.compiler.target>${openjdk.version}</maven.compiler.target>
+                <mapjfx.version>2.7.1</mapjfx.version>
             </properties>
             <build>
                 <pluginManagement>
