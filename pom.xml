@@ -11,8 +11,9 @@
     <url>http://maven.apache.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk.version>1.8</jdk.version>
+        <maven.compiler.source>${jdk.version}</maven.compiler.source>
+        <maven.compiler.target>${jdk.version}</maven.compiler.target>
         <geotools.version>20.3</geotools.version>
         <mapjfx.version>1.26.1</mapjfx.version>
     </properties>
@@ -161,7 +162,7 @@
                                     <version>3.0.5</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>${jdk.version}</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -437,9 +438,7 @@
                 <jdk>11</jdk>
             </activation>
             <properties>
-                <openjdk.version>11</openjdk.version>
-                <maven.compiler.source>${openjdk.version}</maven.compiler.source>
-                <maven.compiler.target>${openjdk.version}</maven.compiler.target>
+                <jdk.version>11</jdk.version>
                 <mapjfx.version>2.7.1</mapjfx.version>
             </properties>
             <build>
@@ -448,9 +447,9 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.8.0</version>
+                            <version>3.8.1</version>
                             <configuration>
-                                <release>${openjdk.version}</release>
+                                <release>${jdk.version}</release>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -460,27 +459,27 @@
                 <dependency>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-base</artifactId>
-                    <version>${openjdk.version}</version>
+                    <version>${jdk.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-controls</artifactId>
-                    <version>${openjdk.version}</version>
+                    <version>${jdk.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-fxml</artifactId>
-                    <version>${openjdk.version}</version>
+                    <version>${jdk.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-swing</artifactId>
-                    <version>${openjdk.version}</version>
+                    <version>${jdk.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-web</artifactId>
-                    <version>${openjdk.version}</version>
+                    <version>${jdk.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>javax.xml.bind</groupId>
