@@ -13,7 +13,7 @@ echo 'Building Downloadclient Release ' $VERSION
 echo ''
 echo ''
 
-rm -r build
+rm -rf build
 
 echo ''
 echo 'Creating Build directories'
@@ -27,6 +27,7 @@ cp src/resources/settings.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
 cp src/resources/de/bayern/gdi/model/proxy.xml.sample build/config
+cp src/resources/log4j2.yaml build/config
 
 echo ''
 echo 'Populating Textfiles'
