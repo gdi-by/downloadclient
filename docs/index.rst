@@ -255,7 +255,7 @@ Anwendungs-Logfile
 Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt), in dem die Aktionen der Anwendung Download-Client protokolliert werden.
 Diese Log-Datei kann zur Fehleranalyse oder zur Auswertung der HTTP-Anfragen genutzt werden.
 
-Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig.
+Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig. Die Datei liegt im Unterordner ``/config``.
 Dazu muss folgende Zeile unterhalb des Elements ``Configuration:Loggers:Logger`` aktiviert werden:
 
 .. code-block:: yaml
@@ -288,6 +288,9 @@ Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. 
 
   - name: de.bayern.gdi
     level: trace
+
+Wenn Sie Änderungen an der Konfigurationsdatei ``log4j2.yaml`` vornehmen, müssen Sie die Anwendung neustarten. Denn die Einstellungen werden
+nur einmalig beim Starten der Anwendung ausgelesen.
 
 Weitere Informationen, wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
 

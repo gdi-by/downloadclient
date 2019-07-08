@@ -83,7 +83,7 @@ GISINTERNALSSHA256='d3e2108377113065c8771ccb172d9dd60699fb601dbe79cefda6cc38caa9
 wget http://download.gisinternals.com/sdk/downloads/$GISINTERNALS
 
 echo 'Testing if SHA256 sums are equal...'
-TEST=`sha256sum $GISINTERNALS | grep $GISINTERNALSSHA256`
+TEST=`shasum -a 256 $GISINTERNALS | grep $GISINTERNALSSHA256`
 if [ -z "$TEST" ]; then
     echo 'sha256 sum of gisinternals did not match... exiting!'
     exit 1
