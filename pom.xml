@@ -98,7 +98,7 @@
                 <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.1.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -111,6 +111,7 @@
                         <manifestEntries>
                             <Specification-Vendor>GDI-BY</Specification-Vendor>
                             <Implementation-Vendor>GDI-BY</Implementation-Vendor>
+                            <Class-Path>config/</Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -173,6 +174,9 @@
         <resources>
             <resource>
                 <directory>src/resources</directory>
+                <excludes>
+                    <exclude>**/log4j2.yaml</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>
