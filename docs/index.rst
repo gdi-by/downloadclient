@@ -208,7 +208,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
-Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspolygonen zum Download zur Auswahl. Somit ist eine Auswahl über die Kartenkomponente möglich. Es wird der Datensatz *"Digitales Orthophoto 112013-0"* in der Variante *"Gauß-Krueger Zone 4"* (EPSG:31468) gewählt. 
+Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspolygonen zum Download zur Auswahl. Somit ist eine Auswahl über die Kartenkomponente möglich. Es wird der Datensatz *"Digitales Orthophoto 112013-0"* in der Variante *"ETRS89 (EPSG:4258)"* gewählt. 
 
 
 
@@ -220,7 +220,7 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspo
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
 Der Dienst bietet die Datensätze Naturparke, Nationalparke, Naturschutzgebiete, Biosphärenreservate und Landschaftsschutzgebiete zum Download zur Auswahl. 
 Da die Datensätze jeweils eine bayernweite Ausdehnung haben, ist nur eine Auswahl über die Dropdown-Liste möglich.
-Es wird der Datensatz *"Nationalparke"* in der Variante *"Gauß-Krueger Zone 4"* gewählt. 
+Es wird der Datensatz *"Nationalparke"* in der Variante *"ETRS89"* gewählt. 
 
 
 Weiterverarbeitung der heruntergeladenen Datensätze
@@ -243,7 +243,7 @@ Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der V
 
 .. image:: img/V1.1_Weiterverarbeitung_DOP.PNG
 
-Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112017-1" in der Variante "Gauß-Krueger Zone 4" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
+Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112017-1" in der Variante "ETRS89" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
 
 Download-Logfiles
 -------------------
@@ -255,7 +255,7 @@ Anwendungs-Logfile
 Die Anwendung erzeugt ein Anwendungs-Logfile (Dateiname logdlc_<DatumUhrzeit>.txt), in dem die Aktionen der Anwendung Download-Client protokolliert werden.
 Diese Log-Datei kann zur Fehleranalyse oder zur Auswertung der HTTP-Anfragen genutzt werden.
 
-Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig.
+Um die Ausgabe der vollständigen HTTP-Anfragen zu aktivieren, ist eine Anpassung der Konfigurationsdatei ``log4j2.yaml`` notwendig. Die Datei liegt im Unterordner ``/config``.
 Dazu muss folgende Zeile unterhalb des Elements ``Configuration:Loggers:Logger`` aktiviert werden:
 
 .. code-block:: yaml
@@ -288,6 +288,9 @@ Zur Fehleranalyse können zusätzlich alle Systemeigenschaft ausgegeben werden. 
 
   - name: de.bayern.gdi
     level: trace
+
+Wenn Sie Änderungen an der Konfigurationsdatei ``log4j2.yaml`` vornehmen, müssen Sie die Anwendung neustarten. Denn die Einstellungen werden
+nur einmalig beim Starten der Anwendung ausgelesen.
 
 Weitere Informationen, wie das Anwendungs-Logfile angepasst werden kann, können in der Dokumentation von Apache Log4j2 nachgelesen werden [#f3]_.
 

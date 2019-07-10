@@ -13,7 +13,7 @@ echo 'Building Downloadclient Release ' $VERSION
 echo ''
 echo ''
 
-rm -r build
+rm -rf build
 
 echo ''
 echo 'Creating Build directories'
@@ -27,6 +27,7 @@ cp src/resources/settings.xml build/config
 cp src/resources/de/bayern/gdi/model/mimetypes.xml build/config
 cp src/resources/de/bayern/gdi/model/verarbeitungsschritte.xml build/config
 cp src/resources/de/bayern/gdi/model/proxy.xml.sample build/config
+cp src/resources/log4j2.yaml build/config
 
 echo ''
 echo 'Populating Textfiles'
@@ -53,10 +54,10 @@ echo 'Building Downloadclient Package'
 if [ $# -eq 0 ]
   then
     echo '--using NO proxy for mvn tests'
-    mvn clean compile package
+    mvn clean package
   else 
     echo '-- using proxy for mvn tests'   
-    mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean compile package
+    mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean package
 fi
 
 #tidy up the version-number alteration above
@@ -82,7 +83,7 @@ GISINTERNALSSHA256='d3e2108377113065c8771ccb172d9dd60699fb601dbe79cefda6cc38caa9
 wget http://download.gisinternals.com/sdk/downloads/$GISINTERNALS
 
 echo 'Testing if SHA256 sums are equal...'
-TEST=`sha256sum $GISINTERNALS | grep $GISINTERNALSSHA256`
+TEST=`shasum -a 256 $GISINTERNALS | grep $GISINTERNALSSHA256`
 if [ -z "$TEST" ]; then
     echo 'sha256 sum of gisinternals did not match... exiting!'
     exit 1
