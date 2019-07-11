@@ -53,10 +53,10 @@ echo 'Building Downloadclient Package'
 if [ $# -eq 0 ]
   then
     echo '--using NO proxy for mvn tests'
-    mvn clean compile package
+    mvn clean compile package -X
   else 
     echo '-- using proxy for mvn tests'   
-    mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean compile package
+    mvn -Dhttp.proxyHost=$1 -Dhttp.proxyPort=$2 -Dhttps.proxyHost=$1 -Dhttps.proxyPort=$2 clean compile package -X
 fi
 
 #tidy up the version-number alteration above
