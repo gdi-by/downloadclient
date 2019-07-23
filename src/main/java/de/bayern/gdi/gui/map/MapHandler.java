@@ -426,10 +426,10 @@ public class MapHandler {
             double minY = Math.min(y1, y2);
             double maxY = Math.max(y1, y2);
 
-            Coordinate lowerLeft = new Coordinate(minY, minX);
-            Coordinate upperLeft = new Coordinate(maxY, minX);
-            Coordinate upperRight = new Coordinate(maxY, maxX);
-            Coordinate lowerRight = new Coordinate(minY, maxX);
+            Coordinate lowerLeft = new Coordinate(minX, minY);
+            Coordinate upperLeft = new Coordinate(minX, maxY);
+            Coordinate upperRight = new Coordinate(maxX, maxY);
+            Coordinate lowerRight = new Coordinate(maxX, minY);
 
             currentBbox = new CoordinateLine(lowerLeft, upperLeft,
                 upperRight, lowerRight)
