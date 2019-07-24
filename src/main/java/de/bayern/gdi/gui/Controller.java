@@ -2141,6 +2141,9 @@ public class Controller {
                 });
             }
 
+            this.atomContainer.setVisible(false);
+            this.simpleWFSContainer.setVisible(true);
+            this.basicWFSContainer.setVisible(false);
         }
     }
 

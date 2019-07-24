@@ -417,19 +417,19 @@ public class MapHandler {
             bboxFirst = event.getCoordinate();
         } else {
             Coordinate bboxSecond = event.getCoordinate();
-            double x1 = bboxFirst.getLongitude();
-            double x2 = bboxSecond.getLongitude();
-            double y1 = bboxFirst.getLatitude();
-            double y2 = bboxSecond.getLatitude();
+            double x1 = bboxFirst.getLatitude();
+            double x2 = bboxSecond.getLatitude();
+            double y1 = bboxFirst.getLongitude();
+            double y2 = bboxSecond.getLongitude();
             double minX = Math.min(x1, x2);
             double maxX = Math.max(x1, x2);
             double minY = Math.min(y1, y2);
             double maxY = Math.max(y1, y2);
 
-            Coordinate lowerLeft = new Coordinate(minY, minX);
-            Coordinate upperLeft = new Coordinate(maxY, minX);
-            Coordinate upperRight = new Coordinate(maxY, maxX);
-            Coordinate lowerRight = new Coordinate(minY, maxX);
+            Coordinate lowerLeft = new Coordinate(minX, minY);
+            Coordinate upperLeft = new Coordinate(minX, maxY);
+            Coordinate upperRight = new Coordinate(maxX, maxY);
+            Coordinate lowerRight = new Coordinate(maxX, minY);
 
             currentBbox = new CoordinateLine(lowerLeft, upperLeft,
                 upperRight, lowerRight)
