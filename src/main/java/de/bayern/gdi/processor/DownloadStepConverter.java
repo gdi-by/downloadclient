@@ -53,6 +53,7 @@ import static de.bayern.gdi.processor.DownloadStepConverter.
     QueryType.SQLQUERY;
 import static de.bayern.gdi.processor.DownloadStepConverter.
     QueryType.STOREDQUERY;
+import static de.bayern.gdi.processor.WFSPostParamsBuilder.create;
 
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
@@ -304,7 +305,7 @@ public class DownloadStepConverter {
             : wfsURL(dls, usedVars, meta);
 
         Document params = usePost
-            ? WFSPostParamsBuilder.create(dls, usedVars, meta)
+            ? create(dls, usedVars, meta)
             : null;
 
         LOG.info("url: {}", url);
@@ -493,17 +494,16 @@ public class DownloadStepConverter {
         boolean usePost = getFeatureOp.getPOST() != null;
         String wfsURL;
         Document params = null;
-
         int numFeatures;
 
         if (usePost) {
             wfsURL = getFeatureOp.getPOST();
-            params = WFSPostParamsBuilder.create(dls, usedVars, meta, true);
+            params = create(dls, usedVars, meta, true);
             logGetFeatureRequest(params);
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
-            numFeatures = numFeatures(wfsURL(dls, usedVars, meta), null);
+            numFeatures = numFeatures(wfsURL, null);
         }
 
         // Page size greater than number features -> Normal download.
@@ -538,7 +538,7 @@ public class DownloadStepConverter {
                 fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             } else {
                 URL wfs = newURL(wfsURL);
-                Document pagedParams = WFSPostParamsBuilder.create(
+                Document pagedParams = create(
                     dls, usedVars, meta, ofs, fpp, wfs2);
                 logGetFeatureRequest(params);
                 fdj.add(file, wfs,
