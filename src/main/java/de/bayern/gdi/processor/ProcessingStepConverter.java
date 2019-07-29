@@ -190,4 +190,13 @@ public class ProcessingStepConverter {
     public List<Job> getJobs() {
         return jobs;
     }
+
+    /**
+     * @return <code>true</code> if at least one job is configured,
+     * <code>false</code> otherwise
+     */
+    public boolean hasJobs() {
+        return !jobs.isEmpty();
+    }
+
 }
