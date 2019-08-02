@@ -827,9 +827,10 @@ public class Controller {
         resetGui();
         new Thread(() -> {
             try {
-                ServiceModel serviceModel =
-                        (ServiceModel) serviceList.getSelectionModel()
-                                .getSelectedItems().get(0);
+                ObservableList selectedItems = serviceList.
+                    getSelectionModel().getSelectedItems();
+                ServiceModel serviceModel = selectedItems.isEmpty() ? null
+                    : (ServiceModel) selectedItems.get(0);
                 Service service = null;
                 if (serviceModel != null
                     && serviceModel.getUrl().toString().equals(

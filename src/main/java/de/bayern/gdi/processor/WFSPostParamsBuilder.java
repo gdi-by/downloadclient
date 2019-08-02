@@ -218,7 +218,9 @@ public final class WFSPostParamsBuilder {
         getFeature.setAttribute("version",
             meta.highestVersion(WFSMeta.WFS2_0_0).toString());
 
-        getFeature.setAttribute("outputFormat", outputFormat);
+        if (!hits) {
+            getFeature.setAttribute("outputFormat", outputFormat);
+        }
 
         if (hits) {
             getFeature.setAttribute("resultType", "hits");
