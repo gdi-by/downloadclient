@@ -66,6 +66,7 @@ public class ProcessingStepConverter {
         }
 
         jobs.add(new BroadcastJob(I18n.getMsg("processing_chain.start")));
+        jobs.add(new GmlEmptyCheckJob(logger, fileTracker));
         ProcessingConfiguration config =
             Config.getInstance().getProcessingConfig();
 
