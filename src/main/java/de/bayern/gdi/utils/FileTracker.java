@@ -77,7 +77,7 @@ public class FileTracker {
      * Returns list of files new since last scan.
      * @return The list of new files.
      */
-    public List<File> newFiles() {
+    private List<File> newFiles() {
         ArrayList<File> files = new ArrayList<>();
         for (Map.Entry<File, Long> entry: this.current.entrySet()) {
             Long time = this.last.get(entry.getKey());
@@ -124,4 +124,25 @@ public class FileTracker {
     public List<File> globalGlob(String pattern) {
         return glob(current.keySet(), pattern);
     }
+
+    /**
+     * Retrieve file with pattern directly from file systems.
+     * @param pattern The pattern to match, never <code>null</code>.
+     * @return The files that match the pattern,
+     * <code>null</code> if files could not read.
+     */
+    public List<File> retrieveFilesWithoutScan(String pattern) {
+        File[] files = this.directory.listFiles();
+        if (files == null) {
+            LOG.error("Cannot read files from '{}'.", directory);
+            return null;
+        }
+
+        List<File> candidates = new ArrayList<>();
+        for (File file : files) {
+            candidates.add(file);
+        }
+        return glob(candidates, pattern);
+    }
+
 }
