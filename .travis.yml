@@ -11,4 +11,4 @@ jdk:
 - openjdk11
 script:
 - java -version
-- mvn install
+- mvn install -Pintegration-tests
