@@ -16,6 +16,7 @@
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
         <geotools.version>20.3</geotools.version>
         <mapjfx.version>1.26.1</mapjfx.version>
+        <monocle.version>8u76-b04</monocle.version>
     </properties>
     <build>
         <pluginManagement>
@@ -346,7 +347,7 @@
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>openjfx-monocle</artifactId>
-            <version>8u76-b04</version>
+            <version>${monocle.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -424,6 +425,11 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <version>2.22.0</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/AppIT.java</exclude>
+                            </excludes>
+                        </configuration>
                         <executions>
                             <execution>
                                 <goals>
@@ -444,6 +450,7 @@
             <properties>
                 <jdk.version>11</jdk.version>
                 <mapjfx.version>2.7.1</mapjfx.version>
+                <monocle.version>jdk-11+26</monocle.version>
             </properties>
             <build>
                 <pluginManagement>

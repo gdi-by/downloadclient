@@ -71,8 +71,7 @@ public class GmlEmptyCheckJob implements Job {
 
     @Override
     public void run(Processor p) throws JobExecutionException {
-        fileTracker.scan();
-        List<File> files = fileTracker.globalGlob("*.{gml}");
+        List<File> files = retrieveGmlFiles(p);
         if (files.size() == 1) {
             File file = files.get(0);
             p.broadcastMessage(I18n.format("gml.empty.check.start", file));
@@ -97,6 +96,27 @@ public class GmlEmptyCheckJob implements Job {
             }
         }
         return -1;
+    }
+
+    private List<File> retrieveGmlFiles(Processor p)
+        throws JobExecutionException {
+        List<File> files = fileTracker.retrieveFilesWithoutScan("*.{gml}");
+        if (files == null) {
+            String msg = I18n.format(
+                "external.process.scan.dir.failed",
+                this.fileTracker.getDirectory());
+            JobExecutionException jee = new JobExecutionException(msg);
+            broadcastException(p, jee);
+            throw jee;
+        }
+        return files;
+    }
+
+    private void broadcastException(Processor p, JobExecutionException jee) {
+        logger.log(jee.getMessage());
+        if (p != null) {
+            p.broadcastException(jee);
+        }
     }
 
 }
