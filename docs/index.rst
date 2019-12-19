@@ -160,7 +160,7 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 **Beispiel:**
 
-.. image:: img/V1.1_featuretypes_WFS.PNG
+.. image:: img/V1.2.0_featuretypes_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
@@ -204,7 +204,7 @@ Einschränkung: Die Auswahl eines Datensatzes über die Kartenkomponente ist nur
 
 **Beispiel Variante a):**
 
-.. image:: img/V1.1_Kartenauswahl_ATOM.PNG
+.. image:: img/V1.2.0_Kartenauswahl_ATOM.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"digitales Orthophoto"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed"* verwendet.
@@ -214,7 +214,7 @@ Der Dienst stellt Datensätze mit unterschiedlichen geographischen Begrenzungspo
 
 **Beispiel Variante b):**
 
-.. image:: img/V1.1_Listenauswahl_ATOM.PNG
+.. image:: img/V1.2.0_Listenauswahl_ATOM.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Naturschutz"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Schutzgebiete des Naturschutzes - Downloaddienst"* verwendet.
@@ -241,7 +241,7 @@ Folgende Verarbeitungsschritte stehen bereits vorkonfiguriert zur Verfügung:
 Nicht ausführbare Verarbeitungsschritte werden rot eingefärbt. 
 Die zur Verfügung stehenden Verarbeitungsschritte können durch Anpassung der Verarbeitungskonfigurations-Datei (s.u. :ref:`benutzerdefinierte_erweiterungsmoeglichkeiten`) bei Bedarf durch den Anwender beliebig ergänzt und konfiguriert werden.
 
-.. image:: img/V1.1_Weiterverarbeitung_DOP.PNG
+.. image:: img/V1.2.0_Weiterverarbeitung_DOP.PNG
 
 Im oben dargestellten Beispiel wird vom Downloaddienst "Digitales Orthophoto 2 m Bodenauflösung - ATOM-Feed" der Datensatz "Digitales Orthophoto 112017-1" in der Variante "ETRS89" abgerufen. Als Verarbeitungsschritt wird „Konvertierung nach GeoTIFF“ gewählt. Falls der Datensatz aus mehreren physischen Dateien besteht, werden diese bei der Konvertierung zu einer Datei zusammengefügt.
 
