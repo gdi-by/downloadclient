@@ -286,8 +286,8 @@
                                                                                     <HBox>
                                                                                         <Label text="%gui.x1"
                                                                                                fx:id="lablbasicx1"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
+                                                                                               prefWidth="125"
+                                                                                               minWidth="80">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
                                                                                                         left="20.0"
@@ -308,8 +308,8 @@
                                                                                     <HBox>
                                                                                         <Label text="%gui.y1"
                                                                                                fx:id="lablbasicy1"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
+                                                                                               prefWidth="125"
+                                                                                               minWidth="80">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
                                                                                                         left="20.0"
@@ -346,8 +346,8 @@
                                                                                     <HBox>
                                                                                         <Label text="%gui.x2"
                                                                                                fx:id="lablbasicx2"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
+                                                                                               prefWidth="125"
+                                                                                               minWidth="80">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
                                                                                                         left="15.0"
@@ -368,8 +368,8 @@
                                                                                     <HBox>
                                                                                         <Label text="%gui.y2"
                                                                                                fx:id="lablbasicy2"
-                                                                                               prefWidth="175"
-                                                                                               minWidth="120">
+                                                                                               prefWidth="125"
+                                                                                               minWidth="80">
                                                                                             <HBox.margin>
                                                                                                 <Insets bottom="5.0"
                                                                                                         left="15.0"
@@ -437,40 +437,9 @@
                                                                     <children>
                                                                         <HBox VBox.vgrow="NEVER">
                                                                             <children>
-                                                                                <Label minWidth="-Infinity"
-                                                                                       prefWidth="120.0"
-                                                                                       text="%gui.data-format">
-                                                                                    <HBox.margin>
-                                                                                        <Insets bottom="5.0"
-                                                                                                left="20.0"
-                                                                                                right="5.0"
-                                                                                                top="5.0"/>
-                                                                                    </HBox.margin>
-                                                                                </Label>
-                                                                                <ComboBox
-                                                                                    fx:id="dataFormatChooser"
-                                                                                    minWidth="-Infinity"
-                                                                                    onAction="#handleDataformatSelect"
-                                                                                    HBox.hgrow="ALWAYS">
-                                                                                    <HBox.margin>
-                                                                                        <Insets bottom="5.0"
-                                                                                                left="5.0"
-                                                                                                right="15.0"
-                                                                                                top="5.0"/>
-                                                                                    </HBox.margin>
-                                                                                    <tooltip>
-                                                                                        <Tooltip
-                                                                                            text="%tooltip.wfs.dataformat"
-                                                                                            wrapText="true"/>
-                                                                                    </tooltip>
-                                                                                </ComboBox>
-                                                                            </children>
-                                                                        </HBox>
-                                                                        <HBox VBox.vgrow="NEVER">
-                                                                            <children>
                                                                                 <Label fx:id="referenceSystemChooserLabel"
                                                                                        minWidth="-Infinity"
-                                                                                       prefWidth="120.0"
+                                                                                       prefWidth="200.0"
                                                                                        text="%gui.reference-system">
                                                                                     <HBox.margin>
                                                                                         <Insets bottom="5.0"
@@ -493,6 +462,37 @@
                                                                                     <tooltip>
                                                                                         <Tooltip
                                                                                             text="%tooltip.wfs.refsys"
+                                                                                            wrapText="true"/>
+                                                                                    </tooltip>
+                                                                                </ComboBox>
+                                                                            </children>
+                                                                        </HBox>
+                                                                        <HBox VBox.vgrow="NEVER">
+                                                                            <children>
+                                                                                <Label minWidth="-Infinity"
+                                                                                       prefWidth="200.0"
+                                                                                       text="%gui.data-format">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="20.0"
+                                                                                                right="5.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                </Label>
+                                                                                <ComboBox
+                                                                                    fx:id="dataFormatChooser"
+                                                                                    minWidth="-Infinity"
+                                                                                    onAction="#handleDataformatSelect"
+                                                                                    HBox.hgrow="ALWAYS">
+                                                                                    <HBox.margin>
+                                                                                        <Insets bottom="5.0"
+                                                                                                left="5.0"
+                                                                                                right="15.0"
+                                                                                                top="5.0"/>
+                                                                                    </HBox.margin>
+                                                                                    <tooltip>
+                                                                                        <Tooltip
+                                                                                            text="%tooltip.wfs.dataformat"
                                                                                             wrapText="true"/>
                                                                                     </tooltip>
                                                                                 </ComboBox>
