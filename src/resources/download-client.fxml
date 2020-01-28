@@ -388,6 +388,25 @@
                                                                                         </NumberTextField>
                                                                                     </HBox>
                                                                                 </VBox>
+                                                                                <VBox>
+                                                                                    <Button fx:id="basicApplyBbox"
+                                                                                            mnemonicParsing="false"
+                                                                                            prefHeight="45.0"
+                                                                                            prefWidth="130.0"
+                                                                                            text="%gui.apply_bbox"
+                                                                                            textAlignment="CENTER"
+                                                                                            wrapText="true">
+                                                                                        <tooltip>
+                                                                                            <Tooltip text="%tooltip.apply_bbox"/>
+                                                                                        </tooltip>
+                                                                                        <VBox.margin>
+                                                                                            <Insets bottom="0.0"
+                                                                                                    left="15.0"
+                                                                                                    right="5.0"
+                                                                                                    top="30.0"/>
+                                                                                        </VBox.margin>
+                                                                                    </Button>
+                                                                                </VBox>
                                                                             </children>
                                                                             <VBox.margin>
                                                                                 <Insets bottom="15.0"

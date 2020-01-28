@@ -20,6 +20,7 @@ package de.bayern.gdi.gui.map;
 
 import de.bayern.gdi.utils.I18n;
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.geotools.geometry.Envelope2D;
@@ -56,6 +57,8 @@ public class BboxCoordinates {
     private Label coordinateY2Label;
     private CoordinateReferenceSystem displayCRS;
     private CoordinateReferenceSystem oldDisplayCRS;
+    private Button applyCoordsToMap;
+    private MapHandler wmsMapHandler;
 
     /**
      * sets the CRS the coords under the map should be displayed in.
@@ -175,6 +178,19 @@ public class BboxCoordinates {
         this.coordinateY1TextField = y1;
         this.coordinateX2TextField = x2;
         this.coordinateY2TextField = y2;
+
+        this.coordinateX1TextField.setOnMouseClicked(event -> {
+            enableApplyCoordsToMapInput();
+        });
+        this.coordinateY1TextField.setOnMouseClicked(event -> {
+            enableApplyCoordsToMapInput();
+        });
+        this.coordinateX2TextField.setOnMouseClicked(event -> {
+            enableApplyCoordsToMapInput();
+        });
+        this.coordinateY2TextField.setOnMouseClicked(event -> {
+            enableApplyCoordsToMapInput();
+        });
     }
 
     /**
@@ -223,6 +239,44 @@ public class BboxCoordinates {
             clearCoordinateDisplay();
             LOG.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Register {@link MapHandler}.
+     *
+     * @param wmsMapHandlerToRegister handler to register
+     */
+    public void registerWmsMapHandler(MapHandler wmsMapHandlerToRegister) {
+        this.wmsMapHandler = wmsMapHandlerToRegister;
+        if (applyCoordsToMap != null) {
+            this.applyCoordsToMap.setOnAction(event -> {
+                Envelope2D bounds = getBounds(displayCRS);
+                wmsMapHandler.applyBbox(bounds);
+            });
+        }
+    }
+
+    /**
+     * Sets the button to apply the bbox from coordinate input.
+     *
+     * @param applyCoordsToMapBt button
+     */
+    public void setApplyCoordsToMapButton(Button applyCoordsToMapBt) {
+        this.applyCoordsToMap = applyCoordsToMapBt;
+    }
+
+    /**
+     * Disables the button to apply the bbox from coordinate input.
+     */
+    public void disableApplyCoordsToMapInput() {
+        this.applyCoordsToMap.setDisable(true);
+    }
+
+    /**
+     * Enables the button to apply the bbox from coordinate input.
+     */
+    public void enableApplyCoordsToMapInput() {
+        this.applyCoordsToMap.setDisable(false);
     }
 
     private void convertAndDisplayBoundingBox(

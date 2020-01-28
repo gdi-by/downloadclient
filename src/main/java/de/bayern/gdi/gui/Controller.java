@@ -243,6 +243,8 @@ public class Controller {
     @FXML
     private Label lablbasicy2;
     @FXML
+    private Button basicApplyBbox;
+    @FXML
     private TextField atomX1;
     @FXML
     private TextField atomY1;
@@ -2256,6 +2258,8 @@ public class Controller {
                     lablbasicx2,
                     lablbasicy1,
                     lablbasicy2)
+                .withApplyCoordsToMapButton(
+                    basicApplyBbox)
                 .build();
             this.wmsAtomMapHandler = MapHandlerBuilder
                 .newBuilder(serviceSetting)
