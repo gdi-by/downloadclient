@@ -846,6 +846,7 @@ public class Controller {
                     }
                 } else {
                     URL sURL = new URL(serviceURL.getText());
+                    log.info("Connecting " + sURL + "...");
                     if (ServiceChecker.isReachable(sURL)) {
                         service = new Service(
                                 sURL,
@@ -924,6 +925,7 @@ public class Controller {
         if (!catalogReachable) {
             setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
         }
+
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
         dataBean.resetCatalogLists();

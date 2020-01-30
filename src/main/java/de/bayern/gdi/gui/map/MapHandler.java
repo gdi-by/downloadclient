@@ -340,6 +340,9 @@ public class MapHandler {
      *     the extent to draw
      */
     public void applyBbox(Envelope2D bboxToApply) {
+        if (bboxToApply == null) {
+            return;
+        }
         ReferencedEnvelope envelope = new ReferencedEnvelope(bboxToApply);
         try {
             envelope = envelope.transform(this.mapContent.getViewport().
@@ -355,7 +358,9 @@ public class MapHandler {
             Coordinate upperRight = new Coordinate(maxX, maxY);
             Coordinate lowerRight = new Coordinate(maxX, minY);
 
-            mapView.removeCoordinateLine(currentBbox);
+            if (currentBbox != null) {
+                mapView.removeCoordinateLine(currentBbox);
+            }
             setExtend(envelope);
             currentBbox = new CoordinateLine(lowerLeft, upperLeft,
                                              upperRight, lowerRight)
