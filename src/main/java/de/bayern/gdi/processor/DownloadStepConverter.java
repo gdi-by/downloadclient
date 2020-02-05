@@ -320,16 +320,16 @@ public class DownloadStepConverter {
             ? create(dls, usedVars, meta)
             : null;
 
-        LOG.info("url: {}", url);
+        LOG.info("URL: {}", url);
 
         String ext = extension();
 
         File gml = new File(workingDir, "download." + ext);
         LOG.info("Download to file '{}'", gml);
+        logGetFeatureRequest(params);
 
         FileDownloadJob fdj = null;
         if (usePost) {
-            logGetFeatureRequest(params);
             HttpEntity ent = new EntityTemplate(
                 XML.toContentProducer(params));
 
@@ -515,6 +515,7 @@ public class DownloadStepConverter {
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
+            LOG.info("URL: {}", wfsURL);
             numFeatures = numFeatures(wfsURL, null);
         }
 
@@ -524,7 +525,7 @@ public class DownloadStepConverter {
             return;
         }
 
-        LOG.info("total number of features: {}", numFeatures);
+        LOG.info("Total number of features: {}", numFeatures);
 
         FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
         GMLCheckJob gcj = new GMLCheckJob(logger);
@@ -545,7 +546,7 @@ public class DownloadStepConverter {
         for (int ofs = 0, i = 0; ofs < numFeatures; ofs += fpp, i++) {
             String filename = String.format(format, i, ofs);
             File file = new File(workingDir, filename);
-            LOG.info("download to file: {}", file);
+            LOG.info("Download to file: {}", file);
             if (!usePost) {
                 fdj.add(file, pagedFeatureURL(wfsURL, ofs, fpp, wfs2));
             } else {

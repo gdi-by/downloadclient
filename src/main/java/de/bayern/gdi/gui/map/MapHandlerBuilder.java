@@ -167,6 +167,19 @@ public class MapHandlerBuilder {
     }
 
     /**
+     * Sets the Button to apply the bbox from coordinate input.
+     *
+     * @param applyCoordsToMap button
+     * @return the {@link MapHandlerBuilder} instance, never <code>null</code>
+     */
+    public MapHandlerBuilder withApplyCoordsToMapButton(
+        Button applyCoordsToMap) {
+        initBboxCoordinates();
+        bboxCoordinates.setApplyCoordsToMapButton(applyCoordsToMap);
+        return this;
+    }
+
+    /**
      * Builds the MapHandler instance.
      *
      * @return the MapHandler instance, never <code>null</code>
@@ -178,6 +191,9 @@ public class MapHandlerBuilder {
             mapView,
             bboxCoordinates,
             mapActionToolbar);
+        if (bboxCoordinates != null) {
+            this.bboxCoordinates.registerWmsMapHandler(wmsMapHandler);
+        }
         this.mapActionToolbar.registerResizeHandler(wmsMapHandler);
         return wmsMapHandler;
     }

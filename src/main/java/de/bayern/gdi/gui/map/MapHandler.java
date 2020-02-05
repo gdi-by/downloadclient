@@ -333,6 +333,45 @@ public class MapHandler {
         this.polygonFeatureCollection = null;
     }
 
+    /**
+     * Draws the extent.
+     *
+     * @param bboxToApply
+     *     the extent to draw
+     */
+    public void applyBbox(Envelope2D bboxToApply) {
+        if (bboxToApply == null) {
+            return;
+        }
+        ReferencedEnvelope envelope = new ReferencedEnvelope(bboxToApply);
+        try {
+            envelope = envelope.transform(this.mapContent.getViewport().
+                getCoordinateReferenceSystem(), true);
+
+            double minX = envelope.getMinX();
+            double maxX = envelope.getMaxX();
+            double minY = envelope.getMinY();
+            double maxY = envelope.getMaxY();
+
+            Coordinate lowerLeft = new Coordinate(minX, minY);
+            Coordinate upperLeft = new Coordinate(minX, maxY);
+            Coordinate upperRight = new Coordinate(maxX, maxY);
+            Coordinate lowerRight = new Coordinate(maxX, minY);
+
+            if (currentBbox != null) {
+                mapView.removeCoordinateLine(currentBbox);
+            }
+            setExtend(envelope);
+            currentBbox = new CoordinateLine(lowerLeft, upperLeft,
+                                             upperRight, lowerRight)
+                .setWidth(2).setColor(javafx.scene.paint.Color.DARKRED)
+                .setClosed(true)
+                .setVisible(true);
+            mapView.addCoordinateLine(currentBbox);
+        } catch (FactoryException | TransformException e) {
+            LOG.error(e.getMessage(), e);
+        }
+    }
 
     private void initWmsAndLayer(ServiceSettings serviceSetting) {
         try {
@@ -408,6 +447,9 @@ public class MapHandler {
     }
 
     private void handleBboxClickEvent(MapViewEvent event) {
+        if (bboxCoordinates != null) {
+            this.bboxCoordinates.disableApplyCoordsToMapInput();
+        }
         if (currentBbox != null) {
             bboxFirst = null;
             mapView.removeCoordinateLine(currentBbox);
@@ -599,5 +641,4 @@ public class MapHandler {
             .filter(layer -> layer.getTitle().equals(POLYGON_LAYER_TITLE))
             .forEach(layer -> mapContent.removeLayer(layer));
     }
-
 }

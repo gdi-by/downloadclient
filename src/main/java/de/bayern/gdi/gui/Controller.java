@@ -243,6 +243,8 @@ public class Controller {
     @FXML
     private Label lablbasicy2;
     @FXML
+    private Button basicApplyBbox;
+    @FXML
     private TextField atomX1;
     @FXML
     private TextField atomY1;
@@ -844,6 +846,7 @@ public class Controller {
                     }
                 } else {
                     URL sURL = new URL(serviceURL.getText());
+                    log.info("Connecting " + sURL + "...");
                     if (ServiceChecker.isReachable(sURL)) {
                         service = new Service(
                                 sURL,
@@ -922,6 +925,7 @@ public class Controller {
         if (!catalogReachable) {
             setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
         }
+
         String currentText = this.searchField.getText();
         this.serviceList.getItems().clear();
         dataBean.resetCatalogLists();
@@ -2256,6 +2260,8 @@ public class Controller {
                     lablbasicx2,
                     lablbasicy1,
                     lablbasicy2)
+                .withApplyCoordsToMapButton(
+                    basicApplyBbox)
                 .build();
             this.wmsAtomMapHandler = MapHandlerBuilder
                 .newBuilder(serviceSetting)
