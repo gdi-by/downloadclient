@@ -34,6 +34,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,22 +110,23 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     protected RemoteFileState downloadFile(DLFile dlf) throws
             JobExecutionException {
 
-        String msg = I18n.format("download.file", dlf.url, dlf.file);
+        final String msg = I18n.format("download.file", dlf.url, dlf.file);
         log(msg);
         log.info(msg);
         this.currentCount = 0;
-
-
         boolean usePost = dlf.postParams != null;
 
         HttpUriRequest req;
 
         if (usePost) {
-            HttpPost httppost = new HttpPost(dlf.url.toString());
+            final HttpPost httppost = new HttpPost(dlf.url.toString());
             httppost.setEntity(dlf.postParams);
             req = httppost;
+            log.info("WFS GetFeature POST XML request: {}",
+                httpPostToString(dlf.url, dlf.postParams));
         } else {
             req = getGetRequest(dlf.url);
+            log.info("WFS GetFeature GET KVP request: {}", req.toString());
         }
 
         WrapInputStreamFactory wrapFactory
@@ -133,10 +135,8 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         CloseableHttpClient client = null;
         try {
             client = getClient(dlf.url);
-
             FileResponseHandler frh = new FileResponseHandler(
                 dlf.file, wrapFactory, req);
-
             client.execute(req, frh);
 
             return RemoteFileState.SUCCESS;
@@ -148,6 +148,17 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             HTTP.closeGraceful(client);
             this.totalCount += this.currentCount;
         }
+    }
+
+    private String httpPostToString(URL url, HttpEntity postParams) {
+        try {
+            return url.toString() + " " + EntityUtils.toString(postParams);
+        } catch (IOException e) {
+            // nothing to do
+            log.info("POST body cannot be logged: "
+                + e.getLocalizedMessage());
+        }
+        return url.toString();
     }
 
     private static boolean sleep() {

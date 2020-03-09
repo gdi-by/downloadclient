@@ -320,7 +320,7 @@ public class DownloadStepConverter {
             ? create(dls, usedVars, meta)
             : null;
 
-        LOG.info("URL: {}", url);
+        LOG.info("WFS GetFeature KVP GET request: {}", url);
 
         String ext = extension();
 
@@ -452,7 +452,9 @@ public class DownloadStepConverter {
         StringBuilder sb = new StringBuilder(wfsURL)
             .append("&startIndex=").append(ofs)
             .append(wfs2 ? "&count=" : "&maxFeatures=").append(count);
-        return newURL(sb.toString());
+        String wfsGetFeatureRequest = sb.toString();
+        LOG.info("WFS GetFeature GET KVP request: {}", wfsGetFeatureRequest);
+        return newURL(wfsGetFeatureRequest);
     }
 
     private String extension() {
@@ -515,7 +517,7 @@ public class DownloadStepConverter {
             numFeatures = numFeatures(wfsURL, params);
         } else {
             wfsURL = wfsURL(dls, usedVars, meta);
-            LOG.info("URL: {}", wfsURL);
+            LOG.info("WFS GetFeature GET KVP request: {}", wfsURL);
             numFeatures = numFeatures(wfsURL, null);
         }
 
@@ -602,7 +604,7 @@ public class DownloadStepConverter {
     private void logGetFeatureRequest(Document params) {
         try {
             String xmlAsString = XML.documentToString(params);
-            LOG.info("WFS GetFeature Request: {}", xmlAsString);
+            LOG.info("WFS GetFeature POST XML request: {}", xmlAsString);
         } catch (TransformerException e) {
             // nothing to do
             LOG.info("WFS GetFeature Request cannot be logged: "
