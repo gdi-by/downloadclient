@@ -555,7 +555,7 @@ public class DownloadStepConverter {
                 URL wfs = newURL(wfsURL);
                 Document pagedParams = create(
                     dls, usedVars, meta, ofs, fpp, wfs2);
-                logGetFeatureRequest(params);
+                logGetFeatureRequest(pagedParams);
                 fdj.add(file, wfs,
                     new EntityTemplate(XML.toContentProducer(pagedParams)));
             }
