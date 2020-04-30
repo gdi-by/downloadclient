@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Downloadclient GDI-BY'
-copyright = u'2017, Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)'
+copyright = u'2020, Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)'
 author = u'Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)'
 
 # The version info for the project you're documenting, acts as replacement for

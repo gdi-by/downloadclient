@@ -33,10 +33,25 @@ Voraussetzungen - Softwareumgebung
 **Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden:
-- Oracle JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html
-- OpenJDK: https://adoptopenjdk.net/
+
+- Oracle JDK 8 und 11: http://www.oracle.com/technetwork/java/javase/downloads/index.html (JavaFX enthalten)
+- OpenJDK-basierte Java Versionen *mit* JavaFX:
+    - Liberica JDK (8 und 11): https://bell-sw.com/ (JavaFX enthalten)
+    - Zulu JDK (8 und 11): https://www.azul.com/downloads/zulu-community/ (JavaFX enthalten)
+- OpenJDK-basierte Java Versionen *ohne* JavaFX:
+    - AdoptOpenJDK (8 und 11): https://adoptopenjdk.net/ (JavaFX **nicht** enthalten)
+    - Amazon Corretto (8 und 11): https://docs.aws.amazon.com/corretto/ (JavaFX **nicht** enthalten)
+
+Für die diese beiden Java Versionen muss zusätzlich das passende `JavaFX-SDK <https://openjfx.io>`_ installiert sein.
+
+Hinweis:
+  Bitte beachten Sie die Lizenzbedingungen der jeweiligen Hersteller!
+
+Installationspakte
+------------------
 
 Installationspakete für Windows:
+
 - Oracle JDK 1.8 oder OpenJDK 1.8:
     - `downloadclient-X.Y_Windows_jdk8.zip`
 - Oracle JDK 11.0 oder OpenJDK 11.0:
@@ -156,11 +171,12 @@ FeatureTypes
 
 Für jeden über den ausgewählten WFS bereitgestellten FeatureType wird ein Eintrag in der Auswahlliste mit dem Zusatz *"(BBOX)"* angegeben.
 So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so den Abfragebereich definieren, für welchen er Daten beziehen möchte.
-Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden. 
+Das Begrenzungsrechteck (BBOX) kann durch den Nutzer nachträglich über die Eingabefelder noch angepasst werden und mit dem Button "Eingabe übernehmen" wird das Begrenzungsrechteck in der Kartenkomponente für die Auswahl aktualisiert
+Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden.
 
 **Beispiel:**
 
-.. image:: img/V1.2.0_featuretypes_WFS.PNG
+.. image:: img/V1.2.1_featuretypes_WFS.PNG
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
