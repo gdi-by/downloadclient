@@ -15,7 +15,7 @@
         <maven.compiler.source>${jdk.version}</maven.compiler.source>
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
         <geotools.version>20.3</geotools.version>
-        <mapjfx.version>1.26.3</mapjfx.version>
+        <mapjfx.version>1.32.1</mapjfx.version>
         <monocle.version>8u76-b04</monocle.version>
     </properties>
     <build>
@@ -451,7 +451,7 @@
             <properties>
                 <jdk.version>11</jdk.version>
                 <javafx.version>11.0.2</javafx.version>
-                <mapjfx.version>2.7.3</mapjfx.version>
+                <mapjfx.version>2.14.1</mapjfx.version>
                 <monocle.version>jdk-11+26</monocle.version>
             </properties>
             <build>
