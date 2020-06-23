@@ -242,7 +242,7 @@
                                                     <children>
                                                         <VBox fx:id="basicWFSContainer">
                                                             <children>
-                                                                <VBox fx:id="mapNodeWFS" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
+                                                                <VBox fx:id="mapNodeWFS" alignment="CENTER_LEFT" prefHeight="400.0" prefWidth="588.0" minHeight="377" VBox.vgrow="ALWAYS">
                                                                     <children>
                                                                         <HBox spacing="2.0" >
                                                                             <fx:define>
