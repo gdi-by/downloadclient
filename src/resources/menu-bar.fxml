@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<MenuBar xmlns="http://javafx.com/javafx/8"
+         xmlns:fx="http://javafx.com/fxml/1"
+         fx:id="menuBar" fx:controller="de.bayern.gdi.gui.MenuBarController">
+    <menus>
+        <Menu text="%menu.file" fx:id="menuFile">
+            <MenuItem text="%menu.load_config" onAction="#handleLoadConfig"
+                      fx:id="menuLoadConfig"/>
+            <MenuItem text="%menu.quit" onAction="#handleCloseApp"
+                      fx:id="menuQuit"/>
+        </Menu>
+        <Menu text="%menu.extra">
+            <MenuItem text="%menu.help" onAction="#handleHelpAction"
+                      fx:id="menuHelp"/>
+            <MenuItem text="%menu.about" onAction="#handleAboutAction"
+                      fx:id="menuAbout"/>
+        </Menu>
+    </menus>
+</MenuBar>

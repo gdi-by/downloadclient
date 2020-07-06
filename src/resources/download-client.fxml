@@ -16,22 +16,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.bayern.gdi.gui.Controller">
     <children>
-        <MenuBar fx:id="menuBar">
-            <menus>
-                <Menu text="%menu.file" fx:id="menuFile">
-                    <MenuItem text="%menu.load_config" onAction="#handleLoadConfig"
-                              fx:id="menuLoadConfig" />
-                    <MenuItem text="%menu.quit" onAction="#handleCloseApp"
-                              fx:id="menuQuit"/>
-                </Menu>
-                <Menu text="%menu.extra">
-                    <MenuItem text="%menu.help" onAction="#handleHelpAction"
-                              fx:id="menuHelp"/>
-                    <MenuItem text="%menu.about" onAction="#handleAboutAction"
-                              fx:id="menuAbout"/>
-                </Menu>
-            </menus>
-        </MenuBar>
+        <fx:include source="menu-bar.fxml" />
         <SplitPane dividerPositions="0.3311036789297659" VBox.vgrow="ALWAYS">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0"
@@ -791,30 +776,6 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-        <HBox prefHeight="25.0" prefWidth="3840.0"
-              style="-fx-background-color: gainsboro;">
-            <children>
-                <TitledPane fx:id="logHistoryParent"
-                            text="%status.ready"
-                            wrapText = "false"
-                            expanded="false"
-                            prefWidth="3840.0"
-                            prefHeight="150.0">
-                    <tooltip>
-                        <Tooltip text="%tooltip.log_history_hidden"
-                                 wrapText="true"/>
-                    </tooltip>
-                    <HBox.margin>
-                        <Insets bottom="5.0" left="0.0" top="5.0" right="0.0"/>
-                    </HBox.margin>
-                    <content>
-                        <ScrollPane fx:id="logHistoryPanel" minHeight="150.0">
-                            <Label fx:id="logHistory" text="">
-                            </Label>
-                        </ScrollPane>
-                    </content>
-                </TitledPane>
-            </children>
-        </HBox>
+        <fx:include fx:id="statusLog" source="status-log.fxml" />
     </children>
 </VBox>

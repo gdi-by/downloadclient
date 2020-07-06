@@ -20,32 +20,10 @@ package de.bayern.gdi.gui;
 
 import com.sothawo.mapjfx.MapView;
 import de.bayern.gdi.gui.map.FeaturePolygon;
-import de.bayern.gdi.gui.map.PolygonClickedEvent;
-import de.bayern.gdi.gui.map.PolygonInfos;
 import de.bayern.gdi.gui.map.MapHandler;
 import de.bayern.gdi.gui.map.MapHandlerBuilder;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.text.Text;
-import org.locationtech.jts.geom.Geometry;
+import de.bayern.gdi.gui.map.PolygonClickedEvent;
+import de.bayern.gdi.gui.map.PolygonInfos;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
@@ -71,26 +49,7 @@ import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSettings;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -100,37 +59,55 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-
+import org.locationtech.jts.geom.Geometry;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import org.apache.commons.io.IOUtils;
-
-import org.slf4j.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import static de.bayern.gdi.gui.FeatureModel.FilterType.BBOX;
 import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
@@ -141,7 +118,7 @@ import static de.bayern.gdi.services.ServiceType.WFS_TWO;
  */
 public class Controller {
 
-    private static final String USER_DIR = "user.dir";
+    public static final String USER_DIR = "user.dir";
     private static final String STATUS_SERVICE_BROKEN = "status.service.broken";
     private static final String STATUS_READY = "status.ready";
     private static final String OUTPUTFORMAT = "outputformat";
@@ -179,6 +156,8 @@ public class Controller {
     private DownloadConfig downloadConfig;
 
     @FXML
+    private StatusLogController statusLogController;
+    @FXML
     private Button buttonClose;
     @FXML
     private MenuBar mainMenu;
@@ -198,12 +177,6 @@ public class Controller {
     private TextField serviceUser;
     @FXML
     private TextField servicePW;
-    @FXML
-    private Label logHistory;
-    @FXML
-    private TitledPane logHistoryParent;
-    @FXML
-    private ScrollPane logHistoryPanel;
     @FXML
     private ComboBox<ItemModel> serviceTypeChooser;
     @FXML
@@ -294,26 +267,12 @@ public class Controller {
     private VBox basicWFSX2Y2;
     @FXML
     private Label referenceSystemChooserLabel;
-
-    @FXML
-    private MenuItem menuHelp;
-    @FXML
-    private MenuItem menuAbout;
-    @FXML
-    private MenuBar menuBar;
-
     @FXML
     private TextArea sqlTextarea;
     @FXML
     private VBox sqlWFSArea;
     @FXML
     private HBox basicWFSFirstRows;
-    @FXML
-    private Menu menuFile;
-    @FXML
-    private MenuItem menuLoadConfig;
-    @FXML
-    private MenuItem menuQuit;
     @FXML
     private Text searchHeadlineText;
     @FXML
@@ -359,29 +318,10 @@ public class Controller {
         Processor.getInstance().addListener(new DownloadListener());
     }
 
-    /**
-     * Initializes gui elements.
-     */
     @FXML
-    protected void initialize() {
+    protected void handleCloseApp(ActionEvent event) {
 
-        logHistoryParent.expandedProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue o, Object oldVal,
-                    Object newVal) {
-                boolean val = (boolean) newVal;
-                if (val) {
-                    logHistoryParent.getTooltip().setText(
-                            I18n.format("tooltip.log_history_expanded"));
-                } else {
-                    logHistoryParent.getTooltip().setText(
-                            I18n.format("tooltip.log_history_hidden"));
-                }
-            }
-        });
     }
-
-
 
     /**
      * Logs a message to the application log.
@@ -390,151 +330,6 @@ public class Controller {
      */
     public static void logToAppLog(String msg) {
             APP_LOG.info(msg);
-    }
-
-    /**
-     * Handle action related to "About" menu item.
-     *
-     * @param event Event on "About" menu item.
-     */
-    @FXML
-    private void handleAboutAction(final ActionEvent event) {
-        try {
-            String path = "about/about_"
-                + Locale.getDefault().getLanguage()
-                + ".html";
-            displayHTMLFileAsPopup(I18n.getMsg("menu.about"), path);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    private void displayHTMLFileAsPopup(String popuptitle, String pathToFile)
-            throws
-            IOException {
-        WebView web = new WebView();
-        InputStream htmlPage = Misc.getResource(pathToFile);
-        String content = IOUtils.toString(htmlPage, "UTF-8");
-        web.getEngine().loadContent(content);
-        WebViewWindow wvw = new WebViewWindow(web, popuptitle);
-        wvw.popup();
-    }
-    /**
-     * Handle action related to "Help" menu item.
-     *
-     * @param event Event on "Help" menu item.
-     */
-
-    @FXML
-    private void handleHelpAction(final ActionEvent event) {
-        String pathToFile = "help/help_"
-            + Locale.getDefault().getLanguage()
-            + ".txt";
-        try {
-            openLinkFromFile(pathToFile);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    private void openLinkFromFile(String pathToFile) throws IOException {
-        InputStream is = Misc.getResource(pathToFile);
-        String contents = IOUtils.toString(is, "UTF-8");
-        if (contents == null
-        || contents.isEmpty()
-        || contents.equals("null")) {
-            throw new MalformedURLException("URL is Empty");
-        }
-        URL helpURL = new URL(contents);
-        Misc.startExternalBrowser(helpURL.toString());
-    }
-
-    /**
-     * Handler to close the application.
-     *
-     * @param event The event.
-     */
-    @FXML
-    protected void handleCloseApp(ActionEvent event) {
-        Alert closeDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        closeDialog.setTitle(I18n.getMsg("gui.confirm-exit"));
-        closeDialog.setContentText(I18n.getMsg("gui.want-to-quit"));
-        ButtonType confirm = new ButtonType(I18n.getMsg("gui.exit"));
-        ButtonType cancel = new ButtonType(I18n.getMsg("gui.cancel"),
-                ButtonData.CANCEL_CLOSE);
-        closeDialog.getButtonTypes().setAll(confirm, cancel);
-        Optional<ButtonType> res = closeDialog.showAndWait();
-        if (res.isPresent() && res.get() == confirm) {
-            logToAppLog(I18n.format("dlc.stop"));
-            Stage stage = (Stage) buttonClose.getScene().getWindow();
-            stage.fireEvent(new WindowEvent(
-                    stage,
-                    WindowEvent.WINDOW_CLOSE_REQUEST
-            ));
-        }
-    }
-
-    /**
-     * Opens up a file dialog to choose a config file to load.
-     *
-     * @return The chosen file
-     */
-    protected File openConfigFileOpenDialog() {
-        FileChooser fileChooser = new FileChooser();
-        File initialDir = new File(
-            Config.getInstance().getServices().getBaseDirectory().isEmpty()
-                ? System.getProperty(USER_DIR)
-                : Config.getInstance().getServices().getBaseDirectory());
-        fileChooser.setInitialDirectory(initialDir);
-        fileChooser.setTitle(I18n.getMsg("menu.load_config"));
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-            new FileChooser.ExtensionFilter("All Files", "*.*"));
-        return fileChooser.showOpenDialog(primaryStage);
-    }
-
-    /**
-     * Loads config from a given file object.
-     * @param configFile File object holding the config file.
-     */
-    public void loadConfigFromFile(File configFile) {
-        if (configFile == null) {
-            return;
-        }
-        resetGui();
-        try {
-            this.downloadConfig = new DownloadConfig(configFile);
-            serviceURL.setText(this.downloadConfig.getServiceURL());
-            doSelectService(downloadConfig);
-        } catch (IOException
-                    | ParserConfigurationException
-                    | SAXException e) {
-            log.error(e.getMessage(), e);
-            setStatusTextUI(
-                    I18n.format("status.config.invalid-xml"));
-            return;
-        } catch (DownloadConfig.NoServiceURLException urlEx) {
-            setStatusTextUI(
-                    I18n.format("status.config.no-url-provided"));
-        }
-    }
-
-   /**
-    * Handle click at load config menu items.
-    * Opens a file chooser dialog and loads a download config from a XML file.
-    *
-    * @param event The Event.
-    */
-    @FXML
-    protected void handleLoadConfig(ActionEvent event) {
-        File configFile = null;
-        try {
-            configFile = openConfigFileOpenDialog();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return;
-        }
-        loadConfigFromFile(configFile);
     }
 
     private void loadDownloadConfig(DownloadConfig conf) {
@@ -554,7 +349,7 @@ public class Controller {
                 MiscItemModel errorItem = new MiscItemModel();
                 errorItem.setDataset(dataset);
                 errorItem.setItem(conf.getDataset());
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format("gui.dataset-not-available"));
                 serviceTypeChooser.getItems().add(errorItem);
                 serviceTypeChooser.
@@ -630,7 +425,7 @@ public class Controller {
                 initializeCqlTextArea();
                 break;
             default:
-                setStatusTextUI(I18n.format("status.config.invalid-xml"));
+                statusLogController.setStatusTextUI(I18n.format("status.config.invalid-xml"));
                 break;
         }
         List<DownloadConfig.ProcessingStep> steps =
@@ -698,7 +493,7 @@ public class Controller {
                         .select(crsErrorModel);
             }
         } catch (NoSuchAuthorityCodeException nsace) {
-            setStatusTextUI(I18n.format("status.config.invalid-epsg"));
+            statusLogController.setStatusTextUI(I18n.format("status.config.invalid-epsg"));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -857,7 +652,7 @@ public class Controller {
                     }
                 }
                 if (service == null) {
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                         I18n.format("status.service-timeout"));
                     dataBean.setSelectedService(null);
                     serviceSelection.setDisable(false);
@@ -867,7 +662,7 @@ public class Controller {
                 }
                 serviceSelection.setDisable(true);
                 serviceURL.getScene().setCursor(Cursor.WAIT);
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format("status.checking-auth"));
                 serviceURL.setDisable(true);
                 Service finalService = service;
@@ -893,7 +688,7 @@ public class Controller {
                 th.setDaemon(true);
                 th.start();
             } catch (MalformedURLException e) {
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format("status.no-url"));
                 log.error(e.getMessage(), e);
                 serviceSelection.setDisable(false);
@@ -923,7 +718,7 @@ public class Controller {
     @FXML
     protected void handleSearch(KeyEvent event) {
         if (!catalogReachable) {
-            setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
+            statusLogController.setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
         }
 
         String currentText = this.searchField.getText();
@@ -981,7 +776,7 @@ public class Controller {
             };
             Thread th = new Thread(task);
             if (catalogReachable) {
-                setStatusTextUI(I18n.getMsg("status.calling-service"));
+                statusLogController.setStatusTextUI(I18n.getMsg("status.calling-service"));
             }
             th.setDaemon(true);
             th.start();
@@ -1002,14 +797,14 @@ public class Controller {
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 Platform.runLater(() ->
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                             I18n.format(STATUS_SERVICE_BROKEN))
                 );
                 return false;
             }
         } else {
             Platform.runLater(() ->
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format("status.service-not-available"))
             );
             return false;
@@ -1017,7 +812,7 @@ public class Controller {
         if (dataBean.getSelectedService() != null
         &&  dataBean.getSelectedService().equals(service)) {
             Platform.runLater(() ->
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format(STATUS_READY))
             );
             return true;
@@ -1036,7 +831,7 @@ public class Controller {
                 && dataBean.getSelectedService().getPassword().isEmpty()))
                 && dataBean.getSelectedService().isRestricted()) {
             Platform.runLater(() -> {
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format("status.service-needs-auth"));
                 this.serviceAuthenticationCbx.setSelected(true);
                 this.serviceUser.setDisable(false);
@@ -1054,14 +849,14 @@ public class Controller {
         //Check if this thing could be loaded
         if (dataBean.getSelectedService().getServiceType() == null) {
             Platform.runLater(() ->
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format(STATUS_SERVICE_BROKEN))
             );
             return false;
         }
 
         Platform.runLater(() ->
-            setStatusTextUI(
+            statusLogController.setStatusTextUI(
                     I18n.format(STATUS_READY))
         );
         return true;
@@ -1083,7 +878,7 @@ public class Controller {
                 if (serviceModel != null) {
                     serviceSelection.setDisable(true);
                     serviceURL.getScene().setCursor(Cursor.WAIT);
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                             I18n.format("status.checking-auth"));
                     Task task = new Task() {
                         protected Integer call() {
@@ -1272,7 +1067,7 @@ public class Controller {
 
         String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null || format.isEmpty()) {
-            setStatusTextUI(I18n.getMsg(GUI_PROCESS_NO_FORMAT));
+            statusLogController.setStatusTextUI(I18n.getMsg(GUI_PROCESS_NO_FORMAT));
             logToAppLog(I18n.getMsg(GUI_PROCESS_NO_FORMAT));
             return steps;
         }
@@ -1280,7 +1075,7 @@ public class Controller {
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
         if (mtype == null) {
-            setStatusTextUI(I18n.getMsg(GUI_PROCESS_FORMAT_NOT_FOUND));
+            statusLogController.setStatusTextUI(I18n.getMsg(GUI_PROCESS_FORMAT_NOT_FOUND));
             logToAppLog(I18n.getMsg(GUI_PROCESS_FORMAT_NOT_FOUND));
             return steps;
         }
@@ -1295,7 +1090,7 @@ public class Controller {
             String name = psc.getName();
 
             if (!psc.isCompatibleWithFormat(mtype.getType())) {
-                setStatusTextUI(
+                statusLogController.setStatusTextUI(
                         I18n.format(GUI_PROCESS_NOT_COMPATIBLE, name));
                         logToAppLog(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
                                 name));
@@ -1383,7 +1178,7 @@ public class Controller {
                                     .getSelectedItem().toString();
                                 type = "";
                             } else {
-                                Platform.runLater(() -> setStatusTextUI(
+                                Platform.runLater(() -> statusLogController.setStatusTextUI(
                                     I18n.getMsg(GUI_FORMAT_NOT_SELECTED)));
                             }
                         }
@@ -1507,7 +1302,7 @@ public class Controller {
         if (failed.length() == 0) {
             return true;
         }
-        setStatusTextUI(
+        statusLogController.setStatusTextUI(
             I18n.format("status.validation-fail", failed.toString()));
         return false;
     }
@@ -1528,14 +1323,14 @@ public class Controller {
                 boolean lineContainsNoWhere = !userInputLine
                     .toLowerCase().contains("where");
                 if (lineContainsNoWhere) {
-                    setStatusTextUI(I18n.format(
+                    statusLogController.setStatusTextUI(I18n.format(
                         "status.sql.validation.error.overall.where"));
                     return false;
                 }
                 boolean lineContainsSupportedFeatureType =
                     featureTypeWithNameExists(userInputLine);
                 if (!lineContainsSupportedFeatureType) {
-                    setStatusTextUI(I18n.format(
+                    statusLogController.setStatusTextUI(I18n.format(
                         "status.sql.validation.error.overall.featureTypes"));
                     return false;
                 }
@@ -1544,14 +1339,14 @@ public class Controller {
             boolean filterContainsWhere = userInput
                 .toLowerCase().contains("where");
             if (filterContainsWhere) {
-                setStatusTextUI(I18n.format(
+                statusLogController.setStatusTextUI(I18n.format(
                     "status.sql.validation.error.simple.where"));
                 return false;
             }
             boolean filterContiansLineBreak = userInput
                 .toLowerCase().contains("\n");
             if (filterContiansLineBreak) {
-                setStatusTextUI(I18n.format(
+                statusLogController.setStatusTextUI(I18n.format(
                     "status.sql.validation.error.simple.lineBreak"));
                 return false;
             }
@@ -1598,7 +1393,7 @@ public class Controller {
             if (selectedDir == null) {
                 return;
             }
-            setStatusTextUI(
+            statusLogController.setStatusTextUI(
                 I18n.format("status.download.started"));
 
             this.dataBean.setProcessingSteps(extractProcessingSteps());
@@ -1614,7 +1409,7 @@ public class Controller {
                     Processor p = Processor.getInstance();
                     p.addJob(jl);
                 } catch (ConverterException ce) {
-                    setStatusTextUI(ce.getMessage());
+                    statusLogController.setStatusTextUI(ce.getMessage());
                     logToAppLog(ce.getMessage());
                 } finally {
                     this.buttonDownload.setDisable(false);
@@ -1627,10 +1422,10 @@ public class Controller {
     private boolean validateCqlInput() {
         if (dataBean.isFilterType()) {
             String sqlInput = sqlTextarea.getText();
-            logHistoryParent.setStyle(null);
+            statusLogController.setLogHistoryStyle(null);
             if (sqlInput == null || sqlInput.isEmpty()) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(I18n
+                statusLogController.setLogHistoryStyle("-fx-text-fill: #FF0000");
+                statusLogController.setStatusTextUI(I18n
                     .format("status.sql.input.empty"));
                 return false;
             }
@@ -1644,17 +1439,17 @@ public class Controller {
                 FilterEncoder filterEncoder = new FilterEncoder();
                 filterEncoder.validateCql(sqlInput);
             } catch (CQLException e) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(e.getSyntaxError());
+                statusLogController.setLogHistoryStyle("-fx-text-fill: #FF0000");
+                statusLogController.setStatusTextUI(e.getSyntaxError());
                 return false;
             } catch (ConverterException e) {
-                logHistoryParent.setStyle("-fx-text-fill: #FF0000");
-                setStatusTextUI(I18n
+                statusLogController.setLogHistoryStyle("-fx-text-fill: #FF0000");
+                statusLogController.setStatusTextUI(I18n
                     .format("status.sql.validation.failed", e.getMessage()));
                 return false;
             }
         }
-        setStatusTextUI(I18n.format("status.ready"));
+        statusLogController.setStatusTextUI(I18n.format("status.ready"));
         return true;
     }
 
@@ -1777,7 +1572,7 @@ public class Controller {
         switch (dataBean.getSelectedService().getServiceType()) {
             case ATOM:
                 Platform.runLater(() ->
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                             I18n.getMsg("status.type.atom"))
                 );
                 Atom atom = null;
@@ -1793,7 +1588,7 @@ public class Controller {
                         | IOException e) {
                     log.error(e.getMessage(), e);
                     Platform.runLater(() ->
-                        setStatusTextUI(
+                        statusLogController.setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN)
                         )
                     );
@@ -1805,7 +1600,7 @@ public class Controller {
                 break;
             case WFS_ONE:
                 Platform.runLater(() ->
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                             I18n.getMsg("status.type.wfsone"))
                 );
                 WFSMetaExtractor wfsOne =
@@ -1821,7 +1616,7 @@ public class Controller {
                         | URISyntaxException e) {
                     log.error(e.getMessage(), e);
                     Platform.runLater(() ->
-                        setStatusTextUI(
+                        statusLogController.setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN)
                         )
                     );
@@ -1831,7 +1626,7 @@ public class Controller {
                 break;
             case WFS_TWO:
                 Platform.runLater(() ->
-                    setStatusTextUI(
+                    statusLogController.setStatusTextUI(
                             I18n.getMsg("status.type.wfstwo"))
                 );
                 WFSMetaExtractor extractor =
@@ -1847,7 +1642,7 @@ public class Controller {
                         | URISyntaxException e) {
                     log.error(e.getMessage(), e);
                     Platform.runLater(() ->
-                        setStatusTextUI(
+                        statusLogController.setStatusTextUI(
                                 I18n.getMsg(STATUS_SERVICE_BROKEN))
                     );
 
@@ -1860,7 +1655,7 @@ public class Controller {
                         "Could not determine URL",
                         dataBean.getSelectedService());
                 Platform.runLater(() ->
-                    setStatusTextUI(I18n.getMsg("status.no-url"))
+                    statusLogController.setStatusTextUI(I18n.getMsg("status.no-url"))
                 );
                 break;
         }
@@ -1875,7 +1670,7 @@ public class Controller {
             if (downloadConf != null) {
                 loadDownloadConfig(downloadConf);
             }
-            setStatusTextUI(I18n.getMsg(STATUS_READY));
+            statusLogController.setStatusTextUI(I18n.getMsg(STATUS_READY));
         });
         return;
 
@@ -2208,11 +2003,11 @@ public class Controller {
         boolean datasetAvailable = false;
         if (data instanceof MiscItemModel) {
             serviceTypeChooser.setStyle(FX_BORDER_COLOR_RED);
-            setStatusTextUI(I18n.format("gui.dataset-not-available"));
+            statusLogController.setStatusTextUI(I18n.format("gui.dataset-not-available"));
         } else {
             serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
             datasetAvailable = true;
-            setStatusTextUI(I18n.format(STATUS_READY));
+            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
         }
         if (type == ServiceType.ATOM) {
             chooseAtomType(data, datasetAvailable);
@@ -2275,7 +2070,7 @@ public class Controller {
             mapNodeAtom.addEventHandler(PolygonClickedEvent.ANY,
                 new SelectedAtomPolygon());
         } else {
-            setStatusTextUI(I18n.format("status.wms-not-available"));
+            statusLogController.setStatusTextUI(I18n.format("status.wms-not-available"));
         }
         this.atomContainer.setVisible(false);
         this.progressSearch.setVisible(false);
@@ -2298,33 +2093,6 @@ public class Controller {
      */
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-    }
-
-    /**
-     * Set the text of the status bar in UI thread.
-     * Adds current message to log history.
-     *
-     * @param msg the text to set.
-     */
-    public void setStatusTextUI(String msg) {
-        String logText;
-        String regexAtom = I18n.format("atom.bytes.downloaded",
-                 "[\\d|\\.|\\,]+");
-        String regexWfs = I18n.format("file.download.bytes", "[\\d|\\.|\\,]+");
-        //Filter atom/wfs download messages
-        if (!logHistoryParent.getText().matches(regexAtom)
-           && !logHistoryParent.getText().matches(regexWfs)) {
-            logText = logHistoryParent.getText() + "\n"
-                    + logHistory.getText();
-        } else {
-            logText = logHistory.getText();
-        }
-        logToAppLog(msg);
-
-        Platform.runLater(() -> {
-            logHistoryParent.setText(msg);
-            logHistory.setText(logText);
-        });
     }
 
     /**
@@ -2362,7 +2130,7 @@ public class Controller {
         String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
         if (format == null) {
             box.setStyle(FX_BORDER_COLOR_RED);
-            setStatusTextUI(I18n.format(GUI_PROCESS_NO_FORMAT));
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NO_FORMAT));
         }
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
         MIMEType mtype = mtypes.findByName(format);
@@ -2379,7 +2147,7 @@ public class Controller {
                 //Workaround to force cell update
                 items.set(items.indexOf(cfgI), cfgI);
             }
-            setStatusTextUI(I18n.format(GUI_PROCESS_FORMAT_NOT_FOUND));
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_FORMAT_NOT_FOUND));
             return false;
         }
 
@@ -2407,7 +2175,7 @@ public class Controller {
             box.setStyle(FX_BORDER_COLOR_NULL);
         } else {
             box.setStyle(FX_BORDER_COLOR_RED);
-            setStatusTextUI(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
                     box.getValue()));
         }
         return cfg.isCompatible();
@@ -2432,7 +2200,7 @@ public class Controller {
         }
         //If all chain items were ready, set status to ready
         if (allValid) {
-            setStatusTextUI(I18n.format(STATUS_READY));
+            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
         }
     }
 
@@ -2455,7 +2223,7 @@ public class Controller {
 
                 if (polygonName != null && polygonID != null) {
                     if (polygonName.equals("#@#")) {
-                        setStatusTextUI(I18n.format(
+                        statusLogController.setStatusTextUI(I18n.format(
                                 "status.polygon-intersect",
                                 polygonID));
                         return;
@@ -2501,7 +2269,7 @@ public class Controller {
 
         @Override
         public void run() {
-            setStatusTextUI(getMessage());
+            statusLogController.setStatusTextUI(getMessage());
         }
 
         @Override

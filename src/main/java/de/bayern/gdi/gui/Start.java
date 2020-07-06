@@ -18,28 +18,13 @@
 
 package de.bayern.gdi.gui;
 
-import de.bayern.gdi.utils.DocumentResponseHandler;
-import de.bayern.gdi.utils.FileResponseHandler;
-import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Misc;
-import de.bayern.gdi.utils.Unauthorized;
-
-import java.io.IOException;
-
-import java.net.URL;
-import java.util.concurrent.CountDownLatch;
-
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import org.jboss.weld.environment.se.Weld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
@@ -50,14 +35,14 @@ public class Start extends Application {
         = LoggerFactory.getLogger(Start.class.getName());
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
-    private static Start start;
-    private static final int WIDTH = 1024;
-    private static final int HEIGHT = 768;
-    private static final String LOGONAME = "icon_118x118_300dpi.jpg";
 
+    private static Start start;
+
+    private Weld weld;
 
     /**
      * waits for the javafx application to startup.
+     *
      * @return the application
      */
     public static Start waitForStart() {
@@ -86,55 +71,19 @@ public class Start extends Application {
         return Start.start;
     }
 
-    private static DataBean forceDataBean() {
-        try {
-            return new DataBean();
-        } catch (IOException ioe) {
-            LOG.error(ioe.getMessage(), ioe);
-            System.exit(1);
-        }
-        // Not reached.
-        return null;
+    @Override
+    public void init() throws Exception {
+        weld = new Weld();
     }
 
-    /**
-     * starts the application.
-     * @param primaryStage the stage
-     */
     @Override
     public void start(Stage primaryStage) {
-
-        try {
-            ClassLoader classLoader = Start.class.getClassLoader();
-            URL url = classLoader.getResource("download-client.fxml");
-            FXMLLoader.setDefaultClassLoader(
-                Thread.currentThread().getContextClassLoader());
-            FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
-            Parent root = fxmlLoader.load();
-            Scene scene = new Scene(root, WIDTH, HEIGHT);
-            DataBean dataBean = forceDataBean();
-            Controller controller = fxmlLoader.getController();
-            controller.setPrimaryStage(primaryStage);
-            controller.setDataBean(dataBean);
-            Unauthorized unauthorized = new WarningPopup();
-            FileResponseHandler.setUnauthorized(unauthorized);
-            DocumentResponseHandler.setUnauthorized(unauthorized);
-            primaryStage.setTitle(I18n.getMsg("GDI-BY Download-Client"));
-            Image image = new Image(Misc.getResource("img/" + LOGONAME));
-            primaryStage.getIcons().add(image);
-            primaryStage.setScene(scene);
-            primaryStage.show();
-            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent e) {
-                    LOG.info(I18n.format("dlc.stop"));
-                    Platform.exit();
-                    System.exit(0);
-                }
-            });
-        } catch (IOException ioe) {
-            LOG.error("Could not find UI description file: "
-                + ioe.getMessage(), ioe);
-        }
+        weld.initialize().instance().select(FxMain.class).get().start(primaryStage, getParameters());
     }
+
+    @Override
+    public void stop() throws Exception {
+        weld.shutdown();
+    }
+
 }
