@@ -80,7 +80,7 @@ public class Start extends Application {
     @Override
     public void start(Stage primaryStage) {
         SeContainerInitializer initializer = SeContainerInitializer.newInstance();
-        container = initializer.disableDiscovery().addBeanClasses(FxMain.class, FXMLLoaderProducer.class, StatusLogController.class, Controller.class, MenuBarController.class).initialize();
+        container = initializer.disableDiscovery().addPackages(FxMain.class).initialize();
         container.select(FxMain.class).get().start(primaryStage, getParameters());
     }
 
