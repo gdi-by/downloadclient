@@ -20,10 +20,11 @@ package de.bayern.gdi.gui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.jboss.weld.environment.se.Weld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.inject.se.SeContainer;
+import javax.enterprise.inject.se.SeContainerInitializer;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -38,7 +39,7 @@ public class Start extends Application {
 
     private static Start start;
 
-    private Weld weld;
+    private SeContainer container;
 
     /**
      * waits for the javafx application to startup.
@@ -73,17 +74,19 @@ public class Start extends Application {
 
     @Override
     public void init() throws Exception {
-        weld = new Weld();
+
     }
 
     @Override
     public void start(Stage primaryStage) {
-        weld.initialize().instance().select(FxMain.class).get().start(primaryStage, getParameters());
+        SeContainerInitializer initializer = SeContainerInitializer.newInstance();
+        container = initializer.disableDiscovery().addBeanClasses(FxMain.class, FXMLLoaderProducer.class, StatusLogController.class, Controller.class, MenuBarController.class).initialize();
+        container.select(FxMain.class).get().start(primaryStage, getParameters());
     }
 
     @Override
     public void stop() throws Exception {
-        weld.shutdown();
+        container.close();
     }
 
 }
