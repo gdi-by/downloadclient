@@ -165,9 +165,10 @@ public class Controller {
     private ServiceSelectionController serviceSelectionController;
 
     @FXML
-    private MenuBar mainMenu;
+    private ProcessingChainController processingChainController;
+
     @FXML
-    private CheckBox chkChain;
+    private MenuBar mainMenu;
     @FXML
     ComboBox<ItemModel> serviceTypeChooser;
     @FXML
@@ -184,8 +185,6 @@ public class Controller {
     private VBox basicWFSContainer;
     @FXML
     private VBox atomContainer;
-    @FXML
-    private VBox chainContainer;
     @FXML
     private VBox mapNodeWFS;
     @FXML
@@ -231,17 +230,11 @@ public class Controller {
     @FXML
     private Label labelSelectType;
     @FXML
-    private Label labelPostProcess;
-    @FXML
     private WebView valueAtomDescr;
     @FXML
     private Label valueAtomFormat;
     @FXML
     private Label valueAtomRefsys;
-    @FXML
-    private Button addChainItem;
-    @FXML
-    private HBox processStepContainter;
     @FXML
     private VBox basicWFSX1Y1;
     @FXML
@@ -256,8 +249,6 @@ public class Controller {
     private HBox basicWFSFirstRows;
     @FXML
     private Label labelAtomVariation;
-    @FXML
-    private VBox containerChain;
     @FXML
     private Tab tabMap;
     @FXML
@@ -404,19 +395,7 @@ public class Controller {
         }
         List<DownloadConfig.ProcessingStep> steps =
                 downloadConfig.getProcessingSteps();
-        factory.removeAllChainAttributes(chainContainer);
-        if (steps != null) {
-            chkChain.setSelected(true);
-            handleChainCheckbox(new ActionEvent());
-
-            for (DownloadConfig.ProcessingStep iStep : steps) {
-                factory.addChainAttribute(chainContainer,
-                        iStep.getName(), iStep.getParams());
-            }
-        } else {
-            chkChain.setSelected(false);
-            handleChainCheckbox(new ActionEvent());
-        }
+        processingChainController.setProcessingSteps( steps );
     }
 
     private void initializeBoundingBox() {
@@ -608,19 +587,7 @@ public class Controller {
                 ? cb.getValue().toString()
                 : "",
             "");
-        validateChainContainerItems();
-    }
-
-    /**
-     * Handle the dataformat selection.
-     *
-     * @param event The event
-     */
-    @FXML
-    protected void handleAddChainItem(ActionEvent event) {
-        factory.addChainAttribute(chainContainer,
-                this::validateChainContainerItems);
-        validateChainContainerItems();
+        processingChainController.validateChainContainerItems();
     }
 
     /**
@@ -697,19 +664,13 @@ public class Controller {
             this.dataBean.addAttribute("VARIATION", "", "");
             this.dataBean.addAttribute(OUTPUTFORMAT, "", "");
         }
-        validateChainContainerItems();
+        processingChainController.validateChainContainerItems();
     }
 
     public List<ProcessingStep> extractProcessingSteps() {
-
         List<ProcessingStep> steps = new ArrayList<>();
-        if (!this.chkChain.isSelected()) {
-            return steps;
-        }
-
         Set<Node> parameter =
-                this.chainContainer.lookupAll("#process_parameter");
-
+            processingChainController.getProcessingChainParameter();
         if (parameter.isEmpty()) {
             return steps;
         }
@@ -1067,22 +1028,7 @@ public class Controller {
         this.sqlWFSArea.setVisible(false);
         this.referenceSystemChooser.setVisible(false);
         this.referenceSystemChooserLabel.setVisible(false);
-        resetProcessingChainContainer();
-    }
-
-    /**
-     * Handle events on the process Chain Checkbox.
-     *
-     * @param event the event
-     */
-    @FXML
-    protected void handleChainCheckbox(ActionEvent event) {
-        if (chkChain.isSelected()) {
-            processStepContainter.setVisible(true);
-        } else {
-            factory.removeAllChainAttributes(chainContainer);
-            processStepContainter.setVisible(false);
-        }
+        processingChainController.resetProcessingChainContainer();
     }
 
     /**
@@ -1485,7 +1431,7 @@ public class Controller {
         this.atomContainer.setVisible(false);
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
-        this.processStepContainter.setVisible(false);
+        processingChainController.setVisible(false);
         serviceSelectionController.resetGui();
     }
 
@@ -1502,116 +1448,6 @@ public class Controller {
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-
-    /**
-     * Resets all marks at the processing chain container, items are kept.
-     */
-    private void resetProcessingChainContainer() {
-        for (Node o : chainContainer.getChildren()) {
-            if (o instanceof VBox) {
-                VBox v = (VBox) o;
-                HBox hbox = (HBox) v.getChildren().get(0);
-                Node cBox = hbox.getChildren().get(0);
-                if (cBox instanceof ComboBox) {
-                    cBox.setStyle(FX_BORDER_COLOR_NULL);
-                    ComboBox box = (ComboBox) cBox;
-                    ObservableList<ProcessingStepConfiguration> confs =
-                        (ObservableList<ProcessingStepConfiguration>)
-                        box.getItems();
-                    for (ProcessingStepConfiguration cfgI : confs) {
-                        cfgI.setCompatible(true);
-                        confs.set(confs.indexOf(cfgI), cfgI);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Validates the chain items of a ComboBox
-     * and marks the box according to the chosen item.
-     *
-     * @param box Item to validate
-     * @return True if chosen item is valid, else false
-     */
-    private boolean validateChainContainer(ComboBox box) {
-        String format = this.dataBean.getAttributeValue(OUTPUTFORMAT);
-        if (format == null) {
-            box.setStyle(FX_BORDER_COLOR_RED);
-            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NO_FORMAT));
-        }
-        MIMETypes mtypes = Config.getInstance().getMimeTypes();
-        MIMEType mtype = mtypes.findByName(format);
-
-        ProcessingStepConfiguration cfg =
-                (ProcessingStepConfiguration) box.getValue();
-        ObservableList<ProcessingStepConfiguration> items =
-                (ObservableList<ProcessingStepConfiguration>) box.getItems();
-
-        if (format != null && mtype == null) {
-            box.setStyle(FX_BORDER_COLOR_RED);
-            for (ProcessingStepConfiguration cfgI : items) {
-                cfgI.setCompatible(false);
-                //Workaround to force cell update
-                items.set(items.indexOf(cfgI), cfgI);
-            }
-            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_FORMAT_NOT_FOUND));
-            return false;
-        }
-
-        //Mark items that are incompatible
-        for (ProcessingStepConfiguration cfgI : items) {
-            if (format != null) {
-                cfgI.setCompatible(
-                        cfgI.isCompatibleWithFormat(mtype.getType()));
-            } else {
-                cfgI.setCompatible(false);
-            }
-            items.set(items.indexOf(cfgI), cfgI);
-        }
-
-        if (format == null) {
-            return false;
-        }
-
-        if (cfg == null) {
-            box.setStyle(FX_BORDER_COLOR_NULL);
-            return true;
-        }
-
-        if (cfg.isCompatible()) {
-            box.setStyle(FX_BORDER_COLOR_NULL);
-        } else {
-            box.setStyle(FX_BORDER_COLOR_RED);
-            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
-                    box.getValue()));
-        }
-        return cfg.isCompatible();
-    }
-
-    /**
-     * Validates all items in processing chain container.
-     */
-    void validateChainContainerItems() {
-
-        boolean allValid = true;
-        for (Node o : chainContainer.getChildren()) {
-            if (o instanceof VBox) {
-                VBox v = (VBox)o;
-                HBox hbox = (HBox)v.getChildren().get(0);
-                Node cBox = hbox.getChildren().get(0);
-                if (cBox instanceof ComboBox
-                && !validateChainContainer((ComboBox)cBox)) {
-                    allValid = false;
-                }
-            }
-        }
-        //If all chain items were ready, set status to ready
-        if (allValid) {
-            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
-        }
-    }
-
 
     /**
      * Handels the Action, when a polygon is selected.

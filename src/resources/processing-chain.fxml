@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<VBox fx:id="chainContainer"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.bayern.gdi.gui.ProcessingChainController">
+    <children>
+        <CheckBox
+            fx:id="chkChain"
+            mnemonicParsing="false"
+            onAction="#handleChainCheckbox"
+            text="%gui.post_process">
+            <VBox.margin>
+                <Insets left="20.0"
+                        top="5.0"/>
+            </VBox.margin>
+            <tooltip>
+                <Tooltip
+                    text="%tooltip.post_process"/>
+            </tooltip>
+        </CheckBox>
+        <VBox fx:id="containerChain">
+            <children>
+                <HBox fx:id="processStepContainter"
+                      prefHeight="26.0"
+                      prefWidth="200.0"
+                      VBox.vgrow="NEVER">
+                    <children>
+                        <Label fx:id="labelPostProcess"
+                               text="%gui.process_chain">
+                            <font>
+                                <Font name="System Bold"
+                                      size="13.0"/>
+                            </font>
+                            <HBox.margin>
+                                <Insets bottom="5.0"
+                                        left="20.0"
+                                        right="10.0"
+                                        top="5.0"/>
+                            </HBox.margin>
+                        </Label>
+                        <Button fx:id="addChainItem"
+                                mnemonicParsing="false"
+                                onAction="#handleAddChainItem"
+                                text="%gui.add">
+                            <tooltip>
+                                <Tooltip
+                                    text="%tooltip.add_post_process"/>
+                            </tooltip>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

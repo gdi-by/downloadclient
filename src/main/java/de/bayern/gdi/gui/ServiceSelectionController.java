@@ -55,6 +55,9 @@ public class ServiceSelectionController {
     @Inject
     private Controller controller;
 
+    @Inject
+    private ProcessingChainController processingChainController;
+
     @FXML
     private TextField searchField;
 
@@ -337,7 +340,7 @@ public class ServiceSelectionController {
                             serviceURL.getScene()
                                       .setCursor( Cursor.DEFAULT );
                             serviceURL.setDisable( false );
-                            controller.validateChainContainerItems();
+                            processingChainController.validateChainContainerItems();
                         }
                     }
                 };
