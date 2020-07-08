@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui;
 
+import de.bayern.gdi.gui.controller.FxMain;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class Start extends Application {
     @Override
     public void start(Stage primaryStage) {
         SeContainerInitializer initializer = SeContainerInitializer.newInstance();
-        container = initializer.disableDiscovery().addPackages(FxMain.class).initialize();
+        container = initializer.disableDiscovery().addPackages( FxMain.class).initialize();
         container.select(FxMain.class).get().start(primaryStage, getParameters());
     }
 

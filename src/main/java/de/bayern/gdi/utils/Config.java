@@ -20,7 +20,7 @@ package de.bayern.gdi.utils;
 import java.io.File;
 import java.io.IOException;
 
-import de.bayern.gdi.gui.Controller;
+import de.bayern.gdi.gui.controller.Controller;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;

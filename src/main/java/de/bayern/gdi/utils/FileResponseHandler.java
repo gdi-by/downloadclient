@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.gui.Controller;
+import de.bayern.gdi.gui.controller.Controller;
 
 import java.nio.file.Files;
 

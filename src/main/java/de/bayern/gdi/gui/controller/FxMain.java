@@ -1,5 +1,7 @@
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.gui.DataBean;
+import de.bayern.gdi.gui.WarningPopup;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;

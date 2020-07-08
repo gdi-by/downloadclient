@@ -1,5 +1,6 @@
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.gui.WebViewWindow;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
@@ -31,7 +32,7 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Optional;
 
-import static de.bayern.gdi.gui.Controller.USER_DIR;
+import static de.bayern.gdi.gui.controller.Controller.USER_DIR;
 
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>

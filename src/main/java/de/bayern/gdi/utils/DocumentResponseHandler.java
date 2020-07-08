@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import de.bayern.gdi.gui.Controller;
+import de.bayern.gdi.gui.controller.Controller;
 
 import javax.xml.parsers.ParserConfigurationException;
 

@@ -1,5 +1,6 @@
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.gui.UIFactory;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingStepConfiguration;

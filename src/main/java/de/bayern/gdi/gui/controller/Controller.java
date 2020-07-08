@@ -16,15 +16,28 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.controller;
 
 import com.sothawo.mapjfx.MapView;
+import de.bayern.gdi.gui.AtomFieldModel;
+import de.bayern.gdi.gui.AtomItemModel;
+import de.bayern.gdi.gui.CRSModel;
+import de.bayern.gdi.gui.CellTypes;
+import de.bayern.gdi.gui.DataBean;
+import de.bayern.gdi.gui.FeatureModel;
+import de.bayern.gdi.gui.ItemModel;
+import de.bayern.gdi.gui.MiscItemModel;
+import de.bayern.gdi.gui.OutputFormatModel;
+import de.bayern.gdi.gui.OverallFeatureTypeModel;
+import de.bayern.gdi.gui.ServiceModel;
+import de.bayern.gdi.gui.StoredQueryModel;
+import de.bayern.gdi.gui.UIFactory;
+import de.bayern.gdi.gui.Validator;
 import de.bayern.gdi.gui.map.FeaturePolygon;
 import de.bayern.gdi.gui.map.MapHandler;
 import de.bayern.gdi.gui.map.MapHandlerBuilder;
 import de.bayern.gdi.gui.map.PolygonClickedEvent;
 import de.bayern.gdi.gui.map.PolygonInfos;
-import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.Option;
@@ -32,57 +45,42 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.processor.ConverterException;
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.FilterEncoder;
-import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSettings;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.geotools.filter.text.cql2.CQLException;
@@ -100,7 +98,6 @@ import org.xml.sax.SAXException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -365,7 +362,7 @@ public class Controller {
         if (!isSameFeatureTypeName) {
             return false;
         }
-        if (iItem instanceof FeatureModel && config.getCql() != null) {
+        if ( iItem instanceof FeatureModel && config.getCql() != null) {
             return FILTER.equals(((FeatureModel) iItem).getFilterType());
         }
         return true;
@@ -738,7 +735,7 @@ public class Controller {
 
     void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
-        if (data instanceof StoredQueryModel) {
+        if (data instanceof StoredQueryModel ) {
             this.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
 
             ObservableList<Node> children
@@ -862,7 +859,7 @@ public class Controller {
 
         for (DataBean.Attribute attr: this.dataBean.getAttributes()) {
             if (!attr.getType().isEmpty()
-            && !Validator.isValid(attr.getType(), attr.getValue())) {
+            && !Validator.isValid( attr.getType(), attr.getValue())) {
                 fail.accept(attr.getName());
             }
         }
@@ -1063,7 +1060,7 @@ public class Controller {
                             atomCRS = CRS.decode(ATOM_CRS_STRING);
                         Geometry all = null;
                         for (Atom.Item i : items) {
-                            opts.add(new AtomItemModel(i));
+                            opts.add(new AtomItemModel( i));
                             FeaturePolygon polygon =
                                     new FeaturePolygon(
                                             i.getPolygon(),
@@ -1120,7 +1117,7 @@ public class Controller {
                     }
                 }
             }
-            types.add(new OverallFeatureTypeModel(features));
+            types.add(new OverallFeatureTypeModel( features));
         }
         if (extendWFS != null) {
             wmsWfsMapHandler.setExtend(extendWFS);
@@ -1166,7 +1163,7 @@ public class Controller {
         ObservableList<ItemModel> list =
                 FXCollections.observableArrayList();
         for (Atom.Field f : fields) {
-            AtomFieldModel afm = new AtomFieldModel(f);
+            AtomFieldModel afm = new AtomFieldModel( f);
             list.add(afm);
         }
         this.atomVariationChooser.setItems(list);

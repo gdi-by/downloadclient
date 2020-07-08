@@ -1,4 +1,4 @@
-package de.bayern.gdi.gui;
+package de.bayern.gdi.gui.controller;
 
 import de.bayern.gdi.utils.I18n;
 import javafx.application.Platform;

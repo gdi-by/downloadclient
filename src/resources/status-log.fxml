@@ -9,7 +9,7 @@
 <HBox prefHeight="25.0" prefWidth="3840.0"
       xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="de.bayern.gdi.gui.StatusLogController"
+      fx:controller="de.bayern.gdi.gui.controller.StatusLogController"
       style="-fx-background-color: gainsboro;">
     <children>
         <TitledPane fx:id="logHistoryParent"

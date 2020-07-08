@@ -18,7 +18,7 @@
 
 package de.bayern.gdi;
 
-import de.bayern.gdi.gui.Controller;
+import de.bayern.gdi.gui.controller.Controller;
 import de.bayern.gdi.gui.DataBean;
 import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.gui.WarningPopup;

@@ -23,7 +23,7 @@
             SplitPane.resizableWithParent="false"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.bayern.gdi.gui.ServiceSelectionController">
+            fx:controller="de.bayern.gdi.gui.controller.ServiceSelectionController">
     <children>
         <VBox layoutX="37.0" layoutY="147.0" prefHeight="398.0"
               prefWidth="174.0" AnchorPane.bottomAnchor="0.0"
