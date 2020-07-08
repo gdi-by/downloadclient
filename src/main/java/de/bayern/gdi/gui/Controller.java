@@ -97,6 +97,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -116,10 +118,11 @@ import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 /**
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
+@Named
+@Singleton
 public class Controller {
 
     public static final String USER_DIR = "user.dir";
-    private static final String STATUS_SERVICE_BROKEN = "status.service.broken";
     private static final String STATUS_READY = "status.ready";
     private static final String OUTPUTFORMAT = "outputformat";
     private static final String FX_BORDER_COLOR_NULL
@@ -149,36 +152,26 @@ public class Controller {
             = LoggerFactory.getLogger("Application_Log");
 
     // DataBean
-    private DataBean dataBean;
+    DataBean dataBean;
     private Stage primaryStage;
     private UIFactory factory;
-    private boolean catalogReachable;
-    private DownloadConfig downloadConfig;
+    boolean catalogReachable;
+    DownloadConfig downloadConfig;
 
     @FXML
     private StatusLogController statusLogController;
+
+    @FXML
+    private ServiceSelectionController serviceSelectionController;
+
     @FXML
     private Button buttonClose;
     @FXML
     private MenuBar mainMenu;
     @FXML
-    private ListView serviceList;
-    @FXML
-    private TextField searchField;
-    @FXML
-    private Button searchButton;
-    @FXML
-    private TextField serviceURL;
-    @FXML
-    private CheckBox serviceAuthenticationCbx;
-    @FXML
     private CheckBox chkChain;
     @FXML
-    private TextField serviceUser;
-    @FXML
-    private TextField servicePW;
-    @FXML
-    private ComboBox<ItemModel> serviceTypeChooser;
+    ComboBox<ItemModel> serviceTypeChooser;
     @FXML
     private ComboBox<ItemModel> atomVariationChooser;
     @FXML
@@ -234,8 +227,6 @@ public class Controller {
     @FXML
     private Label lablatomy2;
     @FXML
-    private Label labelURL;
-    @FXML
     private Label labelUser;
     @FXML
     private Label labelPassword;
@@ -250,15 +241,11 @@ public class Controller {
     @FXML
     private Label valueAtomRefsys;
     @FXML
-    private Button serviceSelection;
-    @FXML
     private Button buttonDownload;
     @FXML
     private Button buttonSaveConfig;
     @FXML
     private Button addChainItem;
-    @FXML
-    private ProgressIndicator progressSearch;
     @FXML
     private HBox processStepContainter;
     @FXML
@@ -273,8 +260,6 @@ public class Controller {
     private VBox sqlWFSArea;
     @FXML
     private HBox basicWFSFirstRows;
-    @FXML
-    private Text searchHeadlineText;
     @FXML
     private Label labelAtomVariation;
     @FXML
@@ -332,7 +317,7 @@ public class Controller {
             APP_LOG.info(msg);
     }
 
-    private void loadDownloadConfig(DownloadConfig conf) {
+    void loadDownloadConfig( DownloadConfig conf ) {
         String dataset = conf.getDataset();
         if (dataset != null) {
             boolean datasetAvailable = false;
@@ -587,331 +572,6 @@ public class Controller {
                 }
             }
         }
-    }
-
-    /**
-     * Handle the service selection button event.
-     *
-     * @param event The mouse click event.
-     */
-    @FXML
-    protected void handleServiceSelectButton(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY)) {
-            this.downloadConfig = null;
-            doSelectService();
-        }
-    }
-
-   /**
-    * Select a service according to service url textfield.
-    */
-    protected void doSelectService() {
-        doSelectService(null);
-    }
-
-   /**
-    * Select a service according to service url textfield.
-    *
-    * @param downloadConf Loaded download config, null if a service is chosen
-    *    from an URL or the service List
-    */
-    protected void doSelectService(DownloadConfig downloadConf) {
-        log.info("Using download config: " + downloadConf);
-        dataBean.resetSelectedService();
-        serviceSelection.setDisable(true);
-        serviceURL.getScene().setCursor(Cursor.WAIT);
-        serviceURL.setDisable(true);
-        resetGui();
-        new Thread(() -> {
-            try {
-                ObservableList selectedItems = serviceList.
-                    getSelectionModel().getSelectedItems();
-                ServiceModel serviceModel = selectedItems.isEmpty() ? null
-                    : (ServiceModel) selectedItems.get(0);
-                Service service = null;
-                if (serviceModel != null
-                    && serviceModel.getUrl().toString().equals(
-                        serviceURL.getText())
-                        ) {
-                    if (ServiceChecker.isReachable(serviceModel
-                                .getItem().getServiceURL())) {
-                        service = serviceModel.getItem();
-                        service.setPassword(servicePW.getText());
-                        service.setUsername(serviceUser.getText());
-                    }
-                } else {
-                    URL sURL = new URL(serviceURL.getText());
-                    log.info("Connecting " + sURL + "...");
-                    if (ServiceChecker.isReachable(sURL)) {
-                        service = new Service(
-                                sURL,
-                                "",
-                                true,
-                                serviceUser.getText(),
-                                servicePW.getText());
-                    }
-                }
-                if (service == null) {
-                    statusLogController.setStatusTextUI(
-                        I18n.format("status.service-timeout"));
-                    dataBean.setSelectedService(null);
-                    serviceSelection.setDisable(false);
-                    serviceURL.setDisable(false);
-                    serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                    return;
-                }
-                serviceSelection.setDisable(true);
-                serviceURL.getScene().setCursor(Cursor.WAIT);
-                statusLogController.setStatusTextUI(
-                        I18n.format("status.checking-auth"));
-                serviceURL.setDisable(true);
-                Service finalService = service;
-                Task task = new Task() {
-                    protected Integer call() {
-                        try {
-                            boolean serviceSelected = selectService(
-                                    finalService);
-                            if (serviceSelected) {
-                                chooseSelectedService(downloadConf);
-                            }
-                            return 0;
-                        } finally {
-                            serviceSelection.setDisable(false);
-                            serviceURL.getScene()
-                                    .setCursor(Cursor.DEFAULT);
-                            serviceURL.setDisable(false);
-                            validateChainContainerItems();
-                        }
-                    }
-                };
-                Thread th = new Thread(task);
-                th.setDaemon(true);
-                th.start();
-            } catch (MalformedURLException e) {
-                statusLogController.setStatusTextUI(
-                        I18n.format("status.no-url"));
-                log.error(e.getMessage(), e);
-                serviceSelection.setDisable(false);
-                serviceURL.getScene()
-                        .setCursor(Cursor.DEFAULT);
-                serviceURL.setDisable(false);
-            }
-        }).start();
-    }
-
-    /**
-     * Handle search button clicks.
-     * Hide search button and start search
-     *
-     * @param event the event
-     */
-    @FXML
-    protected void handleSearchButtonClick(MouseEvent event) {
-        handleSearch(null);
-    }
-
-    /**
-     * Handle search and filter the service list.
-     *
-     * @param event the event
-     */
-    @FXML
-    protected void handleSearch(KeyEvent event) {
-        if (!catalogReachable) {
-            statusLogController.setStatusTextUI(I18n.getMsg("status.catalog-not-available"));
-        }
-
-        String currentText = this.searchField.getText();
-        this.serviceList.getItems().clear();
-        dataBean.resetCatalogLists();
-        if (currentText == null || currentText.isEmpty()) {
-            this.serviceList.setItems(this.dataBean.getServicesAsList());
-        }
-
-        String searchValue = currentText == null
-            ? ""
-            : currentText.toUpperCase();
-
-        ObservableList<ServiceModel> subentries
-                = FXCollections.observableArrayList();
-        ObservableList<ServiceModel> all = this.dataBean.getServicesAsList();
-        for (ServiceModel entry : all) {
-            boolean match
-                = entry.getName().toUpperCase().contains(searchValue);
-            if (match) {
-                subentries.add(entry);
-            }
-        }
-        if (currentText != null && currentText.length() > 2) {
-            Task task = new Task() {
-                @Override
-                protected Integer call() throws Exception {
-                    Platform.runLater(() -> {
-                        searchButton.setVisible(false);
-                        searchButton.setManaged(false);
-                        progressSearch.setVisible(true);
-                        progressSearch.setManaged(true);
-                    });
-                    if (catalogReachable) {
-                        List<Service> catalog =
-                                dataBean.getCatalogService()
-                                        .getServicesByFilter(currentText);
-                        for (Service entry : catalog) {
-                            dataBean.addCatalogServiceToList(entry);
-                        }
-                        Platform.runLater(() -> {
-                            for (Service entry : catalog) {
-                                subentries.add(new ServiceModel(entry));
-                            }
-                        });
-                    }
-                    Platform.runLater(() -> {
-                        progressSearch.setVisible(false);
-                        progressSearch.setManaged(false);
-                        searchButton.setManaged(true);
-                        searchButton.setVisible(true);
-                    });
-                    return 0;
-                }
-            };
-            Thread th = new Thread(task);
-            if (catalogReachable) {
-                statusLogController.setStatusTextUI(I18n.getMsg("status.calling-service"));
-            }
-            th.setDaemon(true);
-            th.start();
-        }
-        this.serviceList.setItems(subentries);
-    }
-
-    private void clearUserNamePassword() {
-        this.serviceUser.setText("");
-        this.servicePW.setText("");
-    }
-
-    private boolean selectService(Service service) {
-        log.info("User selected: " + service.toString());
-        if (ServiceChecker.isReachable(service.getServiceURL())) {
-            try {
-                service.load();
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                Platform.runLater(() ->
-                    statusLogController.setStatusTextUI(
-                            I18n.format(STATUS_SERVICE_BROKEN))
-                );
-                return false;
-            }
-        } else {
-            Platform.runLater(() ->
-                statusLogController.setStatusTextUI(
-                        I18n.format("status.service-not-available"))
-            );
-            return false;
-        }
-        if (dataBean.getSelectedService() != null
-        &&  dataBean.getSelectedService().equals(service)) {
-            Platform.runLater(() ->
-                statusLogController.setStatusTextUI(
-                        I18n.format(STATUS_READY))
-            );
-            return true;
-        }
-        dataBean.setSelectedService(service);
-        Platform.runLater(() -> {
-            resetGui();
-            this.serviceURL.setText(
-                    dataBean.getSelectedService().getServiceURL().toString()
-            );
-        });
-        //Check if Username and Password are given
-        if (((dataBean.getSelectedService().getUsername() != null
-                && dataBean.getSelectedService().getPassword() != null)
-                || (dataBean.getSelectedService().getUsername().isEmpty()
-                && dataBean.getSelectedService().getPassword().isEmpty()))
-                && dataBean.getSelectedService().isRestricted()) {
-            Platform.runLater(() -> {
-                statusLogController.setStatusTextUI(
-                        I18n.format("status.service-needs-auth"));
-                this.serviceAuthenticationCbx.setSelected(true);
-                this.serviceUser.setDisable(false);
-                this.servicePW.setDisable(false);
-            });
-            return false;
-        } else {
-            Platform.runLater(() -> {
-                this.serviceAuthenticationCbx.setSelected(false);
-                this.serviceUser.setDisable(true);
-                this.servicePW.setDisable(true);
-                clearUserNamePassword();
-            });
-        }
-        //Check if this thing could be loaded
-        if (dataBean.getSelectedService().getServiceType() == null) {
-            Platform.runLater(() ->
-                statusLogController.setStatusTextUI(
-                        I18n.format(STATUS_SERVICE_BROKEN))
-            );
-            return false;
-        }
-
-        Platform.runLater(() ->
-            statusLogController.setStatusTextUI(
-                    I18n.format(STATUS_READY))
-        );
-        return true;
-    }
-
-    /**
-     * Handle the service selection.
-     *
-     * @param event The mouse click event.
-     */
-    @FXML
-    protected void handleServiceSelect(MouseEvent event) {
-        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            if (event.getClickCount() == 1) {
-                clearUserNamePassword();
-                ServiceModel serviceModel =
-                        (ServiceModel) this.serviceList.getSelectionModel()
-                                .getSelectedItems().get(0);
-                if (serviceModel != null) {
-                    serviceSelection.setDisable(true);
-                    serviceURL.getScene().setCursor(Cursor.WAIT);
-                    statusLogController.setStatusTextUI(
-                            I18n.format("status.checking-auth"));
-                    Task task = new Task() {
-                        protected Integer call() {
-                            try {
-                                selectService(serviceModel.getItem());
-                                return 0;
-                            } finally {
-                                serviceSelection.setDisable(false);
-                                serviceURL.getScene().setCursor(Cursor.DEFAULT);
-                            }
-                        }
-                    };
-                    Thread th = new Thread(task);
-                    th.setDaemon(true);
-                    th.start();
-                }
-            } else if (event.getClickCount() > 1) {
-                clearUserNamePassword();
-                resetGui();
-            }
-        }
-    }
-
-    /**
-     * Handle authentication required selection.
-     *
-     * @param event the event
-     */
-    @FXML
-    protected void handleAuthenticationRequired(ActionEvent event) {
-        boolean flag = !this.serviceAuthenticationCbx.isSelected();
-        this.serviceUser.setDisable(flag);
-        this.servicePW.setDisable(flag);
     }
 
     /**
@@ -1453,7 +1113,7 @@ public class Controller {
         return true;
     }
 
-    private void resetGui() {
+    void resetGui() {
         Platform.runLater(() ->
             this.serviceTypeChooser.getItems().retainAll()
         );
@@ -1560,120 +1220,6 @@ public class Controller {
                 log.warn(ex.getMessage(), ex);
             }
         }
-    }
-
-    /**
-     * Use selection to request the service data and fill the UI.
-     *
-     * @param downloadConf Loaded download config, null if service
-     *      was chosen from an URL or the service list
-     */
-    private void chooseSelectedService(DownloadConfig downloadConf) {
-        switch (dataBean.getSelectedService().getServiceType()) {
-            case ATOM:
-                Platform.runLater(() ->
-                    statusLogController.setStatusTextUI(
-                            I18n.getMsg("status.type.atom"))
-                );
-                Atom atom = null;
-                try {
-                    atom = new Atom(
-                            dataBean.getSelectedService()
-                                    .getServiceURL().toString(),
-                            dataBean.getSelectedService().getUsername(),
-                            dataBean.getSelectedService().getPassword());
-                } catch (IllegalArgumentException
-                        | URISyntaxException
-                        | ParserConfigurationException
-                        | IOException e) {
-                    log.error(e.getMessage(), e);
-                    Platform.runLater(() ->
-                        statusLogController.setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN)
-                        )
-                    );
-                    resetGui();
-                    return;
-                } finally {
-                    dataBean.setAtomService(atom);
-                }
-                break;
-            case WFS_ONE:
-                Platform.runLater(() ->
-                    statusLogController.setStatusTextUI(
-                            I18n.getMsg("status.type.wfsone"))
-                );
-                WFSMetaExtractor wfsOne =
-                        new WFSMetaExtractor(
-                                dataBean.getSelectedService()
-                                        .getServiceURL().toString(),
-                                dataBean.getSelectedService().getUsername(),
-                                dataBean.getSelectedService().getPassword());
-                WFSMeta metaOne = null;
-                try {
-                    metaOne = wfsOne.parse();
-                } catch (IOException
-                        | URISyntaxException e) {
-                    log.error(e.getMessage(), e);
-                    Platform.runLater(() ->
-                        statusLogController.setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN)
-                        )
-                    );
-                } finally {
-                    dataBean.setWFSService(metaOne);
-                }
-                break;
-            case WFS_TWO:
-                Platform.runLater(() ->
-                    statusLogController.setStatusTextUI(
-                            I18n.getMsg("status.type.wfstwo"))
-                );
-                WFSMetaExtractor extractor =
-                        new WFSMetaExtractor(
-                                dataBean.getSelectedService()
-                                        .getServiceURL().toString(),
-                                dataBean.getSelectedService().getUsername(),
-                                dataBean.getSelectedService().getPassword());
-                WFSMeta meta = null;
-                try {
-                    meta = extractor.parse();
-                } catch (IOException
-                        | URISyntaxException e) {
-                    log.error(e.getMessage(), e);
-                    Platform.runLater(() ->
-                        statusLogController.setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN))
-                    );
-
-                } finally {
-                    dataBean.setWFSService(meta);
-                }
-                break;
-            default:
-                log.warn(
-                        "Could not determine URL",
-                        dataBean.getSelectedService());
-                Platform.runLater(() ->
-                    statusLogController.setStatusTextUI(I18n.getMsg("status.no-url"))
-                );
-                break;
-        }
-        if (dataBean.isWebServiceSet()) {
-            Platform.runLater(this::setServiceTypes);
-        } else {
-            return;
-        }
-        Platform.runLater(() -> {
-            serviceTypeChooser.
-                    getSelectionModel().select(0);
-            if (downloadConf != null) {
-                loadDownloadConfig(downloadConf);
-            }
-            statusLogController.setStatusTextUI(I18n.getMsg(STATUS_READY));
-        });
-        return;
-
     }
 
     /**
@@ -2023,7 +1569,8 @@ public class Controller {
      */
     public void setDataBean(DataBean dataBean) {
         this.dataBean = dataBean;
-        this.serviceList.setItems(this.dataBean.getServicesAsList());
+        ObservableList<ServiceModel> servicesAsList = this.dataBean.getServicesAsList();
+        serviceSelectionController.setServices( servicesAsList );
 
         ServiceSettings serviceSetting = Config.getInstance().getServices();
         catalogReachable = dataBean.getCatalogService() != null
@@ -2073,12 +1620,10 @@ public class Controller {
             statusLogController.setStatusTextUI(I18n.format("status.wms-not-available"));
         }
         this.atomContainer.setVisible(false);
-        this.progressSearch.setVisible(false);
         this.simpleWFSContainer.setVisible(false);
         this.basicWFSContainer.setVisible(false);
-        this.serviceUser.setDisable(true);
-        this.servicePW.setDisable(true);
         this.processStepContainter.setVisible(false);
+        serviceSelectionController.resetGui();
     }
 
     /**
@@ -2184,7 +1729,7 @@ public class Controller {
     /**
      * Validates all items in processing chain container.
      */
-    private void validateChainContainerItems() {
+    void validateChainContainerItems() {
 
         boolean allValid = true;
         for (Node o : chainContainer.getChildren()) {
