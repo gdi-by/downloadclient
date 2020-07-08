@@ -165,8 +165,6 @@ public class Controller {
     private ServiceSelectionController serviceSelectionController;
 
     @FXML
-    private Button buttonClose;
-    @FXML
     private MenuBar mainMenu;
     @FXML
     private CheckBox chkChain;
@@ -241,10 +239,6 @@ public class Controller {
     @FXML
     private Label valueAtomRefsys;
     @FXML
-    private Button buttonDownload;
-    @FXML
-    private Button buttonSaveConfig;
-    @FXML
     private Button addChainItem;
     @FXML
     private HBox processStepContainter;
@@ -301,11 +295,6 @@ public class Controller {
     public Controller() {
         this.factory = new UIFactory();
         Processor.getInstance().addListener(new DownloadListener());
-    }
-
-    @FXML
-    protected void handleCloseApp(ActionEvent event) {
-
     }
 
     /**
@@ -711,7 +700,7 @@ public class Controller {
         validateChainContainerItems();
     }
 
-    private List<ProcessingStep> extractProcessingSteps() {
+    public List<ProcessingStep> extractProcessingSteps() {
 
         List<ProcessingStep> steps = new ArrayList<>();
         if (!this.chkChain.isSelected()) {
@@ -786,7 +775,7 @@ public class Controller {
         return steps;
     }
 
-    private void extractStoredQuery() {
+    void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
         if (data instanceof StoredQueryModel) {
             this.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
@@ -854,7 +843,7 @@ public class Controller {
         }
     }
 
-    private void extractBoundingBox() {
+    void extractBoundingBox() {
         Envelope2D envelope = null;
         switch (this.dataBean.getServiceType()) {
             case ATOM:
@@ -891,7 +880,7 @@ public class Controller {
         this.dataBean.addAttribute("bbox", bbox.toString(), "");
     }
 
-    private void extractCql() {
+    void extractCql() {
         String sqlInput = sqlTextarea.getText();
         if (dataBean.isFilterType()
             && sqlInput != null
@@ -900,7 +889,7 @@ public class Controller {
         }
     }
 
-    private boolean validateInput() {
+    boolean validateInput() {
         final StringBuilder failed = new StringBuilder();
 
         Consumer<String> fail = s -> {
@@ -1025,61 +1014,7 @@ public class Controller {
         return false;
     }
 
-    /**
-     * Start the download.
-     *
-     * @param event The event
-     */
-    @FXML
-    protected void handleDownload(ActionEvent event) {
-        extractStoredQuery();
-        extractBoundingBox();
-        extractCql();
-        if (validateInput() && validateCqlInput()) {
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-            if (downloadConfig != null
-                        && downloadConfig.getDownloadPath() != null) {
-                try {
-                    File dir =  new File(downloadConfig.getDownloadPath());
-                    if (dir.exists()) {
-                        dirChooser.setInitialDirectory(dir);
-                    }
-                } catch (Exception e) {
-                    log.warn(e.getLocalizedMessage());
-                }
-            }
-            File selectedDir = dirChooser.showDialog(getPrimaryStage());
-            if (selectedDir == null) {
-                return;
-            }
-            statusLogController.setStatusTextUI(
-                I18n.format("status.download.started"));
-
-            this.dataBean.setProcessingSteps(extractProcessingSteps());
-            String savePath = selectedDir.getPath();
-            Runnable convertTask = () -> {
-                DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-                try {
-                    this.buttonDownload.setDisable(true);
-                    DownloadStepConverter dsc = new DownloadStepConverter(
-                            dataBean.getSelectedService().getUsername(),
-                            dataBean.getSelectedService().getPassword());
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (ConverterException ce) {
-                    statusLogController.setStatusTextUI(ce.getMessage());
-                    logToAppLog(ce.getMessage());
-                } finally {
-                    this.buttonDownload.setDisable(false);
-                }
-            };
-            new Thread(convertTask).start();
-        }
-    }
-
-    private boolean validateCqlInput() {
+    boolean validateCqlInput() {
         if (dataBean.isFilterType()) {
             String sqlInput = sqlTextarea.getText();
             statusLogController.setLogHistoryStyle(null);
@@ -1147,78 +1082,6 @@ public class Controller {
         } else {
             factory.removeAllChainAttributes(chainContainer);
             processStepContainter.setVisible(false);
-        }
-    }
-
-    /**
-     * Handle config saving.
-     *
-     * @param event The event.
-     */
-    @FXML
-    protected void handleSaveConfig(ActionEvent event) {
-        extractStoredQuery();
-        extractBoundingBox();
-        extractCql();
-        if (validateInput() && validateCqlInput()) {
-            FileChooser fileChooser = new FileChooser();
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            File downloadDir;
-            File initDir;
-
-            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
-
-            if (downloadConfig == null) {
-                downloadDir = dirChooser.showDialog(getPrimaryStage());
-                String basedir = Config.getInstance().getServices()
-                    .getBaseDirectory();
-                initDir = new File(
-                    basedir.isEmpty()
-                    ? System.getProperty(USER_DIR)
-                    : basedir);
-                File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
-                        null);
-                fileChooser.setInitialFileName(uniqueName.getName());
-            } else {
-                File downloadInitDir
-                        = new File(downloadConfig.getDownloadPath());
-                if (!downloadInitDir.exists()) {
-                    downloadInitDir = new File(System.getProperty(USER_DIR));
-                }
-                dirChooser.setInitialDirectory(downloadInitDir);
-                downloadDir = dirChooser.showDialog(getPrimaryStage());
-
-                String path = downloadConfig.getFile().getAbsolutePath();
-                path = path.substring(0, path.lastIndexOf(File.separator));
-                initDir = new File(path);
-                fileChooser.setInitialFileName(downloadConfig.getFile()
-                        .getName());
-            }
-            fileChooser.setInitialDirectory(initDir);
-            FileChooser.ExtensionFilter xmlFilter =
-                    new FileChooser.ExtensionFilter("xml files (*.xml)",
-                            "*.xml");
-                        fileChooser.getExtensionFilters().add(xmlFilter);
-            fileChooser.setSelectedExtensionFilter(xmlFilter);
-            fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-            File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-            if (configFile == null) {
-                return;
-            }
-
-            if (!configFile.toString().endsWith(".xml")) {
-                configFile = new File(configFile.toString() + ".xml");
-            }
-
-            this.dataBean.setProcessingSteps(extractProcessingSteps());
-
-            String savePath = downloadDir.getPath();
-            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-            try {
-                ds.write(configFile);
-            } catch (IOException ex) {
-                log.warn(ex.getMessage(), ex);
-            }
         }
     }
 

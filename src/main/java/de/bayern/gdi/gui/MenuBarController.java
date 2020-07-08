@@ -100,6 +100,11 @@ public class MenuBarController {
      */
     @FXML
     protected void handleCloseApp( ActionEvent event ) {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        closeApp( stage );
+    }
+
+    public void closeApp( Stage stage ) {
         Alert closeDialog = new Alert( Alert.AlertType.CONFIRMATION );
         closeDialog.setTitle( I18n.getMsg( "gui.confirm-exit" ) );
         closeDialog.setContentText( I18n.getMsg( "gui.want-to-quit" ) );
@@ -110,7 +115,6 @@ public class MenuBarController {
         Optional<ButtonType> res = closeDialog.showAndWait();
         if ( res.isPresent() && res.get() == confirm ) {
             Controller.logToAppLog( I18n.format( "dlc.stop" ) );
-            Stage stage = (Stage) menuBar.getScene().getWindow();
             stage.fireEvent( new WindowEvent(
                 stage,
                 WindowEvent.WINDOW_CLOSE_REQUEST
