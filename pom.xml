@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <version>1.2.2-SNAPSHOT</version>
     <name>downloadclient</name>
-    <url>http://maven.apache.org</url>
+    <url>https://www.gdi.bayern.de/downloadclient.html</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
@@ -128,7 +128,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -138,6 +138,7 @@
                 </executions>
                 <configuration>
                     <mainClass>de.bayern.gdi.App</mainClass>
+                    <additionalClasspathElements>${project.basedir}/src/resources</additionalClasspathElements>
                 </configuration>
             </plugin>
             <plugin>
