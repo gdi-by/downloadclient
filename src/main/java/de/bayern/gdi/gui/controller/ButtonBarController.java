@@ -18,14 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 
-import static de.bayern.gdi.gui.controller.Controller.USER_DIR;
+import static de.bayern.gdi.gui.GuiConstants.USER_DIR;
 
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
+@Named
+@Singleton
 public class ButtonBarController {
 
     private static final Logger log
@@ -42,9 +46,6 @@ public class ButtonBarController {
 
     @FXML
     private Button buttonDownload;
-
-    @FXML
-    private Button buttonSaveConfig;
 
     @FXML
     private Button buttonClose;

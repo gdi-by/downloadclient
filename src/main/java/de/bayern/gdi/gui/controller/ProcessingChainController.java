@@ -11,45 +11,38 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static de.bayern.gdi.gui.GuiConstants.FX_BORDER_COLOR_NULL;
+import static de.bayern.gdi.gui.GuiConstants.FX_BORDER_COLOR_RED;
+import static de.bayern.gdi.gui.GuiConstants.GUI_PROCESS_FORMAT_NOT_FOUND;
+import static de.bayern.gdi.gui.GuiConstants.GUI_PROCESS_NOT_COMPATIBLE;
+import static de.bayern.gdi.gui.GuiConstants.GUI_PROCESS_NO_FORMAT;
+import static de.bayern.gdi.gui.GuiConstants.OUTPUTFORMAT;
+import static de.bayern.gdi.gui.GuiConstants.STATUS_READY;
+
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
+@Named
+@Singleton
 public class ProcessingChainController {
-
-    private static final String STATUS_READY = "status.ready";
-
-    private static final String OUTPUTFORMAT = "outputformat";
-
-    private static final String FX_BORDER_COLOR_NULL
-        = "-fx-border-color: null;";
-
-    private static final String FX_BORDER_COLOR_RED = "-fx-border-color: red;";
-
-    private static final String GUI_PROCESS_NO_FORMAT
-        = "gui.process.no.format";
-
-    private static final String GUI_PROCESS_FORMAT_NOT_FOUND
-        = "gui.process.format.not.found";
-
-    private static final String GUI_PROCESS_NOT_COMPATIBLE
-        = "gui.process.not.compatible";
-
-    @Inject
-    private StatusLogController statusLogController;
 
     @Inject
     private Controller controller;
+
+    @Inject
+    private StatusLogController statusLogController;
 
     @FXML
     private VBox chainContainer;
@@ -59,9 +52,6 @@ public class ProcessingChainController {
 
     @FXML
     private HBox processStepContainter;
-
-    @FXML
-    private Button addChainItem;
 
     private UIFactory factory = new UIFactory();
 

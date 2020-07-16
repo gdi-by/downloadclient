@@ -3,7 +3,6 @@ package de.bayern.gdi.gui.controller;
 import de.bayern.gdi.gui.ServiceModel;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Service;
-import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.DownloadConfig;
@@ -37,10 +36,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import static de.bayern.gdi.services.ServiceType.ATOM;
-import static de.bayern.gdi.services.ServiceType.WFS_ONE;
-import static de.bayern.gdi.services.ServiceType.WFS_TWO;
-
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
@@ -56,10 +51,13 @@ public class ServiceSelectionController {
     private static final String STATUS_READY = "status.ready";
 
     @Inject
+    private Controller controller;
+
+    @Inject
     private StatusLogController statusLogController;
 
     @Inject
-    private Controller controller;
+    private ServiceTypeSelectionController serviceTypeSelectionController;
 
     @Inject
     private ProcessingChainController processingChainController;
@@ -537,14 +535,14 @@ public class ServiceSelectionController {
             break;
         }
         if ( controller.dataBean.isWebServiceSet() ) {
-            Platform.runLater( controller::setServiceTypes );
+            Platform.runLater( serviceTypeSelectionController::setServiceTypes );
         } else {
             return;
         }
         Platform.runLater( () -> {
-            controller.serviceTypeChooser.getSelectionModel().select( 0 );
+            serviceTypeSelectionController.selectFirst();
             if ( downloadConf != null ) {
-                controller.loadDownloadConfig( downloadConf );
+                serviceTypeSelectionController.loadDownloadConfig( downloadConf );
             }
             statusLogController.setStatusTextUI( I18n.getMsg( STATUS_READY ) );
         } );
