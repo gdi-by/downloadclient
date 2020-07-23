@@ -84,7 +84,7 @@ public class StringUtils {
     }
 
     private static Predicate<String> within(String[] haystack) {
-        return needle-> Stream.of(haystack)
+        return needle -> Stream.of(haystack)
                 .anyMatch(needle::equals);
     }
 

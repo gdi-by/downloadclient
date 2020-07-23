@@ -83,7 +83,7 @@ public class ServiceChecker {
         return null;
     }
 
-    private static final String []VARIANTS = {
+    private static final String[] VARIANTS = {
         "WFS_Capabilities",
         "WFS_CAPABILITIES",
         "wfs_capabilities",

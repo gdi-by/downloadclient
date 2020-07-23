@@ -72,8 +72,7 @@ public class ConfigurationParameterTest extends TestCase {
     public void testExtractVariables() {
         ConfigurationParameter confPara1 = new ConfigurationParameter();
 //        ConfigurationParameter confPara2 = new ConfigurationParameter();
-        assertEquals(Collections.<String>emptyList()
-            , confPara1.extractVariables());
+        assertEquals(Collections.<String>emptyList(), confPara1.extractVariables());
     }
 
 }

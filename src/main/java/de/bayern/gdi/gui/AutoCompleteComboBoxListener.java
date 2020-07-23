@@ -184,8 +184,7 @@ public class AutoCompleteComboBoxListener<T> {
         }
     }
 
-    private boolean isItemTextEqualSelectedText(ObservableList item
-            , String selectedText, int i) {
+    private boolean isItemTextEqualSelectedText(ObservableList item, String selectedText, int i) {
         return item.get(i) != null
                 && selectedText.equalsIgnoreCase(item.get(i).toString());
     }

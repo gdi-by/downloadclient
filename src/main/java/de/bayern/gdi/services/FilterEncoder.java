@@ -61,6 +61,7 @@ public class FilterEncoder {
      * @return the encoder filters
      * @throws CQLException       CQL was not valid
      * @throws ConverterException if the creation of the filter fails
+     * @throws IllegalArgumentException if no CQL expression is provided
      */
     public List<QueryToFeatureType> initializeQueries(String userInput)
         throws CQLException, ConverterException {
