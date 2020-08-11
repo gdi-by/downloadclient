@@ -34,7 +34,7 @@ Voraussetzungen - Softwareumgebung
 
 Aktuelle Java-Versionen können hier heruntergeladen werden:
 
-- Oracle JDK 8 und 11: http://www.oracle.com/technetwork/java/javase/downloads/index.html (JavaFX enthalten)
+- Oracle JDK 8: http://www.oracle.com/technetwork/java/javase/downloads/index.html (JavaFX enthalten)
 - OpenJDK-basierte Java Versionen *mit* JavaFX:
     - Liberica JDK (8 und 11): https://bell-sw.com/ (JavaFX enthalten)
     - Zulu JDK (8 und 11): https://www.azul.com/downloads/zulu-community/ (JavaFX enthalten)
@@ -58,6 +58,7 @@ Installationspakete für Windows:
     - `downloadclient-X.Y_Windows_jdk11.zip`
 
 Installationspakete für Linux:
+
 - Oracle JDK 1.8 oder OpenJDK 1.8:
     - `downloadclient-X.Y_Linux_jdk8.zip`
 - Oracle JDK 11.0 oder OpenJDK 11.0:
@@ -121,7 +122,6 @@ Benutzeroberfläche
 .. image:: img/V1.1_Benutzeroberflaeche.png
 
 
-
 Auswahl von Downloaddiensten
 ------------------------------
 Downloaddienste können über verschiedene Wege eingebunden werden: 
@@ -170,8 +170,9 @@ FeatureTypes
 ************
 
 Für jeden über den ausgewählten WFS bereitgestellten FeatureType wird ein Eintrag in der Auswahlliste mit dem Zusatz *"(BBOX)"* angegeben.
-So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so den Abfragebereich definieren, für welchen er Daten beziehen möchte.
-Das Begrenzungsrechteck (BBOX) kann durch den Nutzer nachträglich über die Eingabefelder noch angepasst werden und mit dem Button "Eingabe übernehmen" wird das Begrenzungsrechteck in der Kartenkomponente für die Auswahl aktualisiert
+So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so einen Abfragebereich definieren, für welchen er Daten beziehen möchte. Um den Abfragebereich im Kartenfenster
+auszuwählen, muss der Button "Abfragebereich bestimmen" ausgewählt und dann kann durch Klick in die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufgezogen werden. Durch einen weiteren Klick wird das Begrenzungsrechteck festgelegt und die Koordinaten in die Eingabefelder übernommen.
+Das Begrenzungsrechteck (BBOX) kann durch den Nutzer nachträglich über die Eingabefelder noch angepasst werden. Mit dem Button "Eingabe übernehmen" wird das Begrenzungsrechteck in der Kartenkomponente für die Auswahl aktualisiert.
 Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden.
 
 **Beispiel:**
@@ -180,6 +181,18 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
+
+****************************************
+Weitere Funktionen der Kartenkomponenten
+****************************************
+
+* Über die Schaltflächen "+" und "-" innerhalb der Kartenkomponente kann der Kartenausschnitt durch Zoom-in und Zoom-out verändert werden. Diese Funktionalität ist auch über das Scroll-Rad der Maus (mittlere Maustaste) aufrufbar.
+
+Weitere Tastenkombinationen:
+
+- ``linke Maustaste``: Verschieben des Kartenausschnitts (Pan) bei gleichzeitiger Bewegung des Mauszeigers.
+- ``SHIFT`` + ``linke Maustaste``: Zieht einen Bereich auf (blaues Rechteck) mit anschließendem Zoom-in auf den ausgewählten Bereich.
+- ``SHIFT`` + ``ALT`` + ``linke Maustaste``: Ausrichtung der Karte verändern (es wird zusätzlich eine Schaltfläche rechts oben innerhalb der Kartenkomponente angezeigt, über die die Karte wieder in die ursprüngliche Nord-Süd-Ausrichtung ausgerichtet werden kann).
 
 ***********************
 Abfragen mit CQL-Filter

@@ -539,6 +539,7 @@ public class XML {
      * lazy serialization.
      * @param doc the XML document to wrap.
      * @return The ContentProducer.
+     * @throws IOException in case of errors
      */
     public static ContentProducer toContentProducer(final Document doc) {
         return out -> {

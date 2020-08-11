@@ -118,8 +118,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         try {
             return entity == null
                     ? null
-                    : XML.getDocument(wrap(entity.getContent())
-                        , namespaceAware);
+                    : XML.getDocument(wrap(entity.getContent()), namespaceAware);
         } catch (org.xml.sax.SAXException
                 | ParserConfigurationException e) {
             LOG.error(e.toString(), entity);

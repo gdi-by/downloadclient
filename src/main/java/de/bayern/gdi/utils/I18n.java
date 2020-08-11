@@ -75,7 +75,7 @@ public final class I18n {
      * @param args The arguments for the formatting.
      * @return The formatted translation.
      */
-    public static String format(String key, Object ... args) {
+    public static String format(String key, Object... args) {
         ResourceBundle bundle = getBundle();
         String tmpl;
         try {

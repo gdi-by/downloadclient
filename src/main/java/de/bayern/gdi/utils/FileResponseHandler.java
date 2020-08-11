@@ -112,7 +112,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         }
         try {
             try (FileOutputStream out = new FileOutputStream(this.file)) {
-                byte [] buf = new byte[BUF_SIZE];
+                byte[] buf = new byte[BUF_SIZE];
                 int r;
                 InputStream ins = wrap(entity.getContent());
                 while ((r = ins.read(buf)) >= 0) {

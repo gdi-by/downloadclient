@@ -37,8 +37,7 @@ public class ProcessingConfigurationTest extends TestCase {
         assertEquals(name, procConf.findProcessingStepConfiguration(name));
 
         name = "name";
-        assertEquals(psc.getName()
-            , procConf.findProcessingStepConfiguration(name));
+        assertEquals(psc.getName(), procConf.findProcessingStepConfiguration(name));
     }
 
     /** Test the FilterStepsByType. */
