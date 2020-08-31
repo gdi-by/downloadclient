@@ -5,7 +5,9 @@ Version: {VERSION}
 
 Inbetriebnahme:
 ---------------
-Das Zip-Archiv an einen geigneten Ort entpacken.
+Das Zip-Archiv an einem geeigneten Ort entpacken.
+
+Bei Verwendung eines Proxys ist im Unterordner "config" eine entsprechende Datei "proxy.xml" anzulegen. Als Beispiel dient die dort hinterlegte Datei "proxy.xml.sample".
 
 
 Starten der Anwendung:
