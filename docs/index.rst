@@ -68,7 +68,7 @@ Installationspakete für Linux:
 Inbetriebnahme
 --------------
 
-Das Zip-Archiv an einen geeigneten Ort entpacken.
+Das Zip-Archiv an einem geeigneten Ort entpacken.
 
 Starten der Anwendung
 ----------------------
