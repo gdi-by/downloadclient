@@ -3,6 +3,8 @@ GDI-BY Downloadclient
 
 Version: {VERSION}
 
+GDI-BY Download-Client Dokumentation: http://downloadclient-gdi-by.readthedocs.io/de/docs/index.html
+
 Inbetriebnahme:
 ---------------
 Das Zip-Archiv an einem geeigneten Ort entpacken.
