@@ -126,8 +126,7 @@ public class ProxyConfigurationTest extends TestCase {
     public void testHttpsNonProxyHosts() {
         ProxyConfiguration pct = new ProxyConfiguration();
         pct.setHttpsNonProxyHosts("an encrypted non proxy host");
-        assertEquals("an encrypted non proxy host"
-            , pct.getHttpsNonProxyHosts());
+        assertEquals("an encrypted non proxy host", pct.getHttpsNonProxyHosts());
     }
 
     /** Test the name getter/setter. */

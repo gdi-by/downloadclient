@@ -72,9 +72,9 @@ public class StringUtilsTest {
      */
     private static final class SCL {
         String have;
-        String []want;
+        String[] want;
 
-        private SCL(String have, String []want) {
+        private SCL(String have, String[] want) {
             this.have = have;
             this.want = want;
         }
@@ -150,7 +150,7 @@ public class StringUtilsTest {
 
     private static final double EPS = 0.00001;
 
-    private static void assertDoubleEquals(double [] a, double [] b) {
+    private static void assertDoubleEquals(double[] a, double[] b) {
         if (a.length != b.length) {
             Assert.fail("arrays are not of same size");
         }
@@ -168,7 +168,7 @@ public class StringUtilsTest {
     public void testToDouble() {
         final String have = "1 2 4 3 5";
         final double[] want = new double[] {ONE, TWO, FOUR, THREE, FIVE};
-        double [] got = StringUtils.toDouble(have);
+        double[] got = StringUtils.toDouble(have);
         assertDoubleEquals(want, got);
         got = StringUtils.toDouble("1 bad 2");
         assertDoubleEquals(new double[0], got);

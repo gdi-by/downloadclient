@@ -15,12 +15,17 @@
         <maven.compiler.source>${jdk.version}</maven.compiler.source>
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
         <geotools.version>20.3</geotools.version>
-        <mapjfx.version>1.26.3</mapjfx.version>
+        <mapjfx.version>1.32.1</mapjfx.version>
         <monocle.version>8u76-b04</monocle.version>
     </properties>
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -79,7 +84,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.15</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>validate</id>
@@ -157,7 +162,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -328,32 +333,37 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.12.1</version>
+            <version>2.13.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.12.1</version>
+            <version>2.13.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -385,14 +395,14 @@
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
-            <artifactId>openjfx-monocle</artifactId>
-            <version>${monocle.version}</version>
+            <artifactId>testfx-junit</artifactId>
+            <version>4.0.15-alpha</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
-            <artifactId>testfx-junit</artifactId>
-            <version>4.0.15-alpha</version>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>${monocle.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -427,29 +437,28 @@
             <url>https://mvnrepository.com/</url>
         </repository>
         <repository>
-            <id>boundless</id>
-            <name>Boundless Maven Repository</name>
-            <url>http://repo.boundlessgeo.com/main</url>
+            <id>OSGeo</id>
+            <name>OSGeo Repository</name>
+            <url>https://repo.osgeo.org/repository/Geoserver-releases</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </repository>
         <repository>
-            <id>geotools</id>
-            <name>Geotools Maven Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools</url>
+            <id>GeoTools</id>
+            <name>GeoTools Repository</name>
+            <url>https://repo.osgeo.org/repository/geotools-releases</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </repository>
         <repository>
-            <releases />
+            <id>GeoSolutions</id>
+            <name>GeoSolutions Repository</name>
+            <url>https://repo.osgeo.org/repository/geo-solutions-cache</url>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
-            <id>mygrid-repository</id>
-            <name>myGrid Repository</name>
-            <url>http://www.mygrid.org.uk/maven/repository</url>
         </repository>
     </repositories>
     <profiles>
@@ -484,7 +493,7 @@
             <properties>
                 <jdk.version>11</jdk.version>
                 <javafx.version>11.0.2</javafx.version>
-                <mapjfx.version>2.7.3</mapjfx.version>
+                <mapjfx.version>2.14.1</mapjfx.version>
                 <monocle.version>jdk-11+26</monocle.version>
             </properties>
             <build>
@@ -493,7 +502,6 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.8.1</version>
                             <configuration>
                                 <release>${jdk.version}</release>
                             </configuration>

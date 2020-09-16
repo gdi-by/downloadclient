@@ -17,7 +17,9 @@ Maven Checkstyle plugin. Some design related checks where removed.
 <property name="basedir" value="${basedir}"/>
 -->
 
-<!-- Checks that each Java package has a Javadoc file used for commenting. -->
+<property name="cacheFile" value="${checkstyle.cache.file}"/>
+
+    <!-- Checks that each Java package has a Javadoc file used for commenting. -->
 <!-- See http://checkstyle.sf.net/config_javadoc.html#JavadocPackage       -->
 <!--<module name="JavadocPackage">
   <property name="allowLegacy" value="true"/>
@@ -36,6 +38,15 @@ Maven Checkstyle plugin. Some design related checks where removed.
 <module name="FileLength">
   <property name="max" value="10000"/>
 </module>
+
+<!-- Checks for Size Violations.                    -->
+<!-- See http://checkstyle.sf.net/config_sizes.html -->
+<module name="LineLength">
+    <property name="max" value="120"/>
+    <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+    <property name="fileExtensions" value="java"/>
+</module>
+
 <!-- Following interprets the header file as regular expressions. -->
 <module name="Header">
   <property name="headerFile" value="java.header"/>
@@ -54,8 +65,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
 
 <module name="TreeWalker">
 
-  <property name="cacheFile" value="${checkstyle.cache.file}"/>
-
   <!-- required for SuppressWarningsFilter (and other Suppress* rules not used here) -->
   <!-- see http://checkstyle.sourceforge.net/config_annotation.html#SuppressWarningsHolder -->
   <module name="SuppressWarningsHolder"/>
@@ -66,15 +75,17 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="JavadocMethod">
     <property name="scope" value="protected"/>
     <property name="validateThrows" value="true"/>
+    <property name="tokens" value="METHOD_DEF"/>
+  </module>
+  <module name="MissingJavadocMethod">
     <property name="allowMissingPropertyJavadoc" value="true"/>
-    <property name="suppressLoadErrors" value="true"/>
+    <property name="scope" value="protected"/>
     <property name="tokens" value="METHOD_DEF"/>
   </module>
   <module name="JavadocVariable">
     <property name="scope" value="protected"/>
   </module>
   <module name="JavadocStyle"/>
-
 
   <!-- Checks for Naming Conventions.                  -->
   <!-- See http://checkstyle.sf.net/config_naming.html -->
@@ -91,7 +102,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="StaticVariableName"/>
   <module name="TypeName"/>
 
-
   <!-- Checks for Headers                                -->
   <!-- See http://checkstyle.sf.net/config_header.html   -->
   <!-- <module name="Header">                            -->
@@ -106,7 +116,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <!--     value="${basedir}/java.header"/>                   -->
   <!-- </module> -->
 
-
   <!-- Checks for imports                              -->
   <!-- See http://checkstyle.sf.net/config_import.html -->
   <module name="AvoidStarImport"/>
@@ -114,15 +123,10 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="RedundantImport"/>
   <module name="UnusedImports"/>
 
-
-  <!-- Checks for Size Violations.                    -->
-  <!-- See http://checkstyle.sf.net/config_sizes.html -->
-  <module name="LineLength"/>
   <module name="MethodLength"/>
   <module name="ParameterNumber">
     <property name="tokens" value="METHOD_DEF"/>
   </module>
-
 
   <!-- Checks for whitespace                               -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -138,12 +142,10 @@ Maven Checkstyle plugin. Some design related checks where removed.
   </module>
   <module name="WhitespaceAround"/>
 
-
   <!-- Modifier Checks                                    -->
   <!-- See http://checkstyle.sf.net/config_modifiers.html -->
   <module name="ModifierOrder"/>
   <module name="RedundantModifier"/>
-
 
   <!-- Checks for blocks. You know, those {}'s         -->
   <!-- See http://checkstyle.sf.net/config_blocks.html -->
@@ -153,7 +155,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="NeedBraces"/>
   <module name="RightCurly"/>
 
-
   <!-- Checks for common coding problems               -->
   <!-- See http://checkstyle.sf.net/config_coding.html -->
   <!-- module name="EmptyStatement"/ -->
@@ -161,6 +162,7 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="HiddenField">
     <property name="ignoreConstructorParameter" value="true"/>
     <property name="ignoreSetter" value="true"/>
+    <property name="tokens" value="VARIABLE_DEF,PARAMETER_DEF"/>
   </module>
   <module name="IllegalInstantiation"/>
   <module name="InnerAssignment"/>
@@ -173,7 +175,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <!-- See http://checkstyle.sf.net/config_design.html -->
   <module name="HideUtilityClassConstructor"/>
   <module name="InterfaceIsType"/>
-
 
   <!-- Miscellaneous other checks.                   -->
   <!-- See http://checkstyle.sf.net/config_misc.html -->

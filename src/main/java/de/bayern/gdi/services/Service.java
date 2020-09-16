@@ -294,7 +294,7 @@ public class Service extends Object {
 
     /**
      * checks if given object is equal.
-     * @param s given object
+     * @param o given object
      * @return true if equal; false if not
      */
     @Override

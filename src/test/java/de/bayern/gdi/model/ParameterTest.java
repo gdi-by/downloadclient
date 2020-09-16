@@ -50,8 +50,7 @@ public class ParameterTest {
         parameter.setValue("a value");
         assertEquals("[Parameter: key = \"" + parameter.getKey()
                 + "\" value = \""
-                + parameter.getValue() + "\"]"
-            , parameter.toString());
+                + parameter.getValue() + "\"]", parameter.toString());
     }
 
 }

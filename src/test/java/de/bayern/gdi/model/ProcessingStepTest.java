@@ -71,8 +71,7 @@ public class ProcessingStepTest extends TestCase {
         procStep.setParameters(listOfParameters);
         assertEquals("[processing step: name = \"" + procStep.getName()
             + "\"  parameters: [[Parameter: key = \"" + parameter.getKey()
-            + "\" value = \"" + parameter.getValue() + "\"]]"
-            , procStep.toString());
+            + "\" value = \"" + parameter.getValue() + "\"]]", procStep.toString());
 
         procStep.setName("ProcessStep name2");
         ArrayList<Parameter> listOfParameters1 = createListOfParameters();
@@ -81,9 +80,7 @@ public class ProcessingStepTest extends TestCase {
         assertEquals("[processing step: name = \"" + procStep.getName()
                 + "\"  parameters: [" + parameterString
                 + "key 1\" value = \"value 1\"], " + parameterString
-                + "key 2\" value = \"value 2\"]]"
-
-            , procStep.toString());
+                + "key 2\" value = \"value 2\"]]", procStep.toString());
     }
 
     private Parameter createParameter() {

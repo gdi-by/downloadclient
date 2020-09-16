@@ -99,6 +99,7 @@ public class MapHandler {
     private CoordinateReferenceSystem mapCRS;
     private Coordinate bboxFirst;
     private CoordinateLine currentBbox;
+    private CoordinateLine finishedBbox;
     private WMSLayer layer;
     private MapContent mapContent;
     private BboxCoordinates bboxCoordinates;
@@ -106,7 +107,6 @@ public class MapHandler {
     private PolygonsOnMapViewHandler polygonsOnMapViewHandler;
     private final FeatureInfoReporter featureInfoReporter =
         new FeatureInfoReporter();
-
 
     /**
      * Initializes geotools localisation system with our default I18n locale.
@@ -173,7 +173,6 @@ public class MapHandler {
             LOG.error(e.getMessage(), e);
         }
     }
-
 
     /**
      * return the Bounds of the Map.
@@ -433,6 +432,12 @@ public class MapHandler {
                 handleInfoClickedEvent(event);
             }
         });
+        mapView.addEventHandler(MapViewEvent.MAP_POINTER_MOVED, event -> {
+            event.consume();
+            if (toolbar.isBboxButtonSelected()) {
+                handleBboxMovedEvent(event);
+            }
+        });
     }
 
     private void afterMapIsInitialized() {
@@ -450,13 +455,12 @@ public class MapHandler {
         if (bboxCoordinates != null) {
             this.bboxCoordinates.disableApplyCoordsToMapInput();
         }
-        if (currentBbox != null) {
-            bboxFirst = null;
-            mapView.removeCoordinateLine(currentBbox);
-            currentBbox = null;
-        }
-        if (bboxFirst == null) {
+        boolean isStartClick = bboxFirst == null;
+        if (isStartClick) {
             bboxFirst = event.getCoordinate();
+            if (finishedBbox != null) {
+                mapView.removeCoordinateLine(finishedBbox);
+            }
         } else {
             Coordinate bboxSecond = event.getCoordinate();
             double x1 = bboxFirst.getLatitude();
@@ -468,23 +472,47 @@ public class MapHandler {
             double minY = Math.min(y1, y2);
             double maxY = Math.max(y1, y2);
 
-            Coordinate lowerLeft = new Coordinate(minX, minY);
-            Coordinate upperLeft = new Coordinate(minX, maxY);
-            Coordinate upperRight = new Coordinate(maxX, maxY);
-            Coordinate lowerRight = new Coordinate(maxX, minY);
-
-            currentBbox = new CoordinateLine(lowerLeft, upperLeft,
-                upperRight, lowerRight)
-                .setWidth(2)
-                .setColor(javafx.scene.paint.Color.DARKRED)
-                .setClosed(true)
-                .setVisible(true);
-            mapView.addCoordinateLine(currentBbox);
+            finishedBbox = createCoordinateLine(minX, maxX, minY, maxY);
+            mapView.addCoordinateLine(finishedBbox);
+            mapView.removeCoordinateLine(currentBbox);
+            currentBbox = null;
+            bboxFirst = null;
             if (bboxCoordinates != null) {
-                bboxCoordinates.setDisplayCoordinates(minX, maxX, minY, maxY,
-                    mapCRS);
+                bboxCoordinates.setDisplayCoordinates(minX, maxX, minY, maxY, mapCRS);
             }
         }
+    }
+
+    private void handleBboxMovedEvent(MapViewEvent event) {
+        if (bboxFirst != null) {
+            Coordinate bboxSecond = event.getCoordinate();
+            double x1 = bboxFirst.getLatitude();
+            double x2 = bboxSecond.getLatitude();
+            double y1 = bboxFirst.getLongitude();
+            double y2 = bboxSecond.getLongitude();
+            double minX = Math.min(x1, x2);
+            double maxX = Math.max(x1, x2);
+            double minY = Math.min(y1, y2);
+            double maxY = Math.max(y1, y2);
+
+            CoordinateLine lastBbox = currentBbox;
+            currentBbox = createCoordinateLine(minX, maxX, minY, maxY);
+            mapView.addCoordinateLine(currentBbox);
+            mapView.removeCoordinateLine(lastBbox);
+        }
+    }
+
+    private CoordinateLine createCoordinateLine(double minX, double maxX, double minY, double maxY) {
+        Coordinate lowerLeft = new Coordinate(minX, minY);
+        Coordinate upperLeft = new Coordinate(minX, maxY);
+        Coordinate upperRight = new Coordinate(maxX, maxY);
+        Coordinate lowerRight = new Coordinate(maxX, minY);
+
+        return new CoordinateLine(lowerLeft, upperLeft, upperRight, lowerRight)
+            .setWidth(2)
+            .setColor(javafx.scene.paint.Color.DARKRED)
+            .setClosed(true)
+            .setVisible(true);
     }
 
     private void handleSelectClickEvent(MapViewEvent event) {
