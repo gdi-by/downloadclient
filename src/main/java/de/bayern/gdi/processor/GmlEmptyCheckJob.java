@@ -20,13 +20,12 @@ package de.bayern.gdi.processor;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
-import de.bayern.gdi.utils.XML;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathConstants;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,9 +34,6 @@ import java.util.List;
  * data for further processing.
  */
 public class GmlEmptyCheckJob implements Job {
-
-    private static final String XPATH_NUMBER_FEATURES
-        = "count(//*[local-name()='FeatureCollection']/*)";
 
     private Log logger;
 
@@ -48,27 +44,6 @@ public class GmlEmptyCheckJob implements Job {
         this.fileTracker = fileTracker;
     }
 
-    private void log(String msg) {
-        if (this.logger != null) {
-            this.logger.log(msg);
-        }
-    }
-
-    private void checkIfEmpty(File file)
-    throws JobExecutionException, SAXException,
-            ParserConfigurationException, IOException {
-        Document doc = XML.getDocument(file);
-
-        String numberReturnedString = (String)XML.xpath(
-            doc, XPATH_NUMBER_FEATURES,
-            XPathConstants.STRING);
-        if (asInt(numberReturnedString) == 0) {
-            String msg = I18n.format("gml.empty.check.isempty");
-            log(msg);
-            throw new JobExecutionException(msg);
-        }
-    }
-
     @Override
     public void run(Processor p) throws JobExecutionException {
         List<File> files = retrieveGmlFiles(p);
@@ -77,9 +52,7 @@ public class GmlEmptyCheckJob implements Job {
             p.broadcastMessage(I18n.format("gml.empty.check.start", file));
             try {
                 checkIfEmpty(file);
-            } catch (SAXException
-                    | ParserConfigurationException
-                    | IOException e) {
+            } catch (IOException | XMLStreamException e) {
                 throw new JobExecutionException(e.getMessage());
             }
             String msg = I18n.getMsg("gml.empty.check.passed");
@@ -88,14 +61,28 @@ public class GmlEmptyCheckJob implements Job {
         }
     }
 
-    private int asInt(String numberReturnedString) {
-        if (numberReturnedString != null && !numberReturnedString.isEmpty()) {
-            try {
-                return Integer.parseInt(numberReturnedString);
-            } catch (NumberFormatException nfe) {
+    private void checkIfEmpty(File file)
+        throws JobExecutionException, IOException, XMLStreamException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            XMLStreamReader xmlStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(fis);
+            boolean isFeatureCollection = false;
+            while (xmlStreamReader.hasNext()) {
+                xmlStreamReader.next();
+                if (xmlStreamReader.isStartElement()) {
+                    String localName = xmlStreamReader.getLocalName();
+                    if ("FeatureCollection".equals(localName)) {
+                        isFeatureCollection = true;
+                    }
+                    if (isFeatureCollection
+                        && ("member".equals(localName) || "featureMember".equals(localName))) {
+                        return;
+                    }
+                }
             }
+            String msg = I18n.format("gml.empty.check.isempty");
+            log(msg);
+            throw new JobExecutionException(msg);
         }
-        return -1;
     }
 
     private List<File> retrieveGmlFiles(Processor p)
@@ -116,6 +103,12 @@ public class GmlEmptyCheckJob implements Job {
         logger.log(jee.getMessage());
         if (p != null) {
             p.broadcastException(jee);
+        }
+    }
+
+    private void log(String msg) {
+        if (this.logger != null) {
+            this.logger.log(msg);
         }
     }
 
