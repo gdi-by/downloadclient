@@ -60,6 +60,11 @@ unter Windows durch:
 
 ``set JAVAFX_HOME=C:\path\to\javafx-sdk-11.0.2``
 
+Gdal-Bibliothek
+^^^^^^^^^^^^^^^
+
+Unter Linux und macOS ist die Installation von gdal/ogr erforderlich. Es muss die Version 2.1 oder höher installiert sein.
+
 
 Installationspakte
 ------------------

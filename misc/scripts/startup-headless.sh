@@ -19,8 +19,13 @@ if [[ "$_java" ]]; then
         echo "Starting GDI-BY Downloadclient in headless mode using Java version 1.8"
         $_java -jar downloadclient.jar -headless $FILE --config=config $@
     elif [[ "$version" = "11.0"* ]]; then
-        echo "Starting GDI-BY Downloadclient in headless mode using Java version 11"
-        $_java -jar downloadclient.jar -headless $FILE --config=config $@
+        if [[ -n "$JAVAFX_HOME" ]]; then
+            echo "Starting GDI-BY Downloadclient in headless mode using Java version 11"
+            echo "Using JAVAFX in JAVAFX_HOME=$JAVAFX_HOME"
+            $_java --module-path $JAVAFX_HOME/lib --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.web --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=javafx.graphics/javafx.application=ALL-UNNAMED --add-opens=javafx.graphics/javafx.geometry=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.util=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom.transform=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.utils=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.font=ALL-UNNAMED --add-exports javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism.paint=ALL-UNNAMED --add-exports javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED -jar downloadclient.jar --headless $FILE --config=config $@
+        else
+            echo "JAVAFX_HOME is not set. Please read the documentation for further information."
+        fi
     else
         echo "No suitable Java version found. Please read the documentation for further information."
     fi
