@@ -30,7 +30,7 @@ eine für das Betriebssystem passende Java-Version.
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
-**Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX benötigt.**
+**Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11 (mindestens 11.0.2) mit JavaFX benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden:
 
