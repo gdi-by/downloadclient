@@ -9,8 +9,10 @@ Inbetriebnahme:
 ---------------
 Das Zip-Archiv an einem geeigneten Ort entpacken.
 
-Bei Verwendung eines Proxys ist im Unterordner "config" eine entsprechende Datei "proxy.xml" anzulegen. Als Beispiel dient die dort hinterlegte Datei "proxy.xml.sample".
+Falls eine OpenJDK-Distributionen ohne JavaFX genutzt wird, muss zusätzlich das zum Betriebssystem passende JavaFX-SDK installiert sein und die Umgebungsvariable JAVAFX_HOME gesetzt werden. Z.B.:
+set JAVAFX_HOME=C:\path\to\javafx-sdk-11.0.2
 
+Bei Verwendung eines Proxys ist im Unterordner "config" eine entsprechende Datei "proxy.xml" anzulegen. Als Beispiel dient die dort hinterlegte Datei "proxy.xml.sample".
 
 Starten der Anwendung:
 ----------------------
@@ -27,9 +29,9 @@ welcher den Pfad zu einer Downloadschritt-Datei definiert.
 
 Externe Abhängigkeiten:
 -----------------------
-Der Downloadclient benötigt Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit Java FX.
+Der Downloadclient benötigt Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX (mindestens 11.0.2).
 
-Der Downloadclient benötigt GDAL/OGR um Verarbeitungsschritte
+Der Downloadclient benötigt GDAL/OGR (mindestens 2.1) um Verarbeitungsschritte
 durchzuführen.
 
 Das Zip-Archiv enthält diese Anwendungen für Windows 32 Bit im Ordner
