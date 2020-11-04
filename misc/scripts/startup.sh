@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if type -p java; then
     echo "Found 'java' executable in PATH=$PATH"
