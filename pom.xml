@@ -71,6 +71,18 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/registryFile.jaiext</resource>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>de.bayern.gdi.App</Main-Class>
+                                        <!-- <Class-Path>config/</Class-Path> -->
+                                        <Specification-Vendor>GDI-BY</Specification-Vendor>
+                                        <Specification-Title>${project.name}</Specification-Title>
+                                        <Specification-Version>${project.version}</Specification-Version>
+                                        <Implementation-Vendor>GDI-BY</Implementation-Vendor>
+                                        <Implementation-Title>${project.name}</Implementation-Title>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
+                                    </manifestEntries>
+                                </transformer>
                             </transformers>
                         </configuration>
                     </execution>
@@ -103,8 +115,8 @@
                 </configuration>
             </plugin>
             -->
+            <!-- Build an executable JAR
             <plugin>
-                <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
@@ -125,6 +137,7 @@
                     </archive>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
