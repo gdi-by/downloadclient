@@ -24,6 +24,8 @@ Configuration:
             level: warn
         -   name: net.refractions
             level: warn
+        -   name: org.jboss.weld
+            level: info
         -   name: org.hsqldb
             level: warn
         -   name: org.eclipse.jetty
