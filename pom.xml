@@ -74,7 +74,7 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>de.bayern.gdi.App</Main-Class>
-                                        <!-- <Class-Path>config/</Class-Path> -->
+                                        <Class-Path>config/</Class-Path>
                                         <Specification-Vendor>GDI-BY</Specification-Vendor>
                                         <Specification-Title>${project.name}</Specification-Title>
                                         <Specification-Version>${project.version}</Specification-Version>
@@ -154,6 +154,7 @@
                     <additionalClasspathElements>${project.basedir}/src/resources</additionalClasspathElements>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -170,6 +171,7 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -207,7 +209,7 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
-            <version>3.1.4.Final</version>
+            <version>3.1.6.Final</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
