@@ -1,3 +1,20 @@
+/*
+ * DownloadClient Geodateninfrastruktur Bayern
+ *
+ * (c) 2016 GSt. GDI-BY (gdi.bayern.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.bayern.gdi.gui.controller;
 
 import com.sothawo.mapjfx.MapView;
@@ -55,14 +72,15 @@ import static de.bayern.gdi.gui.GuiConstants.INITIAL_CRS_DISPLAY;
 import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
 
 /**
+ * Filter Basic WFS controller.
+ *
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 @Named
 @Singleton
 public class FilterWfsBasicController {
 
-    private static final Logger log
-        = LoggerFactory.getLogger( FilterWfsBasicController.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger(FilterWfsBasicController.class.getName());
 
     @Inject
     private Controller controller;
@@ -142,30 +160,30 @@ public class FilterWfsBasicController {
      *     The event
      */
     @FXML
-    protected void handleReferenceSystemSelect( ActionEvent event ) {
-        if ( referenceSystemChooser.getValue() != null ) {
-            if ( referenceSystemChooser.getValue().isAvailable() ) {
-                referenceSystemChooser.setStyle( FX_BORDER_COLOR_NULL );
+    protected void handleReferenceSystemSelect(ActionEvent event) {
+        if (referenceSystemChooser.getValue() != null) {
+            if (referenceSystemChooser.getValue().isAvailable()) {
+                referenceSystemChooser.setStyle(FX_BORDER_COLOR_NULL);
             } else {
-                referenceSystemChooser.setStyle( FX_BORDER_COLOR_RED );
+                referenceSystemChooser.setStyle(FX_BORDER_COLOR_RED);
             }
         }
-        controller.dataBean.addAttribute( "srsName",
+        controller.dataBean.addAttribute("srsName",
                                           referenceSystemChooser.getValue() != null
                                           ? referenceSystemChooser.
                                                                       getValue().getOldName()
                                           : EPSG4326,
-                                          "" );
-        if ( wmsWfsMapHandler != null
-             && referenceSystemChooser.getValue() != null ) {
+                                          "");
+        if (wmsWfsMapHandler != null
+             && referenceSystemChooser.getValue() != null) {
             this.wmsWfsMapHandler.setDisplayCRS(
-                referenceSystemChooser.getValue().getCRS() );
-        } else if ( wmsWfsMapHandler != null ) {
+                referenceSystemChooser.getValue().getCRS());
+        } else if (wmsWfsMapHandler != null) {
             try {
                 this.wmsWfsMapHandler.setDisplayCRS(
-                    controller.dataBean.getAttributeValue( "srsName" ) );
-            } catch ( FactoryException e ) {
-                log.error( e.getMessage(), e );
+                    controller.dataBean.getAttributeValue("srsName"));
+            } catch (FactoryException e) {
+                LOG.error(e.getMessage(), e);
             }
         }
     }
@@ -177,120 +195,120 @@ public class FilterWfsBasicController {
      *     The event
      */
     @FXML
-    protected void handleDataformatSelect( ActionEvent event ) {
+    protected void handleDataformatSelect(ActionEvent event) {
         ComboBox<OutputFormatModel> cb =
             (ComboBox<OutputFormatModel>) event.getSource();
-        controller.handleDataformatSelect( cb );
+        controller.handleDataformatSelect(cb);
     }
 
-    public void initGui( ItemModel data ) {
+    public void initGui(ItemModel data) {
         boolean isSqlFilterType = false;
-        if ( data instanceof OverallFeatureTypeModel ) {
+        if (data instanceof OverallFeatureTypeModel) {
             isSqlFilterType = true;
         }
-        if ( data instanceof FeatureModel ) {
+        if (data instanceof FeatureModel) {
             FeatureModel.FilterType filterType =
-                ( (FeatureModel) data ).getFilterType();
-            isSqlFilterType = FILTER.equals( filterType );
+                ((FeatureModel) data).getFilterType();
+            isSqlFilterType = FILTER.equals(filterType);
         }
-        this.referenceSystemChooser.setVisible( true );
-        this.referenceSystemChooserLabel.setVisible( true );
-        this.basicWFSContainer.setVisible( true );
-        if ( isSqlFilterType ) {
-            this.sqlWFSArea.setVisible( true );
-            this.sqlWFSArea.setManaged( true );
-            this.mapNodeWFS.setVisible( false );
-            this.mapNodeWFS.setManaged( false );
+        this.referenceSystemChooser.setVisible(true);
+        this.referenceSystemChooserLabel.setVisible(true);
+        this.basicWFSContainer.setVisible(true);
+        if (isSqlFilterType) {
+            this.sqlWFSArea.setVisible(true);
+            this.sqlWFSArea.setManaged(true);
+            this.mapNodeWFS.setVisible(false);
+            this.mapNodeWFS.setManaged(false);
         } else {
-            this.sqlWFSArea.setVisible( false );
-            this.sqlWFSArea.setManaged( false );
-            this.mapNodeWFS.setVisible( true );
-            this.mapNodeWFS.setManaged( true );
+            this.sqlWFSArea.setVisible(false);
+            this.sqlWFSArea.setManaged(false);
+            this.mapNodeWFS.setVisible(true);
+            this.mapNodeWFS.setManaged(true);
         }
 
-        if ( data.getItem() instanceof WFSMeta.Feature ) {
-            setCrsAndExtent( (WFSMeta.Feature) data.getItem() );
-        } else if ( data.getItem() instanceof List
-                    && !( (List) data.getItem() ).isEmpty() ) {
+        if (data.getItem() instanceof WFSMeta.Feature) {
+            setCrsAndExtent((WFSMeta.Feature) data.getItem());
+        } else if (data.getItem() instanceof List
+                    && !((List) data.getItem()).isEmpty()) {
             List items = (List) data.getItem();
-            setCrsAndExtent( (WFSMeta.Feature)
-                                 items.get( items.size() - 1 ) );
+            setCrsAndExtent((WFSMeta.Feature)
+                                 items.get(items.size() - 1));
         }
         List<String> outputFormats = controller
             .dataBean.getWFSService()
-                     .findOperation( "GetFeature" ).getOutputFormats();
+                     .findOperation("GetFeature").getOutputFormats();
 
-        if ( outputFormats.isEmpty() ) {
+        if (outputFormats.isEmpty()) {
             outputFormats =
                 controller.dataBean.getWFSService().getOutputFormats();
         }
         List<OutputFormatModel> formatModels = new ArrayList<>();
-        for ( String s : outputFormats ) {
+        for (String s : outputFormats) {
             OutputFormatModel m = new OutputFormatModel();
-            m.setItem( s );
-            m.setAvailable( true );
-            formatModels.add( m );
+            m.setItem(s);
+            m.setAvailable(true);
+            formatModels.add(m);
         }
         ObservableList<OutputFormatModel> formats =
-            FXCollections.observableArrayList( formatModels );
-        this.dataFormatChooser.setItems( formats );
+            FXCollections.observableArrayList(formatModels);
+        this.dataFormatChooser.setItems(formats);
         this.dataFormatChooser.getSelectionModel().selectFirst();
     }
 
     public void resetGui() {
-        if ( wmsWfsMapHandler != null ) {
+        if (wmsWfsMapHandler != null) {
             this.wmsWfsMapHandler.reset();
         }
-        this.basicWFSContainer.setVisible( false );
-        this.mapNodeWFS.setVisible( false );
-        this.sqlWFSArea.setVisible( false );
-        this.referenceSystemChooser.setVisible( false );
-        this.referenceSystemChooserLabel.setVisible( false );
+        this.basicWFSContainer.setVisible(false);
+        this.mapNodeWFS.setVisible(false);
+        this.sqlWFSArea.setVisible(false);
+        this.referenceSystemChooser.setVisible(false);
+        this.referenceSystemChooserLabel.setVisible(false);
     }
 
-    public void validate( Consumer<String> fail ) {
-        if ( referenceSystemChooser.isVisible()
-             && !referenceSystemChooser.getValue().isAvailable() ) {
-            fail.accept( I18n.format( "gui.reference-system" ) );
+    public void validate(Consumer<String> fail) {
+        if (referenceSystemChooser.isVisible()
+             && !referenceSystemChooser.getValue().isAvailable()) {
+            fail.accept(I18n.format("gui.reference-system"));
         }
-        if ( basicWFSContainer.isVisible()
+        if (basicWFSContainer.isVisible()
              && dataFormatChooser.isVisible()
-             && !dataFormatChooser.getValue().isAvailable() ) {
-            fail.accept( I18n.format( "gui.data-format" ) );
+             && !dataFormatChooser.getValue().isAvailable()) {
+            fail.accept(I18n.format("gui.data-format"));
         }
     }
 
-    public void initMapHandler( ServiceSettings serviceSetting ) {
+    public void initMapHandler(ServiceSettings serviceSetting) {
         this.wmsWfsMapHandler = MapHandlerBuilder
-            .newBuilder( serviceSetting )
-            .withEventTarget( mapNodeWFS )
-            .withMapView( wfsMapView )
-            .withWmsSourceLabel( wfsMapWmsSource )
-            .withBboxButton( wfsMapBboxButton )
-            .withInfoButton( wfsMapInfoButton )
-            .withResizeButtton( wfsMapResizeButton )
+            .newBuilder(serviceSetting)
+            .withEventTarget(mapNodeWFS)
+            .withMapView(wfsMapView)
+            .withWmsSourceLabel(wfsMapWmsSource)
+            .withBboxButton(wfsMapBboxButton)
+            .withInfoButton(wfsMapInfoButton)
+            .withResizeButtton(wfsMapResizeButton)
             .withCoordinateDisplay(
                 basicX1,
                 basicX2,
                 basicY1,
-                basicY2 )
+                basicY2)
             .withCoordinateLabel(
                 lablbasicx1,
                 lablbasicx2,
                 lablbasicy1,
-                lablbasicy2 )
+                lablbasicy2)
             .withApplyCoordsToMapButton(
-                basicApplyBbox )
+                basicApplyBbox)
             .build();
     }
 
-    public void setVisible( boolean isVisible ) {
-        this.basicWFSContainer.setVisible( isVisible );
+    public void setVisible(boolean isVisible) {
+        this.basicWFSContainer.setVisible(isVisible);
     }
 
-    public boolean isReachable( URL url ) {
+    public boolean isReachable(URL url) {
         return ServiceChecker
-            .isReachable( wmsWfsMapHandler.getCapabiltiesURL( url ) );
+            .isReachable(wmsWfsMapHandler.getCapabiltiesURL(url));
     }
 
     public void setCellFactories() {
@@ -298,24 +316,24 @@ public class FilterWfsBasicController {
             new Callback<ListView<CRSModel>,
                 ListCell<CRSModel>>() {
                 @Override
-                public ListCell<CRSModel> call( ListView<CRSModel> list ) {
+                public ListCell<CRSModel> call(ListView<CRSModel> list) {
                     return new CellTypes.CRSCell() {
                     };
                 }
-            } );
+            });
         dataFormatChooser.setCellFactory(
             new Callback<ListView<OutputFormatModel>,
                 ListCell<OutputFormatModel>>() {
                 @Override
                 public ListCell<OutputFormatModel>
-                call( ListView<OutputFormatModel> list ) {
+                call(ListView<OutputFormatModel> list) {
                     return new CellTypes.StringCell();
                 }
-            } );
+            });
     }
 
-    public void setExtent( ReferencedEnvelope extendWFS ) {
-        wmsWfsMapHandler.setExtend( extendWFS );
+    public void setExtent(ReferencedEnvelope extendWFS) {
+        wmsWfsMapHandler.setExtend(extendWFS);
     }
 
     public String getSqlText() {
@@ -327,133 +345,140 @@ public class FilterWfsBasicController {
             referenceSystemChooser.
                                       getSelectionModel().
                                       getSelectedItem().
-                                      getCRS() );
-        if ( envelope == null ) {
+                                      getCRS());
+        if (envelope == null) {
             // Raise an error?
             return null;
         }
         StringBuilder bbox = new StringBuilder();
-        bbox.append( envelope.getX() ).append( ',' )
-            .append( envelope.getY() ).append( ',' )
-            .append( envelope.getX() + envelope.getWidth() ).append( ',' )
-            .append( envelope.getY() + envelope.getHeight() );
+        bbox.append(envelope.getX()).append(',')
+            .append(envelope.getY()).append(',')
+            .append(envelope.getX() + envelope.getWidth()).append(',')
+            .append(envelope.getY() + envelope.getHeight());
 
         CRSModel model = referenceSystemChooser.getValue();
-        if ( model != null ) {
-            bbox.append( ',' ).append( model.getOldName() );
+        if (model != null) {
+            bbox.append(',').append(model.getOldName());
         }
         return bbox.toString();
     }
 
     public void initializeBoundingBox() {
-        if ( controller.downloadConfig.getBoundingBox() != null ) {
-            String[] bBox = controller.downloadConfig.getBoundingBox().split( "," );
-            basicX1.setText( bBox[BBOX_X1_INDEX] );
-            basicY1.setText( bBox[BBOX_Y1_INDEX] );
-            basicX2.setText( bBox[BBOX_X2_INDEX] );
-            basicY2.setText( bBox[BBOX_Y2_INDEX] );
+        if (controller.downloadConfig.getBoundingBox() != null) {
+            String[] bBox = controller.downloadConfig.getBoundingBox().split(",");
+            basicX1.setText(bBox[BBOX_X1_INDEX]);
+            basicY1.setText(bBox[BBOX_Y1_INDEX]);
+            basicX2.setText(bBox[BBOX_X2_INDEX]);
+            basicY2.setText(bBox[BBOX_Y2_INDEX]);
         }
     }
 
     public void initializeCqlTextArea() {
-        if ( controller.downloadConfig != null ) {
+        if (controller.downloadConfig != null) {
             String cql = controller.downloadConfig.getCql();
-            sqlTextarea.setText( cql );
+            sqlTextarea.setText(cql);
         }
     }
 
     public void initializeDataFormatChooser() {
         boolean outputFormatAvailable = false;
-        for ( OutputFormatModel i : dataFormatChooser.getItems() ) {
-            if ( i.getItem().equals( controller.downloadConfig.getOutputFormat() ) ) {
-                dataFormatChooser.getSelectionModel().select( i );
+        for (OutputFormatModel i : dataFormatChooser.getItems()) {
+            if (i.getItem().equals(controller.downloadConfig.getOutputFormat())) {
+                dataFormatChooser.getSelectionModel().select(i);
                 outputFormatAvailable = true;
             }
         }
-        if ( !outputFormatAvailable ) {
+        if (!outputFormatAvailable) {
             OutputFormatModel output = new OutputFormatModel();
-            output.setAvailable( false );
-            output.setItem( controller.downloadConfig.getOutputFormat() );
-            dataFormatChooser.getItems().add( output );
-            dataFormatChooser.getSelectionModel().select( output );
+            output.setAvailable(false);
+            output.setItem(controller.downloadConfig.getOutputFormat());
+            dataFormatChooser.getItems().add(output);
+            dataFormatChooser.getSelectionModel().select(output);
         }
     }
 
+    /**
+     * Initialise CRS chooser.
+     */
     public void initialiseCrsChooser() {
         try {
             CoordinateReferenceSystem targetCRS =
-                CRS.decode( controller.downloadConfig.getSRSName() );
+                CRS.decode(controller.downloadConfig.getSRSName());
             boolean crsAvailable = false;
-            for ( CRSModel crsModel : referenceSystemChooser.getItems() ) {
-                if ( CRS.equalsIgnoreMetadata( targetCRS,
-                                               crsModel.getCRS() ) ) {
+            for (CRSModel crsModel : referenceSystemChooser.getItems()) {
+                if (CRS.equalsIgnoreMetadata(targetCRS,
+                                               crsModel.getCRS())) {
                     crsAvailable = true;
                     referenceSystemChooser.getSelectionModel()
-                                          .select( crsModel );
+                                          .select(crsModel);
                 }
             }
-            if ( !crsAvailable ) {
-                CRSModel crsErrorModel = new CRSModel( targetCRS );
-                crsErrorModel.setAvailable( false );
-                referenceSystemChooser.getItems().add( crsErrorModel );
+            if (!crsAvailable) {
+                CRSModel crsErrorModel = new CRSModel(targetCRS);
+                crsErrorModel.setAvailable(false);
+                referenceSystemChooser.getItems().add(crsErrorModel);
                 referenceSystemChooser.getSelectionModel()
-                                      .select( crsErrorModel );
+                                      .select(crsErrorModel);
             }
-        } catch ( NoSuchAuthorityCodeException nsace ) {
-            statusLogController.setStatusTextUI( I18n.format( "status.config.invalid-epsg" ) );
-        } catch ( Exception e ) {
-            log.error( e.getMessage(), e );
+        } catch (NoSuchAuthorityCodeException nsace) {
+            statusLogController.setStatusTextUI(I18n.format("status.config.invalid-epsg"));
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
         }
     }
 
-    public void setCrsAndExtent( WFSMeta.Feature feature ) {
-        wmsWfsMapHandler.setExtend( feature.getBBox() );
+    /**
+     * Sets the CRS and extend by the given feature.
+     * @param feature the feature from which CRS and extend are extracted
+     */
+    public void setCrsAndExtent(WFSMeta.Feature feature) {
+        wmsWfsMapHandler.setExtend(feature.getBBox());
         ArrayList<String> list = new ArrayList<>();
-        list.add( feature.getDefaultCRS() );
-        list.addAll( feature.getOtherCRSs() );
+        list.add(feature.getDefaultCRS());
+        list.addAll(feature.getOtherCRSs());
         ObservableList<CRSModel> crsList =
             FXCollections.observableArrayList();
-        for ( String crsStr : list ) {
+        for (String crsStr : list) {
             try {
                 String newcrsStr = crsStr;
                 String seperator = null;
-                if ( newcrsStr.contains( "::" ) ) {
+                if (newcrsStr.contains("::")) {
                     seperator = "::";
-                } else if ( newcrsStr.contains( "/" ) ) {
+                } else if (newcrsStr.contains("/")) {
                     seperator = "/";
                 }
-                if ( seperator != null ) {
+                if (seperator != null) {
                     newcrsStr = "EPSG:"
                                 + newcrsStr.substring(
-                        newcrsStr.lastIndexOf( seperator )
+                        newcrsStr.lastIndexOf(seperator)
                         + seperator.length(),
-                        newcrsStr.length() );
+                        newcrsStr.length());
                 }
-                CoordinateReferenceSystem crs = CRS.decode( newcrsStr );
-                CRSModel crsm = new CRSModel( crs );
-                crsm.setOldName( crsStr );
-                crsList.add( crsm );
-            } catch ( FactoryException e ) {
-                log.error( e.getMessage(), e );
+                CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                CRSModel crsm = new CRSModel(crs);
+                crsm.setOldName(crsStr);
+                crsList.add(crsm);
+            } catch (FactoryException e) {
+                LOG.error(e.getMessage(), e);
             }
         }
-        if ( !crsList.isEmpty() ) {
-            this.referenceSystemChooser.setItems( crsList );
-            CRSModel crsm = crsList.get( 0 );
+        if (!crsList.isEmpty()) {
+            this.referenceSystemChooser.setItems(crsList);
+            CRSModel crsm = crsList.get(0);
             try {
                 CoordinateReferenceSystem initCRS = CRS.decode(
-                    INITIAL_CRS_DISPLAY );
-                CRSModel initCRSM = new CRSModel( initCRS );
-                for ( int i = 0; i < crsList.size(); i++ ) {
-                    if ( crsList.get( i ).equals( initCRSM ) ) {
-                        crsm = crsList.get( i );
+                    INITIAL_CRS_DISPLAY);
+                CRSModel initCRSM = new CRSModel(initCRS);
+                for (int i = 0; i < crsList.size(); i++) {
+                    if (crsList.get(i).equals(initCRSM)) {
+                        crsm = crsList.get(i);
                         break;
                     }
                 }
-            } catch ( FactoryException e ) {
-                log.error( e.getMessage(), e );
+            } catch (FactoryException e) {
+                LOG.error(e.getMessage(), e);
             }
-            this.referenceSystemChooser.setValue( crsm );
+            this.referenceSystemChooser.setValue(crsm);
         }
     }
 }

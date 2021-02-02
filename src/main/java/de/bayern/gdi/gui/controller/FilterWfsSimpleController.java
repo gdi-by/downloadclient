@@ -1,3 +1,20 @@
+/*
+ * DownloadClient Geodateninfrastruktur Bayern
+ *
+ * (c) 2016 GSt. GDI-BY (gdi.bayern.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.bayern.gdi.gui.controller;
 
 import de.bayern.gdi.gui.CellTypes;
@@ -51,12 +68,12 @@ public class FilterWfsSimpleController {
 
     private UIFactory factory = new UIFactory();
 
-    public void setVisible( boolean isVisible ) {
-        this.simpleWFSContainer.setVisible( isVisible );
+    public void setVisible(boolean isVisible) {
+        this.simpleWFSContainer.setVisible(isVisible);
     }
 
 
-    public void initGui( ItemModel data, boolean datasetAvailable ) {
+    public void initGui(ItemModel data, boolean datasetAvailable) {
         List<String> outputFormats = controller.dataBean.getWFSService()
                                                   .findOperation("GetFeature").getOutputFormats();
         if (outputFormats.isEmpty()) {
@@ -84,8 +101,8 @@ public class FilterWfsSimpleController {
 
         // XXX: This is a bit ugly. We need real MVC.
         Node df = this.simpleWFSContainer
-            .lookup( "#" + UIFactory.getDataFormatID());
-        if (df instanceof ComboBox ) {
+            .lookup("#" + UIFactory.getDataFormatID());
+        if (df instanceof ComboBox) {
             ((ComboBox)df).setOnAction(evt -> {
                 ComboBox<OutputFormatModel> cb =
                     (ComboBox<OutputFormatModel>)evt.getSource();
@@ -95,12 +112,12 @@ public class FilterWfsSimpleController {
     }
 
     public void setStoredQueryAttributes() {
-        controller.dataBean.setAttributes( new ArrayList<DataBean.Attribute>() );
+        controller.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
 
         ObservableList<Node> children
             = this.simpleWFSContainer.getChildren();
-        for ( Node n : children ) {
-            if ( n.getClass() == HBox.class ) {
+        for (Node n : children) {
+            if (n.getClass() == HBox.class) {
                 HBox hbox = (HBox) n;
                 ObservableList<Node> hboxChildren = hbox.getChildren();
                 String value = "";
@@ -110,49 +127,49 @@ public class FilterWfsSimpleController {
                 Label l2 = null;
                 TextField tf = null;
                 ComboBox cb = null;
-                for ( Node hn : hboxChildren ) {
-                    if ( hn.getClass() == ComboBox.class ) {
+                for (Node hn : hboxChildren) {
+                    if (hn.getClass() == ComboBox.class) {
                         cb = (ComboBox) hn;
                     }
-                    if ( hn.getClass() == TextField.class ) {
+                    if (hn.getClass() == TextField.class) {
                         tf = (TextField) hn;
                     }
-                    if ( hn.getClass() == Label.class ) {
-                        if ( l1 == null ) {
+                    if (hn.getClass() == Label.class) {
+                        if (l1 == null) {
                             l1 = (Label) hn;
                         }
-                        if ( l1 != (Label) hn ) {
+                        if (l1 != (Label) hn) {
                             l2 = (Label) hn;
                         }
                     }
-                    if ( tf != null && ( l1 != null || l2 != null ) ) {
+                    if (tf != null && (l1 != null || l2 != null)) {
                         name = tf.getUserData().toString();
                         value = tf.getText();
-                        if ( l2 != null && l1.getText().equals( name ) ) {
+                        if (l2 != null && l1.getText().equals(name)) {
                             type = l2.getText();
                         } else {
                             type = l1.getText();
                         }
                     }
-                    if ( cb != null && ( l1 != null || l2 != null )
-                         && cb.getId().equals( UIFactory.getDataFormatID() ) ) {
+                    if (cb != null && (l1 != null || l2 != null)
+                         && cb.getId().equals(UIFactory.getDataFormatID())) {
                         name = OUTPUTFORMAT;
-                        if ( cb.getSelectionModel() != null
+                        if (cb.getSelectionModel() != null
                              && cb.getSelectionModel().getSelectedItem()
-                                != null ) {
+                                != null) {
                             value = cb.getSelectionModel()
                                       .getSelectedItem().toString();
                             type = "";
                         } else {
-                            Platform.runLater( () -> statusLogController.setStatusTextUI(
-                                I18n.getMsg( GUI_FORMAT_NOT_SELECTED ) ) );
+                            Platform.runLater(() -> statusLogController.setStatusTextUI(
+                                I18n.getMsg(GUI_FORMAT_NOT_SELECTED)));
                         }
                     }
-                    if ( !name.isEmpty() && !value.isEmpty() ) {
+                    if (!name.isEmpty() && !value.isEmpty()) {
                         controller.dataBean.addAttribute(
                             name,
                             value,
-                            type );
+                            type);
                     }
                 }
             }
@@ -163,21 +180,21 @@ public class FilterWfsSimpleController {
         ObservableList<Node> children
             = simpleWFSContainer.getChildren();
         Map<String, String> parameters = controller.downloadConfig.getParams();
-        for ( Node node : children ) {
-            if ( node instanceof HBox ) {
+        for (Node node : children) {
+            if (node instanceof HBox) {
                 HBox hb = (HBox) node;
-                Node n1 = hb.getChildren().get( 0 );
-                Node n2 = hb.getChildren().get( 1 );
-                if ( n1 instanceof Label && n2 instanceof TextField ) {
+                Node n1 = hb.getChildren().get(0);
+                Node n2 = hb.getChildren().get(1);
+                if (n1 instanceof Label && n2 instanceof TextField) {
                     Label paramLabel = (Label) n1;
                     TextField paramBox = (TextField) n2;
-                    String targetValue = parameters.get( paramLabel
-                                                             .getText() );
-                    if ( targetValue != null ) {
-                        paramBox.setText( targetValue );
+                    String targetValue = parameters.get(paramLabel
+                                                             .getText());
+                    if (targetValue != null) {
+                        paramBox.setText(targetValue);
                     }
                 }
-                if ( n2 instanceof ComboBox ) {
+                if (n2 instanceof ComboBox) {
                     ComboBox<OutputFormatModel> cb
                         = (ComboBox<OutputFormatModel>) n2;
                     cb.setCellFactory(
@@ -185,57 +202,57 @@ public class FilterWfsSimpleController {
                             ListCell<OutputFormatModel>>() {
                             @Override
                             public ListCell<OutputFormatModel>
-                            call( ListView<OutputFormatModel> list ) {
+                            call(ListView<OutputFormatModel> list) {
                                 return new CellTypes.StringCell();
                             }
-                        } );
-                    cb.setOnAction( event -> {
-                        if ( cb.getValue().isAvailable() ) {
-                            cb.setStyle( FX_BORDER_COLOR_NULL );
+                        });
+                    cb.setOnAction(event -> {
+                        if (cb.getValue().isAvailable()) {
+                            cb.setStyle(FX_BORDER_COLOR_NULL);
                         } else {
-                            cb.setStyle( FX_BORDER_COLOR_RED );
+                            cb.setStyle(FX_BORDER_COLOR_RED);
                         }
-                    } );
+                    });
                     boolean formatAvailable = false;
-                    for ( OutputFormatModel i : cb.getItems() ) {
-                        if ( i.getItem().equals( controller.downloadConfig
-                                                     .getOutputFormat() ) ) {
-                            cb.getSelectionModel().select( i );
+                    for (OutputFormatModel i : cb.getItems()) {
+                        if (i.getItem().equals(controller.downloadConfig
+                                                     .getOutputFormat())) {
+                            cb.getSelectionModel().select(i);
                             formatAvailable = true;
                         }
                     }
-                    if ( !formatAvailable ) {
+                    if (!formatAvailable) {
                         String format = controller.downloadConfig
                             .getOutputFormat();
                         OutputFormatModel m = new OutputFormatModel();
-                        m.setItem( format );
-                        m.setAvailable( false );
-                        cb.getItems().add( m );
-                        cb.getSelectionModel().select( m );
+                        m.setItem(format);
+                        m.setAvailable(false);
+                        cb.getItems().add(m);
+                        cb.getSelectionModel().select(m);
                     }
-                    if ( cb.getValue().isAvailable() ) {
-                        cb.setStyle( FX_BORDER_COLOR_NULL );
+                    if (cb.getValue().isAvailable()) {
+                        cb.setStyle(FX_BORDER_COLOR_NULL);
                     } else {
-                        cb.setStyle( FX_BORDER_COLOR_RED );
+                        cb.setStyle(FX_BORDER_COLOR_RED);
                     }
                 }
             }
         }
     }
 
-    public void validate( Consumer<String> fail ) {
-        if ( simpleWFSContainer.isVisible() ) {
+    public void validate(Consumer<String> fail) {
+        if (simpleWFSContainer.isVisible()) {
             ObservableList<Node> children
                 = simpleWFSContainer.getChildren();
-            for ( Node node : children ) {
-                if ( node instanceof HBox ) {
+            for (Node node : children) {
+                if (node instanceof HBox) {
                     HBox hb = (HBox) node;
-                    Node n2 = hb.getChildren().get( 1 );
-                    if ( n2 instanceof ComboBox ) {
+                    Node n2 = hb.getChildren().get(1);
+                    if (n2 instanceof ComboBox) {
                         ComboBox<OutputFormatModel> cb
                             = (ComboBox<OutputFormatModel>) n2;
-                        if ( !cb.getValue().isAvailable() ) {
-                            fail.accept( I18n.format( "gui.data-format" ) );
+                        if (!cb.getValue().isAvailable()) {
+                            fail.accept(I18n.format("gui.data-format"));
                             break;
                         }
                     }

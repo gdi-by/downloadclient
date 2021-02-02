@@ -41,8 +41,8 @@ public class DownloadConfigTest extends TestCase {
      * @throws IOException Exception just in case
      */
     @Test
-    public void testDownloadConfigGetters() throws ParserConfigurationException
-        , SAXException, DownloadConfig.NoServiceURLException, IOException {
+    public void testDownloadConfigGetters() throws ParserConfigurationException,
+        SAXException, DownloadConfig.NoServiceURLException, IOException {
 
 
         DownloadConfiguration dc = new DownloadConfiguration();
@@ -56,18 +56,15 @@ public class DownloadConfigTest extends TestCase {
         DownloadConfig downloadConfig = new DownloadConfig(file);
 
         assertEquals(
-            "http://www.geodaten.bayern.de/ba-data/Themen/kml/biergarten.kml"
-            , downloadConfig.getAtomVariation());
+            "http://www.geodaten.bayern.de/ba-data/Themen/kml/biergarten.kml", downloadConfig.getAtomVariation());
 
-        assertEquals("2496b2ed-8a64-465a-95dd-170799788982"
-            , downloadConfig.getDataset());
+        assertEquals("2496b2ed-8a64-465a-95dd-170799788982", downloadConfig.getDataset());
 
         assertEquals(tempPath.toString(), downloadConfig.getDownloadPath());
 
         assertEquals(file, downloadConfig.getFile());
 
-        assertEquals("application/vnd.google-earth.kml+xml"
-            , downloadConfig.getOutputFormat());
+        assertEquals("application/vnd.google-earth.kml+xml", downloadConfig.getOutputFormat());
 
 //        assertEquals("{VARIATION="
 //                + downloadConfig.getAtomVariation().toString()
@@ -80,8 +77,7 @@ public class DownloadConfigTest extends TestCase {
         assertEquals("ATOM", downloadConfig.getServiceType());
 
         assertEquals("https://geoportal.bayern.de/gdiadmin/ausgabe/"
-            + "ATOM_SERVICE/a90c75a0-f1b5-46e7-9e45-c0385fd0c200"
-        , downloadConfig.getServiceURL());
+            + "ATOM_SERVICE/a90c75a0-f1b5-46e7-9e45-c0385fd0c200", downloadConfig.getServiceURL());
 
     }
 }

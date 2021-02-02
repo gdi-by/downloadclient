@@ -20,21 +20,21 @@ Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier b
 
 Für beide Betriebssysteme steht je eine Version des Download-Client für die Java Version 1.8 und Java 11.0 zur Verfügung.
 
-Prüfen Sie vor dem Download der Datei die installierte Java-Version mit dem Befehl `java -version` und wählen Sie entsprechend
+Prüfen Sie vor dem Download der Datei die installierte Java-Version mit dem Befehl ``java -version`` und wählen Sie entsprechend
 der angezeigten Java-Version das passende Installationspaket für den Download-Client aus.
 
-Wenn kein Java installiert ist, dann installieren Sie wie
-im folgenden Kapitel beschrieben eine für das Betriebssystem passende Java-Version.
+Wenn kein Java installiert ist, dann installieren Sie wie im folgenden Kapitel beschrieben
+eine für das Betriebssystem passende Java-Version.
 
 
 Voraussetzungen - Softwareumgebung
 ------------------------------------
 
-**Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX benötigt.**
+**Für die Ausführung des Download-Clients wird Java 1.8 (mindestens 1.8.0_40) oder Java 11 (mindestens 11.0.2) mit JavaFX benötigt.**
 
 Aktuelle Java-Versionen können hier heruntergeladen werden:
 
-- Oracle JDK 8 und 11: http://www.oracle.com/technetwork/java/javase/downloads/index.html (JavaFX enthalten)
+- Oracle JDK 8: http://www.oracle.com/technetwork/java/javase/downloads/index.html (JavaFX enthalten)
 - OpenJDK-basierte Java Versionen *mit* JavaFX:
     - Liberica JDK (8 und 11): https://bell-sw.com/ (JavaFX enthalten)
     - Zulu JDK (8 und 11): https://www.azul.com/downloads/zulu-community/ (JavaFX enthalten)
@@ -42,10 +42,29 @@ Aktuelle Java-Versionen können hier heruntergeladen werden:
     - AdoptOpenJDK (8 und 11): https://adoptopenjdk.net/ (JavaFX **nicht** enthalten)
     - Amazon Corretto (8 und 11): https://docs.aws.amazon.com/corretto/ (JavaFX **nicht** enthalten)
 
-Für die diese beiden Java Versionen muss zusätzlich das passende `JavaFX-SDK <https://openjfx.io>`_ installiert sein.
-
 Hinweis:
   Bitte beachten Sie die Lizenzbedingungen der jeweiligen Hersteller!
+
+JavaFX-Bibliothek
+^^^^^^^^^^^^^^^^^
+
+Für die OpenJDK-Distributionen ohne JavaFX muss zusätzlich das zum Betriebssystem passende `JavaFX-SDK <https://openjfx.io>`_ installiert sein.
+Die Installation des JavaFX-SDK erfolgt nach erfolgreichem Download durch Entpacken des Zip-Archivs im Dateisystem und setzen der Umgebungsvariable
+``JAVAFX_HOME``.
+
+Unter Linux z.B. durch:
+
+``export JAVAFX_HOME=/path/to/javafx-sdk-11.0.2``
+
+unter Windows durch:
+
+``set JAVAFX_HOME=C:\path\to\javafx-sdk-11.0.2``
+
+Gdal-Bibliothek
+^^^^^^^^^^^^^^^
+
+Unter Linux und macOS ist die Installation von gdal/ogr erforderlich. Es muss die Version 2.1 oder höher installiert sein.
+
 
 Installationspakte
 ------------------
@@ -58,6 +77,7 @@ Installationspakete für Windows:
     - `downloadclient-X.Y_Windows_jdk11.zip`
 
 Installationspakete für Linux:
+
 - Oracle JDK 1.8 oder OpenJDK 1.8:
     - `downloadclient-X.Y_Linux_jdk8.zip`
 - Oracle JDK 11.0 oder OpenJDK 11.0:
@@ -67,7 +87,7 @@ Installationspakete für Linux:
 Inbetriebnahme
 --------------
 
-Das Zip-Archiv an einen geeigneten Ort entpacken.
+Das Zip-Archiv an einem geeigneten Ort entpacken.
 
 Starten der Anwendung
 ----------------------
@@ -121,7 +141,6 @@ Benutzeroberfläche
 .. image:: img/V1.1_Benutzeroberflaeche.png
 
 
-
 Auswahl von Downloaddiensten
 ------------------------------
 Downloaddienste können über verschiedene Wege eingebunden werden: 
@@ -151,9 +170,9 @@ Download von Datensätzen eines WFS 2.0
 Beim Download von Datensätzen eines WFS 2.0 werden in der Datensatz-Auswahlliste sowohl alle FeatureTypes des WFS als auch alle vordefinierten Abfragen ("Stored Queries" - wenn vorhanden) zum Download angeboten. 
 Standardmäßig ist der erste Eintrag der Liste ausgewählt.
  
-*********************
+
 Vordefinierte Abfrage
-*********************
+^^^^^^^^^^^^^^^^^^^^^
 
 Bei Auswahl einer vordefinierten Abfrage passt sich der Datensatzvarianten-Auswahlbereich dahingehend an, dass die Abfrageparameter als Eingabefelder sowie (falls vorhanden) eine Beschreibung der vordefinierten Abfrage erscheinen. Zusätzlich kann eines der vom Dienst nativ angebotenen Ausgabedatenformate gewählt werden.
 
@@ -165,13 +184,14 @@ Bei Auswahl einer vordefinierten Abfrage passt sich der Datensatzvarianten-Auswa
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Die vordefinierte Abfrage lautet *"Abfrage einer Gemeinde über den Gemeindeschlüssel"*. 
 Dabei wird die Grenze der Stadt München mit dem Schlüssel *09162000* im Format *KML* abgefragt. Mit Klick auf den Button „Download start...“ unter Angabe eines Zielordners wird der Download angestoßen.
 
-************
+
 FeatureTypes
-************
+^^^^^^^^^^^^
 
 Für jeden über den ausgewählten WFS bereitgestellten FeatureType wird ein Eintrag in der Auswahlliste mit dem Zusatz *"(BBOX)"* angegeben.
-So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so den Abfragebereich definieren, für welchen er Daten beziehen möchte.
-Das Begrenzungsrechteck (BBOX) kann durch den Nutzer nachträglich über die Eingabefelder noch angepasst werden und mit dem Button "Eingabe übernehmen" wird das Begrenzungsrechteck in der Kartenkomponente für die Auswahl aktualisiert
+So kann der Nutzer über die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufziehen und so einen Abfragebereich definieren, für welchen er Daten beziehen möchte. Um den Abfragebereich im Kartenfenster
+auszuwählen, muss der Button "Abfragebereich bestimmen" ausgewählt und dann kann durch Klick in die Kartenkomponente ein Begrenzungsrechteck (BBOX) aufgezogen werden. Durch einen weiteren Klick wird das Begrenzungsrechteck festgelegt und die Koordinaten in die Eingabefelder übernommen.
+Das Begrenzungsrechteck (BBOX) kann durch den Nutzer nachträglich über die Eingabefelder noch angepasst werden. Mit dem Button "Eingabe übernehmen" wird das Begrenzungsrechteck in der Kartenkomponente für die Auswahl aktualisiert.
 Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem gewählt werden, welche vom WFS nativ unterstützt werden.
 
 **Beispiel:**
@@ -181,9 +201,21 @@ Zusätzlich kann noch ein Ausgabedatenformat und ein Koordinatenreferenzsystem g
 
 Im oben dargestellten Beispiel wird als Suchbegriff *"Gemeinde"* im entsprechenden Suchfenster eingegeben und der Downloaddienst *"Verwaltungsgrenzen - WFS 2.0 DemoServer"* verwendet. Anschließend wird der FeatureType *"Gemeinden Bayern"* ausgewählt und auf der Karte ein Rechteck aufgezogen. Somit können sämtliche Gemeindegrenzen heruntergeladen werden, welche sich mit dem Begrenzungsrechteck berühren. Als Ausgabedatenformat wird *KML* gewählt, das Koordinatenreferenzsystem soll *WGS84* sein.
 
-***********************
+
+Weitere Funktionen der Kartenkomponenten
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Über die Schaltflächen "+" und "-" innerhalb der Kartenkomponente kann der Kartenausschnitt durch Zoom-in und Zoom-out verändert werden. Diese Funktionalität ist auch über das Scroll-Rad der Maus (mittlere Maustaste) aufrufbar.
+
+Weitere Tastenkombinationen:
+
+- ``linke Maustaste``: Verschieben des Kartenausschnitts (Pan) bei gleichzeitiger Bewegung des Mauszeigers.
+- ``SHIFT`` + ``linke Maustaste``: Zieht einen Bereich auf (blaues Rechteck) mit anschließendem Zoom-in auf den ausgewählten Bereich.
+- ``SHIFT`` + ``ALT`` + ``linke Maustaste``: Ausrichtung der Karte verändern (es wird zusätzlich eine Schaltfläche rechts oben innerhalb der Kartenkomponente angezeigt, über die die Karte wieder in die ursprüngliche Nord-Süd-Ausrichtung ausgerichtet werden kann).
+
+
 Abfragen mit CQL-Filter
-***********************
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Neben der Auswahl über ein Begrenzungsrechteck (BBOX) wird für jeden bereitgestellten FeatureType ein Eintrag in der Auswahlliste mit dem Zusatz *"(Filter)"* angegeben.
 So kann der Benutzer mit Angabe eines CQL-Ausdrucks [#f2]_ im Textfeld die Ausgabe des WFS filtern.
@@ -195,9 +227,9 @@ So kann der Benutzer mit Angabe eines CQL-Ausdrucks [#f2]_ im Textfeld die Ausga
 
 Im oben dargestellten Beispiel wird der FeatureType *"Gemeinden"* über den CQL-Ausdruck auf dem Attribut *"bvv:sch"* mit dem Wert *09162000* gefiltert.
 
-************************
+
 Typübergreifende Abfrage
-************************
+^^^^^^^^^^^^^^^^^^^^^
 
 Zusätzlich zu der Filterfunktion je FeatureType kann auch ein typübergreifender Filter definiert werden. Dazu muss in der Auswahl der Eintrag "Typübergreifende Abfrage (Filter)" ausgewählt werden.
 Im Textfeld kann der Benutzer einen oder mehrere CQL-Ausdrücke [#f2]_ eingeben und somit die Ausgabe des WFS filtern.
@@ -313,7 +345,7 @@ Weitere Informationen, wie das Anwendungs-Logfile angepasst werden kann, können
 .. [#f3] Apache Log4j2 Dokumentation https://logging.apache.org/log4j/2.x/manual/configuration.html
 
 Ausführungswiederholung
----------------------------
+-----------------------
 
 Eine Download-Konfiguration kann über den entsprechenden Button als XML-Datei (Dateiname config<DatumUhrzeitNr>.xml) gespeichert und im Download-Client über das Menü *Datei* --> *Download-Konfiguration laden* erneut geladen werden. Zudem kann die gespeicherte Download-Konfiguration über ein Konsolenprogramm erneut bzw. in regelmäßigen Intervallen ausgeführt werden. 
  

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CswIT extends TestCase {
 
-    private static final Logger log = LoggerFactory.getLogger(CswIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CswIT.class);
 
     private static final int THREE = 3;
 
@@ -68,7 +68,7 @@ public class CswIT extends TestCase {
     @Override
     @Before
     public void setUp() throws IOException {
-        log.debug("Start jadler ...");
+        LOG.debug("Start jadler ...");
         Config.initialize(null);
         initJadler();
     }
@@ -76,7 +76,7 @@ public class CswIT extends TestCase {
     @Override
     @After
     public void tearDown() {
-        log.debug("Stop jadler ...");
+        LOG.debug("Stop jadler ...");
         closeJadler();
     }
 
@@ -87,7 +87,7 @@ public class CswIT extends TestCase {
      */
     @Test
     public void testCswClient1() throws IOException, URISyntaxException {
-        log.debug("... Testing virtuell search");
+        LOG.debug("... Testing virtuell search");
         run("/csw/atom-feeds",
             "/csw202/atom-feeds.xml",
             "/csw202/csw-capabilities-1.xml");
@@ -100,7 +100,7 @@ public class CswIT extends TestCase {
      */
     @Test
     public void testCswClient2() throws IOException, URISyntaxException {
-        log.debug("... Testing virtuell search");
+        LOG.debug("... Testing virtuell search");
         run("/csw/atom-feeds",
             "/csw202/atom-feeds.xml",
             "/csw202/csw-capabilities-2.xml");
@@ -124,7 +124,7 @@ public class CswIT extends TestCase {
                 getServicesByFilter("not-required-because-mocked");
 
 
-        log.debug("Anzahl der ermittelten Dienste: "
+        LOG.debug("Anzahl der ermittelten Dienste: "
                 + services.size());
 
         assertTrue(services.size() == THREE);
@@ -174,7 +174,7 @@ public class CswIT extends TestCase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(PATH_GETCAPABILITIES);
-        log.debug("GetCapabilities-URL: " + sb.toString());
+        LOG.debug("GetCapabilities-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -185,7 +185,7 @@ public class CswIT extends TestCase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        log.debug("GetRecords-URL: " + sb.toString());
+        LOG.debug("GetRecords-URL: " + sb.toString());
         return sb.toString();
     }
 

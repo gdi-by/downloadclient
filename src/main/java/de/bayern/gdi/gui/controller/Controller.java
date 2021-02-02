@@ -84,13 +84,11 @@ import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 @Singleton
 public class Controller {
 
-    private static final Logger log
-            = LoggerFactory.getLogger(Controller.class.getName());
-    //Application log
-    private static final Logger APP_LOG
-            = LoggerFactory.getLogger("Application_Log");
+    private static final Logger LOG = LoggerFactory.getLogger(Controller.class.getName());
+    /** Application log. */
+    private static final Logger APP_LOG = LoggerFactory.getLogger("Application_Log");
 
-    // DataBean
+    /** DataBean. */
     DataBean dataBean;
     private Stage primaryStage;
     private UIFactory factory;
@@ -227,7 +225,7 @@ public class Controller {
 
     void extractStoredQuery() {
         ItemModel data = this.dataBean.getDatatype();
-        if (data instanceof StoredQueryModel ) {
+        if (data instanceof StoredQueryModel) {
             filterWfsSimpleController.setStoredQueryAttributes();
         }
     }
@@ -249,11 +247,10 @@ public class Controller {
     }
 
     void extractCql() {
-        if (dataBean.isFilterType() ) {
+        if (dataBean.isFilterType()) {
             String sqlInput = filterWfsBasicController.getSqlText();
-            if ( sqlInput != null
-                 && !sqlInput.isEmpty() ) {
-                this.dataBean.addAttribute( "CQL", sqlInput, "" );
+            if (sqlInput != null && !sqlInput.isEmpty()) {
+                this.dataBean.addAttribute("CQL", sqlInput, "");
             }
         }
     }
@@ -270,16 +267,16 @@ public class Controller {
 
         for (DataBean.Attribute attr: this.dataBean.getAttributes()) {
             if (!attr.getType().isEmpty()
-            && !Validator.isValid( attr.getType(), attr.getValue())) {
+            && !Validator.isValid(attr.getType(), attr.getValue())) {
                 fail.accept(attr.getName());
             }
         }
 
         if (downloadConfig != null) {
-            serviceTypeSelectionController.validate( fail );
-            filterAtomController.validate( fail );
-            filterWfsBasicController.validate( fail );
-            filterWfsSimpleController.validate( fail );
+            serviceTypeSelectionController.validate(fail);
+            filterAtomController.validate(fail);
+            filterWfsBasicController.validate(fail);
+            filterWfsSimpleController.validate(fail);
         }
 
         if (failed.length() == 0) {
@@ -392,7 +389,7 @@ public class Controller {
         processingChainController.resetProcessingChainContainer();
     }
 
-    public ObservableList<ItemModel> collectServiceTypes( boolean isWfs2 ) {
+    public ObservableList<ItemModel> collectServiceTypes(boolean isWfs2) {
         ReferencedEnvelope extendWFS = null;
         List<WFSMeta.Feature> features =
                 dataBean.getWFSService().getFeatures();
@@ -414,15 +411,15 @@ public class Controller {
                     }
                 }
             }
-            types.add(new OverallFeatureTypeModel( features));
+            types.add(new OverallFeatureTypeModel(features));
         }
-        if ( extendWFS != null ) {
-            filterWfsBasicController.setExtent( extendWFS );
+        if (extendWFS != null) {
+            filterWfsBasicController.setExtent(extendWFS);
         }
         return types;
     }
 
-    public void addStoredQueries( ObservableList<ItemModel> types ) {
+    public void addStoredQueries(ObservableList<ItemModel> types) {
         List<WFSMeta.StoredQuery> queries =
             dataBean.getWFSService().getStoredQueries();
         for (WFSMeta.StoredQuery s : queries) {
@@ -430,21 +427,21 @@ public class Controller {
         }
     }
 
-    public void chooseServiceType( ItemModel data, ServiceType type, boolean datasetAvailable ) {
-        if ( type == ServiceType.ATOM ) {
-            filterAtomController.chooseAtomType( data, datasetAvailable );
+    public void chooseServiceType(ItemModel data, ServiceType type, boolean datasetAvailable) {
+        if (type == ServiceType.ATOM) {
+            filterAtomController.chooseAtomType(data, datasetAvailable);
             enableAtomType();
-        } else if ( type == WFS_TWO ) {
+        } else if (type == WFS_TWO) {
             if (data instanceof FeatureModel
                 || data instanceof  OverallFeatureTypeModel
                 || (!datasetAvailable
                     && downloadConfig.getServiceType() == "WFS2_BASIC")) {
-                filterWfsBasicController.initGui( data );
+                filterWfsBasicController.initGui(data);
                 enableWfsBasic();
             } else if (data instanceof StoredQueryModel
                        || (!datasetAvailable
                            && downloadConfig.getServiceType().equals("WFS2_SIMPLE"))) {
-                filterWfsSimpleController.initGui( data, datasetAvailable );
+                filterWfsSimpleController.initGui(data, datasetAvailable);
                 enableWfsSimple();
             }
         }
@@ -476,7 +473,7 @@ public class Controller {
     public void setDataBean(DataBean dataBean) {
         this.dataBean = dataBean;
         ObservableList<ServiceModel> servicesAsList = this.dataBean.getServicesAsList();
-        serviceSelectionController.setServices( servicesAsList );
+        serviceSelectionController.setServices(servicesAsList);
 
         ServiceSettings serviceSetting = Config.getInstance().getServices();
         catalogReachable = dataBean.getCatalogService() != null
@@ -486,11 +483,11 @@ public class Controller {
         try {
             url = new URL(serviceSetting.getWMSUrl());
         } catch (MalformedURLException e) {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
-        if (url != null && filterWfsBasicController.isReachable( url ) ) {
-            filterWfsBasicController.initMapHandler( serviceSetting );
-            filterAtomController.initMapHandler( serviceSetting );
+        if (url != null && filterWfsBasicController.isReachable(url)) {
+            filterWfsBasicController.initMapHandler(serviceSetting);
+            filterAtomController.initMapHandler(serviceSetting);
         } else {
             statusLogController.setStatusTextUI(I18n.format("status.wms-not-available"));
         }
@@ -519,12 +516,12 @@ public class Controller {
         processingChainController.validateChainContainerItems();
     }
 
-    public void setProcessingSteps( List<DownloadConfig.ProcessingStep> steps ) {
-        processingChainController.setProcessingSteps( steps );
+    public void setProcessingSteps(List<DownloadConfig.ProcessingStep> steps) {
+        processingChainController.setProcessingSteps(steps);
     }
 
-    public void selectServiceType( String polygonID ) {
-        serviceTypeSelectionController.selectServiceType( polygonID );
+    public void selectServiceType(String polygonID) {
+        serviceTypeSelectionController.selectServiceType(polygonID);
     }
 
     /**

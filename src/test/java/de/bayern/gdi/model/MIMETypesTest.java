@@ -53,8 +53,7 @@ public class MIMETypesTest extends TestCase {
         MIMETypes mimeTypesExpected = new MIMETypes();
         mimeTypesExpected.setTypes(expectedMimeType);
 
-        assertEquals(mimeTypesExpected.getTypes()
-            , mimeTypesActual.getTypes());
+        assertEquals(mimeTypesExpected.getTypes(), mimeTypesActual.getTypes());
     }
 
 

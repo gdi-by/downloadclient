@@ -50,7 +50,7 @@ public class WFSMetaExtractorIT extends WFS20ResourceTestBase {
      */
     @Test
     public void testGeoServer() throws IOException, URISyntaxException {
-        log.debug("... Testing virtuell GeoServer");
+        LOG.debug("... Testing virtuell GeoServer");
         run("/geoserver/wfs",
             "/wfs20/geoserver/geoserver-capabilities.xml",
             NUMBER_OF_FEATURE_TYPES_GEOSERVER);
@@ -64,7 +64,7 @@ public class WFSMetaExtractorIT extends WFS20ResourceTestBase {
      */
     @Test
     public void testXtraServer() throws IOException, URISyntaxException {
-        log.debug("... Testing virtuell XtraServer");
+        LOG.debug("... Testing virtuell XtraServer");
         run("/xtraserver/wfs",
             "/wfs20/xtraserver/xtraserver-capabilities.xml",
             NUMBER_OF_FEATURE_TYPES_XTRASERVER);

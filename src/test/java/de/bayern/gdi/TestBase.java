@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.bayern.gdi;
 
 import de.bayern.gdi.gui.controller.Controller;
@@ -101,7 +100,7 @@ public abstract class TestBase extends ApplicationTest {
     /**
      * The logger.
      */
-    protected static final Logger log = LoggerFactory.getLogger(TestBase.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(TestBase.class);
 
     // Overrides and Annotated Methods
 
@@ -110,7 +109,7 @@ public abstract class TestBase extends ApplicationTest {
      */
     @BeforeClass
     public static void initTests() {
-        log.debug("init tests ....");
+        LOG.debug("init tests ....");
         System.setProperty("testfx.robot", "glass");
         System.setProperty("testfx.headless", "true");
         System.setProperty("prism.order", "sw");
@@ -124,10 +123,10 @@ public abstract class TestBase extends ApplicationTest {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        log.debug("start stage ...");
+        LOG.debug("start stage ...");
         Config.initialize(null);
 
-        log.debug("Preparing app for controller tests");
+        LOG.debug("Preparing app for controller tests");
         ClassLoader classLoader = Start.class.getClassLoader();
         URL url = classLoader.getResource("download-client.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());

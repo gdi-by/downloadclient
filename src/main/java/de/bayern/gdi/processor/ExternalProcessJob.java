@@ -44,8 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExternalProcessJob implements Job {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(ExternalProcessJob.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ExternalProcessJob.class.getName());
 
     /** An argument for an external call. */
     public static class Arg {

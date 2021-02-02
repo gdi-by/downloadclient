@@ -66,8 +66,7 @@ import org.xml.sax.SAXException;
  */
 public class XML {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(XML.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(XML.class.getName());
 
     private static final String UTF8 = "UTF-8";
 
@@ -539,6 +538,7 @@ public class XML {
      * lazy serialization.
      * @param doc the XML document to wrap.
      * @return The ContentProducer.
+     * @throws IOException in case of errors
      */
     public static ContentProducer toContentProducer(final Document doc) {
         return out -> {

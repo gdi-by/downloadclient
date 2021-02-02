@@ -36,8 +36,7 @@ import java.util.stream.Stream;
  */
 public class StringUtils {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(StringUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class.getName());
 
     private static final int TEN = 10;
 
@@ -84,7 +83,7 @@ public class StringUtils {
     }
 
     private static Predicate<String> within(String[] haystack) {
-        return needle-> Stream.of(haystack)
+        return needle -> Stream.of(haystack)
                 .anyMatch(needle::equals);
     }
 

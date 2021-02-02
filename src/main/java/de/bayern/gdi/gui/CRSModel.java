@@ -57,7 +57,6 @@ public class CRSModel {
 
     /**
      * Checks of another crsModel is equal.
-     * @param crsModel crsModel
      * @return true if equal; false if not
      */
     @Override

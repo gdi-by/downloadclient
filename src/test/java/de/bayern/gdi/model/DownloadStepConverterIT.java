@@ -55,8 +55,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class DownloadStepConverterIT {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(DownloadStepConverterIT.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadStepConverterIT.class.getName());
 
     /**
      * Service under test.

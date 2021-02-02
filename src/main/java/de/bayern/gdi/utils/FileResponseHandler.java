@@ -60,8 +60,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         }
     }
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(FileResponseHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileResponseHandler.class.getName());
 
     private static final int BUF_SIZE = 4096;
 
@@ -112,7 +111,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         }
         try {
             try (FileOutputStream out = new FileOutputStream(this.file)) {
-                byte [] buf = new byte[BUF_SIZE];
+                byte[] buf = new byte[BUF_SIZE];
                 int r;
                 InputStream ins = wrap(entity.getContent());
                 while ((r = ins.read(buf)) >= 0) {

@@ -37,13 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Bounding box coordinates.
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 public class BboxCoordinates {
 
-
-    private static final Logger LOG
-        = LoggerFactory.getLogger(BboxCoordinates.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BboxCoordinates.class.getName());
 
     private static final Double HOUNDREDTHOUSAND = 100000.0D;
 
@@ -61,7 +60,7 @@ public class BboxCoordinates {
     private MapHandler wmsMapHandler;
 
     /**
-     * sets the CRS the coords under the map should be displayed in.
+     * Sets the CRS the coords under the map should be displayed in.
      *
      * @param crs Coordinate Reference System
      * @throws FactoryException when the CRS can't be found

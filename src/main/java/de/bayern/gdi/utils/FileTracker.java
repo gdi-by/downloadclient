@@ -33,8 +33,7 @@ import java.util.TreeMap;
 /** Tracks files in a directory. */
 public class FileTracker {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(FileTracker.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileTracker.class.getName());
 
     private File directory;
     private Map<File, Long> last;

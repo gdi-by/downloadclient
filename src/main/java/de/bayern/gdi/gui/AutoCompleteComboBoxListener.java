@@ -15,12 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.bayern.gdi.gui;
-
-/**
- * @author Jochen Saalfeld (jochen@intevation.de)
- */
 
 import javafx.collections.ObservableList;
 
@@ -32,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 
 /**
  * Class to build a Autocomplete Combobox (Dropdown List).
+ * @author Jochen Saalfeld (jochen@intevation.de)
  *
  * @param <T>
  */
@@ -184,8 +180,7 @@ public class AutoCompleteComboBoxListener<T> {
         }
     }
 
-    private boolean isItemTextEqualSelectedText(ObservableList item
-            , String selectedText, int i) {
+    private boolean isItemTextEqualSelectedText(ObservableList item, String selectedText, int i) {
         return item.get(i) != null
                 && selectedText.equalsIgnoreCase(item.get(i).toString());
     }

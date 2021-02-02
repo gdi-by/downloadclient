@@ -41,8 +41,7 @@ import org.slf4j.LoggerFactory;
 /** Abstract class to do multiple file downloads. */
 public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
-    private static final Logger log
-        = LoggerFactory.getLogger(MultipleFileDownloadJob.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MultipleFileDownloadJob.class);
 
     /** Number to re-tries for a failed download. */
     protected static final int MAX_TRIES = 5;
@@ -112,7 +111,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
 
         final String msg = I18n.format("download.file", dlf.url, dlf.file);
         log(msg);
-        log.info(msg);
+        LOG.info(msg);
         this.currentCount = 0;
         boolean usePost = dlf.postParams != null;
 
@@ -122,11 +121,11 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             final HttpPost httppost = new HttpPost(dlf.url.toString());
             httppost.setEntity(dlf.postParams);
             req = httppost;
-            log.info("WFS GetFeature POST XML request: {}",
+            LOG.info("WFS GetFeature POST XML request: {}",
                 httpPostToString(dlf.url, dlf.postParams));
         } else {
             req = getGetRequest(dlf.url);
-            log.info("WFS GetFeature GET KVP request: {}", req.toString());
+            LOG.info("WFS GetFeature GET KVP request: {}", req.toString());
         }
 
         WrapInputStreamFactory wrapFactory
@@ -155,7 +154,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             return url.toString() + " " + EntityUtils.toString(postParams);
         } catch (IOException e) {
             // nothing to do
-            log.info("POST body cannot be logged: "
+            LOG.info("POST body cannot be logged: "
                 + e.getLocalizedMessage());
         }
         return url.toString();
@@ -222,7 +221,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         String msg =
             I18n.format("atom.bytes.downloaded.total", this.totalCount);
         log(msg);
-        log.info(msg);
+        LOG.info(msg);
 
         if (!failed.isEmpty()) {
             msg = I18n.format(

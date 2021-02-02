@@ -1,3 +1,20 @@
+/*
+ * DownloadClient Geodateninfrastruktur Bayern
+ *
+ * (c) 2016 GSt. GDI-BY (gdi.bayern.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.bayern.gdi.gui.controller;
 
 import com.sothawo.mapjfx.MapView;
@@ -63,8 +80,7 @@ import static de.bayern.gdi.gui.GuiConstants.OUTPUTFORMAT;
 @Singleton
 public class FilterAtomController {
 
-    private static final Logger log
-        = LoggerFactory.getLogger( FilterAtomController.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger(FilterAtomController.class.getName());
 
     @Inject
     private Controller controller;
@@ -114,96 +130,106 @@ public class FilterAtomController {
      *     The event
      */
     @FXML
-    protected void handleVariationSelect( ActionEvent event ) {
+    protected void handleVariationSelect(ActionEvent event) {
         ItemModel selim = (ItemModel) this.atomVariationChooser.getValue();
         boolean variationAvailable = false;
-        if ( selim instanceof MiscItemModel ) {
-            atomVariationChooser.setStyle( FX_BORDER_COLOR_RED );
+        if (selim instanceof MiscItemModel) {
+            atomVariationChooser.setStyle(FX_BORDER_COLOR_RED);
         } else {
-            atomVariationChooser.setStyle( FX_BORDER_COLOR_NULL );
+            atomVariationChooser.setStyle(FX_BORDER_COLOR_NULL);
             variationAvailable = true;
         }
-        if ( selim != null ) {
+        if (selim != null) {
             Atom.Field selaf;
-            if ( variationAvailable ) {
+            if (variationAvailable) {
                 selaf = (Atom.Field) selim.getItem();
             } else {
-                selaf = new Atom.Field( "", "" );
+                selaf = new Atom.Field("", "");
             }
-            controller.dataBean.addAttribute( "VARIATION", selaf.getType(), "" );
-            if ( selaf.getFormat().isEmpty() ) {
-                this.valueAtomFormat.setVisible( false );
+            controller.dataBean.addAttribute("VARIATION", selaf.getType(), "");
+            if (selaf.getFormat().isEmpty()) {
+                this.valueAtomFormat.setVisible(false);
             } else {
-                this.valueAtomFormat.setText( selaf.getFormat() );
-                this.valueAtomFormat.setVisible( true );
+                this.valueAtomFormat.setText(selaf.getFormat());
+                this.valueAtomFormat.setVisible(true);
             }
-            if ( selaf.getCRS().isEmpty() ) {
-                this.valueAtomRefsys.setVisible( false );
+            if (selaf.getCRS().isEmpty()) {
+                this.valueAtomRefsys.setVisible(false);
             } else {
-                this.valueAtomRefsys.setVisible( true );
-                this.valueAtomRefsys.setText( selaf.getCRS() );
+                this.valueAtomRefsys.setVisible(true);
+                this.valueAtomRefsys.setText(selaf.getCRS());
             }
-            controller.dataBean.addAttribute( OUTPUTFORMAT, selaf.getFormat(), "" );
+            controller.dataBean.addAttribute(OUTPUTFORMAT, selaf.getFormat(), "");
         } else {
-            controller.dataBean.addAttribute( "VARIATION", "", "" );
-            controller.dataBean.addAttribute( OUTPUTFORMAT, "", "" );
+            controller.dataBean.addAttribute("VARIATION", "", "");
+            controller.dataBean.addAttribute(OUTPUTFORMAT, "", "");
         }
         controller.validateChainContainerItems();
     }
 
+    /**
+     * Loads Atom feed.
+     */
     public void loadAtom() {
         boolean variantAvailable = false;
-        for ( ItemModel i : atomVariationChooser.getItems() ) {
+        for (ItemModel i : atomVariationChooser.getItems()) {
             Atom.Field field = (Atom.Field) i.getItem();
-            if ( field.getType()
-                      .equals( controller.downloadConfig.getAtomVariation() ) ) {
+            if (field.getType()
+                      .equals(controller.downloadConfig.getAtomVariation())) {
                 variantAvailable = true;
-                atomVariationChooser.getSelectionModel().select( i );
+                atomVariationChooser.getSelectionModel().select(i);
             }
         }
-        if ( !variantAvailable ) {
+        if (!variantAvailable) {
             MiscItemModel errorVariant = new MiscItemModel();
-            errorVariant.setItem( controller.downloadConfig.getAtomVariation() );
-            atomVariationChooser.getItems().add( errorVariant );
+            errorVariant.setItem(controller.downloadConfig.getAtomVariation());
+            atomVariationChooser.getItems().add(errorVariant);
             atomVariationChooser.getSelectionModel()
-                                .select( errorVariant );
+                                .select(errorVariant);
         }
     }
 
-    public void setVisible( boolean isVisible ) {
-        this.atomContainer.setVisible( isVisible );
+    /**
+     * Sets the visibility.
+     * @param isVisible is shown when true otherwise hidden
+     */
+    public void setVisible(boolean isVisible) {
+        this.atomContainer.setVisible(isVisible);
     }
 
+    /**
+     * Resets GUI.
+     */
     public void resetGui() {
-        if ( wmsAtomMapHandler != null ) {
+        if (wmsAtomMapHandler != null) {
             this.wmsAtomMapHandler.reset();
         }
     }
 
-    public void validate( Consumer<String> fail ) {
-        if ( atomContainer.isVisible()
-             && atomVariationChooser.getValue() instanceof MiscItemModel ) {
-            fail.accept( I18n.format( "gui.variants" ) );
+    public void validate(Consumer<String> fail) {
+        if (atomContainer.isVisible()
+             && atomVariationChooser.getValue() instanceof MiscItemModel) {
+            fail.accept(I18n.format("gui.variants"));
         }
     }
 
-    public void initMapHandler( ServiceSettings serviceSetting ) {
+    public void initMapHandler(ServiceSettings serviceSetting) {
         this.wmsAtomMapHandler = MapHandlerBuilder
-            .newBuilder( serviceSetting )
-            .withEventTarget( mapNodeAtom )
-            .withMapView( atomMapView )
-            .withWmsSourceLabel( atomMapWmsSource )
-            .withSelectButton( atomMapSelectButton )
-            .withInfoButton( atomMapInfoButton )
-            .withResizeButtton( atomMapResizeButton )
+            .newBuilder(serviceSetting)
+            .withEventTarget(mapNodeAtom)
+            .withMapView(atomMapView)
+            .withWmsSourceLabel(atomMapWmsSource)
+            .withSelectButton(atomMapSelectButton)
+            .withInfoButton(atomMapInfoButton)
+            .withResizeButtton(atomMapResizeButton)
             .build();
-        mapNodeAtom.addEventHandler( PolygonClickedEvent.ANY,
-                                     new SelectedAtomPolygon() );
+        mapNodeAtom.addEventHandler(PolygonClickedEvent.ANY,
+                                     new SelectedAtomPolygon());
     }
 
-    public void highlightPolygon( Atom.Item item ) {
-        if ( wmsAtomMapHandler != null ) {
-            wmsAtomMapHandler.highlightSelectedPolygon( item.getID() );
+    public void highlightPolygon(Atom.Item item) {
+        if (wmsAtomMapHandler != null) {
+            wmsAtomMapHandler.highlightSelectedPolygon(item.getID());
         }
     }
 
@@ -212,13 +238,13 @@ public class FilterAtomController {
             new Callback<ListView<ItemModel>,
                 ListCell<ItemModel>>() {
                 @Override
-                public ListCell<ItemModel> call( ListView<ItemModel> list ) {
+                public ListCell<ItemModel> call(ListView<ItemModel> list) {
                     return new CellTypes.ItemCell();
                 }
-            } );
+            });
     }
 
-    public ObservableList<ItemModel> chooseType( List<Atom.Item> items ) {
+    public ObservableList<ItemModel> chooseType(List<Atom.Item> items) {
         ObservableList<ItemModel> opts =
             FXCollections.observableArrayList();
         List<FeaturePolygon> polygonList
@@ -228,99 +254,99 @@ public class FilterAtomController {
         try {
             ReferencedEnvelope extendATOM = null;
             CoordinateReferenceSystem
-                atomCRS = CRS.decode( ATOM_CRS_STRING );
+                atomCRS = CRS.decode(ATOM_CRS_STRING);
             Geometry all = null;
-            for ( Atom.Item i : items ) {
-                opts.add( new AtomItemModel( i ) );
+            for (Atom.Item i : items) {
+                opts.add(new AtomItemModel(i));
                 FeaturePolygon polygon =
                     new FeaturePolygon(
                         i.getPolygon(),
                         i.getTitle(),
                         i.getID(),
-                        atomCRS );
-                polygonList.add( polygon );
+                        atomCRS);
+                polygonList.add(polygon);
                 all = all == null
                       ? i.getPolygon()
-                      : all.union( i.getPolygon() );
+                      : all.union(i.getPolygon());
             }
-            if ( wmsAtomMapHandler != null ) {
-                if ( all != null ) {
+            if (wmsAtomMapHandler != null) {
+                if (all != null) {
                     extendATOM = new ReferencedEnvelope(
-                        all.getEnvelopeInternal(), atomCRS );
-                    wmsAtomMapHandler.setExtend( extendATOM );
+                        all.getEnvelopeInternal(), atomCRS);
+                    wmsAtomMapHandler.setExtend(extendATOM);
                 }
-                wmsAtomMapHandler.drawPolygons( polygonList );
+                wmsAtomMapHandler.drawPolygons(polygonList);
             }
-        } catch ( FactoryException e ) {
-            log.error( e.getMessage(), e );
+        } catch (FactoryException e) {
+            LOG.error(e.getMessage(), e);
         }
         return opts;
     }
 
-    public void chooseAtomType( ItemModel data, boolean datasetAvailable ) {
+    public void chooseAtomType(ItemModel data, boolean datasetAvailable) {
         Atom.Item item;
-        if ( datasetAvailable ) {
+        if (datasetAvailable) {
             item = (Atom.Item) data.getItem();
             try {
                 item.load();
-            } catch ( URISyntaxException
+            } catch (URISyntaxException
                 | SAXException
                 | ParserConfigurationException
-                | IOException e ) {
-                log.error( "Could not Load Item\n"
-                           + e.getMessage(), item );
+                | IOException e) {
+                LOG.error("Could not Load Item\n"
+                           + e.getMessage(), item);
                 return;
             }
         } else {
             try {
                 item = new Atom.Item(
-                    new URL( controller.downloadConfig.getServiceURL() ),
-                    "" );
-            } catch ( Exception e ) {
+                    new URL(controller.downloadConfig.getServiceURL()),
+                    "");
+            } catch (Exception e) {
                 return;
             }
         }
-        highlightPolygon( item );
+        highlightPolygon(item);
         List<Atom.Field> fields = item.getFields();
         ObservableList<ItemModel> list =
             FXCollections.observableArrayList();
-        for ( Atom.Field f : fields ) {
-            AtomFieldModel afm = new AtomFieldModel( f );
-            list.add( afm );
+        for (Atom.Field f : fields) {
+            AtomFieldModel afm = new AtomFieldModel(f);
+            list.add(afm);
         }
-        this.atomVariationChooser.setItems( list );
+        this.atomVariationChooser.setItems(list);
         this.atomVariationChooser.getSelectionModel().selectFirst();
         WebEngine engine = this.valueAtomDescr.getEngine();
         java.lang.reflect.Field f;
         try {
-            f = engine.getClass().getDeclaredField( "page" );
-            f.setAccessible( true );
+            f = engine.getClass().getDeclaredField("page");
+            f.setAccessible(true);
             com.sun.webkit.WebPage page =
-                (com.sun.webkit.WebPage) f.get( engine );
+                (com.sun.webkit.WebPage) f.get(engine);
             page.setBackgroundColor(
-                ( new java.awt.Color( BGCOLOR, BGCOLOR, BGCOLOR ) ).getRGB()
-            );
-        } catch ( NoSuchFieldException
+                (new java.awt.Color(BGCOLOR, BGCOLOR, BGCOLOR)).getRGB()
+           );
+        } catch (NoSuchFieldException
             | SecurityException
             | IllegalArgumentException
-            | IllegalAccessException e ) {
+            | IllegalAccessException e) {
             // Displays the webview with white background...
         }
-        engine.loadContent( "<head> <style>"
+        engine.loadContent("<head> <style>"
                             + ".description-content" + "{"
                             + "font-family: Sans-Serif" + "}"
                             + "</style> </head>"
                             + "<div class=\"description-content\">"
-                            + item.getDescription() + "</div>" );
+                            + item.getDescription() + "</div>");
     }
 
     public class SelectedAtomPolygon implements
                                      EventHandler<Event> {
 
         @Override
-        public void handle( Event event ) {
-            if ( wmsAtomMapHandler != null
-                 && event instanceof PolygonClickedEvent ) {
+        public void handle(Event event) {
+            if (wmsAtomMapHandler != null
+                 && event instanceof PolygonClickedEvent) {
 
                 PolygonClickedEvent pce = (PolygonClickedEvent) event;
                 PolygonInfos polygonInfos =
@@ -328,14 +354,14 @@ public class FilterAtomController {
                 String polygonName = polygonInfos.getName();
                 String polygonID = polygonInfos.getID();
 
-                if ( polygonName != null && polygonID != null ) {
-                    if ( polygonName.equals( "#@#" ) ) {
-                        statusLogController.setStatusTextUI( I18n.format(
+                if (polygonName != null && polygonID != null) {
+                    if (polygonName.equals("#@#")) {
+                        statusLogController.setStatusTextUI(I18n.format(
                             "status.polygon-intersect",
-                            polygonID ) );
+                            polygonID));
                         return;
                     }
-                    controller.selectServiceType( polygonID );
+                    controller.selectServiceType(polygonID);
                 }
             }
         }

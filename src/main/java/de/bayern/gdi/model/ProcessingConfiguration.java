@@ -43,8 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessingConfiguration {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(ProcessingStepConfiguration.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessingStepConfiguration.class.getName());
 
     /** Name of the config file. */
     public static final String PROCESSING_CONFIG_FILE =

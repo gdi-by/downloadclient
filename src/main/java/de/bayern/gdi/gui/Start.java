@@ -33,8 +33,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Start extends Application {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(Start.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Start.class.getName());
 
     private static final CountDownLatch LATCH = new CountDownLatch(1);
 
@@ -81,7 +80,7 @@ public class Start extends Application {
     @Override
     public void start(Stage primaryStage) {
         SeContainerInitializer initializer = SeContainerInitializer.newInstance();
-        container = initializer.disableDiscovery().addPackages( FxMain.class).initialize();
+        container = initializer.disableDiscovery().addPackages(FxMain.class).initialize();
         container.select(FxMain.class).get().start(primaryStage, getParameters());
     }
 

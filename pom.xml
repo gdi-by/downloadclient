@@ -6,7 +6,7 @@
     <groupId>de.bayern.gdi</groupId>
     <artifactId>downloadclient</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <name>downloadclient</name>
     <url>https://www.gdi.bayern.de/downloadclient.html</url>
     <properties>
@@ -15,12 +15,17 @@
         <maven.compiler.source>${jdk.version}</maven.compiler.source>
         <maven.compiler.target>${jdk.version}</maven.compiler.target>
         <geotools.version>20.3</geotools.version>
-        <mapjfx.version>1.26.3</mapjfx.version>
+        <mapjfx.version>1.32.1</mapjfx.version>
         <monocle.version>8u76-b04</monocle.version>
     </properties>
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -29,10 +34,11 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- build all-in-one uber JAR containing all dependend classes -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -40,6 +46,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.openjfx:*</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
@@ -48,12 +59,6 @@
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
                                     </excludes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.openjfx</artifact>
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
                                 </filter>
                             </filters>
                             <transformers>
@@ -88,11 +93,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.15</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>validate</id>
@@ -114,8 +118,7 @@
                     <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                 </configuration>
             </plugin>
-            -->
-            <!-- Build an executable JAR
+            <!-- Build an executable JAR with all dependencies in /lib -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -137,7 +140,6 @@
                     </archive>
                 </configuration>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -154,7 +156,7 @@
                     <additionalClasspathElements>${project.basedir}/src/resources</additionalClasspathElements>
                 </configuration>
             </plugin>
-            <!--
+            <!-- build an jar with all dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -171,11 +173,10 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -193,7 +194,40 @@
                             </rules>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>enforce-ban-duplicate-classes</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <banDuplicateClasses>
+                                    <ignoreClasses>
+                                    <!--
+                                        <ignoreClass>org.apache.commons.logging.*</ignoreClass>
+                                        <ignoreClass>org.w3c.dom.*</ignoreClass>
+                                    -->
+                                        <ignoreClass>it.geosolutions.jaiext.scale.JaiI18N</ignoreClass>
+                                    </ignoreClasses>
+                                    <scopes>
+                                        <scope>compile</scope>
+                                        <scope>provided</scope>
+                                    </scopes>
+                                    <findAllDuplicates>true</findAllDuplicates>
+                                    <ignoreWhenIdentical>true</ignoreWhenIdentical>
+                                </banDuplicateClasses>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>1.3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
         <resources>
@@ -346,6 +380,11 @@
             <version>2.13.3</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.10.4</version>
@@ -364,7 +403,7 @@
         <dependency>
            <groupId>junit</groupId>
            <artifactId>junit</artifactId>
-           <version>4.12</version>
+           <version>4.13.1</version>
            <scope>test</scope>
         </dependency>
         <dependency>
@@ -375,14 +414,14 @@
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
-            <artifactId>openjfx-monocle</artifactId>
-            <version>${monocle.version}</version>
+            <artifactId>testfx-junit</artifactId>
+            <version>4.0.15-alpha</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
-            <artifactId>testfx-junit</artifactId>
-            <version>4.0.15-alpha</version>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>${monocle.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -407,6 +446,12 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <version>9.8.0-15</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -473,7 +518,7 @@
             <properties>
                 <jdk.version>11</jdk.version>
                 <javafx.version>11.0.2</javafx.version>
-                <mapjfx.version>2.7.3</mapjfx.version>
+                <mapjfx.version>2.14.1</mapjfx.version>
                 <monocle.version>jdk-11+26</monocle.version>
             </properties>
             <build>
@@ -482,7 +527,6 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.8.1</version>
                             <configuration>
                                 <release>${jdk.version}</release>
                             </configuration>

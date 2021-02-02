@@ -1,3 +1,20 @@
+/*
+ * DownloadClient Geodateninfrastruktur Bayern
+ *
+ * (c) 2016 GSt. GDI-BY (gdi.bayern.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.bayern.gdi.gui.controller;
 
 import de.bayern.gdi.gui.UIFactory;
@@ -32,6 +49,7 @@ import static de.bayern.gdi.gui.GuiConstants.OUTPUTFORMAT;
 import static de.bayern.gdi.gui.GuiConstants.STATUS_READY;
 
 /**
+ * Processing chain controller.
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
  */
 @Named
@@ -62,12 +80,12 @@ public class ProcessingChainController {
      *     the event
      */
     @FXML
-    protected void handleChainCheckbox( ActionEvent event ) {
-        if ( chkChain.isSelected() ) {
-            processStepContainter.setVisible( true );
+    protected void handleChainCheckbox(ActionEvent event) {
+        if (chkChain.isSelected()) {
+            processStepContainter.setVisible(true);
         } else {
-            factory.removeAllChainAttributes( chainContainer );
-            processStepContainter.setVisible( false );
+            factory.removeAllChainAttributes(chainContainer);
+            processStepContainter.setVisible(false);
         }
     }
 
@@ -78,57 +96,69 @@ public class ProcessingChainController {
      *     The event
      */
     @FXML
-    protected void handleAddChainItem( ActionEvent event ) {
-        factory.addChainAttribute( chainContainer,
-                                   this::validateChainContainerItems );
+    protected void handleAddChainItem(ActionEvent event) {
+        factory.addChainAttribute(chainContainer,
+                                   this::validateChainContainerItems);
         validateChainContainerItems();
     }
 
-    public void setVisible( boolean isVisible ) {
-        this.processStepContainter.setVisible( isVisible );
+    /**
+     * Sets visibility.
+     * @param isVisible shows container when true otherwise is hidden
+     */
+    public void setVisible(boolean isVisible) {
+        this.processStepContainter.setVisible(isVisible);
     }
 
-    public void setProcessingSteps( List<DownloadConfig.ProcessingStep> steps ) {
-        factory.removeAllChainAttributes( chainContainer );
-        if ( steps != null ) {
-            chkChain.setSelected( true );
-            handleChainCheckbox( new ActionEvent() );
+    /**
+     * Sets processing steps.
+     * @param steps list of steps
+     */
+    public void setProcessingSteps(List<DownloadConfig.ProcessingStep> steps) {
+        factory.removeAllChainAttributes(chainContainer);
+        if (steps != null) {
+            chkChain.setSelected(true);
+            handleChainCheckbox(new ActionEvent());
 
-            for ( DownloadConfig.ProcessingStep iStep : steps ) {
-                factory.addChainAttribute( chainContainer,
-                                           iStep.getName(), iStep.getParams() );
+            for (DownloadConfig.ProcessingStep iStep : steps) {
+                factory.addChainAttribute(chainContainer,
+                                           iStep.getName(), iStep.getParams());
             }
         } else {
-            chkChain.setSelected( false );
-            handleChainCheckbox( new ActionEvent() );
+            chkChain.setSelected(false);
+            handleChainCheckbox(new ActionEvent());
         }
     }
 
+    /**
+     * Returns processing chain parameter.
+     * @return set of parameter
+     */
     public Set<Node> getProcessingChainParameter() {
-        if ( !this.chkChain.isSelected() ) {
+        if (!this.chkChain.isSelected()) {
             Collections.emptyList();
         }
-        return this.chainContainer.lookupAll( "#process_parameter" );
+        return this.chainContainer.lookupAll("#process_parameter");
     }
 
     /**
      * Resets all marks at the processing chain container, items are kept.
      */
     public void resetProcessingChainContainer() {
-        for ( Node o : chainContainer.getChildren() ) {
-            if ( o instanceof VBox ) {
+        for (Node o : chainContainer.getChildren()) {
+            if (o instanceof VBox) {
                 VBox v = (VBox) o;
-                HBox hbox = (HBox) v.getChildren().get( 0 );
-                Node cBox = hbox.getChildren().get( 0 );
-                if ( cBox instanceof ComboBox ) {
-                    cBox.setStyle( FX_BORDER_COLOR_NULL );
+                HBox hbox = (HBox) v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox) {
+                    cBox.setStyle(FX_BORDER_COLOR_NULL);
                     ComboBox box = (ComboBox) cBox;
                     ObservableList<ProcessingStepConfiguration> confs =
                         (ObservableList<ProcessingStepConfiguration>)
                             box.getItems();
-                    for ( ProcessingStepConfiguration cfgI : confs ) {
-                        cfgI.setCompatible( true );
-                        confs.set( confs.indexOf( cfgI ), cfgI );
+                    for (ProcessingStepConfiguration cfgI : confs) {
+                        cfgI.setCompatible(true);
+                        confs.set(confs.indexOf(cfgI), cfgI);
                     }
                 }
             }
@@ -141,20 +171,20 @@ public class ProcessingChainController {
     public void validateChainContainerItems() {
 
         boolean allValid = true;
-        for ( Node o : chainContainer.getChildren() ) {
-            if ( o instanceof VBox ) {
+        for (Node o : chainContainer.getChildren()) {
+            if (o instanceof VBox) {
                 VBox v = (VBox) o;
-                HBox hbox = (HBox) v.getChildren().get( 0 );
-                Node cBox = hbox.getChildren().get( 0 );
-                if ( cBox instanceof ComboBox
-                     && !validateChainContainer( (ComboBox) cBox ) ) {
+                HBox hbox = (HBox) v.getChildren().get(0);
+                Node cBox = hbox.getChildren().get(0);
+                if (cBox instanceof ComboBox
+                     && !validateChainContainer((ComboBox) cBox)) {
                     allValid = false;
                 }
             }
         }
         //If all chain items were ready, set status to ready
-        if ( allValid ) {
-            statusLogController.setStatusTextUI( I18n.format( STATUS_READY ) );
+        if (allValid) {
+            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
         }
     }
 
@@ -166,57 +196,57 @@ public class ProcessingChainController {
      *     Item to validate
      * @return True if chosen item is valid, else false
      */
-    private boolean validateChainContainer( ComboBox box ) {
-        String format = controller.dataBean.getAttributeValue( OUTPUTFORMAT );
-        if ( format == null ) {
-            box.setStyle( FX_BORDER_COLOR_RED );
-            statusLogController.setStatusTextUI( I18n.format( GUI_PROCESS_NO_FORMAT ) );
+    private boolean validateChainContainer(ComboBox box) {
+        String format = controller.dataBean.getAttributeValue(OUTPUTFORMAT);
+        if (format == null) {
+            box.setStyle(FX_BORDER_COLOR_RED);
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NO_FORMAT));
         }
         MIMETypes mtypes = Config.getInstance().getMimeTypes();
-        MIMEType mtype = mtypes.findByName( format );
+        MIMEType mtype = mtypes.findByName(format);
 
         ProcessingStepConfiguration cfg =
             (ProcessingStepConfiguration) box.getValue();
         ObservableList<ProcessingStepConfiguration> items =
             (ObservableList<ProcessingStepConfiguration>) box.getItems();
 
-        if ( format != null && mtype == null ) {
-            box.setStyle( FX_BORDER_COLOR_RED );
-            for ( ProcessingStepConfiguration cfgI : items ) {
-                cfgI.setCompatible( false );
+        if (format != null && mtype == null) {
+            box.setStyle(FX_BORDER_COLOR_RED);
+            for (ProcessingStepConfiguration cfgI : items) {
+                cfgI.setCompatible(false);
                 //Workaround to force cell update
-                items.set( items.indexOf( cfgI ), cfgI );
+                items.set(items.indexOf(cfgI), cfgI);
             }
-            statusLogController.setStatusTextUI( I18n.format( GUI_PROCESS_FORMAT_NOT_FOUND ) );
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_FORMAT_NOT_FOUND));
             return false;
         }
 
         //Mark items that are incompatible
-        for ( ProcessingStepConfiguration cfgI : items ) {
-            if ( format != null ) {
+        for (ProcessingStepConfiguration cfgI : items) {
+            if (format != null) {
                 cfgI.setCompatible(
-                    cfgI.isCompatibleWithFormat( mtype.getType() ) );
+                    cfgI.isCompatibleWithFormat(mtype.getType()));
             } else {
-                cfgI.setCompatible( false );
+                cfgI.setCompatible(false);
             }
-            items.set( items.indexOf( cfgI ), cfgI );
+            items.set(items.indexOf(cfgI), cfgI);
         }
 
-        if ( format == null ) {
+        if (format == null) {
             return false;
         }
 
-        if ( cfg == null ) {
-            box.setStyle( FX_BORDER_COLOR_NULL );
+        if (cfg == null) {
+            box.setStyle(FX_BORDER_COLOR_NULL);
             return true;
         }
 
-        if ( cfg.isCompatible() ) {
-            box.setStyle( FX_BORDER_COLOR_NULL );
+        if (cfg.isCompatible()) {
+            box.setStyle(FX_BORDER_COLOR_NULL);
         } else {
-            box.setStyle( FX_BORDER_COLOR_RED );
-            statusLogController.setStatusTextUI( I18n.format( GUI_PROCESS_NOT_COMPATIBLE,
-                                                              box.getValue() ) );
+            box.setStyle(FX_BORDER_COLOR_RED);
+            statusLogController.setStatusTextUI(I18n.format(GUI_PROCESS_NOT_COMPATIBLE,
+                                                              box.getValue()));
         }
         return cfg.isCompatible();
     }

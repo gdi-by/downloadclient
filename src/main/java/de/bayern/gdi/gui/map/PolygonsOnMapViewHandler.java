@@ -46,8 +46,7 @@ import static de.bayern.gdi.gui.map.MapHandler.POLYGON_LAYER_TITLE;
  */
 public class PolygonsOnMapViewHandler implements MapLayerListListener {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(PolygonsOnMapViewHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PolygonsOnMapViewHandler.class.getName());
 
     private static final Color OUTLINE = Color.rgb(0, 0, 0, 0.8);
     private static final Color SELECTED_FILL = Color.rgb(255, 255, 0, 0.4);

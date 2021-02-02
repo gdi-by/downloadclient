@@ -266,8 +266,8 @@ public final class WFSPostParamsBuilder {
                     typeName = dataset;
                 }
                 Document filterDoc = filter.getFilter();
-                Element queryElement = createQueryElement(meta
-                    , doc, srsName, typeName);
+                Element queryElement = createQueryElement(meta,
+                    doc, srsName, typeName);
                 Node filterElement = filterDoc.getFirstChild().cloneNode(true);
                 Node copiedFilterElement = doc.importNode(filterElement, true);
                 queryElement.appendChild(copiedFilterElement);

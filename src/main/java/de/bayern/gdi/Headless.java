@@ -41,8 +41,7 @@ import java.util.List;
  */
 public class Headless implements ProcessorListener {
 
-    private static final Logger log
-        = LoggerFactory.getLogger(Headless.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Headless.class);
 
     private Headless() {
     }
@@ -55,7 +54,7 @@ public class Headless implements ProcessorListener {
      */
     public static int main(String[] args, String user, String password) {
 
-        log.info("Running in headless mode");
+        LOG.info("Running in headless mode");
 
         Unauthorized unauthorized = new UnauthorizedLog();
         DocumentResponseHandler.setUnauthorized(unauthorized);
@@ -68,12 +67,12 @@ public class Headless implements ProcessorListener {
             if (file.isFile() && file.canRead()) {
                 try {
                     steps.add(DownloadStep.read(file));
-                    log.info("Download steps: " + file.getName());
+                    LOG.info("Download steps: " + file.getName());
                 } catch (IOException ioe) {
-                    log.warn("Cannot load file: " + file.getName(), ioe);
+                    LOG.warn("Cannot load file: " + file.getName(), ioe);
                 }
             } else {
-                log.warn("'" + arg + "' is not a readable file.");
+                LOG.warn("'" + arg + "' is not a readable file.");
             }
         }
 
@@ -96,7 +95,7 @@ public class Headless implements ProcessorListener {
         Thread thread = new Thread(processor);
         thread.start();
 
-        log.info("Executing download steps " + steps);
+        LOG.info("Executing download steps " + steps);
 
         for (DownloadStep step : steps) {
             try {
@@ -104,7 +103,7 @@ public class Headless implements ProcessorListener {
                     new DownloadStepConverter(user, password);
                 processor.addJob(dsc.convert(step));
             } catch (ConverterException ce) {
-                log.warn("Creating download jobs failed", ce);
+                LOG.warn("Creating download jobs failed", ce);
             }
         }
 
@@ -122,13 +121,13 @@ public class Headless implements ProcessorListener {
 
     @Override
     public void receivedMessage(ProcessorEvent pe) {
-        log.info(pe.getMessage());
+        LOG.info(pe.getMessage());
     }
 
     @Override
     public void receivedException(ProcessorEvent pe) {
         JobExecutionException jee = pe.getException();
-        log.error(jee.getMessage(), jee);
+        LOG.error(jee.getMessage(), jee);
     }
 }
 

@@ -48,8 +48,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
 
     private static Unauthorized unauthorized;
 
-    private static final Logger LOG
-            = LoggerFactory.getLogger(DocumentResponseHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentResponseHandler.class.getName());
 
 
     /** Set the Unauthorized handler.
@@ -118,8 +117,7 @@ public class DocumentResponseHandler implements ResponseHandler<Document> {
         try {
             return entity == null
                     ? null
-                    : XML.getDocument(wrap(entity.getContent())
-                        , namespaceAware);
+                    : XML.getDocument(wrap(entity.getContent()), namespaceAware);
         } catch (org.xml.sax.SAXException
                 | ParserConfigurationException e) {
             LOG.error(e.toString(), entity);

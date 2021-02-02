@@ -34,13 +34,12 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 
 /** Load configurations from specified directory. */
-public class Config {
+public final class Config {
 
     private Config() {
     }
 
-    private static final Logger log
-        = LoggerFactory.getLogger(Config.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Config.class.getName());
 
     /** Inner class to implicit synchronize the instance access. */
     private static final class Holder {
@@ -133,7 +132,7 @@ public class Config {
         } catch (SAXException
                 | ParserConfigurationException
                 | IOException e) {
-            log.error(e.getMessage(), Holder.INSTANCE);
+            LOG.error(e.getMessage(), Holder.INSTANCE);
             throwConfigFailureException(Settings.getName());
         }
         // Not reached.
@@ -147,7 +146,7 @@ public class Config {
     private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
-            log.info("No config directory given, starting with standard "
+            LOG.info("No config directory given, starting with standard "
                     + "values...");
             Holder.INSTANCE.settings = loadSettings(null);
             Holder.INSTANCE.processingConfig =
@@ -171,7 +170,7 @@ public class Config {
             Logging.GEOTOOLS.setLoggerFactory(
                 "org.geotools.util.logging.Log4JLoggerFactory");
         } catch (ClassNotFoundException e) {
-            log.warn("Failed to initialize GeoTools logging subsystem: "
+            LOG.warn("Failed to initialize GeoTools logging subsystem: "
                 + e.getLocalizedMessage());
         }
         if (dirname == null) {
@@ -186,17 +185,17 @@ public class Config {
                 }
             }
         }
-        log.trace("System Properties:");
+        LOG.trace("System Properties:");
         System.getProperties().keySet().stream().map(
             k -> (String)k).sorted().forEach(k -> {
-            log.trace(String.format("\t%s=%s", k,
+            LOG.trace(String.format("\t%s=%s", k,
                 System.getProperty(k)));
         });
         Controller.logToAppLog(I18n.format("dlc.config", Config.getInstance()));
     }
 
     private static void load(String dirname) throws IOException {
-        log.info("config directory: " + dirname);
+        LOG.info("config directory: " + dirname);
 
         File dir = new File(dirname);
 
@@ -209,7 +208,7 @@ public class Config {
             Holder.INSTANCE.proxyConfig = ProxyConfiguration.read(proxy);
             Holder.INSTANCE.proxyConfig.apply();
         } else {
-            log.info("No Proxy config found, starting without proxy.");
+            LOG.info("No Proxy config found, starting without proxy.");
         }
 
         File services = new File(dir, Settings.SETTINGS_FILE);
@@ -217,7 +216,7 @@ public class Config {
             Holder.INSTANCE.settings = loadSettings(services);
         } else {
             Holder.INSTANCE.settings = loadSettings(null);
-            log.info("Settings config not found, using fallback...");
+            LOG.info("Settings config not found, using fallback...");
         }
 
         File procConfig = new File(
@@ -228,7 +227,7 @@ public class Config {
         } else {
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
-            log.info("Processing config not found, using fallback...");
+            LOG.info("Processing config not found, using fallback...");
         }
 
         if (Holder.INSTANCE.getProcessingConfig() == null) {
@@ -241,7 +240,7 @@ public class Config {
                 MIMETypes.read(mimeTypes);
         } else {
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
-            log.info("MimeTypes config not found, using fallback...");
+            LOG.info("MimeTypes config not found, using fallback...");
         }
 
         if (Holder.INSTANCE.getMimeTypes() == null) {

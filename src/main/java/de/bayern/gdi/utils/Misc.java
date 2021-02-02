@@ -41,8 +41,7 @@ public final class Misc {
     /** Common prefix. */
     public static final String PREFIX = "gdibydl-";
 
-    private static final Logger LOG
-            = LoggerFactory.getLogger(Misc.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Misc.class.getName());
 
     private Misc() {
     }

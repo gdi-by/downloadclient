@@ -41,7 +41,7 @@ class InfoToolHelperLookup {
          * Constructs a new RuntimeException wrapping an exception.
          * @cause the cause.
          */
-        public InfoToolHelperException(Throwable cause) {
+        InfoToolHelperException(Throwable cause) {
             super(cause);
         }
     }

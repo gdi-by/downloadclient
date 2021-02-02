@@ -66,7 +66,7 @@ public class Issue86IT extends TestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        log.debug("GetCapabilities-URL: " + sb.toString());
+        LOG.debug("GetCapabilities-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -75,7 +75,7 @@ public class Issue86IT extends TestBase {
      */
     @Before
     public void startJadler() {
-        log.debug("Start jadler ...");
+        LOG.debug("Start jadler ...");
         initJadler();
     }
 
@@ -84,7 +84,7 @@ public class Issue86IT extends TestBase {
      */
     @After
     public void stopJadler() {
-        log.debug("Stop jadler ...");
+        LOG.debug("Stop jadler ...");
         closeJadler();
     }
 
