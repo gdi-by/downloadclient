@@ -523,6 +523,10 @@ public class Controller {
         processingChainController.setProcessingSteps( steps );
     }
 
+    public void selectServiceType( String polygonID ) {
+        serviceTypeSelectionController.selectServiceType( polygonID );
+    }
+
     /**
      * Keeps track of download progression and errors.
      */

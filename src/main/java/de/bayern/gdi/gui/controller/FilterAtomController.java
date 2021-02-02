@@ -72,10 +72,6 @@ public class FilterAtomController {
     @Inject
     private StatusLogController statusLogController;
 
-    // TODO: circular dependencies
-    // @Inject
-    // private  ServiceTypeSelectionController serviceTypeSelectionController;
-
     @FXML
     private ComboBox<ItemModel> atomVariationChooser;
 
@@ -339,8 +335,7 @@ public class FilterAtomController {
                             polygonID ) );
                         return;
                     }
-                    // TODO: circular dependencies
-                    //serviceTypeSelectionController.selectServiceType( polygonID );
+                    controller.selectServiceType( polygonID );
                 }
             }
         }
