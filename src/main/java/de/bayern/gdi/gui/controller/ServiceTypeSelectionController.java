@@ -32,11 +32,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.util.Callback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,10 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
 import static de.bayern.gdi.gui.GuiConstants.FX_BORDER_COLOR_NULL;
 import static de.bayern.gdi.gui.GuiConstants.FX_BORDER_COLOR_RED;
 import static de.bayern.gdi.gui.GuiConstants.STATUS_READY;
-import static de.bayern.gdi.gui.FeatureModel.FilterType.FILTER;
 import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 
 /**
@@ -58,8 +53,6 @@ import static de.bayern.gdi.services.ServiceType.WFS_TWO;
 @Named
 @Singleton
 public class ServiceTypeSelectionController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceTypeSelectionController.class.getName());
 
     @Inject
     private Controller controller;
@@ -97,6 +90,12 @@ public class ServiceTypeSelectionController {
         }
     }
 
+    /**
+     * Validates the user input.
+     *
+     * @param fail
+     *     never <code>null</code>>
+     */
     public void validate(Consumer<String> fail) {
         if (serviceTypeChooser.isVisible()
              && serviceTypeChooser.getValue() instanceof MiscItemModel) {
@@ -104,6 +103,9 @@ public class ServiceTypeSelectionController {
         }
     }
 
+    /**
+     * Resets GUI.
+     */
     public void resetGui() {
         Platform.runLater(() ->
                                this.serviceTypeChooser.getItems().retainAll()
@@ -111,53 +113,46 @@ public class ServiceTypeSelectionController {
         this.serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
     }
 
-    public void selectFirst() {
+    /**
+     * Load the passed {@link DownloadConfig}.
+     *
+     * @param downloadConf
+     *     never <code>null</code>
+     */
+    public void loadDownloadConfig(DownloadConfig downloadConf) {
         serviceTypeChooser.getSelectionModel().select(0);
-    }
-
-    void loadDownloadConfig(DownloadConfig conf) {
-        String dataset = conf.getDataset();
-        if (dataset != null) {
-            boolean datasetAvailable = false;
-            List<ItemModel> datasets = serviceTypeChooser.
-                                                             getItems();
-            for (ItemModel iItem : datasets) {
-                if (isFeatureTypeToSelect(iItem, conf)) {
+        if (downloadConf != null) {
+            String dataset = downloadConf.getDataset();
+            if (dataset != null) {
+                boolean datasetAvailable = false;
+                List<ItemModel> datasets = serviceTypeChooser.
+                                                                 getItems();
+                for (ItemModel iItem : datasets) {
+                    if (isFeatureTypeToSelect(iItem, downloadConf)) {
+                        serviceTypeChooser.
+                                              getSelectionModel().select(iItem);
+                        datasetAvailable = true;
+                    }
+                }
+                if (!datasetAvailable) {
+                    MiscItemModel errorItem = new MiscItemModel();
+                    errorItem.setDataset(dataset);
+                    errorItem.setItem(downloadConf.getDataset());
+                    statusLogController.setStatusTextUI(I18n.format("gui.dataset-not-available"));
+                    serviceTypeChooser.getItems().add(errorItem);
                     serviceTypeChooser.
-                                          getSelectionModel().select(iItem);
-                    datasetAvailable = true;
+                                          getSelectionModel().select(errorItem);
                 }
             }
-            if (!datasetAvailable) {
-                MiscItemModel errorItem = new MiscItemModel();
-                errorItem.setDataset(dataset);
-                errorItem.setItem(conf.getDataset());
-                statusLogController.setStatusTextUI(
-                    I18n.format("gui.dataset-not-available"));
-                serviceTypeChooser.getItems().add(errorItem);
-                serviceTypeChooser.
-                                      getSelectionModel().select(errorItem);
-            }
+            setCellFactories();
+            filterAtomController.setCellFactories();
+            filterWfsBasicController.setCellFactories();
+            loadGUIComponents();
         }
-        setCellFactories();
-        filterAtomController.setCellFactories();
-        filterWfsBasicController.setCellFactories();
-        loadGUIComponents();
-    }
-
-    private void setCellFactories() {
-        serviceTypeChooser.setCellFactory(
-            new Callback<ListView<ItemModel>,
-                ListCell<ItemModel>>() {
-                @Override
-                public ListCell<ItemModel> call(ListView<ItemModel> list) {
-                    return new CellTypes.ItemCell();
-                }
-            });
     }
 
     /**
-     * Sets the Service Types.
+     * Sets the service types.
      */
     public void setServiceTypes() {
         if (controller.dataBean.isWebServiceSet()) {
@@ -189,20 +184,12 @@ public class ServiceTypeSelectionController {
         }
     }
 
-    private void chooseType(ItemModel data) {
-        ServiceType type = controller.dataBean.getServiceType();
-        boolean datasetAvailable = false;
-        if (data instanceof MiscItemModel) {
-            serviceTypeChooser.setStyle(FX_BORDER_COLOR_RED);
-            statusLogController.setStatusTextUI(I18n.format("gui.dataset-not-available"));
-        } else {
-            serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
-            datasetAvailable = true;
-            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
-        }
-        controller.chooseServiceType(data, type, datasetAvailable);
-    }
-
+    /**
+     * Select the service type with the passed id.
+     *
+     * @param id
+     *     the id of the service to select
+     */
     public void selectServiceType(String id) {
         ObservableList<ItemModel> items =
             serviceTypeChooser.getItems();
@@ -218,10 +205,28 @@ public class ServiceTypeSelectionController {
             .getSelectionModel()
             .getSelectedItem().getItem();
         if (i < items.size()
-             && !oldItem.getID().equals(id)) {
+            && !oldItem.getID().equals(id)) {
             serviceTypeChooser.setValue(items.get(i));
             chooseType(serviceTypeChooser.getValue());
         }
+    }
+
+    private void setCellFactories() {
+        serviceTypeChooser.setCellFactory(list -> new CellTypes.ItemCell());
+    }
+
+    private void chooseType(ItemModel data) {
+        ServiceType type = controller.dataBean.getServiceType();
+        boolean datasetAvailable = false;
+        if (data instanceof MiscItemModel) {
+            serviceTypeChooser.setStyle(FX_BORDER_COLOR_RED);
+            statusLogController.setStatusTextUI(I18n.format("gui.dataset-not-available"));
+        } else {
+            serviceTypeChooser.setStyle(FX_BORDER_COLOR_NULL);
+            datasetAvailable = true;
+            statusLogController.setStatusTextUI(I18n.format(STATUS_READY));
+        }
+        controller.chooseServiceType(data, type, datasetAvailable);
     }
 
     private boolean isFeatureTypeToSelect(ItemModel iItem,
@@ -240,7 +245,7 @@ public class ServiceTypeSelectionController {
     private void loadGUIComponents() {
         switch (controller.downloadConfig.getServiceType()) {
         case "ATOM":
-            filterAtomController.loadAtom();
+            filterAtomController.initialiseGuiComponents();
             break;
         case "WFS2_BASIC":
             filterWfsBasicController.initialiseCrsChooser();
@@ -248,7 +253,7 @@ public class ServiceTypeSelectionController {
             filterWfsBasicController.initializeDataFormatChooser();
             break;
         case "WFS2_SIMPLE":
-            filterWfsSimpleController.loadWfsSimple();
+            filterWfsSimpleController.initialiseGuiComponents();
             break;
         case "WFS2_SQL":
             filterWfsBasicController.initialiseCrsChooser();

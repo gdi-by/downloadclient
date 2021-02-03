@@ -154,6 +154,11 @@ public class Controller {
         processingChainController.validateChainContainerItems();
     }
 
+    /**
+     * Extracts the processing steps.
+     *
+     * @return all processing steps, may be <code>empty</code> but never <code>null</code>
+     */
     public List<ProcessingStep> extractProcessingSteps() {
         List<ProcessingStep> steps = new ArrayList<>();
         Set<Node> parameter =
@@ -248,7 +253,7 @@ public class Controller {
 
     void extractCql() {
         if (dataBean.isFilterType()) {
-            String sqlInput = filterWfsBasicController.getSqlText();
+            String sqlInput = filterWfsBasicController.getCqlText();
             if (sqlInput != null && !sqlInput.isEmpty()) {
                 this.dataBean.addAttribute("CQL", sqlInput, "");
             }
@@ -347,7 +352,7 @@ public class Controller {
 
     boolean validateCqlInput() {
         if (dataBean.isFilterType()) {
-            String sqlInput = filterWfsBasicController.getSqlText();
+            String sqlInput = filterWfsBasicController.getCqlText();
             statusLogController.setLogHistoryStyle(null);
             if (sqlInput == null || sqlInput.isEmpty()) {
                 statusLogController.setLogHistoryStyle("-fx-text-fill: #FF0000");
@@ -389,6 +394,13 @@ public class Controller {
         processingChainController.resetProcessingChainContainer();
     }
 
+    /**
+     * Collects the available service types.
+     *
+     * @param isWfs2
+     *     <code>true</code> if the service is a WFS 2, <code>false</code> otherwise
+     * @return the available service types. may be <code>empty</code> but never <code>null</code>
+     */
     public ObservableList<ItemModel> collectServiceTypes(boolean isWfs2) {
         ReferencedEnvelope extendWFS = null;
         List<WFSMeta.Feature> features =
@@ -419,6 +431,12 @@ public class Controller {
         return types;
     }
 
+    /**
+     * Adds new stored queries to the data bean.
+     *
+     * @param types
+     *     the stored queries to add, never <code>null</code>
+     */
     public void addStoredQueries(ObservableList<ItemModel> types) {
         List<WFSMeta.StoredQuery> queries =
             dataBean.getWFSService().getStoredQueries();
@@ -427,9 +445,15 @@ public class Controller {
         }
     }
 
+    /**
+     * Select the service type.
+     * @param data never <code>null</code>
+     * @param type the type of the service
+     * @param datasetAvailable <code>true</code> if a dataset is available, <code>false</code> otherwise
+     */
     public void chooseServiceType(ItemModel data, ServiceType type, boolean datasetAvailable) {
         if (type == ServiceType.ATOM) {
-            filterAtomController.chooseAtomType(data, datasetAvailable);
+            filterAtomController.initGui(data, datasetAvailable);
             enableAtomType();
         } else if (type == WFS_TWO) {
             if (data instanceof FeatureModel
@@ -512,14 +536,27 @@ public class Controller {
         this.primaryStage = primaryStage;
     }
 
+    /**
+     * Validates the process steps.
+     */
     public void validateChainContainerItems() {
         processingChainController.validateChainContainerItems();
     }
 
+    /**
+     * Sets the processing steps.
+     * @param steps to set
+     */
     public void setProcessingSteps(List<DownloadConfig.ProcessingStep> steps) {
         processingChainController.setProcessingSteps(steps);
     }
 
+    /**
+     * Selects the service type.
+     *
+     * @param polygonID
+     *     id of the selected polygon
+     */
     public void selectServiceType(String polygonID) {
         serviceTypeSelectionController.selectServiceType(polygonID);
     }

@@ -201,6 +201,12 @@ public class FilterWfsBasicController {
         controller.handleDataformatSelect(cb);
     }
 
+    /**
+     * Initialise the GUI with the passed data.
+     *
+     * @param data
+     *     never <code>null</code>
+     */
     public void initGui(ItemModel data) {
         boolean isSqlFilterType = false;
         if (data instanceof OverallFeatureTypeModel) {
@@ -255,6 +261,9 @@ public class FilterWfsBasicController {
         this.dataFormatChooser.getSelectionModel().selectFirst();
     }
 
+    /**
+     * Resets GUI.
+     */
     public void resetGui() {
         if (wmsWfsMapHandler != null) {
             this.wmsWfsMapHandler.reset();
@@ -266,6 +275,12 @@ public class FilterWfsBasicController {
         this.referenceSystemChooserLabel.setVisible(false);
     }
 
+    /**
+     * Validates the user input.
+     *
+     * @param fail
+     *     never <code>null</code>>
+     */
     public void validate(Consumer<String> fail) {
         if (referenceSystemChooser.isVisible()
              && !referenceSystemChooser.getValue().isAvailable()) {
@@ -278,6 +293,10 @@ public class FilterWfsBasicController {
         }
     }
 
+    /**
+     * Initialise the map handler.
+     * @param serviceSetting never <code>null</code>
+     */
     public void initMapHandler(ServiceSettings serviceSetting) {
         this.wmsWfsMapHandler = MapHandlerBuilder
             .newBuilder(serviceSetting)
@@ -302,15 +321,29 @@ public class FilterWfsBasicController {
             .build();
     }
 
+    /**
+     * Sets the visibility.
+     * @param isVisible is shown when true otherwise hidden
+     */
     public void setVisible(boolean isVisible) {
         this.basicWFSContainer.setVisible(isVisible);
     }
 
+    /**
+     * Checks if the passed url is reachable.
+     *
+     * @param url
+     *     to check, must not be <code>null</code>
+     * @return <code>true</code> if reachable, <code>false</code> otherwise
+     */
     public boolean isReachable(URL url) {
         return ServiceChecker
             .isReachable(wmsWfsMapHandler.getCapabiltiesURL(url));
     }
 
+    /**
+     * Sets the cell factories of this controller.
+     */
     public void setCellFactories() {
         referenceSystemChooser.setCellFactory(
             new Callback<ListView<CRSModel>,
@@ -332,14 +365,30 @@ public class FilterWfsBasicController {
             });
     }
 
+    /**
+     * Sets the extends.
+     *
+     * @param extendWFS
+     *     to set, never <code>null</code>
+     */
     public void setExtent(ReferencedEnvelope extendWFS) {
         wmsWfsMapHandler.setExtend(extendWFS);
     }
 
-    public String getSqlText() {
+    /**
+     * Returns the cql filter expression.
+     *
+     * @return the cql filter expression
+     */
+    public String getCqlText() {
         return sqlTextarea.getText();
     }
 
+    /**
+     * Retunrs the selected bounding box.
+     *
+     * @return the selected bounding box
+     */
     public String getBoundingBox() {
         Envelope2D envelope = this.wmsWfsMapHandler.getBounds(
             referenceSystemChooser.
@@ -363,6 +412,9 @@ public class FilterWfsBasicController {
         return bbox.toString();
     }
 
+    /**
+     * Initialise the bounding box component.
+     */
     public void initializeBoundingBox() {
         if (controller.downloadConfig.getBoundingBox() != null) {
             String[] bBox = controller.downloadConfig.getBoundingBox().split(",");
@@ -373,6 +425,9 @@ public class FilterWfsBasicController {
         }
     }
 
+    /**
+     * Initialise the cql text area component.
+     */
     public void initializeCqlTextArea() {
         if (controller.downloadConfig != null) {
             String cql = controller.downloadConfig.getCql();
@@ -380,6 +435,9 @@ public class FilterWfsBasicController {
         }
     }
 
+    /**
+     * Initialise the data format component.
+     */
     public void initializeDataFormatChooser() {
         boolean outputFormatAvailable = false;
         for (OutputFormatModel i : dataFormatChooser.getItems()) {

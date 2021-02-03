@@ -168,9 +168,9 @@ public class FilterAtomController {
     }
 
     /**
-     * Loads Atom feed.
+     * Initialise GUI components.
      */
-    public void loadAtom() {
+    public void initialiseGuiComponents() {
         boolean variantAvailable = false;
         for (ItemModel i : atomVariationChooser.getItems()) {
             Atom.Field field = (Atom.Field) i.getItem();
@@ -206,6 +206,12 @@ public class FilterAtomController {
         }
     }
 
+    /**
+     * Validates the user input.
+     *
+     * @param fail
+     *     never <code>null</code>>
+     */
     public void validate(Consumer<String> fail) {
         if (atomContainer.isVisible()
              && atomVariationChooser.getValue() instanceof MiscItemModel) {
@@ -213,6 +219,10 @@ public class FilterAtomController {
         }
     }
 
+    /**
+     * Initialise the map handler.
+     * @param serviceSetting never <code>null</code>
+     */
     public void initMapHandler(ServiceSettings serviceSetting) {
         this.wmsAtomMapHandler = MapHandlerBuilder
             .newBuilder(serviceSetting)
@@ -227,12 +237,19 @@ public class FilterAtomController {
                                      new SelectedAtomPolygon());
     }
 
+    /**
+     * Highlight the polygon identified by the passed item.
+     * @param item never <code>null</code>
+     */
     public void highlightPolygon(Atom.Item item) {
         if (wmsAtomMapHandler != null) {
             wmsAtomMapHandler.highlightSelectedPolygon(item.getID());
         }
     }
 
+    /**
+     * Sets the cell factories of this controller.
+     */
     public void setCellFactories() {
         atomVariationChooser.setCellFactory(
             new Callback<ListView<ItemModel>,
@@ -244,6 +261,13 @@ public class FilterAtomController {
             });
     }
 
+    /**
+     * Creates a list with the items.
+     *
+     * @param items
+     *     never <code>null</code>
+     * @return the list, may be <code>empty</code> but never <code>null</code>
+     */
     public ObservableList<ItemModel> chooseType(List<Atom.Item> items) {
         ObservableList<ItemModel> opts =
             FXCollections.observableArrayList();
@@ -283,7 +307,15 @@ public class FilterAtomController {
         return opts;
     }
 
-    public void chooseAtomType(ItemModel data, boolean datasetAvailable) {
+    /**
+     * Initialise the GUI with the passed data.
+     *
+     * @param data
+     *     never <code>null</code>
+     * @param datasetAvailable
+     *     <code> true</code> if a dataset is available
+     */
+    public void initGui(ItemModel data, boolean datasetAvailable) {
         Atom.Item item;
         if (datasetAvailable) {
             item = (Atom.Item) data.getItem();

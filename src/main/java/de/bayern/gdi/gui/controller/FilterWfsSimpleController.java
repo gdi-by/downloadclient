@@ -68,11 +68,22 @@ public class FilterWfsSimpleController {
 
     private UIFactory factory = new UIFactory();
 
+    /**
+     * Sets the visibility.
+     * @param isVisible is shown when true otherwise hidden
+     */
     public void setVisible(boolean isVisible) {
         this.simpleWFSContainer.setVisible(isVisible);
     }
 
-
+    /**
+     * Initialise the GUI with the passed data.
+     *
+     * @param data
+     *     never <code>null</code>
+     * @param datasetAvailable
+     *     <code> true</code> if a dataset is available
+     */
     public void initGui(ItemModel data, boolean datasetAvailable) {
         List<String> outputFormats = controller.dataBean.getWFSService()
                                                   .findOperation("GetFeature").getOutputFormats();
@@ -111,6 +122,9 @@ public class FilterWfsSimpleController {
         }
     }
 
+    /**
+     * Stores the filter attributes of stored query in the data bean.
+     */
     public void setStoredQueryAttributes() {
         controller.dataBean.setAttributes(new ArrayList<DataBean.Attribute>());
 
@@ -176,7 +190,10 @@ public class FilterWfsSimpleController {
         }
     }
 
-    public void loadWfsSimple() {
+    /**
+     * Initialise GUI components.
+     */
+    public void initialiseGuiComponents() {
         ObservableList<Node> children
             = simpleWFSContainer.getChildren();
         Map<String, String> parameters = controller.downloadConfig.getParams();
@@ -240,6 +257,12 @@ public class FilterWfsSimpleController {
         }
     }
 
+    /**
+     * Validates the user input.
+     *
+     * @param fail
+     *     never <code>null</code>>
+     */
     public void validate(Consumer<String> fail) {
         if (simpleWFSContainer.isVisible()) {
             ObservableList<Node> children

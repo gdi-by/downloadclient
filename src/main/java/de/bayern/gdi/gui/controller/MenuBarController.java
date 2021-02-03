@@ -206,7 +206,7 @@ public class MenuBarController {
         try {
             controller.downloadConfig = new DownloadConfig(configFile);
             String serviceURL = controller.downloadConfig.getServiceURL();
-            serviceSelectionController.setServiceUrl(serviceURL, controller.downloadConfig);
+            serviceSelectionController.loadDownloadConfig(serviceURL, controller.downloadConfig);
         } catch (IOException
             | ParserConfigurationException
             | SAXException e) {

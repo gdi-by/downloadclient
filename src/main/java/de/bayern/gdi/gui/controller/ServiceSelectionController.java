@@ -201,7 +201,7 @@ public class ServiceSelectionController {
         this.serviceList.getItems().clear();
         controller.dataBean.resetCatalogLists();
         if (currentText == null || currentText.isEmpty()) {
-            this.serviceList.setItems(controller.dataBean.getServicesAsList());
+            setServices(controller.dataBean.getServicesAsList());
         }
 
         String searchValue = currentText == null
@@ -258,18 +258,35 @@ public class ServiceSelectionController {
             th.setDaemon(true);
             th.start();
         }
-        this.serviceList.setItems(subentries);
+        setServices(subentries);
     }
 
-    public void setServiceUrl(String url, DownloadConfig downloadConfig) {
+    /**
+     * Initialise the GUI with the passed url and config.
+     *
+     * @param url
+     *     never <code>null</code>
+     * @param downloadConfig
+     *     never <code>null</code>
+     */
+    public void loadDownloadConfig(String url, DownloadConfig downloadConfig) {
         this.serviceURL.setText(url);
         doSelectService(downloadConfig);
     }
 
+    /**
+     * Sets the services.
+     *
+     * @param servicesAsList
+     *     may be <code>empty</code>> but never <code>null</code>
+     */
     public void setServices(ObservableList<ServiceModel> servicesAsList) {
         this.serviceList.setItems(servicesAsList);
     }
 
+    /**
+     * Resets GUI.
+     */
     public void resetGui() {
         this.progressSearch.setVisible(false);
         this.serviceUser.setDisable(true);
@@ -556,10 +573,7 @@ public class ServiceSelectionController {
             return;
         }
         Platform.runLater(() -> {
-            serviceTypeSelectionController.selectFirst();
-            if (downloadConf != null) {
-                serviceTypeSelectionController.loadDownloadConfig(downloadConf);
-            }
+            serviceTypeSelectionController.loadDownloadConfig(downloadConf);
             statusLogController.setStatusTextUI(I18n.getMsg(STATUS_READY));
         });
         return;
