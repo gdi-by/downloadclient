@@ -23,7 +23,7 @@ import de.bayern.gdi.services.WFSMeta;
  * Model class to display WFS features.
  */
 public class FeatureModel implements ItemModel {
-
+//12345678901234567890123456789012345678901234567890123456789012345678901234567890
     /**
      * FilterType (Filter or BBox).
      */
