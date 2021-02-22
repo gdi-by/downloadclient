@@ -43,6 +43,7 @@ import static net.jadler.Jadler.port;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
+import static org.xmlunit.matchers.ValidationMatcher.valid;
 
 /**
  * Test class to verify WFS GetFeature request builder.
@@ -72,8 +73,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
             is(getValue(downloadStep, "srsName")))
@@ -98,8 +98,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
             is(getValue(downloadStep, "srsName")))
@@ -125,8 +124,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
             is(getValue(downloadStep, "srsName")))
@@ -152,8 +150,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, HasXPathMatcher.hasXPath(
             "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']")
@@ -179,8 +176,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("2"))
@@ -210,8 +206,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfs()));
+        assertThat(wfsRequest, valid(wfs()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("2"))
@@ -240,8 +235,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfsAndGml()));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("1"))
@@ -276,8 +270,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfsAndGml()));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("1"))
@@ -311,8 +304,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfsAndGml()));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("1"))
@@ -348,8 +340,7 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        // Validation fails when xmlunit is used
-        //assertThat(wfsRequest, valid(wfsAndGml()));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
         assertThat(wfsRequest, hasXPath(
             "count(/wfs:GetFeature/wfs:Query)", is("1"))
