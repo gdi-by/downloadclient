@@ -17,30 +17,26 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.gui.controller.Controller;
 import de.bayern.gdi.gui.DataBean;
-import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.gui.WarningPopup;
+import de.bayern.gdi.gui.controller.ButtonBarController;
+import de.bayern.gdi.gui.controller.Controller;
+import de.bayern.gdi.gui.controller.FXMLLoaderProducer;
+import de.bayern.gdi.gui.controller.FilterAtomController;
+import de.bayern.gdi.gui.controller.FilterWfsBasicController;
+import de.bayern.gdi.gui.controller.FilterWfsSimpleController;
+import de.bayern.gdi.gui.controller.MenuBarController;
+import de.bayern.gdi.gui.controller.ProcessingChainController;
+import de.bayern.gdi.gui.controller.ServiceSelectionController;
+import de.bayern.gdi.gui.controller.ServiceTypeSelectionController;
+import de.bayern.gdi.gui.controller.StatusLogController;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.SceneConstants;
-
-import static de.bayern.gdi.utils.SceneConstants.CQL_INPUT;
-import static de.bayern.gdi.utils.SceneConstants.DATAFORMATCHOOSER;
-import static de.bayern.gdi.utils.SceneConstants.HEIGHT;
-import static de.bayern.gdi.utils.SceneConstants.HISTORY_PARENT;
-import static de.bayern.gdi.utils.SceneConstants.PROCESSINGSTEPS;
-import static de.bayern.gdi.utils.SceneConstants.PROCESS_SELECTION;
-import static de.bayern.gdi.utils.SceneConstants.READY_STATUS;
-import static de.bayern.gdi.utils.SceneConstants.SERVICE_LIST;
-import static de.bayern.gdi.utils.SceneConstants.SERVICE_TYPE_CHOOSER;
-import static de.bayern.gdi.utils.SceneConstants.WIDTH;
 import de.bayern.gdi.utils.Unauthorized;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,18 +49,32 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import static org.awaitility.Awaitility.await;
+import org.jboss.weld.junit4.WeldInitiator;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testfx.framework.junit.ApplicationTest;
 
+import javax.inject.Inject;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import org.junit.BeforeClass;
-import org.testfx.framework.junit.ApplicationTest;
+import static de.bayern.gdi.utils.SceneConstants.CQL_INPUT;
+import static de.bayern.gdi.utils.SceneConstants.DATAFORMATCHOOSER;
+import static de.bayern.gdi.utils.SceneConstants.HEIGHT;
+import static de.bayern.gdi.utils.SceneConstants.HISTORY_PARENT;
+import static de.bayern.gdi.utils.SceneConstants.PROCESSINGSTEPS;
+import static de.bayern.gdi.utils.SceneConstants.PROCESS_SELECTION;
+import static de.bayern.gdi.utils.SceneConstants.READY_STATUS;
+import static de.bayern.gdi.utils.SceneConstants.SERVICE_LIST;
+import static de.bayern.gdi.utils.SceneConstants.SERVICE_TYPE_CHOOSER;
+import static de.bayern.gdi.utils.SceneConstants.WIDTH;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Base Class for JavaFXTests.
@@ -102,8 +112,22 @@ public abstract class TestBase extends ApplicationTest {
      */
     protected static final Logger LOG = LoggerFactory.getLogger(TestBase.class);
 
-    // Overrides and Annotated Methods
+    /**
+     * The WeldInitiator.
+     */
+    @Rule
+    public WeldInitiator weld = WeldInitiator.from(FXMLLoaderProducer.class, Controller.class,
+                                                    MenuBarController.class, StatusLogController.class,
+                                                    ServiceSelectionController.class, ProcessingChainController.class,
+                                                    ServiceTypeSelectionController.class, FilterAtomController.class,
+                                                    FilterWfsBasicController.class, FilterWfsSimpleController.class,
+                                                    ButtonBarController.class)
+                                             .inject(this).build();;
 
+    @Inject
+    private FXMLLoader fxmlLoader;
+
+    // Overrides and Annotated Methods
     /**
      * Initial phase.
      */
@@ -125,24 +149,21 @@ public abstract class TestBase extends ApplicationTest {
     public void start(Stage primaryStage) throws Exception {
         LOG.debug("start stage ...");
         Config.initialize(null);
-
         LOG.debug("Preparing app for controller tests");
-        ClassLoader classLoader = Start.class.getClassLoader();
-        URL url = classLoader.getResource("download-client.fxml");
-        FXMLLoader fxmlLoader = new FXMLLoader(url, I18n.getBundle());
-        Parent root = fxmlLoader.load();
-        scene = new Scene(root, WIDTH, HEIGHT);
-        controller = fxmlLoader.getController();
-        controller.setDataBean(getDataBean());
-        controller.setPrimaryStage(primaryStage);
-        Unauthorized unauthorized = new WarningPopup();
-        FileResponseHandler.setUnauthorized(unauthorized);
-        DocumentResponseHandler.setUnauthorized(unauthorized);
-        Image image = new Image(Misc.getResource("img/" + LOGONAME));
-        primaryStage.getIcons().add(image);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
+        try (InputStream mainfxml = getClass().getResourceAsStream("/download-client.fxml")) {
+            Parent root = fxmlLoader.load(mainfxml);
+            scene = new Scene(root, WIDTH, HEIGHT);
+            controller = fxmlLoader.getController();
+            controller.setDataBean(getDataBean());
+            controller.setPrimaryStage(primaryStage);
+            Unauthorized unauthorized = new WarningPopup();
+            FileResponseHandler.setUnauthorized(unauthorized);
+            DocumentResponseHandler.setUnauthorized(unauthorized);
+            Image image = new Image(Misc.getResource("img/" + LOGONAME));
+            primaryStage.getIcons().add(image);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }
     }
 
     /**
