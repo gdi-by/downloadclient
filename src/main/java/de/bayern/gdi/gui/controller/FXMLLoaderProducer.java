@@ -38,7 +38,7 @@ public class FXMLLoaderProducer {
     public FXMLLoader createLoader() {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setResources(I18n.getBundle());
-        fxmlLoader.setLocation(getClass().getResource("/"));
+        fxmlLoader.setLocation(getClass().getResource("/download-client.fxml"));
         fxmlLoader.setControllerFactory(param -> instance.select(param).get());
         return fxmlLoader;
     }

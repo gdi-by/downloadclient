@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
@@ -60,8 +59,8 @@ public class FxMain {
      * @param parameters application parameters
      */
     public void start(Stage primaryStage, Application.Parameters parameters) {
-        try (InputStream mainfxml = getClass().getResourceAsStream("/download-client.fxml")) {
-            Parent root = fxmlLoader.load(mainfxml);
+        try {
+            Parent root = fxmlLoader.load();
             Scene scene = new Scene(root, WIDTH, HEIGHT);
             DataBean dataBean = forceDataBean();
             Controller controller = fxmlLoader.getController();

@@ -58,7 +58,6 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
@@ -150,20 +149,18 @@ public abstract class TestBase extends ApplicationTest {
         LOG.debug("start stage ...");
         Config.initialize(null);
         LOG.debug("Preparing app for controller tests");
-        try (InputStream mainfxml = getClass().getResourceAsStream("/download-client.fxml")) {
-            Parent root = fxmlLoader.load(mainfxml);
-            scene = new Scene(root, WIDTH, HEIGHT);
-            controller = fxmlLoader.getController();
-            controller.setDataBean(getDataBean());
-            controller.setPrimaryStage(primaryStage);
-            Unauthorized unauthorized = new WarningPopup();
-            FileResponseHandler.setUnauthorized(unauthorized);
-            DocumentResponseHandler.setUnauthorized(unauthorized);
-            Image image = new Image(Misc.getResource("img/" + LOGONAME));
-            primaryStage.getIcons().add(image);
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        }
+        Parent root = fxmlLoader.load();
+        scene = new Scene(root, WIDTH, HEIGHT);
+        controller = fxmlLoader.getController();
+        controller.setDataBean(getDataBean());
+        controller.setPrimaryStage(primaryStage);
+        Unauthorized unauthorized = new WarningPopup();
+        FileResponseHandler.setUnauthorized(unauthorized);
+        DocumentResponseHandler.setUnauthorized(unauthorized);
+        Image image = new Image(Misc.getResource("img/" + LOGONAME));
+        primaryStage.getIcons().add(image);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     /**
