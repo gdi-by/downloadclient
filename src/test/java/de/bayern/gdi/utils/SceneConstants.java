@@ -122,7 +122,7 @@ public class SceneConstants {
      * Selection field.
      */
     public static final String SERVICE_SELECTION =
-        "#serviceSelection";
+        "#serviceSelectionBt";
 
     /**
      * Selection of service kinds.

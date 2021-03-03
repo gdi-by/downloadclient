@@ -94,7 +94,7 @@ public class ServiceSelectionController {
     private TextField serviceURL;
 
     @FXML
-    private Button serviceSelection;
+    private Button serviceSelectionBt;
 
     @FXML
     private CheckBox serviceAuthenticationCbx;
@@ -134,7 +134,7 @@ public class ServiceSelectionController {
                     (ServiceModel) this.serviceList.getSelectionModel()
                                                    .getSelectedItems().get(0);
                 if (serviceModel != null) {
-                    serviceSelection.setDisable(true);
+                    serviceSelectionBt.setDisable(true);
                     serviceURL.getScene().setCursor(Cursor.WAIT);
                     statusLogController.setStatusTextUI(
                         I18n.format("status.checking-auth"));
@@ -144,7 +144,7 @@ public class ServiceSelectionController {
                                 selectService(serviceModel.getItem());
                                 return 0;
                             } finally {
-                                serviceSelection.setDisable(false);
+                                serviceSelectionBt.setDisable(false);
                                 serviceURL.getScene().setCursor(Cursor.DEFAULT);
                             }
                         }
@@ -315,7 +315,7 @@ public class ServiceSelectionController {
     private void doSelectService(DownloadConfig downloadConf) {
         LOG.info("Using download config: " + downloadConf);
         controller.dataBean.resetSelectedService();
-        serviceSelection.setDisable(true);
+        serviceSelectionBt.setDisable(true);
         serviceURL.getScene().setCursor(Cursor.WAIT);
         serviceURL.setDisable(true);
         controller.resetGui();
@@ -352,12 +352,12 @@ public class ServiceSelectionController {
                     statusLogController.setStatusTextUI(
                         I18n.format("status.service-timeout"));
                     controller.dataBean.setSelectedService(null);
-                    serviceSelection.setDisable(false);
+                    serviceSelectionBt.setDisable(false);
                     serviceURL.setDisable(false);
                     serviceURL.getScene().setCursor(Cursor.DEFAULT);
                     return;
                 }
-                serviceSelection.setDisable(true);
+                serviceSelectionBt.setDisable(true);
                 serviceURL.getScene().setCursor(Cursor.WAIT);
                 statusLogController.setStatusTextUI(
                     I18n.format("status.checking-auth"));
@@ -373,7 +373,7 @@ public class ServiceSelectionController {
                             }
                             return 0;
                         } finally {
-                            serviceSelection.setDisable(false);
+                            serviceSelectionBt.setDisable(false);
                             serviceURL.getScene()
                                       .setCursor(Cursor.DEFAULT);
                             serviceURL.setDisable(false);
@@ -388,7 +388,7 @@ public class ServiceSelectionController {
                 statusLogController.setStatusTextUI(
                     I18n.format("status.no-url"));
                 LOG.error(e.getMessage(), e);
-                serviceSelection.setDisable(false);
+                serviceSelectionBt.setDisable(false);
                 serviceURL.getScene()
                           .setCursor(Cursor.DEFAULT);
                 serviceURL.setDisable(false);

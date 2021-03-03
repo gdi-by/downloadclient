@@ -125,7 +125,7 @@
                         <Tooltip text="%tooltip.url"/>
                     </tooltip>
                 </TextField>
-                <Button fx:id="serviceSelection"
+                <Button fx:id="serviceSelectionBt"
                         alignment="CENTER_RIGHT"
                         mnemonicParsing="false"
                         onMouseClicked="#handleServiceSelectButton"
