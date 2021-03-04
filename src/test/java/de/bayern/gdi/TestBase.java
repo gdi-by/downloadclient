@@ -30,7 +30,7 @@ import de.bayern.gdi.gui.controller.ProcessingChainController;
 import de.bayern.gdi.gui.controller.ServiceSelectionController;
 import de.bayern.gdi.gui.controller.ServiceTypeSelectionController;
 import de.bayern.gdi.gui.controller.StatusLogController;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;

@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.config.ServiceSettings;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.xml.sax.SAXException;

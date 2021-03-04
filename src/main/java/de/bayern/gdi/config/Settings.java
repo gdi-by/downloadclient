@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.config;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import javax.xml.parsers.ParserConfigurationException;
+
+import de.bayern.gdi.utils.Misc;
+import de.bayern.gdi.utils.XML;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

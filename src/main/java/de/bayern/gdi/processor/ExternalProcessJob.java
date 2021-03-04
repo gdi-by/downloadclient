@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.bayern.gdi.model.ProxyConfiguration;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;

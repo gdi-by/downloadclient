@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.config;
 
 import de.bayern.gdi.services.Service;
 
@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.xml.xpath.XPathConstants;
 
+import de.bayern.gdi.utils.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -178,7 +179,7 @@ public class ServiceSettings {
 
         StringBuilder pattern = new StringBuilder();
 
-        NodeList nodes = (NodeList)XML.xpath(
+        NodeList nodes = (NodeList) XML.xpath(
             doc, CHECK_WITH_GET_XPATH,
             XPathConstants.NODESET, null, null);
 

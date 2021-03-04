@@ -29,7 +29,7 @@ import de.bayern.gdi.gui.map.MapHandlerBuilder;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.ServiceSettings;
+import de.bayern.gdi.config.ServiceSettings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

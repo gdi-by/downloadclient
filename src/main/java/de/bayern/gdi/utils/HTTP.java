@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 
+import de.bayern.gdi.config.ApplicationSettings;
+import de.bayern.gdi.config.Config;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi;
 
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;

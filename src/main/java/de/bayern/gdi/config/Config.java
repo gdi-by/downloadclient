@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.utils;
+package de.bayern.gdi.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
 
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Info;
 import org.geotools.util.logging.Logging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

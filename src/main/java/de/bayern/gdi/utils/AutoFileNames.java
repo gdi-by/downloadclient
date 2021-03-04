@@ -17,6 +17,8 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.config.Config;
+
 /**
  * A class to automatically generate formated filenames.
  * The extension is determined by a MIME type.
