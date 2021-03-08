@@ -17,6 +17,9 @@
  */
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.config.ApplicationSettings;
+import de.bayern.gdi.config.Config;
+import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.gui.ServiceModel;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Service;
@@ -298,6 +301,19 @@ public class ServiceSelectionController {
         this.servicePW.setText("");
     }
 
+    private void setUserNamePasswordFromConfig(Service selectedService) {
+        ApplicationSettings settings = Config
+            .getInstance()
+            .getApplicationSettings();
+        Credentials credentials = settings.getCredentials();
+        if ((selectedService.getUsername() == null
+            || selectedService.getUsername().isEmpty())
+            && credentials != null) {
+            this.serviceUser.setText(credentials.getUsername());
+            this.servicePW.setText(credentials.getPassword());
+        }
+    }
+
     /**
      * Select a service according to service url textfield.
      */
@@ -443,6 +459,7 @@ public class ServiceSelectionController {
                 this.serviceAuthenticationCbx.setSelected(true);
                 this.serviceUser.setDisable(false);
                 this.servicePW.setDisable(false);
+                setUserNamePasswordFromConfig(controller.dataBean.getSelectedService());
             });
             return false;
         } else {

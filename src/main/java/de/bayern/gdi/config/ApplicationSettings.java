@@ -18,12 +18,13 @@
 
 package de.bayern.gdi.config;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class managing application settings.
@@ -72,6 +73,11 @@ public class ApplicationSettings {
      */
     public String getApplicationSetting(String name) {
         return settings.get(name);
+    }
+
+    public Credentials getCredentials() {
+        //TODO!
+        return new Credentials("bc", "pw");
     }
 
     @Override
