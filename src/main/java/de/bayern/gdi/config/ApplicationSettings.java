@@ -18,61 +18,42 @@
 
 package de.bayern.gdi.config;
 
+import de.bayern.gdi.utils.HTTP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class managing application settings.
+ *
  * @author Alexander Woestmann (awoestmann@intevation)
  */
 
 public class ApplicationSettings {
 
-    private Map<String, String> settings;
+    private static final int DEFAULT_TIMEOUT = 10000;
+
+    private static final int S_TO_MS = 1000;
+
+    private static final Logger LOG = LoggerFactory.getLogger(HTTP.class.getName());
+
+    private int requestTimeOutInMS = DEFAULT_TIMEOUT;
 
     public ApplicationSettings(Document doc) throws IOException {
         parseDocument(doc);
     }
 
-    private void parseDocument(Document xmlDocument) throws IOException {
-        this.settings = parseNodeForElements(
-                xmlDocument, "application");
-    }
-
-    /**Parse Node by name, save all elements to map.*/
-    private Map<String, String> parseNodeForElements(Document doc,
-            String nodeName) throws IOException {
-
-        NodeList nodes = doc.getElementsByTagName(nodeName);
-        if (nodes.getLength() < 1) {
-            throw new IOException("Node " + nodeName + " not found");
-        }
-        Node parent = nodes.item(0);
-
-        Map<String, String> elements = new HashMap<>();
-
-        NodeList childs = parent.getChildNodes();
-        for (int i = 0; i < childs.getLength(); i++) {
-            Node node = childs.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                elements.put(node.getNodeName(), node.getTextContent());
-            }
-        }
-        return elements;
-    }
-
     /**
-     * Returns string value of a application settings item.
-     * @param name Name of the setting
-     * @return String value
+     * Returns the configured request timeout in ms.
+     *
+     * @return the request timeout in ms
      */
-    public String getApplicationSetting(String name) {
-        return settings.get(name);
+    public int getRequestTimeoutInMs() {
+        return requestTimeOutInMS;
     }
 
     public Credentials getCredentials() {
@@ -83,7 +64,46 @@ public class ApplicationSettings {
     @Override
     public String toString() {
         return "ApplicationSettings: {"
-            +  settings
+            + "requestTimeOutInMS: " + requestTimeOutInMS
             + "}";
     }
+
+
+    private void parseDocument(Document xmlDocument) throws IOException {
+        parseNodeForElements(xmlDocument, "application");
+    }
+
+    /**
+     * Parse application from settings.xml.
+     */
+    private void parseNodeForElements(Document doc,
+                                      String nodeName) throws IOException {
+        NodeList nodes = doc.getElementsByTagName(nodeName);
+        if (nodes.getLength() < 1) {
+            throw new IOException("Node " + nodeName + " not found");
+        }
+        Node parent = nodes.item(0);
+
+        NodeList childs = parent.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++) {
+            Node node = childs.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                if ("requestTimeout_s".equals(node.getNodeName())) {
+                    parseRequestTimeout(node);
+                }
+            }
+        }
+    }
+
+    private void parseRequestTimeout(Node node) {
+        String ts = node.getTextContent();
+        if (ts != null) {
+            try {
+                requestTimeOutInMS = S_TO_MS * Integer.parseInt(ts);
+            } catch (NumberFormatException nfe) {
+                LOG.error(nfe.getMessage());
+            }
+        }
+    }
+
 }
