@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.utils;
+package de.bayern.gdi.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +29,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.bayern.gdi.gui.FeatureModel.FilterType;
+import de.bayern.gdi.utils.I18n;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.model.DownloadStep;
-import de.bayern.gdi.utils.DownloadConfiguration;
+import de.bayern.gdi.config.DownloadConfiguration;
 import static de.bayern.gdi.utils.SceneConstants.ACTIVATE_FURTHER_PROCESSING;
 import static de.bayern.gdi.utils.SceneConstants.ADD_PROCESSING_STEP;
 import static de.bayern.gdi.utils.SceneConstants.AUTH;

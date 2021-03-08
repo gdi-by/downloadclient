@@ -41,7 +41,7 @@ import de.bayern.gdi.services.FilterEncoder;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.config.Config;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.config.ServiceSettings;

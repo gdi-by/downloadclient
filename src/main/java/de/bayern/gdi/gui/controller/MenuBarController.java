@@ -19,7 +19,7 @@ package de.bayern.gdi.gui.controller;
 
 import de.bayern.gdi.gui.WebViewWindow;
 import de.bayern.gdi.config.Config;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import javafx.event.ActionEvent;

@@ -25,7 +25,7 @@ import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import javafx.application.Platform;

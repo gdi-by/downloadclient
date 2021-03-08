@@ -22,7 +22,7 @@ import de.bayern.gdi.model.MIMEType;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.config.Config;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
