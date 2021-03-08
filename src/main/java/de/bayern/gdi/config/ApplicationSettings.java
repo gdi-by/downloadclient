@@ -43,6 +43,8 @@ public class ApplicationSettings {
 
     private int requestTimeOutInMS = DEFAULT_TIMEOUT;
 
+    private Credentials credentials;
+
     public ApplicationSettings(Document doc) throws IOException {
         parseDocument(doc);
     }
@@ -56,9 +58,13 @@ public class ApplicationSettings {
         return requestTimeOutInMS;
     }
 
+    /**
+     * Returns the configured credentials.
+     *
+     * @return the configured credentials, <code>null</code> if not configured
+     */
     public Credentials getCredentials() {
-        //TODO!
-        return new Credentials("bc", "pw");
+        return credentials;
     }
 
     @Override
@@ -90,6 +96,8 @@ public class ApplicationSettings {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 if ("requestTimeout_s".equals(node.getNodeName())) {
                     parseRequestTimeout(node);
+                } else if ("credentials".equals(node.getNodeName())) {
+                    parseCredentials(node);
                 }
             }
         }
@@ -103,6 +111,23 @@ public class ApplicationSettings {
             } catch (NumberFormatException nfe) {
                 LOG.error(nfe.getMessage());
             }
+        }
+    }
+
+    private void parseCredentials(Node credentialsNode) {
+        String username = null;
+        String password = null;
+        NodeList childs = credentialsNode.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++) {
+            Node node = childs.item(i);
+            if ("username".equals(node.getNodeName())) {
+                username = node.getTextContent();
+            } else if ("password".equals(node.getNodeName())) {
+                password = node.getTextContent();
+            }
+        }
+        if (username != null) {
+            this.credentials = new Credentials(username, password);
         }
     }
 

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -76,6 +77,7 @@ public class ConfigTest {
         ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
 
         assertThat(applicationSettings.getRequestTimeoutInMs(), is(EXPECTED_DEFAULT_TIMEOUT));
+        assertThat(applicationSettings.getCredentials(), is(nullValue()));
     }
 
 
@@ -90,6 +92,8 @@ public class ConfigTest {
         ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
 
         assertThat(applicationSettings.getRequestTimeoutInMs(), is(EXPECTED_TIMEOUT));
+        assertThat(applicationSettings.getCredentials().getUsername(), is("name"));
+        assertThat(applicationSettings.getCredentials().getPassword(), is("pw"));
     }
 
 }
