@@ -47,7 +47,7 @@ public class ApplicationSettingsTest extends TestCase {
         Document doc = builder.newDocument();
 
         try {
-            new ApplicationSettings(doc);
+            new ApplicationSettings(doc, new Settings());
             fail("should not be reached");
         } catch (IOException ioe) {
             // Test passed.

@@ -18,7 +18,6 @@
 
 package de.bayern.gdi.config;
 
-import de.bayern.gdi.utils.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,18 +34,24 @@ import java.io.IOException;
 
 public class ApplicationSettings {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationSettings.class.getName());
+
     private static final int DEFAULT_TIMEOUT = 10000;
 
     private static final int S_TO_MS = 1000;
 
-    private static final Logger LOG = LoggerFactory.getLogger(HTTP.class.getName());
+    private final Document doc;
+
+    private final Settings settings;
 
     private int requestTimeOutInMS = DEFAULT_TIMEOUT;
 
     private Credentials credentials;
 
-    public ApplicationSettings(Document doc) throws IOException {
-        parseDocument(doc);
+    public ApplicationSettings(Document doc, Settings settings) throws IOException {
+        this.doc = doc;
+        this.settings = settings;
+        parseNodeForElements("application");
     }
 
     /**
@@ -64,7 +69,26 @@ public class ApplicationSettings {
      * @return the configured credentials, <code>null</code> if not configured
      */
     public Credentials getCredentials() {
-        return credentials;
+        return this.credentials;
+    }
+
+    /**
+     * Writes the passed credentials to the settings.xml.
+     *
+     * @param credentialsToPersist the credentials to store, if <code>null</code>
+     *                    or username or password <code>null</code>
+     *                    nothing is persisted.
+     */
+    public void persistCredentials(Credentials credentialsToPersist) {
+        if (credentialsToPersist != null
+            && credentialsToPersist.getUsername() != null
+            && !credentialsToPersist.getUsername().isEmpty()
+            && credentialsToPersist.getPassword() != null
+            && !credentialsToPersist.getPassword().isEmpty()) {
+            LOG.info("Persist credentials");
+            modifyDocument(credentialsToPersist);
+            settings.persistSettingsFile(doc);
+        }
     }
 
     @Override
@@ -74,16 +98,10 @@ public class ApplicationSettings {
             + "}";
     }
 
-
-    private void parseDocument(Document xmlDocument) throws IOException {
-        parseNodeForElements(xmlDocument, "application");
-    }
-
     /**
      * Parse application from settings.xml.
      */
-    private void parseNodeForElements(Document doc,
-                                      String nodeName) throws IOException {
+    private void parseNodeForElements(String nodeName) throws IOException {
         NodeList nodes = doc.getElementsByTagName(nodeName);
         if (nodes.getLength() < 1) {
             throw new IOException("Node " + nodeName + " not found");
@@ -131,4 +149,46 @@ public class ApplicationSettings {
         }
     }
 
+    private void modifyDocument(Credentials newCredentials) {
+        NodeList nodes = doc.getElementsByTagName("application");
+        if (nodes.getLength() < 1) {
+            LOG.warn("Credentials could not be stored. No application element found in settings.xml.");
+        }
+        Node applicationNode = nodes.item(0);
+
+        Node credentialsNode = parseNode(applicationNode, "credentials");
+        if (credentialsNode == null) {
+            credentialsNode = doc.createElement("credentials");
+            applicationNode.appendChild(credentialsNode);
+        }
+        persistCredentials(credentialsNode, newCredentials);
+    }
+
+    private void persistCredentials(Node credentialsNode, Credentials newCredentials) {
+        Node usernameNode = parseNode(credentialsNode, "username");
+        Node passwordNode = parseNode(credentialsNode, "password");
+        if (usernameNode == null) {
+            usernameNode = doc.createElement("username");
+            credentialsNode.appendChild(usernameNode);
+        }
+        if (passwordNode == null) {
+            passwordNode = doc.createElement("password");
+            credentialsNode.appendChild(passwordNode);
+        }
+        usernameNode.setTextContent(newCredentials.getUsername());
+        passwordNode.setTextContent(newCredentials.getPassword());
+    }
+
+    private Node parseNode(Node parentNode, String nodeName) {
+        NodeList childs = parentNode.getChildNodes();
+        for (int i = 0; i < childs.getLength(); i++) {
+            Node node = childs.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                if (nodeName.equals(node.getNodeName())) {
+                    return node;
+                }
+            }
+        }
+        return null;
+    }
 }

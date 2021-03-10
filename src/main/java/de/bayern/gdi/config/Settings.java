@@ -18,15 +18,18 @@
 
 package de.bayern.gdi.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
-import javax.xml.parsers.ParserConfigurationException;
-
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.XML;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Class managing all settings.
@@ -35,12 +38,16 @@ import org.xml.sax.SAXException;
 
 public class Settings {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Settings.class.getName());
+
     /** Name of the config file. */
     public static final String SETTINGS_FILE =
             "settings.xml";
 
     private static final String NAME =
             "Settings";
+
+    private File file;
 
     private ServiceSettings serviceSettings;
 
@@ -63,11 +70,12 @@ public class Settings {
     public Settings(File file)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(file));
+        this.file = file;
     }
 
-    public Settings(Document doc) throws IOException {
+    private Settings(Document doc) throws IOException {
         this.serviceSettings = new ServiceSettings(doc);
-        this.applicationSettings = new ApplicationSettings(doc);
+        this.applicationSettings = new ApplicationSettings(doc, this);
     }
 
     /**
@@ -96,5 +104,22 @@ public class Settings {
      */
     public static String getName() {
         return NAME;
+    }
+
+    /**
+     * Persist the passed document as settings.xml.
+     *
+     * @param doc to persist, should not be <code>null</code>
+     */
+    public void persistSettingsFile(Document doc) {
+        if (this.file == null) {
+            LOG.warn("settings are bot be persisted as settings.xml is null");
+            return;
+        }
+        try (FileOutputStream outputStream = new FileOutputStream(this.file)) {
+            XML.printDocument(doc, outputStream);
+        } catch (IOException e) {
+            LOG.warn("settings.xml could not be persisted!", e);
+        }
     }
 }

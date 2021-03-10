@@ -387,6 +387,7 @@ public class ServiceSelectionController {
                             if (serviceSelected) {
                                 chooseSelectedService(downloadConf);
                             }
+                            persistUsernameAndPasswordInSettingsXml(finalService);
                             return 0;
                         } finally {
                             serviceSelectionBt.setDisable(false);
@@ -595,4 +596,16 @@ public class ServiceSelectionController {
         });
         return;
     }
+
+    private void persistUsernameAndPasswordInSettingsXml(Service service) {
+        ApplicationSettings settings = Config
+            .getInstance()
+            .getApplicationSettings();
+        if ((service.getUsername() != null
+            && !service.getUsername().isEmpty())) {
+            Credentials credentials = new Credentials(service.getUsername(), service.getPassword());
+            settings.persistCredentials(credentials);
+        }
+    }
+
 }

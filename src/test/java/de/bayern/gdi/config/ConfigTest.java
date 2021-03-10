@@ -49,6 +49,12 @@ public class ConfigTest {
 
     private File configFolder;
 
+    private File configFolderWithCredentials;
+
+    private File configFolderPersistTest;
+
+    private File configFolderWithCredentialsPersistTest;
+
     /**
      * Copies the test configuration to the tmp folder.
      *
@@ -57,13 +63,13 @@ public class ConfigTest {
     @Before
     public void copyResourcesToTemporaryFolder() throws IOException {
         this.configFolder = folder.newFolder();
-        File targetFile = new File(configFolder, "settings.xml");
-        try (InputStream settingsSource = ConfigTest.class.
-            getResourceAsStream("settings.xml");
-             FileOutputStream settingsTarget = new
-                 FileOutputStream(targetFile)) {
-            IOUtils.copy(settingsSource, settingsTarget);
-        }
+        this.configFolderWithCredentials = folder.newFolder();
+        this.configFolderPersistTest = folder.newFolder();
+        this.configFolderWithCredentialsPersistTest = folder.newFolder();
+        writeToConfigDirectory("settings.xml", this.configFolder);
+        writeToConfigDirectory("settings-withCredentials.xml", this.configFolderWithCredentials);
+        writeToConfigDirectory("settings.xml", this.configFolderPersistTest);
+        writeToConfigDirectory("settings-withCredentials.xml", this.configFolderWithCredentialsPersistTest);
     }
 
     /**
@@ -87,13 +93,75 @@ public class ConfigTest {
      * @throws IOException
      */
     @Test
-    public void testInitialize() throws IOException {
-        Config.initialize(configFolder.getAbsolutePath());
+    public void testInitializeSettingsWithCredentials() throws IOException {
+        Config.initialize(configFolderWithCredentials.getAbsolutePath());
         ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
 
         assertThat(applicationSettings.getRequestTimeoutInMs(), is(EXPECTED_TIMEOUT));
         assertThat(applicationSettings.getCredentials().getUsername(), is("name"));
         assertThat(applicationSettings.getCredentials().getPassword(), is("pw"));
+    }
+
+    /**
+     * Tests the initialization of the test configuration.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testInitialize() throws IOException {
+        Config.initialize(configFolder.getAbsolutePath());
+        ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
+
+        assertThat(applicationSettings.getRequestTimeoutInMs(), is(EXPECTED_TIMEOUT));
+        assertThat(applicationSettings.getCredentials(), is(nullValue()));
+    }
+
+    /**
+     * Tests the persisting of credentials if the settings.xml does not contain credentials.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testPersistCredentials() throws IOException {
+        Config.initialize(configFolderPersistTest.getAbsolutePath());
+        ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
+        String newUsername = "newuser";
+        String newPassword = "newpw";
+        applicationSettings.persistCredentials(new Credentials(newUsername, newPassword));
+
+        Config.initialize(configFolderPersistTest.getAbsolutePath());
+        ApplicationSettings reinitializedApplicationSettings = Config.getInstance().getApplicationSettings();
+        assertThat(reinitializedApplicationSettings.getCredentials().getUsername(), is(newUsername));
+        assertThat(reinitializedApplicationSettings.getCredentials().getPassword(), is(newPassword));
+    }
+
+    /**
+     * Tests the overwriting of credentials.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testPersistCredentialsOverwrite() throws IOException {
+        Config.initialize(configFolderWithCredentialsPersistTest.getAbsolutePath());
+        ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
+        String newUsername = "newuser";
+        String newPassword = "newpw";
+        applicationSettings.persistCredentials(new Credentials(newUsername, newPassword));
+
+        Config.initialize(configFolderWithCredentialsPersistTest.getAbsolutePath());
+        ApplicationSettings reinitializedApplicationSettings = Config.getInstance().getApplicationSettings();
+        assertThat(reinitializedApplicationSettings.getCredentials().getUsername(), is(newUsername));
+        assertThat(reinitializedApplicationSettings.getCredentials().getPassword(), is(newPassword));
+    }
+
+    private void writeToConfigDirectory(String resourceToCopy, File targetFolder) throws IOException {
+        File targetFile = new File(targetFolder, "settings.xml");
+        try (InputStream settingsSource = ConfigTest.class.
+            getResourceAsStream(resourceToCopy);
+             FileOutputStream settingsTarget = new
+                 FileOutputStream(targetFile)) {
+            IOUtils.copy(settingsSource, settingsTarget);
+        }
     }
 
 }
