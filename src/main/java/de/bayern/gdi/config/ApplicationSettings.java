@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.config;
 
+import de.bayern.gdi.utils.CryptoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -76,8 +77,8 @@ public class ApplicationSettings {
      * Writes the passed credentials to the settings.xml.
      *
      * @param credentialsToPersist the credentials to store, if <code>null</code>
-     *                    or username or password <code>null</code>
-     *                    nothing is persisted.
+     *                             or username or password <code>null</code>
+     *                             nothing is persisted.
      */
     public void persistCredentials(Credentials credentialsToPersist) {
         if (credentialsToPersist != null
@@ -141,7 +142,7 @@ public class ApplicationSettings {
             if ("username".equals(node.getNodeName())) {
                 username = node.getTextContent();
             } else if ("password".equals(node.getNodeName())) {
-                password = node.getTextContent();
+                password = decrypt(node.getTextContent());
             }
         }
         if (username != null) {
@@ -176,7 +177,7 @@ public class ApplicationSettings {
             credentialsNode.appendChild(passwordNode);
         }
         usernameNode.setTextContent(newCredentials.getUsername());
-        passwordNode.setTextContent(newCredentials.getPassword());
+        passwordNode.setTextContent(encrypt(newCredentials.getPassword()));
     }
 
     private Node parseNode(Node parentNode, String nodeName) {
@@ -190,5 +191,27 @@ public class ApplicationSettings {
             }
         }
         return null;
+    }
+
+    private String decrypt(String password) {
+        if (password != null) {
+            try {
+                return CryptoUtils.decrypt(password);
+            } catch (Exception e) {
+                LOG.error("Password could not be decrypted", e);
+            }
+        }
+        return password;
+    }
+
+    private String encrypt(String password) {
+        if (password != null) {
+            try {
+                return CryptoUtils.encrypt(password);
+            } catch (Exception e) {
+                LOG.error("Password could not be encrypted", e);
+            }
+        }
+        return password;
     }
 }
