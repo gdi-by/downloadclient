@@ -20,19 +20,17 @@ package de.bayern.gdi.services;
 import org.geotools.filter.text.cql2.CQLException;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.xmlmatchers.namespace.SimpleNamespaceContext;
 
-import javax.xml.namespace.NamespaceContext;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.xmlmatchers.XmlMatchers.conformsTo;
-import static org.xmlmatchers.XmlMatchers.hasXPath;
-import static org.xmlmatchers.transform.XmlConverters.the;
-import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
+import static org.xmlunit.matchers.HasXPathMatcher.hasXPath;
+import static org.xmlunit.matchers.ValidationMatcher.valid;
 
 /**
  * Test class to verify CQL to filter expressions encoder.
@@ -77,8 +75,9 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(1));
 
         Document filter = filters.get(0).getFilter();
-        assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
+        assertThat(filter, valid(fes()));
+        assertThat(filter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
     }
 
 
@@ -96,8 +95,9 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(1));
 
         Document filter = filters.get(0).getFilter();
-        assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
+        assertThat(filter, valid(fes()));
+        assertThat(filter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
     }
 
 
@@ -116,8 +116,9 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(1));
 
         Document filter = filters.get(0).getFilter();
-        assertThat(the(filter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(filter), hasXPath("/fes:Filter", namespaceContext()));
+        assertThat(filter, valid(fes()));
+        assertThat(filter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
     }
 
     /**
@@ -136,14 +137,14 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(2));
 
         Document firstFilter = filters.get(0).getFilter();
-        assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(firstFilter), hasXPath("/fes:Filter",
-            namespaceContext()));
+        assertThat(firstFilter, valid(fes()));
+        assertThat(firstFilter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
 
         Document secondFilter = filters.get(1).getFilter();
-        assertThat(the(secondFilter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(secondFilter), hasXPath("/fes:Filter",
-            namespaceContext()));
+        assertThat(secondFilter, valid(fes()));
+        assertThat(secondFilter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
     }
 
     /**
@@ -162,19 +163,19 @@ public class FilterEncoderTest {
         assertThat(filters.size(), is(2));
 
         Document firstFilter = filters.get(0).getFilter();
-        assertThat(the(firstFilter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(firstFilter), hasXPath("/fes:Filter",
-            namespaceContext()));
+        assertThat(firstFilter, valid(fes()));
+        assertThat(firstFilter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
 
         Document secondFilter = filters.get(1).getFilter();
-        assertThat(the(secondFilter), conformsTo(w3cXmlSchemaFrom(fes())));
-        assertThat(the(secondFilter), hasXPath("/fes:Filter",
-            namespaceContext()));
+        assertThat(secondFilter, valid(fes()));
+        assertThat(secondFilter, hasXPath("/fes:Filter")
+            .withNamespaceContext(fesContext()));
     }
 
-    private NamespaceContext namespaceContext() {
-        SimpleNamespaceContext namespaceContext = new SimpleNamespaceContext();
-        namespaceContext.bind("fes", "http://www.opengis.net/fes/2.0");
+    private Map<String, String> fesContext() {
+        Map<String, String> namespaceContext = new HashMap<>();
+        namespaceContext.put("fes", "http://www.opengis.net/fes/2.0");
         return namespaceContext;
     }
 
