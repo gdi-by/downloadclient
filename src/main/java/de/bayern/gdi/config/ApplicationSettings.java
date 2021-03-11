@@ -85,11 +85,13 @@ public class ApplicationSettings {
             && credentialsToPersist.getUsername() != null
             && !credentialsToPersist.getUsername().isEmpty()
             && credentialsToPersist.getPassword() != null
-            && !credentialsToPersist.getPassword().isEmpty()) {
+            && !credentialsToPersist.getPassword().isEmpty()
+            && !credentialsToPersist.equals(this.credentials)) {
             LOG.info("Persist credentials");
             modifyDocument(credentialsToPersist);
             settings.persistSettingsFile(doc);
         }
+        this.credentials = credentialsToPersist;
     }
 
     @Override

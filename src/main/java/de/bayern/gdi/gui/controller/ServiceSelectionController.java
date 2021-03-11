@@ -301,14 +301,15 @@ public class ServiceSelectionController {
         this.servicePW.setText("");
     }
 
-    private void setUserNamePasswordFromConfig(Service selectedService) {
+    private void setUserNamePasswordFromServiceOrConfig(Service selectedService) {
         ApplicationSettings settings = Config
             .getInstance()
             .getApplicationSettings();
         Credentials credentials = settings.getCredentials();
-        if ((selectedService.getUsername() == null
-            || selectedService.getUsername().isEmpty())
-            && credentials != null) {
+        if (selectedService.getUsername() != null && !selectedService.getUsername().isEmpty()) {
+            this.serviceUser.setText(selectedService.getUsername());
+            this.servicePW.setText(selectedService.getPassword());
+        } else if (credentials != null) {
             this.serviceUser.setText(credentials.getUsername());
             this.servicePW.setText(credentials.getPassword());
         }
@@ -460,7 +461,7 @@ public class ServiceSelectionController {
                 this.serviceAuthenticationCbx.setSelected(true);
                 this.serviceUser.setDisable(false);
                 this.servicePW.setDisable(false);
-                setUserNamePasswordFromConfig(controller.dataBean.getSelectedService());
+                setUserNamePasswordFromServiceOrConfig(controller.dataBean.getSelectedService());
             });
             return false;
         } else {
