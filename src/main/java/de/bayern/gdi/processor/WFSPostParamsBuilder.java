@@ -290,7 +290,7 @@ public final class WFSPostParamsBuilder {
             String namespacePrefix = typeName.substring(0, idx);
             String namespaceUri = meta.getNamespaces()
                 .getNamespaceURI(namespacePrefix);
-            queryEl.setAttribute("xmlns:" + namespacePrefix, namespaceUri);
+            queryEl.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + namespacePrefix, namespaceUri);
         }
         queryEl.setAttribute(SRS_NAME, srsName);
         return queryEl;

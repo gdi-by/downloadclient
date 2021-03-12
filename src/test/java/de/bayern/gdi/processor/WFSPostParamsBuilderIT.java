@@ -25,9 +25,8 @@ import de.bayern.gdi.services.WFSMetaExtractor;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.xmlmatchers.namespace.SimpleNamespaceContext;
+import org.xmlunit.matchers.HasXPathMatcher;
 
-import javax.xml.namespace.NamespaceContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -35,19 +34,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static net.jadler.Jadler.port;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.xmlmatchers.XmlMatchers.conformsTo;
-import static org.xmlmatchers.XmlMatchers.hasXPath;
-import static org.xmlmatchers.transform.XmlConverters.the;
-import static org.xmlmatchers.validation.SchemaFactory.w3cXmlSchemaFrom;
-import static org.xmlmatchers.xpath.XpathReturnType.returningABoolean;
-import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
-import static org.xmlmatchers.xpath.XpathReturnType.returningAString;
+import static org.xmlunit.matchers.EvaluateXPathMatcher.hasXPath;
+import static org.xmlunit.matchers.ValidationMatcher.valid;
 
 /**
  * Test class to verify WFS GetFeature request builder.
@@ -77,17 +73,15 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@srsName",
-            namespaceContext(),
-            is(getValue(downloadStep, "srsName"))));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
+            is(getValue(downloadStep, "srsName")))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
+        assertThat(wfsRequest, hasXPath(
             "/wfs:GetFeature/wfs:Query/@typeNames",
-            namespaceContext(),
-            is(downloadStep.getDataset())));
+            is(downloadStep.getDataset())).withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -104,17 +98,15 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@srsName",
-            namespaceContext(),
-            is(getValue(downloadStep, "srsName"))));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
+            is(getValue(downloadStep, "srsName")))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
+        assertThat(wfsRequest, hasXPath(
             "/wfs:GetFeature/wfs:Query/@typeNames",
-            namespaceContext(),
-            is(downloadStep.getDataset())));
+            is(downloadStep.getDataset())).withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -132,17 +124,15 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@srsName",
-            namespaceContext(),
-            is(getValue(downloadStep, "srsName"))));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/@srsName",
+            is(getValue(downloadStep, "srsName")))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
+        assertThat(wfsRequest, hasXPath(
             "/wfs:GetFeature/wfs:Query/@typeNames",
-            namespaceContext(),
-            is(downloadStep.getDataset())));
+            is(downloadStep.getDataset())).withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -160,18 +150,14 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']")
+            .withNamespaceContext(wfsContext()));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -190,24 +176,18 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(2d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("2"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']")
+            .withNamespaceContext(wfsContext()));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -226,24 +206,18 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfs())));
+        assertThat(wfsRequest, valid(wfs()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(2d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("2"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:lkr_ex']")
+            .withNamespaceContext(wfsContext()));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -261,32 +235,23 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(1d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("1"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/"
-                + "fes:Equals/fes:ValueReference",
-            namespaceContext(),
-            returningAString(),
-            is("bvv:geom")));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/"
+            + "fes:Filter/fes:Equals/fes:ValueReference", is("bvv:geom"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Equals/gml:Polygon",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Equals/gml:Polygon")
+            .withNamespaceContext(wfsContext()));
 
     }
 
@@ -305,32 +270,23 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(1d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("1"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/"
-                + "fes:Within/fes:ValueReference",
-            namespaceContext(),
-            returningAString(),
-            is("bvv:geom")));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/"
+            + "fes:Filter/fes:Within/fes:ValueReference", is("bvv:geom"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Within/gml:Polygon",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Within/gml:Polygon")
+            .withNamespaceContext(wfsContext()));
     }
 
     /**
@@ -348,32 +304,24 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(1d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("1"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/"
-                + "fes:Intersects/fes:ValueReference",
-            namespaceContext(),
-            returningAString(),
-            is("bvv:geom")));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/"
+                + "fes:Filter/fes:Intersects/fes:ValueReference",
+            is("bvv:geom"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Intersects/gml:Point",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Intersects/gml:Point")
+            .withNamespaceContext(wfsContext()));
     }
 
 
@@ -392,32 +340,24 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         Document wfsRequest = WFSPostParamsBuilder.create(downloadStep,
             usedVars, meta);
 
-        assertThat(the(wfsRequest), conformsTo(w3cXmlSchemaFrom(wfsAndGml())));
+        assertThat(wfsRequest, valid(wfsAndGml()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "count(/wfs:GetFeature/wfs:Query)",
-            namespaceContext(),
-            returningANumber(),
-            is(1d)));
+        assertThat(wfsRequest, hasXPath(
+            "count(/wfs:GetFeature/wfs:Query)", is("1"))
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/@typeNames['bvv:gmd_ex']")
+            .withNamespaceContext(wfsContext()));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/"
-                + "fes:Disjoint/fes:ValueReference",
-            namespaceContext(),
-            returningAString(),
-            is("bvv:geom")));
+        assertThat(wfsRequest, hasXPath("/wfs:GetFeature/wfs:Query/"
+            + "fes:Filter/fes:Disjoint/fes:ValueReference", is("bvv:geom"))
+            .withNamespaceContext(wfsContext()
+        ));
 
-        assertThat(the(wfsRequest), hasXPath(
-            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Disjoint/gml:Polygon",
-            namespaceContext(),
-            returningABoolean(),
-            is(true)));
+        assertThat(wfsRequest, HasXPathMatcher.hasXPath(
+            "/wfs:GetFeature/wfs:Query/fes:Filter/fes:Disjoint/gml:Polygon")
+            .withNamespaceContext(wfsContext()));
     }
 
     private WFSMeta parseMeta(String queryResource)
@@ -468,11 +408,11 @@ public class WFSPostParamsBuilderIT extends WFS20ResourceTestBase {
         return getClass().getResource("/xsd/wfs20gml32.xsd");
     }
 
-    private NamespaceContext namespaceContext() {
-        SimpleNamespaceContext namespaceContext = new SimpleNamespaceContext();
-        namespaceContext.bind("wfs", "http://www.opengis.net/wfs/2.0");
-        namespaceContext.bind("fes", "http://www.opengis.net/fes/2.0");
-        namespaceContext.bind("gml", "http://www.opengis.net/gml/3.2");
+    private Map<String, String> wfsContext() {
+        Map<String, String> namespaceContext = new HashMap<>();
+        namespaceContext.put("wfs", "http://www.opengis.net/wfs/2.0");
+        namespaceContext.put("fes", "http://www.opengis.net/fes/2.0");
+        namespaceContext.put("gml", "http://www.opengis.net/gml/3.2");
         return namespaceContext;
     }
 
