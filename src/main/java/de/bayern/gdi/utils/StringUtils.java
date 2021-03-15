@@ -36,8 +36,7 @@ import java.util.stream.Stream;
  */
 public class StringUtils {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(StringUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class.getName());
 
     private static final int TEN = 10;
 

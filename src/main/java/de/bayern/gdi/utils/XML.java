@@ -66,8 +66,7 @@ import org.xml.sax.SAXException;
  */
 public class XML {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(XML.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(XML.class.getName());
 
     private static final String UTF8 = "UTF-8";
 

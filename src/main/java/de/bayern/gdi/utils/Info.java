@@ -54,8 +54,7 @@ public class Info {
     private static final String COMMENT = "Geodateninfrastruktur Bayern";
     private static final String UNKNOWN = "unknown";
 
-    private static final Logger log
-        = LoggerFactory.getLogger(Info.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Info.class.getName());
 
     private Info() {
         try {
@@ -63,7 +62,7 @@ public class Info {
             name = pullName();
         } catch (URISyntaxException
             | IOException e) {
-            log.error("Reading of Version or Name failed: " + e.getMessage(),
+            LOG.error("Reading of Version or Name failed: " + e.getMessage(),
                 e);
             version = UNKNOWN;
             name = UNKNOWN;
@@ -184,7 +183,7 @@ public class Info {
                 return path.resolve("pom.xml");
             }
         } catch (FileSystemNotFoundException e) {
-            log.info("Not in Filesystem-Mode: "
+            LOG.info("Not in Filesystem-Mode: "
                 + e.getMessage(), e);
         }
         return null;
@@ -208,7 +207,7 @@ public class Info {
         } catch (ParserConfigurationException
             | XPathExpressionException
             | SAXException e) {
-            log.error("Parsing of " + xPath + " in Pom failed: "
+            LOG.error("Parsing of " + xPath + " in Pom failed: "
                 + e.getMessage(), e);
             return "";
         }
@@ -228,7 +227,7 @@ public class Info {
                     return value;
                 }
             } catch (IOException e) {
-                log.error("Parsing of " + tag + " in Properties failed: "
+                LOG.error("Parsing of " + tag + " in Properties failed: "
                     + e.getMessage(), e);
             }
         }

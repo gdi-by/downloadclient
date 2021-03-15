@@ -77,8 +77,7 @@ import static com.sun.javafx.event.EventUtil.fireEvent;
 
 public class MapHandler {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(MapHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(MapHandler.class.getName());
 
     /**
      * name of the polygon layer.

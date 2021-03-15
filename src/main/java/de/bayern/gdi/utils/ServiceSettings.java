@@ -43,8 +43,7 @@ import org.w3c.dom.NodeList;
  */
 public class ServiceSettings {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(ServiceSettings.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceSettings.class.getName());
 
     private List<Service> services;
     private Map<String, String> catalogues;

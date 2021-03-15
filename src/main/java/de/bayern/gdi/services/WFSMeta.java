@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
 /** Stores meta data about WFS. */
 public class WFSMeta {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(WFSMeta.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(WFSMeta.class.getName());
 
     private static final String TAB_NEWLINE = "\t}\n";
 

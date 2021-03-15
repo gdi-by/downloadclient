@@ -58,8 +58,7 @@ import static de.bayern.gdi.processor.WFSPostParamsBuilder.create;
 /** Make DownloadStep configurations suitable for the download processor. */
 public class DownloadStepConverter {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(DownloadStepConverter.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadStepConverter.class.getName());
 
     private static final String OUTPUTFORMAT_PARAM = "outputformat";
 

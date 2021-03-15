@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <version>1.2.3-SNAPSHOT</version>
     <name>downloadclient</name>
-    <url>http://maven.apache.org</url>
+    <url>https://www.gdi.bayern.de/downloadclient.html</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
@@ -34,6 +34,7 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- build all-in-one uber JAR containing all dependend classes -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -75,6 +76,18 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/registryFile.jaiext</resource>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>de.bayern.gdi.App</Main-Class>
+                                        <Class-Path>config/</Class-Path>
+                                        <Specification-Vendor>GDI-BY</Specification-Vendor>
+                                        <Specification-Title>${project.name}</Specification-Title>
+                                        <Specification-Version>${project.version}</Specification-Version>
+                                        <Implementation-Vendor>GDI-BY</Implementation-Vendor>
+                                        <Implementation-Title>${project.name}</Implementation-Title>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
+                                    </manifestEntries>
+                                </transformer>
                             </transformers>
                         </configuration>
                     </execution>
@@ -105,8 +118,8 @@
                     <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                 </configuration>
             </plugin>
+            <!-- Build an executable JAR with all dependencies in /lib -->
             <plugin>
-                <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
@@ -130,7 +143,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -140,8 +153,10 @@
                 </executions>
                 <configuration>
                     <mainClass>de.bayern.gdi.App</mainClass>
+                    <additionalClasspathElements>${project.basedir}/src/resources</additionalClasspathElements>
                 </configuration>
             </plugin>
+            <!-- build an jar with all dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -225,6 +240,11 @@
         </resources>
     </build>
     <dependencies>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-shaded</artifactId>
+            <version>3.1.6.Final</version>
+        </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
@@ -362,12 +382,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.10.1</version>
+            <version>2.10.5</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.10.1</version>
+            <version>2.10.5</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -402,6 +422,12 @@
             <groupId>org.testfx</groupId>
             <artifactId>openjfx-monocle</artifactId>
             <version>${monocle.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-junit4</artifactId>
+            <version>2.0.2.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>

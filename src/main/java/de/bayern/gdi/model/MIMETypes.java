@@ -43,8 +43,7 @@ import org.slf4j.LoggerFactory;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MIMETypes {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(MIMETypes.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(MIMETypes.class.getName());
 
     /** Name of the config file. */
     public static final String MIME_TYPES_FILE =

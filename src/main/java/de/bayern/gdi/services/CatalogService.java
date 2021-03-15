@@ -56,8 +56,7 @@ public class CatalogService {
             "http://www.isotc211.org/2005/gco";
     private static final String CSW_QUERY_FILEPATH =
             "csw_searchQuery.xml";
-    private static final Logger LOG
-            = LoggerFactory.getLogger(CatalogService.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CatalogService.class.getName());
     private URL catalogURL;
     private String userName;
     private static final int MIN_SEARCHLENGTH = 2;

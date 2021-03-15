@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.gui.Controller;
+import de.bayern.gdi.gui.controller.Controller;
 
 import java.nio.file.Files;
 
@@ -60,8 +60,7 @@ public class FileResponseHandler implements ResponseHandler<Boolean> {
         }
     }
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(FileResponseHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileResponseHandler.class.getName());
 
     private static final int BUF_SIZE = 4096;
 

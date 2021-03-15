@@ -31,8 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Processor implements Runnable {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(Processor.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Processor.class.getName());
 
     private static final long WAIT_TIME = 1000;
 

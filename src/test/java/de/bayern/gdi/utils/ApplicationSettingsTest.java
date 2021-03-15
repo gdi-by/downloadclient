@@ -15,9 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.model;
-
-import de.bayern.gdi.utils.ApplicationSettings;
+package de.bayern.gdi.utils;
 
 import junit.framework.TestCase;
 import org.junit.Test;

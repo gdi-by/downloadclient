@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<HBox prefHeight="25.0" prefWidth="3840.0"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.bayern.gdi.gui.controller.StatusLogController"
+      style="-fx-background-color: gainsboro;">
+    <children>
+        <TitledPane fx:id="logHistoryParent"
+                    text="%status.ready"
+                    wrapText="false"
+                    expanded="false"
+                    prefWidth="3840.0"
+                    prefHeight="150.0">
+            <tooltip>
+                <Tooltip text="%tooltip.log_history_hidden"
+                         wrapText="true"/>
+            </tooltip>
+            <HBox.margin>
+                <Insets bottom="5.0" left="0.0" top="5.0" right="0.0"/>
+            </HBox.margin>
+            <content>
+                <ScrollPane fx:id="logHistoryPanel" minHeight="150.0">
+                    <Label fx:id="logHistory" text="">
+                    </Label>
+                </ScrollPane>
+            </content>
+        </TitledPane>
+    </children>
+</HBox>

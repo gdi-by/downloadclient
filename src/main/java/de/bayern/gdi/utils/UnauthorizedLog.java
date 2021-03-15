@@ -26,8 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class UnauthorizedLog implements Unauthorized {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(UnauthorizedLog.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(UnauthorizedLog.class.getName());
 
     /**
      * Constructor.

@@ -41,8 +41,7 @@ import org.w3c.dom.NodeList;
  */
 public class ServiceChecker {
 
-    private static final Logger LOG
-            = LoggerFactory.getLogger(ServiceChecker.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceChecker.class.getName());
 
     private static final String COULD_NOT_GET_DOCUMENT_OF_URL
             = "Could not get Document of URL: ";

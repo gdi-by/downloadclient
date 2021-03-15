@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.sothawo.mapjfx.MapView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
+<VBox fx:id="atomContainer" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.bayern.gdi.gui.controller.FilterAtomController">
+    <children>
+        <VBox fx:id="mapNodeAtom" alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="588.0" VBox.vgrow="ALWAYS">
+            <children>
+                <HBox spacing="2.0">
+                    <fx:define>
+                        <ToggleGroup fx:id="atomMapActionGrp"/>
+                    </fx:define>
+                    <children>
+                        <ToggleButton fx:id="atomMapSelectButton" toggleGroup="$atomMapActionGrp"/>
+                        <ToggleButton fx:id="atomMapInfoButton" toggleGroup="$atomMapActionGrp"/>
+                        <Button fx:id="atomMapResizeButton"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="5.0"
+                                top="2.0"/>
+                    </VBox.margin>
+                </HBox>
+                <MapView fx:id="atomMapView" prefHeight="300.0" prefWidth="400.0" VBox.vgrow="ALWAYS"/>
+                <Label fx:id="atomMapWmsSource" VBox.vgrow="NEVER">
+                    <font>
+                        <Font name="System Bold"
+                              size="13.0"/>
+                    </font>
+                </Label>
+            </children>
+            <VBox.margin>
+                <Insets bottom="5.0"
+                        left="20.0"
+                        right="10.0"
+                        top="5.0"/>
+            </VBox.margin>
+        </VBox>
+        <Separator
+            VBox.vgrow="NEVER"/>
+        <Label text="%gui.description"
+               VBox.vgrow="NEVER">
+            <font>
+                <Font name="System Bold"
+                      size="13.0"/>
+            </font>
+            <VBox.margin>
+                <Insets bottom="5.0"
+                        left="20.0"
+                        top="5.0"/>
+            </VBox.margin>
+        </Label>
+        <WebView
+            fx:id="valueAtomDescr"
+            fontScale="0.8"
+            minHeight="10.0"
+            minWidth="200.0"
+            prefHeight="100.0"
+            prefWidth="-1.0"
+            VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets bottom="5.0"
+                        left="20.0"
+                        right="20.0"
+                        top="5.0"/>
+            </VBox.margin>
+        </WebView>
+        <Separator
+            VBox.vgrow="NEVER"/>
+        <HBox minHeight="-Infinity"
+              VBox.vgrow="NEVER">
+            <children>
+                <Label fx:id="labelAtomVariation"
+                       minWidth="-Infinity"
+                       prefWidth="200.0"
+                       text="%gui.variants">
+                    <HBox.margin>
+                        <Insets bottom="5.0"
+                                left="20.0"
+                                right="5.0"
+                                top="5.0"/>
+                    </HBox.margin>
+                </Label>
+                <ComboBox
+                    fx:id="atomVariationChooser"
+                    onAction="#handleVariationSelect"
+                    HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets right="20.0"/>
+                    </HBox.margin>
+                    <tooltip>
+                        <Tooltip
+                            text="%tooltip.atom.variation"
+                            wrapText="true"/>
+                    </tooltip>
+                </ComboBox>
+            </children>
+        </HBox>
+        <HBox minHeight="-Infinity"
+              VBox.vgrow="NEVER">
+            <children>
+                <Label minWidth="-Infinity"
+                       prefWidth="200.0"
+                       text="%gui.data-format">
+                    <HBox.margin>
+                        <Insets bottom="5.0"
+                                left="20.0"
+                                right="5.0"
+                                top="5.0"/>
+                    </HBox.margin>
+                </Label>
+                <Label fx:id="valueAtomFormat"
+                       text=""
+                       wrapText="true"
+                       HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets bottom="5.0"
+                                left="5.0"
+                                right="20.0"
+                                top="5.0"/>
+                    </HBox.margin>
+                </Label>
+            </children>
+        </HBox>
+        <HBox minHeight="-Infinity"
+              VBox.vgrow="NEVER">
+            <children>
+                <Label prefWidth="200.0"
+                       text="%gui.coordinate-ref-system">
+                    <HBox.margin>
+                        <Insets bottom="5.0"
+                                left="20.0"
+                                right="5.0"
+                                top="5.0"/>
+                    </HBox.margin>
+                </Label>
+                <Label fx:id="valueAtomRefsys"
+                       text=""
+                       wrapText="true"
+                       HBox.hgrow="ALWAYS">
+                    <HBox.margin>
+                        <Insets bottom="5.0"
+                                left="5.0"
+                                right="20.0"
+                                top="5.0"/>
+                    </HBox.margin>
+                </Label>
+            </children>
+        </HBox>
+    </children>
+</VBox>

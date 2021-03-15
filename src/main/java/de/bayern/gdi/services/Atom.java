@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package de.bayern.gdi.services;
 
 import org.locationtech.jts.geom.Envelope;
@@ -50,12 +49,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * Instance of this class represents an Atom feed.
  * @author Jochen Saalfeld (jochen@intevation.de)
  */
 public class Atom {
 
-    private static final Logger LOG
-            = LoggerFactory.getLogger(Atom.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Atom.class.getName());
 
     private String serviceURL;
     private String username;

@@ -43,8 +43,7 @@ public abstract class WFS20ResourceTestBase {
     /**
      * Logger instance to be used.
      */
-    protected static final Logger log
-        = LoggerFactory.getLogger(WFS20ResourceTestBase.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(WFS20ResourceTestBase.class);
 
     /**
      * Init Jadler and Config.
@@ -56,7 +55,7 @@ public abstract class WFS20ResourceTestBase {
         try {
             initJadler();
         } catch (IllegalStateException ise) {
-            log.debug("Jadler is already initialized");
+            LOG.debug("Jadler is already initialized");
         }
         Config.initialize(null);
     }
@@ -122,7 +121,7 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append(queryPath);
-        log.debug("Service-URL: " + sb.toString());
+        LOG.debug("Service-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -137,7 +136,7 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append("/wfs/gf");
-        log.debug("GetFeature-URL: " + sb.toString());
+        LOG.debug("GetFeature-URL: " + sb.toString());
         return sb.toString();
     }
 
@@ -152,14 +151,14 @@ public abstract class WFS20ResourceTestBase {
         sb.append("http://localhost:");
         sb.append(port);
         sb.append("/wfs/wfs");
-        log.debug("DescribeStoredQueries-URL: " + sb.toString());
+        LOG.debug("DescribeStoredQueries-URL: " + sb.toString());
         return sb.toString();
     }
 
     private void prepareResource(String method,
                                  String queryPath,
                                  String body) {
-        log.debug("Method: " + method + " QueryPath: " + queryPath);
+        LOG.debug("Method: " + method + " QueryPath: " + queryPath);
         onRequest()
             .havingMethodEqualTo(method)
             .havingPathEqualTo(queryPath)

@@ -48,8 +48,7 @@ public final class HTTP {
     private static final int DEFAULT_TIMEOUT = 10000;
     private static final int S_TO_MS = 1000;
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(HTTP.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(HTTP.class.getName());
 
     private HTTP() {
     }

@@ -30,8 +30,7 @@ import java.util.List;
  */
 public class JobList implements Job {
 
-    private static final Logger LOG
-        = LoggerFactory.getLogger(JobList.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(JobList.class.getName());
 
     private List<Job> jobs;
 
