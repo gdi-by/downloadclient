@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.gui.ProgressDialog;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
@@ -25,8 +26,10 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -60,6 +63,9 @@ public class ButtonBarController {
 
     @Inject
     private StatusLogController statusLogController;
+
+    @Inject
+    private FXMLLoader fxmlLoader;
 
     @FXML
     private Button buttonDownload;
@@ -111,6 +117,7 @@ public class ButtonBarController {
                     JobList jl = dsc.convert(ds);
                     Processor p = Processor.getInstance();
                     p.addJob(jl);
+                    openProgressDialog();
                 } catch (ConverterException ce) {
                     statusLogController.setStatusTextUI(ce.getMessage());
                     Controller.logToAppLog(ce.getMessage());
@@ -203,6 +210,15 @@ public class ButtonBarController {
     protected void handleCloseApp(ActionEvent event) {
         Stage stage = (Stage) buttonClose.getScene().getWindow();
         menuBarController.closeApp(stage);
+    }
+
+    private void openProgressDialog() {
+        Platform.runLater(
+            () -> {
+                ProgressDialog dialog = new ProgressDialog(controller);
+                dialog.showAndWait();
+            }
+        );
     }
 
 }
