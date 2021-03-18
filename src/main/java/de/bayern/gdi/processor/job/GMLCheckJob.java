@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import org.w3c.dom.Document;
 
 import de.bayern.gdi.utils.I18n;

@@ -30,6 +30,16 @@ import java.util.Set;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 
+import de.bayern.gdi.processor.job.AtomDownloadJob;
+import de.bayern.gdi.processor.job.BroadcastJob;
+import de.bayern.gdi.processor.job.CloseLogJob;
+import de.bayern.gdi.processor.job.FileDownloadJob;
+import de.bayern.gdi.processor.job.FilesDownloadJob;
+import de.bayern.gdi.processor.job.GMLCheckJob;
+import de.bayern.gdi.processor.job.JobList;
+import de.bayern.gdi.processor.job.LogMetaJob;
+import de.bayern.gdi.processor.job.OpenLogJob;
+import de.bayern.gdi.processor.job.UnzipJob;
 import de.bayern.gdi.processor.listener.CountListener;
 import org.apache.http.HttpEntity;
 import org.apache.http.conn.ConnectTimeoutException;

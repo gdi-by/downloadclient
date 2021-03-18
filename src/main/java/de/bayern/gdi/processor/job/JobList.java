@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

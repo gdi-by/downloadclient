@@ -15,10 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
+
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 
 /**
- * Job which is executed in a JobList even if a prior job failed.
+ * A job broadcasting a message.
  */
-public interface DeferredJob extends Job {
+public class BroadcastJob implements Job {
+
+    private String msg;
+
+    public BroadcastJob(String msg) {
+        this.msg = msg;
+    }
+
+    @Override
+    public void run(Processor p) throws JobExecutionException {
+        if (p == null) {
+            throw new JobExecutionException();
+        }
+        p.broadcastMessage(msg);
+    }
 }

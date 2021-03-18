@@ -18,9 +18,9 @@
 package de.bayern.gdi.model;
 
 import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.FileDownloadJob;
-import de.bayern.gdi.processor.Job;
-import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.processor.job.FileDownloadJob;
+import de.bayern.gdi.processor.job.Job;
+import de.bayern.gdi.processor.job.JobList;
 import de.bayern.gdi.utils.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;

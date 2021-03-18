@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;

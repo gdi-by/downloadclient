@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.bayern.gdi.model.ProxyConfiguration;
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;

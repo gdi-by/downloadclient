@@ -15,13 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;

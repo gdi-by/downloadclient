@@ -15,24 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
+
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 
 /**
- * A job broadcasting a message.
+ * Job implements a job to be run by a processor.
  */
-public class BroadcastJob implements Job {
+public interface Job {
 
-    private String msg;
-
-    public BroadcastJob(String msg) {
-        this.msg = msg;
-    }
-
-    @Override
-    public void run(Processor p) throws JobExecutionException {
-        if (p == null) {
-            throw new JobExecutionException();
-        }
-        p.broadcastMessage(msg);
-    }
+    /**
+     * Run the job.
+     * @param p The processor which run this job.
+     * @throws JobExecutionException if the job execution failed.
+     */
+    void run(Processor p) throws JobExecutionException;
 }
+
+
+

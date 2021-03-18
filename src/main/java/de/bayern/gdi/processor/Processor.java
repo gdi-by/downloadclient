@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.processor.job.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

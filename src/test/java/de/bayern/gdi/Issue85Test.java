@@ -30,8 +30,8 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 
 import de.bayern.gdi.processor.ConverterException;
-import de.bayern.gdi.processor.ExternalProcessJob;
-import de.bayern.gdi.processor.Job;
+import de.bayern.gdi.processor.job.ExternalProcessJob;
+import de.bayern.gdi.processor.job.Job;
 import de.bayern.gdi.processor.ProcessingStepConverter;
 
 import de.bayern.gdi.utils.Config;

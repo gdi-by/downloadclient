@@ -15,8 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
