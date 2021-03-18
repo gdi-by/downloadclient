@@ -20,14 +20,16 @@ package de.bayern.gdi.gui;
 
 import de.bayern.gdi.gui.controller.Controller;
 import de.bayern.gdi.gui.controller.ProgressDialogController;
+import de.bayern.gdi.processor.listener.CountListener;
 import de.bayern.gdi.utils.I18n;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 
 import java.io.IOException;
 
-public class ProgressDialog extends Dialog<Void> {
+public class ProgressDialog extends Dialog<Void> implements CountListener {
 
     private ProgressDialogController progressDialogController;
 
@@ -35,6 +37,7 @@ public class ProgressDialog extends Dialog<Void> {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/progress-dialog.fxml"), I18n.getBundle());
             DialogPane dialogPane = fxmlLoader.load();
+            dialogPane.getButtonTypes().add(ButtonType.CLOSE);
             this.progressDialogController = fxmlLoader.getController();
             this.progressDialogController.init(controller);
             setDialogPane(dialogPane);
@@ -42,5 +45,10 @@ public class ProgressDialog extends Dialog<Void> {
         } catch (IOException e) {
             throw new IllegalStateException("Could not initialize ProgressDialog.", e);
         }
+    }
+
+    @Override
+    public void bytesCounted(long counter) {
+        progressDialogController.setBytesCountedText(counter);
     }
 }

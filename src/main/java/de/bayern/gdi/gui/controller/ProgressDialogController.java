@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.utils.I18n;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 
@@ -45,5 +46,12 @@ public class ProgressDialogController {
 
     }
 
+    /**
+     * Sets the bytes counted text.
+     * @param count download bytes to set as text.
+     */
+    public void setBytesCountedText(long count) {
+        progressBytes.setText(I18n.format("file.download.bytes", count));
+    }
 
 }

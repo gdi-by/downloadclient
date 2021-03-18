@@ -85,11 +85,13 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     /** Total number of bytes of downloaded files do far. */
     protected long totalCount;
 
-    public MultipleFileDownloadJob() {
+    public MultipleFileDownloadJob(String user, String password) {
+        this(user, password, null);
     }
 
     public MultipleFileDownloadJob(String user, String password, Log logger) {
         super(user, password, logger);
+        addListener(this);
     }
 
     @Override
@@ -129,7 +131,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         }
 
         WrapInputStreamFactory wrapFactory
-            = CountingInputStream.createWrapFactory(this);
+            = CountingInputStream.createWrapFactory(listener);
 
         CloseableHttpClient client = null;
         try {

@@ -27,16 +27,10 @@ import org.apache.http.HttpEntity;
 /** Download a list of URLs to given files. */
 public class FilesDownloadJob extends MultipleFileDownloadJob {
 
-    private List<DLFile> files;
-
-    public FilesDownloadJob() {
-        this.files = new ArrayList<>();
-    }
+    private List<DLFile> files = new ArrayList<>();
 
     public FilesDownloadJob(String user, String password) {
-        this();
-        this.user = user;
-        this.password = password;
+        super(user, password);
     }
 
     /** Downloads an URL to a file.

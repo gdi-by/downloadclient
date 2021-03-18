@@ -42,18 +42,13 @@ public class FileDownloadJob extends AbstractDownloadJob {
     private File file;
     private HttpEntity postParams;
 
-    public FileDownloadJob() {
-    }
-
     public FileDownloadJob(
             String urlString,
             File   file,
             String user,
             String password,
             Log    logger) {
-        super(user, password, logger);
-        this.urlString = urlString;
-        this.file = file;
+        this(urlString, file, user, password, null, logger);
     }
 
     public FileDownloadJob(
@@ -67,6 +62,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
         this.urlString = urlString;
         this.file = file;
         this.postParams = postParams;
+        this.listener.add(this);
     }
 
     @Override
@@ -79,7 +75,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
         URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
-            = CountingInputStream.createWrapFactory(this);
+            = CountingInputStream.createWrapFactory(listener);
 
         CloseableHttpClient httpclient = getClient(url);
 

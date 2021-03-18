@@ -114,10 +114,10 @@ public class ButtonBarController {
                     DownloadStepConverter dsc = new DownloadStepConverter(
                         controller.dataBean.getSelectedService().getUsername(),
                         controller.dataBean.getSelectedService().getPassword());
+                    openProgressDialog(dsc);
                     JobList jl = dsc.convert(ds);
                     Processor p = Processor.getInstance();
                     p.addJob(jl);
-                    openProgressDialog();
                 } catch (ConverterException ce) {
                     statusLogController.setStatusTextUI(ce.getMessage());
                     Controller.logToAppLog(ce.getMessage());
@@ -212,10 +212,11 @@ public class ButtonBarController {
         menuBarController.closeApp(stage);
     }
 
-    private void openProgressDialog() {
+    private void openProgressDialog(DownloadStepConverter dsc) {
         Platform.runLater(
             () -> {
                 ProgressDialog dialog = new ProgressDialog(controller);
+                dsc.addListener(dialog);
                 dialog.showAndWait();
             }
         );

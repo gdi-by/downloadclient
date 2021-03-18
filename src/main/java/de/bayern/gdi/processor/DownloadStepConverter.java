@@ -23,12 +23,14 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 
+import de.bayern.gdi.processor.listener.CountListener;
 import org.apache.http.HttpEntity;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.EntityTemplate;
@@ -87,11 +89,14 @@ public class DownloadStepConverter {
     private static final String GETFEATURE = "GetFeature";
 
     private String user;
+
     private String password;
 
     private DownloadStep dls;
 
     private Log logger;
+
+    private List<CountListener> listener = new ArrayList<>();
 
     public DownloadStepConverter() {
     }
@@ -104,6 +109,14 @@ public class DownloadStepConverter {
     public DownloadStepConverter(String user, String password) {
         this.user = user;
         this.password = password;
+    }
+
+    /**
+     * Adds a CountListener.
+     * @param listenerToAdd listener to add, never <code>null</code>
+     */
+    public void addListener(CountListener listenerToAdd) {
+        this.listener.add(listenerToAdd);
     }
 
     /**
@@ -326,8 +339,16 @@ public class DownloadStepConverter {
         File gml = new File(workingDir, "download." + ext);
         LOG.info("Download to file '{}'", gml);
         logGetFeatureRequest(params);
+        FileDownloadJob fdj = createFileDownloadJob(usePost, url, params, gml);
+        jl.addJob(fdj);
+        if (ext.equals("gml")) {
+            jl.addJob(new GMLCheckJob(gml, logger));
+            jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
+        }
+    }
 
-        FileDownloadJob fdj = null;
+    private FileDownloadJob createFileDownloadJob(boolean usePost, String url, Document params, File gml) {
+        final FileDownloadJob fdj;
         if (usePost) {
             HttpEntity ent = new EntityTemplate(
                 XML.toContentProducer(params));
@@ -343,12 +364,8 @@ public class DownloadStepConverter {
                 this.user, this.password,
                 this.logger);
         }
-
-        jl.addJob(fdj);
-        if (ext.equals("gml")) {
-            jl.addJob(new GMLCheckJob(gml, logger));
-            jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
-        }
+        listener.forEach(l -> fdj.addListener(l));
+        return fdj;
     }
 
     private static URL newURL(String url) throws ConverterException {

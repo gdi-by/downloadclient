@@ -51,9 +51,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     private String variation;
     private File workingDir;
 
-    public AtomDownloadJob() {
-    }
-
     public AtomDownloadJob(
         String url,
         String dataset,

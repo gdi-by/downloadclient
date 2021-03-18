@@ -20,18 +20,20 @@ package de.bayern.gdi.processor;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.bayern.gdi.processor.listener.CountListener;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob
-    implements Job, CountingInputStream.CountListener {
+    implements Job, CountListener {
 
     /** optional user. */
     protected String user;
@@ -41,9 +43,8 @@ public abstract class AbstractDownloadJob
     protected Processor processor;
     /** The logger to log to. */
     protected Log logger;
-
-    public AbstractDownloadJob() {
-    }
+    /** The count listener. */
+    protected List<CountListener> listener = new ArrayList<>();
 
     private static final String FILE_DOWNLOAD_BAD_URL
             = "file.download.bad.url";
@@ -52,6 +53,14 @@ public abstract class AbstractDownloadJob
         this.user = user;
         this.password = password;
         this.logger = logger;
+    }
+
+    /**
+     * Adds a CountListener.
+     * @param listenerToAdd listener to add, never <code>null</code>
+     */
+    public void addListener(CountListener listenerToAdd) {
+        this.listener.add(listenerToAdd);
     }
 
     /**
