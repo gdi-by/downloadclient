@@ -24,6 +24,7 @@ import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.processor.job.Job;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.Unauthorized;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The command line tool.
@@ -90,25 +92,13 @@ public class Headless implements ProcessorListener {
     static int runHeadless(String user,
                                    String password,
                                    List<DownloadStep> steps) {
-        Processor processor = new Processor();
+
+        LOG.info("Executing download steps " + steps);
+        List<Job> jobs = createJobs(user, password, steps);
+        Processor processor = new Processor(jobs);
         processor.addListener(new Headless());
         Thread thread = new Thread(processor);
         thread.start();
-
-        LOG.info("Executing download steps " + steps);
-
-        for (DownloadStep step : steps) {
-            try {
-                DownloadStepConverter dsc =
-                    new DownloadStepConverter(user, password);
-                processor.addJob(dsc.convert(step));
-            } catch (ConverterException ce) {
-                LOG.warn("Creating download jobs failed", ce);
-            }
-        }
-
-        processor.addJob(Processor.QUIT_JOB);
-
         try {
             thread.join();
         } catch (InterruptedException ie) {
@@ -117,6 +107,20 @@ public class Headless implements ProcessorListener {
         }
 
         return 0;
+    }
+
+    private static List<Job> createJobs(String user, String password, List<DownloadStep> steps) {
+        return steps.stream().map(step -> {
+            try {
+                DownloadStepConverter dsc =
+                    new DownloadStepConverter(user, password);
+                return dsc.convert(step);
+            } catch (ConverterException ce) {
+                LOG.warn("Creating download jobs failed", ce);
+                return null;
+            }
+        }).filter(job -> job != null)
+          .collect(Collectors.toList());
     }
 
     @Override

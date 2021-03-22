@@ -67,6 +67,9 @@ public class ButtonBarController {
     @Inject
     private FXMLLoader fxmlLoader;
 
+    @Inject
+    private DownloadListener downloadListener;
+
     @FXML
     private Button buttonDownload;
 
@@ -107,25 +110,25 @@ public class ButtonBarController {
 
             controller.dataBean.setProcessingSteps(controller.extractProcessingSteps());
             String savePath = selectedDir.getPath();
-            Runnable convertTask = () -> {
+            try {
+                this.buttonDownload.setDisable(true);
                 DownloadStep ds = controller.dataBean.convertToDownloadStep(savePath);
-                try {
-                    this.buttonDownload.setDisable(true);
-                    DownloadStepConverter dsc = new DownloadStepConverter(
-                        controller.dataBean.getSelectedService().getUsername(),
-                        controller.dataBean.getSelectedService().getPassword());
-                    openProgressDialog(dsc);
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (ConverterException ce) {
-                    statusLogController.setStatusTextUI(ce.getMessage());
-                    Controller.logToAppLog(ce.getMessage());
-                } finally {
-                    this.buttonDownload.setDisable(false);
-                }
-            };
-            new Thread(convertTask).start();
+                DownloadStepConverter dsc = new DownloadStepConverter(
+                    controller.dataBean.getSelectedService().getUsername(),
+                    controller.dataBean.getSelectedService().getPassword());
+                JobList jl = dsc.convert(ds);
+                openProgressDialog(dsc);
+                Processor p = new Processor(jl);
+                p.addListener(downloadListener);
+                Thread processorStep = new Thread(p);
+                processorStep.setDaemon(true);
+                processorStep.start();
+            } catch (ConverterException ce) {
+                statusLogController.setStatusTextUI(ce.getMessage());
+                Controller.logToAppLog(ce.getMessage());
+            } finally {
+                this.buttonDownload.setDisable(false);
+            }
         }
     }
 

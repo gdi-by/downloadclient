@@ -34,9 +34,6 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.ProcessingStep;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.processor.ConverterException;
-import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.processor.ProcessorEvent;
-import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.FilterEncoder;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
@@ -45,7 +42,6 @@ import de.bayern.gdi.utils.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.utils.ServiceSettings;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -122,7 +118,6 @@ public class Controller {
      */
     public Controller() {
         this.factory = new UIFactory();
-        Processor.getInstance().addListener(new DownloadListener());
     }
 
     /**
@@ -559,42 +554,6 @@ public class Controller {
      */
     public void selectServiceType(String polygonID) {
         serviceTypeSelectionController.selectServiceType(polygonID);
-    }
-
-    /**
-     * Keeps track of download progression and errors.
-     */
-    private class DownloadListener implements ProcessorListener, Runnable {
-
-        private String message;
-
-        private synchronized String getMessage() {
-            return this.message;
-        }
-
-        private synchronized void setMessage(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            statusLogController.setStatusTextUI(getMessage());
-        }
-
-        @Override
-        public void receivedException(ProcessorEvent pe) {
-            setMessage(
-                    I18n.format(
-                            "status.error",
-                            pe.getException().getMessage()));
-            Platform.runLater(this);
-        }
-
-        @Override
-        public void receivedMessage(ProcessorEvent pe) {
-            setMessage(pe.getMessage());
-            Platform.runLater(this);
-        }
     }
 
 }
