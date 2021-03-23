@@ -36,7 +36,7 @@ import de.bayern.gdi.processor.job.CloseLogJob;
 import de.bayern.gdi.processor.job.FileDownloadJob;
 import de.bayern.gdi.processor.job.FilesDownloadJob;
 import de.bayern.gdi.processor.job.GMLCheckJob;
-import de.bayern.gdi.processor.job.JobList;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.processor.job.LogMetaJob;
 import de.bayern.gdi.processor.job.OpenLogJob;
 import de.bayern.gdi.processor.job.UnzipJob;
@@ -135,7 +135,7 @@ public class DownloadStepConverter {
      * @return A job list for the download processor.
      * @throws ConverterException If the conversion went wrong.
      */
-    public JobList convert(DownloadStep downloadSteps)
+    public DownloadStepJob convert(DownloadStep downloadSteps)
         throws ConverterException {
 
         this.dls = downloadSteps;
@@ -175,7 +175,7 @@ public class DownloadStepConverter {
 
         psc.convert(dls, fileTracker, logger);
 
-        JobList jl = new JobList();
+        DownloadStepJob jl = new DownloadStepJob();
 
         jl.addJob(olj);
         jl.addJob(lmj);
@@ -325,7 +325,7 @@ public class DownloadStepConverter {
     }
 
     private void unpagedWFSDownload(
-        JobList      jl,
+        DownloadStepJob jl,
         File         workingDir,
         Set<String>  usedVars,
         WFSMeta      meta
@@ -490,7 +490,7 @@ public class DownloadStepConverter {
     }
 
     private void createWFSDownload(
-        JobList      jl,
+        DownloadStepJob jl,
         File         workingDir,
         Set<String>  usedVars
     ) throws ConverterException {
@@ -605,7 +605,7 @@ public class DownloadStepConverter {
     }
 
     private void createAtomDownload(
-        JobList jl,
+        DownloadStepJob jl,
         File workingDir
     ) throws ConverterException {
 

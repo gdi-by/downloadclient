@@ -22,7 +22,7 @@ import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.processor.job.JobList;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
@@ -126,13 +126,13 @@ public class ButtonBarController {
                     controller.dataBean.getSelectedService().getPassword());
                 ProgressDialog progressDialog = new ProgressDialog(controller);
                 dsc.addListener(progressDialog);
-                JobList jl = dsc.convert(ds);
-                Processor p = new Processor(jl);
-                p.addListeners(downloadListener, progressDialog);
+                DownloadStepJob downloadStepJob = dsc.convert(ds);
+                Processor processor = new Processor(downloadStepJob)
+                    .withListeners(downloadListener, progressDialog);
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 openProgressDialog(progressDialog, selectedDir);
                 try {
-                    this.jobExecution = executorService.submit(p);
+                    this.jobExecution = executorService.submit(processor);
                 } finally {
                     executorService.shutdown();
                 }

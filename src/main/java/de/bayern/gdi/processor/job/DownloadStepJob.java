@@ -28,15 +28,15 @@ import java.util.List;
 
 
 /**
- * JobList is a job of a sequence of depended jobs.
+ * Collects all jobs of a DownloadSteps.
  */
-public class JobList implements Job {
+public class DownloadStepJob implements Job {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobList.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadStepJob.class.getName());
 
     private List<Job> jobs;
 
-    public JobList() {
+    public DownloadStepJob() {
         jobs = new ArrayList<>();
     }
 
@@ -58,7 +58,7 @@ public class JobList implements Job {
 
     @Override
     public void run(Processor p) throws JobExecutionException {
-        LOG.info("Executing job list");
+        LOG.info("Executing download step jobs");
         int i = 0;
         try {
             for (; i < jobs.size(); i++) {

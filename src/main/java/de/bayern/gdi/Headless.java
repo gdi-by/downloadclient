@@ -24,7 +24,7 @@ import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
-import de.bayern.gdi.processor.job.Job;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.Unauthorized;
@@ -96,9 +96,9 @@ public class Headless implements ProcessorListener {
                                    List<DownloadStep> steps) {
 
         LOG.info("Executing download steps " + steps);
-        List<Job> jobs = createJobs(user, password, steps);
-        Processor processor = new Processor(jobs);
-        processor.addListeners(new Headless());
+        List<DownloadStepJob> jobs = createJobs(user, password, steps);
+        Processor processor = new Processor(jobs)
+            .withListeners(new Headless());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
             executorService.submit(processor);
@@ -108,7 +108,7 @@ public class Headless implements ProcessorListener {
         return 0;
     }
 
-    private static List<Job> createJobs(String user, String password, List<DownloadStep> steps) {
+    private static List<DownloadStepJob> createJobs(String user, String password, List<DownloadStep> steps) {
         return steps.stream().map(step -> {
             try {
                 DownloadStepConverter dsc =

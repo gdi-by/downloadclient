@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi.processor;
 
-import de.bayern.gdi.processor.job.Job;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +34,15 @@ public class Processor implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Processor.class.getName());
 
-    private Deque<Job> jobs = new ArrayDeque<>();;
+    private Deque<DownloadStepJob> jobs = new ArrayDeque<>();;
 
     private List<ProcessorListener> listeners = new CopyOnWriteArrayList<>();
 
-    public Processor(Job jobToExecute) {
+    public Processor(DownloadStepJob jobToExecute) {
         jobs.add(jobToExecute);
     }
 
-    public Processor(List<Job> jobsToExecute) {
+    public Processor(List<DownloadStepJob> jobsToExecute) {
         jobs.addAll(jobsToExecute);
     }
 
@@ -50,22 +50,16 @@ public class Processor implements Runnable {
      * Adds listeners to the list of listeners.
      *
      * @param listenersToAdd The listeners to add.
+     * @return the processor instance, never <code>null</code>
      */
-    public void addListeners(ProcessorListener... listenersToAdd) {
+    public Processor withListeners(ProcessorListener... listenersToAdd) {
         Arrays.stream(listenersToAdd).forEach(listenerToAdd -> {
                 if (!listeners.contains(listenerToAdd)) {
                     listeners.add(listenerToAdd);
                 }
             }
         );
-    }
-
-    /**
-     * Removes a listener from the list of listeners.
-     * @param listener The listener to remove.
-     */
-    public void removeListener(ProcessorListener listener) {
-        listeners.remove(listener);
+        return this;
     }
 
     /** Broadcasts an exception to all listeners.
@@ -102,7 +96,7 @@ public class Processor implements Runnable {
     public void run() {
         while (!this.jobs.isEmpty()) {
             try {
-                Job job = this.jobs.poll();
+                DownloadStepJob job = this.jobs.poll();
                 job.run(this);
             } catch (JobExecutionException jee) {
                 LOG.error(jee.getMessage(), jee);
