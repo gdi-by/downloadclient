@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -125,7 +126,7 @@ public class ButtonBarController {
                     controller.dataBean.getSelectedService().getPassword());
                 JobList jl = dsc.convert(ds);
                 Processor p = new Processor(jl);
-                openProgressDialog(dsc, p);
+                openProgressDialog(dsc, p, selectedDir);
                 p.addListener(downloadListener);
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 try {
@@ -232,7 +233,7 @@ public class ButtonBarController {
         }
     }
 
-    private void openProgressDialog(DownloadStepConverter dsc, Processor processor) {
+    private void openProgressDialog(DownloadStepConverter dsc, Processor processor, File selectedDir) {
         Platform.runLater(
             () -> {
                 ProgressDialog dialog = new ProgressDialog(controller);
@@ -243,10 +244,25 @@ public class ButtonBarController {
                 buttonType.ifPresent(bt -> {
                     if (buttonType.get() == ButtonType.CANCEL) {
                         this.cancelJobExecution();
+                    } else if (buttonType.get() == ProgressDialog.OPEN_FILES) {
+                        openFileSystemBrowser(selectedDir);
                     }
                 });
             }
         );
+    }
+
+    private void openFileSystemBrowser(File selectedDir) {
+        if (Desktop.isDesktopSupported()) {
+            new Thread(() -> {
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.browse(selectedDir.toURI());
+                } catch (IOException e) {
+                    LOG.error("File Browser with the passed uri " + selectedDir + " could not be opened.", e);
+                }
+            }).start();
+        }
     }
 
 }

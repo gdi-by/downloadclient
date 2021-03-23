@@ -30,9 +30,15 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 
+import java.awt.Desktop;
 import java.io.IOException;
 
 public class ProgressDialog extends Dialog<ButtonType> implements CountListener, ProcessorListener {
+
+    /**
+     * Button to open the download directory.
+     */
+    public static final ButtonType OPEN_FILES = new ButtonType(I18n.getMsg("progressdialog.button.openfiles"));
 
     private final DialogPane dialogPane;
 
@@ -72,6 +78,9 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
         Platform.runLater(
             () -> {
                 dialogPane.getButtonTypes().remove(ButtonType.CANCEL);
+                if (Desktop.isDesktopSupported()) {
+                    dialogPane.getButtonTypes().add(OPEN_FILES);
+                }
                 dialogPane.getButtonTypes().add(ButtonType.CLOSE);
             });
     }
