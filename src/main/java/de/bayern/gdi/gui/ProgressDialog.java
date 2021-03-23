@@ -64,13 +64,13 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
     }
 
     @Override
-    public void processingFailed(ProcessorEvent pe) {
+    public void receivedMessage(ProcessorEvent pe) {
 
     }
 
     @Override
-    public void receivedMessage(ProcessorEvent pe) {
-
+    public void processingFailed(ProcessorEvent pe) {
+        progressDialogController.showDownloadFailed(pe.getException());
     }
 
     @Override

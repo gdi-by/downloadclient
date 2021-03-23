@@ -14,8 +14,9 @@
                 <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS" spacing="10">
                     <children>
                         <Text text="%progressdialog.download.label"/>
-                        <Text fx:id="downloadUrl" text=""/>
-                        <Text fx:id="progressBytes" />
+                        <Text fx:id="downloadUrl" />
+                        <Text fx:id="status" />
+                        <Text fx:id="statusDetails"/>
                     </children>
                     <VBox.margin>
                         <Insets bottom="5.0"

@@ -18,9 +18,12 @@
 
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.utils.I18n;
 import javafx.fxml.FXML;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+
 
 /**
  * @author <a href="mailto:goltz@lat-lon.de">Lyn Goltz </a>
@@ -31,7 +34,10 @@ public class ProgressDialogController {
     private Text downloadUrl;
 
     @FXML
-    private Text progressBytes;
+    private Text status;
+
+    @FXML
+    private Text statusDetails;
 
     private Controller controller;
 
@@ -48,10 +54,22 @@ public class ProgressDialogController {
 
     /**
      * Sets the bytes counted text.
+     *
      * @param count download bytes to set as text.
      */
     public void setBytesCountedText(long count) {
-        progressBytes.setText(I18n.format("file.download.bytes", count));
+        statusDetails.setText(I18n.format("file.download.bytes", count));
     }
 
+    /**
+     * Shows the exception in the progress dialog.
+     *
+     * @param exception never <code>null</code>
+     */
+    public void showDownloadFailed(JobExecutionException exception) {
+        status.setFill(Color.RED);
+        statusDetails.setFill(Color.RED);
+        status.setText(I18n.getMsg("progressdialog.download.status.failed"));
+        statusDetails.setText(exception.getMessage());
+    }
 }
