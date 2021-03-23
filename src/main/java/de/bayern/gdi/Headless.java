@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -97,15 +99,12 @@ public class Headless implements ProcessorListener {
         List<Job> jobs = createJobs(user, password, steps);
         Processor processor = new Processor(jobs);
         processor.addListener(new Headless());
-        Thread thread = new Thread(processor);
-        thread.start();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
-            thread.join();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            return 1;
+            executorService.submit(processor);
+        } finally {
+            executorService.shutdown();
         }
-
         return 0;
     }
 

@@ -21,8 +21,8 @@ import de.bayern.gdi.gui.ProgressDialog;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.job.JobList;
 import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.job.JobList;
 import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
@@ -42,6 +42,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static de.bayern.gdi.gui.GuiConstants.USER_DIR;
 
@@ -120,9 +122,12 @@ public class ButtonBarController {
                 openProgressDialog(dsc);
                 Processor p = new Processor(jl);
                 p.addListener(downloadListener);
-                Thread processorStep = new Thread(p);
-                processorStep.setDaemon(true);
-                processorStep.start();
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                try {
+                    executorService.submit(p);
+                } finally {
+                    executorService.shutdown();
+                }
             } catch (ConverterException ce) {
                 statusLogController.setStatusTextUI(ce.getMessage());
                 Controller.logToAppLog(ce.getMessage());
