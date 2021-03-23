@@ -37,7 +37,7 @@ public class DownloadListener implements ProcessorListener {
     private StatusLogController statusLogController;
 
     @Override
-    public void receivedException(ProcessorEvent pe) {
+    public void processingFailed(ProcessorEvent pe) {
         Platform.runLater(
             () -> statusLogController.setStatusTextUI(
                 I18n.format(
@@ -53,6 +53,6 @@ public class DownloadListener implements ProcessorListener {
     }
 
     @Override
-    public void jobFinished(ProcessorEvent pe) {
+    public void processingFinished() {
     }
 }

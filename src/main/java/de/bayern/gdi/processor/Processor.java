@@ -89,14 +89,13 @@ public class Processor implements Runnable {
     private void downloadStepJobFailed(JobExecutionException jee) {
         ProcessorEvent pe = new ProcessorEvent(this, jee);
         for (ProcessorListener pl: listeners) {
-            pl.receivedException(pe);
+            pl.processingFailed(pe);
         }
     }
 
     private void downloadStepJobFinished() {
-        ProcessorEvent pe = new ProcessorEvent(this);
         for (ProcessorListener pl: listeners) {
-            pl.jobFinished(pe);
+            pl.processingFinished();
         }
     }
 }

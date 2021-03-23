@@ -64,7 +64,7 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
     }
 
     @Override
-    public void receivedException(ProcessorEvent pe) {
+    public void processingFailed(ProcessorEvent pe) {
 
     }
 
@@ -74,7 +74,7 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
     }
 
     @Override
-    public void jobFinished(ProcessorEvent pe) {
+    public void processingFinished() {
         Platform.runLater(
             () -> {
                 dialogPane.getButtonTypes().remove(ButtonType.CANCEL);
