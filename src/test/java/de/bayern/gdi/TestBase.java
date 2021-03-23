@@ -21,6 +21,7 @@ import de.bayern.gdi.gui.DataBean;
 import de.bayern.gdi.gui.WarningPopup;
 import de.bayern.gdi.gui.controller.ButtonBarController;
 import de.bayern.gdi.gui.controller.Controller;
+import de.bayern.gdi.gui.controller.DownloadListener;
 import de.bayern.gdi.gui.controller.FXMLLoaderProducer;
 import de.bayern.gdi.gui.controller.FilterAtomController;
 import de.bayern.gdi.gui.controller.FilterWfsBasicController;
@@ -120,7 +121,7 @@ public abstract class TestBase extends ApplicationTest {
                                                     ServiceSelectionController.class, ProcessingChainController.class,
                                                     ServiceTypeSelectionController.class, FilterAtomController.class,
                                                     FilterWfsBasicController.class, FilterWfsSimpleController.class,
-                                                    ButtonBarController.class)
+                                                    ButtonBarController.class, DownloadListener.class)
                                              .inject(this).build();;
 
     @Inject
