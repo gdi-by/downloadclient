@@ -31,6 +31,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -42,8 +43,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static de.bayern.gdi.gui.GuiConstants.USER_DIR;
 
@@ -77,6 +80,8 @@ public class ButtonBarController {
 
     @FXML
     private Button buttonClose;
+
+    private Future<?> jobExecution;
 
     /**
      * Start the download.
@@ -124,7 +129,7 @@ public class ButtonBarController {
                 p.addListener(downloadListener);
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 try {
-                    executorService.submit(p);
+                    this.jobExecution = executorService.submit(p);
                 } finally {
                     executorService.shutdown();
                 }
@@ -220,12 +225,25 @@ public class ButtonBarController {
         menuBarController.closeApp(stage);
     }
 
+    private void cancelJobExecution() {
+        if (jobExecution != null && !jobExecution.isDone()) {
+            // TODO: Job is not cancelled
+            jobExecution.cancel(true);
+        }
+    }
+
     private void openProgressDialog(DownloadStepConverter dsc) {
         Platform.runLater(
             () -> {
                 ProgressDialog dialog = new ProgressDialog(controller);
                 dsc.addListener(dialog);
-                dialog.showAndWait();
+                Optional<ButtonType> buttonType = dialog.showAndWait();
+
+                buttonType.ifPresent( bt -> {
+                    if (buttonType.get() == ButtonType.CANCEL ) {
+                        this.cancelJobExecution();
+                    }
+                });
             }
         );
     }

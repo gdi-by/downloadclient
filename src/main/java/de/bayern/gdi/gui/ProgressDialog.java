@@ -29,7 +29,7 @@ import javafx.scene.control.DialogPane;
 
 import java.io.IOException;
 
-public class ProgressDialog extends Dialog<Void> implements CountListener {
+public class ProgressDialog extends Dialog<ButtonType> implements CountListener {
 
     private ProgressDialogController progressDialogController;
 
@@ -37,7 +37,7 @@ public class ProgressDialog extends Dialog<Void> implements CountListener {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/progress-dialog.fxml"), I18n.getBundle());
             DialogPane dialogPane = fxmlLoader.load();
-            dialogPane.getButtonTypes().add(ButtonType.CLOSE);
+            dialogPane.getButtonTypes().add(ButtonType.CANCEL);
             this.progressDialogController = fxmlLoader.getController();
             this.progressDialogController.init(controller);
             setDialogPane(dialogPane);
