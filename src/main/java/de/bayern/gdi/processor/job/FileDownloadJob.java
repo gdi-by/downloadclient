@@ -103,20 +103,17 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
             }
         } catch (ConnectTimeoutException | SocketTimeoutException te) {
-            JobExecutionException jee =
-            new JobExecutionException(
-                    I18n.format(
-                            "file.download.failed_reason",
-                            I18n.getMsg("file.download.failed.timeout")),
-                    te);
-            broadcastException(jee);
+            String failureMsg = I18n.format(
+                "file.download.failed_reason",
+                I18n.getMsg("file.download.failed.timeout"));
+            JobExecutionException jee = new JobExecutionException(failureMsg, te);
+            log(failureMsg);
             throw jee;
 
         } catch (IOException ioe) {
-            JobExecutionException jee =
-                new JobExecutionException(
-                    I18n.getMsg("file.download.failed"), ioe);
-            broadcastException(jee);
+            String failureMsg = I18n.getMsg("file.download.failed");
+            JobExecutionException jee = new JobExecutionException(failureMsg, ioe);
+            log(failureMsg);
             throw jee;
         } finally {
             HTTP.closeGraceful(httpclient);

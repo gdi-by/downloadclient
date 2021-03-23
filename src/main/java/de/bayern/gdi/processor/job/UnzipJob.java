@@ -68,7 +68,7 @@ public class UnzipJob implements Job {
             } catch (IOException e) {
                 String msg = "Could not unzip file " + fileToUnzip;
                 JobExecutionException jee = new JobExecutionException(msg, e);
-                broadcastException(p, jee);
+                logger.log(jee.getMessage());
                 throw jee;
             }
         }
@@ -111,22 +111,8 @@ public class UnzipJob implements Job {
                 "external.process.scan.dir.failed",
                 this.fileTracker.getDirectory());
             JobExecutionException jee = new JobExecutionException(msg);
-            broadcastException(p, jee);
+            logger.log(jee.getMessage());
             throw jee;
-        }
-    }
-
-    private void broadcastMessage(Processor p, String msg) {
-        logger.log(msg);
-        if (p != null) {
-            p.broadcastMessage(msg);
-        }
-    }
-
-    private void broadcastException(Processor p, JobExecutionException jee) {
-        logger.log(jee.getMessage());
-        if (p != null) {
-            p.broadcastException(jee);
         }
     }
 }

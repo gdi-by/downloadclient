@@ -62,16 +62,6 @@ public class Processor implements Runnable {
         return this;
     }
 
-    /** Broadcasts an exception to all listeners.
-     * @param jee The exception to broadcast.
-     */
-    public void broadcastException(JobExecutionException jee) {
-        ProcessorEvent pe = new ProcessorEvent(this, jee);
-        for (ProcessorListener pl: listeners) {
-            pl.receivedException(pe);
-        }
-    }
-
     /** Broadcasts a message to all listeners.
      * @param message The message to broadcast.
      */
@@ -82,28 +72,32 @@ public class Processor implements Runnable {
         }
     }
 
-    /**
-     * Informs that all jobs was finished.
-     */
-    public void jobFinished() {
-        ProcessorEvent pe = new ProcessorEvent(this);
-        for (ProcessorListener pl: listeners) {
-            pl.jobFinished(pe);
-        }
-    }
-
     @Override
     public void run() {
         while (!this.jobs.isEmpty()) {
             try {
                 DownloadStepJob job = this.jobs.poll();
                 job.run(this);
+                downloadStepJobFinished();
             } catch (JobExecutionException jee) {
                 LOG.error(jee.getMessage(), jee);
-                broadcastException(jee);
+                downloadStepJobFailed(jee);
             }
         }
-        jobFinished();
+    }
+
+    private void downloadStepJobFailed(JobExecutionException jee) {
+        ProcessorEvent pe = new ProcessorEvent(this, jee);
+        for (ProcessorListener pl: listeners) {
+            pl.receivedException(pe);
+        }
+    }
+
+    private void downloadStepJobFinished() {
+        ProcessorEvent pe = new ProcessorEvent(this);
+        for (ProcessorListener pl: listeners) {
+            pl.jobFinished(pe);
+        }
     }
 }
 

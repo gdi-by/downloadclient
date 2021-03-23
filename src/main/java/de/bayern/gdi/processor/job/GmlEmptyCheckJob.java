@@ -95,17 +95,10 @@ public class GmlEmptyCheckJob implements Job {
                 "external.process.scan.dir.failed",
                 this.fileTracker.getDirectory());
             JobExecutionException jee = new JobExecutionException(msg);
-            broadcastException(p, jee);
+            log(jee.getMessage());
             throw jee;
         }
         return files;
-    }
-
-    private void broadcastException(Processor p, JobExecutionException jee) {
-        logger.log(jee.getMessage());
-        if (p != null) {
-            p.broadcastException(jee);
-        }
     }
 
     private void log(String msg) {

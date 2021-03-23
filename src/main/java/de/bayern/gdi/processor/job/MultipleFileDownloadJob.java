@@ -221,19 +221,19 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             again = new ArrayList<>();
         }
 
-        String msg =
+        String downloadedBytesMsg =
             I18n.format("atom.bytes.downloaded.total", this.totalCount);
-        log(msg);
-        LOG.info(msg);
+        log(downloadedBytesMsg);
+        LOG.info(downloadedBytesMsg);
 
         if (!failed.isEmpty()) {
-            msg = I18n.format(
+            String failedMsg = I18n.format(
                 "atom.downloaded.failed", successful.size(), failed.size());
-            JobExecutionException jee = new JobExecutionException(msg);
-            broadcastException(jee);
+            JobExecutionException jee = new JobExecutionException(failedMsg);
+            log(failedMsg);
             throw jee;
         }
-        msg = I18n.format("atom.downloaded.success", successful.size());
-        broadcastMessage(msg);
+        String infosuccess = I18n.format("atom.downloaded.success", successful.size());
+        broadcastMessage(infosuccess);
     }
 }

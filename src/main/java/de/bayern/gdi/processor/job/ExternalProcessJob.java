@@ -189,12 +189,6 @@ public class ExternalProcessJob implements Job {
         }
     }
 
-    private void broadcastException(Processor p, JobExecutionException jee) {
-        logExtra(jee.getMessage());
-        if (p != null) {
-            p.broadcastException(jee);
-        }
-    }
 
     /**
      * Runs the external process.
@@ -211,7 +205,7 @@ public class ExternalProcessJob implements Job {
                     "external.process.scan.dir.failed",
                     this.fileTracker.getDirectory());
                 JobExecutionException jee = new JobExecutionException(msg);
-                broadcastException(p, jee);
+                logExtra(jee.getMessage());
                 throw jee;
             }
         }
@@ -273,13 +267,13 @@ public class ExternalProcessJob implements Job {
             if (exitcode != 0) {
                 JobExecutionException jee = new JobExecutionException(
                     I18n.format("external.process.error", command, exitcode));
-                broadcastException(p, jee);
+                logExtra(jee.getMessage());
                 throw jee;
             }
         } catch (IOException | InterruptedException e) {
             JobExecutionException jee = new JobExecutionException(
                 I18n.format("external.process.failed", command), e);
-            broadcastException(p, jee);
+            logExtra(jee.getMessage());
             throw jee;
         }
 
