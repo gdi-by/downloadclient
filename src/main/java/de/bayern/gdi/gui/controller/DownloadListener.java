@@ -51,4 +51,8 @@ public class DownloadListener implements ProcessorListener {
             () -> statusLogController.setStatusTextUI(pe.getMessage())
         );
     }
+
+    @Override
+    public void jobFinished(ProcessorEvent pe) {
+    }
 }

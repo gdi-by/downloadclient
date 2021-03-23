@@ -20,8 +20,11 @@ package de.bayern.gdi.gui;
 
 import de.bayern.gdi.gui.controller.Controller;
 import de.bayern.gdi.gui.controller.ProgressDialogController;
+import de.bayern.gdi.processor.ProcessorEvent;
+import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.processor.listener.CountListener;
 import de.bayern.gdi.utils.I18n;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -29,15 +32,17 @@ import javafx.scene.control.DialogPane;
 
 import java.io.IOException;
 
-public class ProgressDialog extends Dialog<ButtonType> implements CountListener {
+public class ProgressDialog extends Dialog<ButtonType> implements CountListener, ProcessorListener {
+
+    private final DialogPane dialogPane;
 
     private ProgressDialogController progressDialogController;
 
     public ProgressDialog(Controller controller) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/progress-dialog.fxml"), I18n.getBundle());
-            DialogPane dialogPane = fxmlLoader.load();
-            dialogPane.getButtonTypes().add(ButtonType.CANCEL);
+            this.dialogPane = fxmlLoader.load();
+            this.dialogPane.getButtonTypes().add(ButtonType.CANCEL);
             this.progressDialogController = fxmlLoader.getController();
             this.progressDialogController.init(controller);
             setDialogPane(dialogPane);
@@ -50,5 +55,24 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener 
     @Override
     public void bytesCounted(long counter) {
         progressDialogController.setBytesCountedText(counter);
+    }
+
+    @Override
+    public void receivedException(ProcessorEvent pe) {
+
+    }
+
+    @Override
+    public void receivedMessage(ProcessorEvent pe) {
+
+    }
+
+    @Override
+    public void jobFinished(ProcessorEvent pe) {
+        Platform.runLater(
+            () -> {
+                dialogPane.getButtonTypes().remove(ButtonType.CANCEL);
+                dialogPane.getButtonTypes().add(ButtonType.CLOSE);
+            });
     }
 }

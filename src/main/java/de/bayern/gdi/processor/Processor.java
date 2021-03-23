@@ -83,6 +83,16 @@ public class Processor implements Runnable {
         }
     }
 
+    /**
+     * Informs that all jobs was finished.
+     */
+    public void jobFinished() {
+        ProcessorEvent pe = new ProcessorEvent(this);
+        for (ProcessorListener pl: listeners) {
+            pl.jobFinished(pe);
+        }
+    }
+
     @Override
     public void run() {
         while (!this.jobs.isEmpty()) {
@@ -94,6 +104,7 @@ public class Processor implements Runnable {
                 broadcastException(jee);
             }
         }
+        jobFinished();
     }
 }
 

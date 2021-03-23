@@ -132,5 +132,9 @@ public class Headless implements ProcessorListener {
         JobExecutionException jee = pe.getException();
         LOG.error(jee.getMessage(), jee);
     }
+
+    @Override
+    public void jobFinished(ProcessorEvent pe) {
+    }
 }
 

@@ -37,4 +37,10 @@ public interface ProcessorListener extends EventListener {
      * message.
      */
     void receivedMessage(ProcessorEvent pe);
+
+    /**
+     * Called if the job execution is finished.
+     * @param pe The event.
+     */
+    void jobFinished(ProcessorEvent pe);
 }
