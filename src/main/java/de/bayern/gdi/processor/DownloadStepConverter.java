@@ -556,6 +556,7 @@ public class DownloadStepConverter {
         LOG.info("Total number of features: {}", numFeatures);
 
         FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
+        listener.forEach(l -> fdj.addListener(l));
         GMLCheckJob gcj = new GMLCheckJob(logger);
 
         String ext = extension();
@@ -624,6 +625,7 @@ public class DownloadStepConverter {
             workingDir,
             this.user, this.password,
             this.logger);
+        listener.forEach(l -> job.addListener(l));
         jl.addJob(job);
     }
 
