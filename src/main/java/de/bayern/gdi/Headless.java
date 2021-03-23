@@ -98,7 +98,7 @@ public class Headless implements ProcessorListener {
         LOG.info("Executing download steps " + steps);
         List<Job> jobs = createJobs(user, password, steps);
         Processor processor = new Processor(jobs);
-        processor.addListener(new Headless());
+        processor.addListeners(new Headless());
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
             executorService.submit(processor);

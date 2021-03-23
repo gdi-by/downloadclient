@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -46,13 +47,17 @@ public class Processor implements Runnable {
     }
 
     /**
-     * Adds a listener to the list of listeners.
-     * @param listener The listener to add.
+     * Adds listeners to the list of listeners.
+     *
+     * @param listenersToAdd The listeners to add.
      */
-    public void addListener(ProcessorListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+    public void addListeners(ProcessorListener... listenersToAdd) {
+        Arrays.stream(listenersToAdd).forEach(listenerToAdd -> {
+                if (!listeners.contains(listenerToAdd)) {
+                    listeners.add(listenerToAdd);
+                }
+            }
+        );
     }
 
     /**

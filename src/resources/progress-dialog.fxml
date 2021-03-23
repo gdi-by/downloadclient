@@ -11,7 +11,7 @@
     <content>
         <GridPane alignment="CENTER_LEFT" hgap="10.0" prefWidth="300.0">
             <children>
-                <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS" spacing="10">
                     <children>
                         <Text text="%progressdialog.download.label"/>
                         <Text fx:id="downloadUrl" text=""/>

@@ -124,11 +124,13 @@ public class ButtonBarController {
                 DownloadStepConverter dsc = new DownloadStepConverter(
                     controller.dataBean.getSelectedService().getUsername(),
                     controller.dataBean.getSelectedService().getPassword());
+                ProgressDialog progressDialog = new ProgressDialog(controller);
+                dsc.addListener(progressDialog);
                 JobList jl = dsc.convert(ds);
                 Processor p = new Processor(jl);
-                openProgressDialog(dsc, p, selectedDir);
-                p.addListener(downloadListener);
+                p.addListeners(downloadListener, progressDialog);
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
+                openProgressDialog(progressDialog, selectedDir);
                 try {
                     this.jobExecution = executorService.submit(p);
                 } finally {
@@ -233,14 +235,10 @@ public class ButtonBarController {
         }
     }
 
-    private void openProgressDialog(DownloadStepConverter dsc, Processor processor, File selectedDir) {
+    private void openProgressDialog(ProgressDialog dialog, File selectedDir) {
         Platform.runLater(
             () -> {
-                ProgressDialog dialog = new ProgressDialog(controller);
-                dsc.addListener(dialog);
-                processor.addListener(dialog);
                 Optional<ButtonType> buttonType = dialog.showAndWait();
-
                 buttonType.ifPresent(bt -> {
                     if (buttonType.get() == ButtonType.CANCEL) {
                         this.cancelJobExecution();
