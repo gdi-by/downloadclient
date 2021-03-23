@@ -23,10 +23,14 @@ import de.bayern.gdi.utils.I18n;
 import javafx.application.Platform;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Keeps track of download progression and errors.
  */
+@Named
+@Singleton
 public class DownloadListener implements ProcessorListener {
 
     @Inject
