@@ -71,6 +71,11 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
     @Override
     public void processingFailed(ProcessorEvent pe) {
         progressDialogController.showDownloadFailed(pe.getException());
+        Platform.runLater(
+            () -> {
+                dialogPane.getButtonTypes().remove(ButtonType.CANCEL);
+                dialogPane.getButtonTypes().add(ButtonType.CLOSE);
+            });
     }
 
     @Override
