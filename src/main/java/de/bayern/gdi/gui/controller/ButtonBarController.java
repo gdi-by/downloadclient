@@ -241,7 +241,7 @@ public class ButtonBarController {
                 Optional<ButtonType> buttonType = dialog.showAndWait();
                 buttonType.ifPresent(bt -> {
                     if (buttonType.get() == ButtonType.CANCEL) {
-                        this.cancelJobExecution();
+                        cancelJobExecution();
                     } else if (buttonType.get() == ProgressDialog.OPEN_FILES) {
                         openFileSystemBrowser(selectedDir);
                     }

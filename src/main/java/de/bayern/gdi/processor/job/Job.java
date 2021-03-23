@@ -30,7 +30,7 @@ public interface Job {
      * @param p The processor which run this job.
      * @throws JobExecutionException if the job execution failed.
      */
-    void run(Processor p) throws JobExecutionException;
+    void run(Processor p) throws JobExecutionException, InterruptedException;
 }
 
 

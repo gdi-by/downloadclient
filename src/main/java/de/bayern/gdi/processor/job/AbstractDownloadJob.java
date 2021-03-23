@@ -75,7 +75,7 @@ public abstract class AbstractDownloadJob
     }
 
     @Override
-    public void run(Processor p) throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException, InterruptedException {
         Processor old = this.processor;
         this.processor = p;
         try {
@@ -121,7 +121,7 @@ public abstract class AbstractDownloadJob
      * @throws JobExecutionException Something went wrong during
      * the download.
      */
-    protected abstract void download() throws JobExecutionException;
+    protected abstract void download() throws JobExecutionException, InterruptedException;
 
     /**
      * Converts a string into an URL.

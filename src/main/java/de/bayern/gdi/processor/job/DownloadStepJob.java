@@ -57,12 +57,15 @@ public class DownloadStepJob implements Job {
     }
 
     @Override
-    public void run(Processor p) throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException, InterruptedException {
         LOG.info("Executing download step jobs");
         int i = 0;
         try {
             for (; i < jobs.size(); i++) {
                 jobs.get(i).run(p);
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException("");
+                }
             }
         } finally {
             for (i++; i < jobs.size(); i++) {

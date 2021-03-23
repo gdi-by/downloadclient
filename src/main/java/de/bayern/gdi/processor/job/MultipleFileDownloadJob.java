@@ -179,7 +179,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      * @throws JobExecutionException If something went wrong.
      */
     protected void downloadFiles(List<DLFile> files)
-    throws JobExecutionException {
+        throws JobExecutionException, InterruptedException {
 
         broadcastMessage(I18n.format("file.download.start"));
 
@@ -211,6 +211,9 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
                         numFiles - failed.size()
                              - successful.size()
                              + again.size())));
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException("");
+                }
             }
 
             // Only sleep if there are files to try again.

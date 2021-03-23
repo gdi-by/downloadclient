@@ -128,7 +128,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    protected void download() throws JobExecutionException, InterruptedException {
         String dsURL = figureoutDatasource();
         URL root = absoluteURL(this.url, dsURL);
         Document ds = getDocument(root);

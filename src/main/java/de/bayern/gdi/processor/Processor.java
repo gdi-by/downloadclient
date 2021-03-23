@@ -18,6 +18,7 @@
 package de.bayern.gdi.processor;
 
 import de.bayern.gdi.processor.job.DownloadStepJob;
+import de.bayern.gdi.utils.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +83,8 @@ public class Processor implements Runnable {
             } catch (JobExecutionException jee) {
                 LOG.error(jee.getMessage(), jee);
                 downloadStepJobFailed(jee);
+            } catch (InterruptedException e) {
+                broadcastMessage(I18n.getMsg("status.download.cancelled"));
             }
         }
     }

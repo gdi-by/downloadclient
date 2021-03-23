@@ -52,7 +52,7 @@ public class FilesDownloadJob extends MultipleFileDownloadJob {
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    protected void download() throws JobExecutionException, InterruptedException {
         downloadFiles(this.files);
     }
 }
