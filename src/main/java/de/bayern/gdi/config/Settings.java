@@ -64,7 +64,7 @@ public class Settings {
      */
     public Settings(String filePath)
         throws SAXException, ParserConfigurationException, IOException {
-        this(XML.getDocument(getFileStream(filePath)));
+        this(new File(filePath));
     }
 
     public Settings(File file)
@@ -113,13 +113,14 @@ public class Settings {
      */
     public void persistSettingsFile(Document doc) {
         if (this.file == null) {
-            LOG.warn("settings are bot be persisted as settings.xml is null");
+            LOG.error("Failed to save settings.xml. File is not defined!");
             return;
         }
         try (FileOutputStream outputStream = new FileOutputStream(this.file)) {
             XML.printDocument(doc, outputStream);
         } catch (IOException e) {
-            LOG.warn("settings.xml could not be persisted!", e);
+            LOG.error("Error while saving settings.xml: ", e);
         }
+        LOG.info("Successfully saved settings.xml");
     }
 }
