@@ -87,7 +87,7 @@ public class ApplicationSettings {
             && credentialsToPersist.getPassword() != null
             && !credentialsToPersist.getPassword().isEmpty()
             && !credentialsToPersist.equals(this.credentials)) {
-            LOG.info("Persist credentials");
+            LOG.info("Saving credentials in settings.xml");
             modifyDocument(credentialsToPersist);
             settings.persistSettingsFile(doc);
         }
@@ -96,9 +96,10 @@ public class ApplicationSettings {
 
     @Override
     public String toString() {
-        return "ApplicationSettings: {"
+        return "ApplicationSettings: ["
             + "requestTimeOutInMS: " + requestTimeOutInMS
-            + "}";
+            + ", credentials: " + credentials
+            + "]";
     }
 
     /**
@@ -150,12 +151,13 @@ public class ApplicationSettings {
         if (username != null) {
             this.credentials = new Credentials(username, password);
         }
+        LOG.debug("Found credentials for username " + username);
     }
 
     private void modifyDocument(Credentials newCredentials) {
         NodeList nodes = doc.getElementsByTagName("application");
         if (nodes.getLength() < 1) {
-            LOG.warn("Credentials could not be stored. No application element found in settings.xml.");
+            LOG.warn("Credentials could not be stored. No application element found in settings.xml");
         }
         Node applicationNode = nodes.item(0);
 

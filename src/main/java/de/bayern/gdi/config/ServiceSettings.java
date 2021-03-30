@@ -52,8 +52,7 @@ public class ServiceSettings {
     private Pattern checkWithGET;
     private String baseDirectory;
 
-    private static final String NAME =
-            "ServiceSetting";
+    private static final String NAME = "ServiceSetting";
 
     public ServiceSettings(Document doc) throws IOException {
         parseDocument(doc);
@@ -328,12 +327,12 @@ public class ServiceSettings {
 
     @Override
     public String toString() {
-        return "ServiceSettings: {"
+        return "ServiceSettings: ["
             + "services=" + services
             + ", catalogues=" + catalogues
             + ", wms=" + wms
             + ", checkWithGET=" + checkWithGET
             + ", basedir=" + baseDirectory
-            + "}";
+            + "]";
     }
 }

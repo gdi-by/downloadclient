@@ -148,8 +148,7 @@ public final class Config {
     private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
-            LOG.info("No config directory given, starting with standard "
-                    + "values...");
+            LOG.info("No config directory given, starting with standard values...");
             Holder.INSTANCE.settings = loadSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
@@ -210,7 +209,7 @@ public final class Config {
             Holder.INSTANCE.proxyConfig = ProxyConfiguration.read(proxy);
             Holder.INSTANCE.proxyConfig.apply();
         } else {
-            LOG.info("No Proxy config found, starting without proxy.");
+            LOG.info("No Proxy config found, starting without proxy settings");
         }
 
         File services = new File(dir, Settings.SETTINGS_FILE);

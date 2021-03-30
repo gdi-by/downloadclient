@@ -29,10 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * Class managing all settings.
+ * An instance of this class manages the application and service settings.
+ * The settings are read from an XML config file settings.xml. A default configuration
+ * is provided with the application. This default settings.xml is read only.
+ * An external settings.xml file can be specified and in this case changes
+ * of the application settings are written to this file.
+ *
  * @author Alexander Woestmann (awoestmann@intevation)
  */
 
@@ -41,38 +45,58 @@ public class Settings {
     private static final Logger LOG = LoggerFactory.getLogger(Settings.class.getName());
 
     /** Name of the config file. */
-    public static final String SETTINGS_FILE =
-            "settings.xml";
+    public static final String SETTINGS_FILE = "settings.xml";
 
-    private static final String NAME =
-            "Settings";
+    /** Name of the settings type. */
+    private static final String NAME = "Settings";
 
+    /** The settings.xml file, can be null. */
     private File file;
 
     private ServiceSettings serviceSettings;
 
     private ApplicationSettings applicationSettings;
 
-    public Settings()
-            throws SAXException, ParserConfigurationException, IOException {
-        this(SETTINGS_FILE);
+    /**
+     * Return class name.
+     * @return The name
+     */
+    public static String getName() {
+        return NAME;
     }
 
     /**
-     * Constructor.
-     * @param filePath Path to the settings xml document
+     * Default constructor with r/o settings.xml from class path.
+     *
+     * @throws SAXException if the XML is invalid
+     * @throws ParserConfigurationException if the XML parser config is invalid
+     * @throws IOException if the file is not accessible
      */
-    public Settings(String filePath)
-        throws SAXException, ParserConfigurationException, IOException {
-        this(new File(filePath));
+    public Settings()
+            throws SAXException, ParserConfigurationException, IOException {
+        this(XML.getDocument(Misc.getResource(SETTINGS_FILE)));
     }
 
+    /**
+     * Creates an instance of Settings which are read from the file system and the settings.xml is writable.
+     *
+     * @param file the settings.xml file, if not null the settings.xml is writable
+     * @throws SAXException if the XML is invalid
+     * @throws ParserConfigurationException if the XML parser config is invalid
+     * @throws IOException if the file is not accessible
+     */
     public Settings(File file)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(file));
         this.file = file;
     }
 
+    /**
+     * Constructor reads service and application settings from given document.
+     *
+     * @param doc the DOM representation of settings.xml
+     * @throws IOException if an error occurs getting the sections from the document.
+     */
     private Settings(Document doc) throws IOException {
         this.serviceSettings = new ServiceSettings(doc);
         this.applicationSettings = new ApplicationSettings(doc, this);
@@ -94,26 +118,15 @@ public class Settings {
         return this.applicationSettings;
     }
 
-    private static InputStream getFileStream(String fileName) {
-        return Misc.getResource(fileName);
-    }
-
     /**
-     * Return class name.
-     * @return The name
-     */
-    public static String getName() {
-        return NAME;
-    }
-
-    /**
-     * Persist the passed document as settings.xml.
+     * Persist the passed document as settings.xml in case the file is writable.
      *
      * @param doc to persist, should not be <code>null</code>
+     * @see #file
      */
     public void persistSettingsFile(Document doc) {
         if (this.file == null) {
-            LOG.error("Failed to save settings.xml. File is not defined!");
+            LOG.warn("Not saving settings.xml. File is not defined!");
             return;
         }
         try (FileOutputStream outputStream = new FileOutputStream(this.file)) {

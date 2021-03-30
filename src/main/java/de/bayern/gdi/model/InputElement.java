@@ -90,10 +90,10 @@ public class InputElement {
 
     @Override
     public String toString() {
-        return "InputElement{"
+        return "InputElement ["
             + "name='" + name + "'"
             + ", type='" + type + "'"
             + ", options=" + options
-            + "}";
+            + "]";
     }
 }

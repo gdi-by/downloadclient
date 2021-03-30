@@ -62,8 +62,7 @@ public class ProcessingConfiguration {
     private List<ProcessingStepConfiguration> processingSteps;
 
 
-    private static final String NAME =
-            "ProcessingConfig";
+    private static final String NAME = "ProcessingConfig";
 
     public ProcessingConfiguration() {
         this.inputElements = new ArrayList<>();
@@ -140,10 +139,10 @@ public class ProcessingConfiguration {
 
     @Override
     public String toString() {
-        return "ProcessingConfiguration: {"
+        return "ProcessingConfiguration: ["
             + "inputElements=" + inputElements
             + ", processingSteps=" + processingSteps
-            + "}";
+            + "]";
     }
 
     /**
