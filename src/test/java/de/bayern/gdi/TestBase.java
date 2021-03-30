@@ -325,18 +325,22 @@ public abstract class TestBase extends ApplicationTest {
             case PROCESS_SELECTION:
             case SERVICE_TYPE_CHOOSER:
                 ComboBox cb = getElementById(element, ComboBox.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, cb.getItems().size(), cb.getItems() );
                 result = comparison.test(cb.getItems().size());
                 break;
             case SERVICE_LIST:
                 ListView lv = getElementById(element, ListView.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, lv.getItems().size(), lv.getItems() );
                 result = comparison.test(lv.getItems().size());
                 break;
             case PROCESSINGSTEPS:
                 HBox b = getElementById(element, HBox.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, b.getChildren().size(), b.getChildren() );
                 result = comparison.test(b.getChildren().size());
                 break;
             default:
                 TextField t = getElementById(element, TextField.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, t.getText().length(), t.getText() );
                 result = comparison.test(t.getText().length());
         }
         return result;

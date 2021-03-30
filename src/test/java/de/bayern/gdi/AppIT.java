@@ -207,6 +207,7 @@ public class AppIT extends TestBase {
                 + VERWALTUNGSGRENZEN_NUMBER_OF_FEATURETYPES
                 + VERWALTUNGSGRENZEN_NUMBER_OF_STOREDQUERIES
                 + VERWALTUNGSGRENZEN_NUMBER_OF_OVERALL;
+        LOG.debug("Testing {} for {} entries", VERWALTUNGSGRENZEN, numberOfExpectedServices);
         assertTrue(hasSize(SERVICE_TYPE_CHOOSER, numberOfExpectedServices));
         selectDataFormatByNumber(0);
         clickOn(ACTIVATE_FURTHER_PROCESSING);
