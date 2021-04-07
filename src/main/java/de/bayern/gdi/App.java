@@ -133,7 +133,7 @@ public class App {
             initConfig(line.getOptionValue("c"));
 
             if (line.hasOption("h")) {
-                System.exit(Headless.main(
+                System.exit(Headless.runHeadless(
                     line.getArgs(),
                     line.getOptionValue("u"),
                     line.getOptionValue("p")));
