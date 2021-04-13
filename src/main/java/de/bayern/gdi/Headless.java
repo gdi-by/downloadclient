@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.config.ApplicationSettings;
 import de.bayern.gdi.config.Config;
 import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.model.DownloadStep;
@@ -50,11 +51,10 @@ public class Headless implements ProcessorListener {
 
     /**
      * @param downloadFiles The command line arguments.
-     * @param user          Optional user name.
-     * @param password      Optional user name.
+     * @param credentials   Optional credentials
      * @return Non zero if the operation fails.
      */
-    public static int runHeadless(String[] downloadFiles, String user, String password) {
+    public static int runHeadless(String[] downloadFiles, Credentials credentials) {
 
         LOG.info("Running in headless mode");
 
@@ -78,19 +78,17 @@ public class Headless implements ProcessorListener {
             }
         }
 
-        return runHeadless(user, password, steps);
+        return runHeadless(credentials, steps);
     }
 
     /**
      * Triggers the actual Headless Mode.
      *
-     * @param user     username
-     * @param password password
-     * @param steps    downloadSteps
+     * @param credentials optional credentials
+     * @param steps       downloadSteps
      * @return exit code
      */
-    static int runHeadless(String user,
-                           String password,
+    static int runHeadless(Credentials credentials,
                            List<DownloadStep> steps) {
         Processor processor = new Processor();
         processor.addListener(new Headless());
@@ -101,7 +99,7 @@ public class Headless implements ProcessorListener {
 
         for (DownloadStep step : steps) {
             try {
-                DownloadStepConverter dsc = createDownloadStepConverter(user, password);
+                DownloadStepConverter dsc = createDownloadStepConverter(credentials);
                 processor.addJob(dsc.convert(step));
             } catch (ConverterException ce) {
                 LOG.warn("Creating download jobs failed", ce);
@@ -131,11 +129,12 @@ public class Headless implements ProcessorListener {
         LOG.error(jee.getMessage(), jee);
     }
 
-    private static DownloadStepConverter createDownloadStepConverter(String user, String password) {
-        if (user != null) {
-            return new DownloadStepConverter(user, password);
+    private static DownloadStepConverter createDownloadStepConverter(Credentials credentials) {
+        ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
+        if (credentials != null) {
+            applicationSettings.persistCredentials(credentials);
         }
-        Credentials configuredCredentials = Config.getInstance().getApplicationSettings().getCredentials();
+        Credentials configuredCredentials = applicationSettings.getCredentials();
         if (configuredCredentials != null) {
             return new DownloadStepConverter(configuredCredentials.getUsername(), configuredCredentials.getPassword());
         }

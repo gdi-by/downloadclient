@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.config.DownloadConfiguration;
 import static de.bayern.gdi.utils.SceneConstants.ACTIVATE_FURTHER_PROCESSING;
@@ -126,6 +127,8 @@ public class AppIT extends TestBase {
      */
     private static final DownloadConfiguration DOWNLOAD_CONFIGURATION =
         new DownloadConfiguration();
+
+    private static final Credentials NO_CREDENTIALS = null;
 
     // METHODS
 
@@ -349,9 +352,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getAGZConfiguration
         );
-        String username = "";
-        String password = "";
-        int result = Headless.runHeadless(username, password, steps);
+        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -365,9 +366,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getBiergartenConfiguration
         );
-        String username = "";
-        String password = "";
-        int result = Headless.runHeadless(username, password, steps);
+        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -381,9 +380,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getNuremburgConfig
         );
-        String username = "";
-        String password = "";
-        int result = Headless.runHeadless(username, password, steps);
+        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -398,9 +395,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getCqlConfig
         );
-        String username = "";
-        String password = "";
-        int result = Headless.runHeadless(username, password, steps);
+        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
