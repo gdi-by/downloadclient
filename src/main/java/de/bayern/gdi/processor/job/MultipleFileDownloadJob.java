@@ -212,7 +212,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
                              - successful.size()
                              + again.size())));
                 if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException("");
+                    throw new InterruptedException("Download of multiple files interrupted.");
                 }
             }
 

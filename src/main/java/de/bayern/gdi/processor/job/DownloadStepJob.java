@@ -64,7 +64,7 @@ public class DownloadStepJob implements Job {
             for (; i < jobs.size(); i++) {
                 jobs.get(i).run(p);
                 if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException("");
+                    throw new InterruptedException("Execution of the download job interrupted.");
                 }
             }
         } finally {
