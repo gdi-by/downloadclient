@@ -120,6 +120,7 @@ public abstract class AbstractDownloadJob
      * Override this for the concrete download.
      * @throws JobExecutionException Something went wrong during
      * the download.
+     * @throws InterruptedException if the job was interrupted.
      */
     protected abstract void download() throws JobExecutionException, InterruptedException;
 

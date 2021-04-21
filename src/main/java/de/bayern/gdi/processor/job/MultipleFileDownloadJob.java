@@ -177,6 +177,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      * Downloads a list of files.
      * @param files The files to download.
      * @throws JobExecutionException If something went wrong.
+     * @throws InterruptedException if the job was interrupted.
      */
     protected void downloadFiles(List<DLFile> files)
         throws JobExecutionException, InterruptedException {
