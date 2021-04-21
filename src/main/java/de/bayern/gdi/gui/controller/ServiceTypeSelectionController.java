@@ -25,7 +25,7 @@ import de.bayern.gdi.gui.ItemModel;
 import de.bayern.gdi.gui.MiscItemModel;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.ServiceType;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;

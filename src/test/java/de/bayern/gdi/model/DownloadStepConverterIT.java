@@ -21,7 +21,7 @@ import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.FileDownloadJob;
 import de.bayern.gdi.processor.Job;
 import de.bayern.gdi.processor.JobList;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;

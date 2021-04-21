@@ -32,7 +32,7 @@ import de.bayern.gdi.processor.ExternalProcessJob.Arg;
 import de.bayern.gdi.processor.ExternalProcessJob.DeltaGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;

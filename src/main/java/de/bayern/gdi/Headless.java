@@ -17,6 +17,9 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.config.ApplicationSettings;
+import de.bayern.gdi.config.Config;
+import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
@@ -47,12 +50,11 @@ public class Headless implements ProcessorListener {
     }
 
     /**
-     * @param args     The command line arguments.
-     * @param user     Optional user name.
-     * @param password Optional user name.
+     * @param downloadFiles The command line arguments.
+     * @param credentials   Optional credentials
      * @return Non zero if the operation fails.
      */
-    public static int main(String[] args, String user, String password) {
+    public static int runHeadless(String[] downloadFiles, Credentials credentials) {
 
         LOG.info("Running in headless mode");
 
@@ -62,34 +64,32 @@ public class Headless implements ProcessorListener {
 
         List<DownloadStep> steps = new ArrayList<>();
 
-        for (String arg : args) {
-            File file = new File(arg);
+        for (String downloadFile : downloadFiles) {
+            File file = new File(downloadFile);
             if (file.isFile() && file.canRead()) {
                 try {
                     steps.add(DownloadStep.read(file));
-                    LOG.info("Download steps: " + file.getName());
+                    LOG.info("Download steps: {}", file.getName());
                 } catch (IOException ioe) {
                     LOG.warn("Cannot load file: " + file.getName(), ioe);
                 }
             } else {
-                LOG.warn("'" + arg + "' is not a readable file.");
+                LOG.warn("'{}' is not a readable file.", downloadFile);
             }
         }
 
-        return runHeadless(user, password, steps);
+        return runHeadless(credentials, steps);
     }
 
     /**
      * Triggers the actual Headless Mode.
      *
-     * @param user     username
-     * @param password password
-     * @param steps    downloadSteps
+     * @param credentials optional credentials
+     * @param steps       downloadSteps
      * @return exit code
      */
-    static int runHeadless(String user,
-                                   String password,
-                                   List<DownloadStep> steps) {
+    static int runHeadless(Credentials credentials,
+                           List<DownloadStep> steps) {
         Processor processor = new Processor();
         processor.addListener(new Headless());
         Thread thread = new Thread(processor);
@@ -99,8 +99,7 @@ public class Headless implements ProcessorListener {
 
         for (DownloadStep step : steps) {
             try {
-                DownloadStepConverter dsc =
-                    new DownloadStepConverter(user, password);
+                DownloadStepConverter dsc = createDownloadStepConverter(credentials);
                 processor.addJob(dsc.convert(step));
             } catch (ConverterException ce) {
                 LOG.warn("Creating download jobs failed", ce);
@@ -129,5 +128,18 @@ public class Headless implements ProcessorListener {
         JobExecutionException jee = pe.getException();
         LOG.error(jee.getMessage(), jee);
     }
+
+    private static DownloadStepConverter createDownloadStepConverter(Credentials credentials) {
+        ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
+        if (credentials != null) {
+            applicationSettings.persistCredentials(credentials);
+        }
+        Credentials configuredCredentials = applicationSettings.getCredentials();
+        if (configuredCredentials != null) {
+            return new DownloadStepConverter(configuredCredentials.getUsername(), configuredCredentials.getPassword());
+        }
+        return new DownloadStepConverter();
+    }
+
 }
 

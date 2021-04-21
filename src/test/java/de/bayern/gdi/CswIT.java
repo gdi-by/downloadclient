@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.services.CatalogService;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;

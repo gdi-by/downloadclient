@@ -17,6 +17,7 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.config.Config;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;

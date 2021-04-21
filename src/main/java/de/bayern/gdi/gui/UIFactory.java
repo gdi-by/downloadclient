@@ -29,7 +29,7 @@ import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProcessingStepConfiguration;
 import de.bayern.gdi.services.Field;
 import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.I18n;
 
 import javafx.collections.FXCollections;

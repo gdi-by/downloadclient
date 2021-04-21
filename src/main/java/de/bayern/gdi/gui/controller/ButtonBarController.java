@@ -22,7 +22,7 @@ import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
 import javafx.event.ActionEvent;

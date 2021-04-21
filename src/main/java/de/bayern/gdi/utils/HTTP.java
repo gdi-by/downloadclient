@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 
+import de.bayern.gdi.config.ApplicationSettings;
+import de.bayern.gdi.config.Config;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -45,9 +47,6 @@ import org.slf4j.LoggerFactory;
 /** Helper for HTTP. */
 public final class HTTP {
 
-    private static final int DEFAULT_TIMEOUT = 10000;
-    private static final int S_TO_MS = 1000;
-
     private static final Logger LOG = LoggerFactory.getLogger(HTTP.class.getName());
 
     private HTTP() {
@@ -63,20 +62,10 @@ public final class HTTP {
     public static CloseableHttpClient getClient(
         URL url, String user, String password
     ) {
-        int timeout = DEFAULT_TIMEOUT;
-
         ApplicationSettings set = Config
             .getInstance()
             .getApplicationSettings();
-
-        String ts = set.getApplicationSetting("requestTimeout_s");
-        if (ts != null) {
-            try {
-                timeout = S_TO_MS * Integer.parseInt(ts);
-            } catch (NumberFormatException nfe) {
-                LOG.error(nfe.getMessage());
-            }
-        }
+        int timeout = set.getRequestTimeoutInMs();
 
         // Use JVM proxy settings.
         SystemDefaultRoutePlanner routePlanner

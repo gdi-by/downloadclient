@@ -18,6 +18,7 @@
 
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.services.ServiceType;
 import java.io.IOException;
 import java.net.MalformedURLException;

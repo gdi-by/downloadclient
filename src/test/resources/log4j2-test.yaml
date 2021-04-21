@@ -16,6 +16,8 @@ Configuration:
             level: warn
         -   name: de.bayern.gdi
             level: warn
+        -   name: de.bayern.gdi.TestBase
+            level: debug
         -   name: de.bayern.gdi.Headless
             level: off
         -   name: org.geotools

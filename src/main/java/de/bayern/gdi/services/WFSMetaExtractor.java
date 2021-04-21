@@ -195,7 +195,7 @@ public class WFSMetaExtractor {
         if (doc != null) {
             return doc;
         }
-        throw new IOException("Cannot load document.");
+        throw new IOException("Cannot load document from " + url);
     }
 
     private static String url(

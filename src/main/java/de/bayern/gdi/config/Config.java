@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.utils;
+package de.bayern.gdi.config;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,8 @@ import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
 
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Info;
 import org.geotools.util.logging.Logging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,8 +148,7 @@ public final class Config {
     private static void uninitialized()
         throws IOException {
         synchronized (Holder.INSTANCE) {
-            LOG.info("No config directory given, starting with standard "
-                    + "values...");
+            LOG.info("No config directory given, starting with standard values...");
             Holder.INSTANCE.settings = loadSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
@@ -208,7 +209,7 @@ public final class Config {
             Holder.INSTANCE.proxyConfig = ProxyConfiguration.read(proxy);
             Holder.INSTANCE.proxyConfig.apply();
         } else {
-            LOG.info("No Proxy config found, starting without proxy.");
+            LOG.info("No Proxy config found, starting without proxy settings");
         }
 
         File services = new File(dir, Settings.SETTINGS_FILE);
