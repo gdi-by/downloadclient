@@ -2,13 +2,13 @@
 @echo GDI-BY Downloadclient
 @echo ===============================================
 @echo Setting up an environment.
-@setlocal EnableDelayedExpansion
 
 SET "SYS_PATH=%PATH%"
 SET dlc=%~dp0
 SET dlc=%dlc:\\=\%
 SET "PATH=%dlcbin%;%dlcdll%;%PATH%"
 SET dlstep=%~f1
+SET arguments=%*
 
 @echo --Setting up GDAL -----------------------------
 call %dlc%bin\gisinternals\SDKShell.bat setenv
@@ -16,6 +16,7 @@ call %dlc%bin\gisinternals\SDKShell.bat setenv
 
 @echo -----------------------------------------------
 @echo Using "%dlstep%" as Download-Step file
+@echo Arguments: "%arguments%"
 @echo Starting the downloadclient.
 @echo -----------------------------------------------
 
@@ -32,7 +33,7 @@ if %errorlevel%==1 (
 
   IF "%JAVAVER:~0,3%"=="1.8" (
     @echo "Starting GDI-BY Downloadclient using Java version 1.8"
-    java -jar downloadclient.jar --headless %dlstep% --config=config
+    java -jar downloadclient.jar --headless %dlstep% --config=config %arguments%
     goto exit
   ) else (
     IF "%JAVAVER:~0,4%"=="11.0" (
@@ -41,7 +42,7 @@ if %errorlevel%==1 (
         goto exit
       ) else (
         @echo "Starting GDI-BY Downloadclient using Java version 11"
-        java --module-path %JAVAFX_HOME%\lib --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.web --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=javafx.graphics/javafx.application=ALL-UNNAMED --add-opens=javafx.graphics/javafx.geometry=ALL-UNNAMED --add-opens=javafx.web/javafx.scene.web=ALL-UNNAMED --add-opens=javafx.web/com.sun.webkit=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.util=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom.transform=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.utils=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.font=ALL-UNNAMED --add-exports javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism.paint=ALL-UNNAMED --add-exports javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED -jar downloadclient.jar --headless %dlstep% --config=config
+        java --module-path %JAVAFX_HOME%\lib --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.web --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=javafx.graphics/javafx.application=ALL-UNNAMED --add-opens=javafx.graphics/javafx.geometry=ALL-UNNAMED --add-opens=javafx.web/javafx.scene.web=ALL-UNNAMED --add-opens=javafx.web/com.sun.webkit=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.sg.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.util=ALL-UNNAMED --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom.transform=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED --add-exports javafx.graphics/com.sun.glass.utils=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.font=ALL-UNNAMED --add-exports javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports javafx.graphics/com.sun.prism.paint=ALL-UNNAMED --add-exports javafx.graphics/com.sun.scenario.effect=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.text=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.iio=ALL-UNNAMED -jar downloadclient.jar --headless %dlstep% --config=config %arguments%
         goto exit
       )
     ) else (
