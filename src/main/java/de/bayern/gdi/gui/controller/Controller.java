@@ -42,7 +42,6 @@ import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import de.bayern.gdi.config.ServiceSettings;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

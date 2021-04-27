@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.model.ConfigurationParameter;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.model.ProcessingConfiguration;
@@ -36,7 +37,6 @@ import de.bayern.gdi.processor.job.ExternalProcessJob.GlobalGlob;
 import de.bayern.gdi.processor.job.ExternalProcessJob.UniqueArg;
 import de.bayern.gdi.processor.job.GmlEmptyCheckJob;
 import de.bayern.gdi.processor.job.Job;
-import de.bayern.gdi.utils.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;

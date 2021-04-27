@@ -22,7 +22,7 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.processor.job.FileDownloadJob;
 import de.bayern.gdi.processor.job.Job;
 import de.bayern.gdi.processor.job.DownloadStepJob;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
