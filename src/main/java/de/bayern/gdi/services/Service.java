@@ -334,7 +334,7 @@ public class Service extends Object {
             + ", serviceType=" + serviceType
             + ", additionalMessage='" + additionalMessage + '\''
             + ", username='" + username + '\''
-            + ", password='" + password + '\''
+            + ", password='" + "***" + '\''
             + ", name='" + name + '\''
             + ", restricted=" + restricted
             + ", loaded=" + loaded

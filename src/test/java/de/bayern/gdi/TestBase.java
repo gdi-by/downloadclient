@@ -31,7 +31,7 @@ import de.bayern.gdi.gui.controller.ProcessingChainController;
 import de.bayern.gdi.gui.controller.ServiceSelectionController;
 import de.bayern.gdi.gui.controller.ServiceTypeSelectionController;
 import de.bayern.gdi.gui.controller.StatusLogController;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;
@@ -326,18 +326,22 @@ public abstract class TestBase extends ApplicationTest {
             case PROCESS_SELECTION:
             case SERVICE_TYPE_CHOOSER:
                 ComboBox cb = getElementById(element, ComboBox.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, cb.getItems().size(), cb.getItems());
                 result = comparison.test(cb.getItems().size());
                 break;
             case SERVICE_LIST:
                 ListView lv = getElementById(element, ListView.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, lv.getItems().size(), lv.getItems());
                 result = comparison.test(lv.getItems().size());
                 break;
             case PROCESSINGSTEPS:
                 HBox b = getElementById(element, HBox.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, b.getChildren().size(), b.getChildren());
                 result = comparison.test(b.getChildren().size());
                 break;
             default:
                 TextField t = getElementById(element, TextField.class);
+                LOG.debug("Element '{}' has {} entries: {}", element, t.getText().length(), t.getText());
                 result = comparison.test(t.getText().length());
         }
         return result;

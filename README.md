@@ -13,7 +13,7 @@ Aktuelle Java-Versionen können hier heruntergeladen werden: http://www.oracle.c
 
 ## Dokumentation
 
-Eine Anwender-Dokumentation steht hier bereit: http://downloadclient-gdi-by.readthedocs.io/de/docs/index.html
+Eine Anwender-Dokumentation steht hier bereit: https://downloadclient-gdi-by.readthedocs.io/de/latest/
 
 
 ## Hinweise für Entwickler

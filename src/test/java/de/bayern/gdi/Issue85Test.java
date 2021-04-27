@@ -34,7 +34,7 @@ import de.bayern.gdi.processor.job.ExternalProcessJob;
 import de.bayern.gdi.processor.job.Job;
 import de.bayern.gdi.processor.ProcessingStepConverter;
 
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.StringUtils;
 
 /**

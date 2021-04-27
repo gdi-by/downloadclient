@@ -17,8 +17,9 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.gui.Start;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.config.Config;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -30,11 +31,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Sascha L. Teichmann (sascha.teichmann@intevation.de)
  */
 public class App {
+
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
     private App() {
         // Not to be instantiated.
@@ -133,10 +138,9 @@ public class App {
             initConfig(line.getOptionValue("c"));
 
             if (line.hasOption("h")) {
-                System.exit(Headless.main(
+                System.exit(Headless.runHeadless(
                     line.getArgs(),
-                    line.getOptionValue("u"),
-                    line.getOptionValue("p")));
+                    createCredentials(line.getOptionValue("u"), line.getOptionValue("p"))));
             }
 
             startGUI();
@@ -145,6 +149,14 @@ public class App {
             System.err.println("Cannot parse input: " + pe.getMessage());
             usage(options, 1);
         }
+    }
+
+    private static Credentials createCredentials(String username, String password) {
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            LOG.info("Username and Password are not passed");
+            return null;
+        }
+        return new Credentials(username, password);
     }
 
     /**

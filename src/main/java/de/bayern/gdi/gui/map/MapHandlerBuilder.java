@@ -18,7 +18,7 @@
 package de.bayern.gdi.gui.map;
 
 import com.sothawo.mapjfx.MapView;
-import de.bayern.gdi.utils.ServiceSettings;
+import de.bayern.gdi.config.ServiceSettings;
 import javafx.event.EventTarget;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

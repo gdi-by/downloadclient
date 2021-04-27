@@ -17,12 +17,15 @@
  */
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.config.ApplicationSettings;
+import de.bayern.gdi.config.Config;
+import de.bayern.gdi.config.Credentials;
 import de.bayern.gdi.gui.ServiceModel;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.config.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.ServiceChecker;
 import javafx.application.Platform;
@@ -298,6 +301,20 @@ public class ServiceSelectionController {
         this.servicePW.setText("");
     }
 
+    private void setUserNamePasswordFromServiceOrConfig(Service selectedService) {
+        ApplicationSettings settings = Config
+            .getInstance()
+            .getApplicationSettings();
+        Credentials credentials = settings.getCredentials();
+        if (selectedService.getUsername() != null && !selectedService.getUsername().isEmpty()) {
+            this.serviceUser.setText(selectedService.getUsername());
+            this.servicePW.setText(selectedService.getPassword());
+        } else if (credentials != null) {
+            this.serviceUser.setText(credentials.getUsername());
+            this.servicePW.setText(credentials.getPassword());
+        }
+    }
+
     /**
      * Select a service according to service url textfield.
      */
@@ -371,6 +388,7 @@ public class ServiceSelectionController {
                             if (serviceSelected) {
                                 chooseSelectedService(downloadConf);
                             }
+                            persistUsernameAndPasswordInSettingsXml(finalService);
                             return 0;
                         } finally {
                             serviceSelectionBt.setDisable(false);
@@ -443,6 +461,7 @@ public class ServiceSelectionController {
                 this.serviceAuthenticationCbx.setSelected(true);
                 this.serviceUser.setDisable(false);
                 this.servicePW.setDisable(false);
+                setUserNamePasswordFromServiceOrConfig(controller.dataBean.getSelectedService());
             });
             return false;
         } else {
@@ -578,4 +597,16 @@ public class ServiceSelectionController {
         });
         return;
     }
+
+    private void persistUsernameAndPasswordInSettingsXml(Service service) {
+        ApplicationSettings settings = Config
+            .getInstance()
+            .getApplicationSettings();
+        if ((service.getUsername() != null
+            && !service.getUsername().isEmpty())) {
+            Credentials credentials = new Credentials(service.getUsername(), service.getPassword());
+            settings.persistCredentials(credentials);
+        }
+    }
+
 }

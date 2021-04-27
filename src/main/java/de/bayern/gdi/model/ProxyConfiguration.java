@@ -309,7 +309,7 @@ public class ProxyConfiguration {
 
     @Override
     public String toString() {
-        return "ProxyConfiguration: {"
+        return "ProxyConfiguration: ["
             + " httpProxyHost='" + httpProxyHost
             + ", httpProxyPort=" + httpProxyPort
             + ", httpProxyUser='" + httpProxyUser
@@ -322,7 +322,7 @@ public class ProxyConfiguration {
             + ", httpsNonProxyHosts='" + httpsNonProxyHosts
             + ", overrideSystemSettings=" + overrideSystemSettings
             + ", enableSNIExtension=" + enableSNIExtension
-            + "}";
+            + "]";
     }
 
     /**
