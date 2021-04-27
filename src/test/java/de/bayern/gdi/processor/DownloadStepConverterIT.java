@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.model;
+package de.bayern.gdi.processor;
 
-import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.FileDownloadJob;
-import de.bayern.gdi.processor.Job;
-import de.bayern.gdi.processor.JobList;
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.model.Parameter;
+import de.bayern.gdi.processor.job.FileDownloadJob;
+import de.bayern.gdi.processor.job.Job;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -194,7 +195,7 @@ public class DownloadStepConverterIT {
             testName, downloadStep.getPath());
         DownloadStepConverter downloadStepConverter =
             new DownloadStepConverter();
-        JobList jobList = downloadStepConverter.convert(downloadStep);
+        DownloadStepJob jobList = downloadStepConverter.convert(downloadStep);
 
         FileDownloadJob fileDownloadJob = findFileDownloadJob(jobList);
         assertThat(fileDownloadJob, is(notNullValue()));
@@ -223,7 +224,7 @@ public class DownloadStepConverterIT {
             service.baseUrl, path, new ArrayList<>());
     }
 
-    private FileDownloadJob findFileDownloadJob(JobList jobList) {
+    private FileDownloadJob findFileDownloadJob(DownloadStepJob jobList) {
         List<Job> jobs = jobList.getJobList();
         for (Job job : jobs) {
             if (job instanceof FileDownloadJob) {

@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +28,15 @@ import java.util.List;
 
 
 /**
- * JobList is a job of a sequence of depended jobs.
+ * Collects all jobs of a DownloadSteps.
  */
-public class JobList implements Job {
+public class DownloadStepJob implements Job {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobList.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadStepJob.class.getName());
 
     private List<Job> jobs;
 
-    public JobList() {
+    public DownloadStepJob() {
         jobs = new ArrayList<>();
     }
 
@@ -55,12 +57,15 @@ public class JobList implements Job {
     }
 
     @Override
-    public void run(Processor p) throws JobExecutionException {
-        LOG.info("Executing job list");
+    public void run(Processor p) throws JobExecutionException, InterruptedException {
+        LOG.info("Executing download step jobs");
         int i = 0;
         try {
             for (; i < jobs.size(); i++) {
                 jobs.get(i).run(p);
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException("Execution of the download job interrupted.");
+                }
             }
         } finally {
             for (i++; i < jobs.size(); i++) {

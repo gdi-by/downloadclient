@@ -15,8 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
@@ -93,17 +95,10 @@ public class GmlEmptyCheckJob implements Job {
                 "external.process.scan.dir.failed",
                 this.fileTracker.getDirectory());
             JobExecutionException jee = new JobExecutionException(msg);
-            broadcastException(p, jee);
+            log(jee.getMessage());
             throw jee;
         }
         return files;
-    }
-
-    private void broadcastException(Processor p, JobExecutionException jee) {
-        logger.log(jee.getMessage());
-        if (p != null) {
-            p.broadcastException(jee);
-        }
     }
 
     private void log(String msg) {

@@ -17,9 +17,13 @@
  */
 package de.bayern.gdi.utils;
 
+import de.bayern.gdi.processor.listener.CountListener;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /** CountingInputStream counts the number of bytes piped
  *  through the parent stream.
@@ -29,25 +33,22 @@ public class CountingInputStream extends FilterInputStream {
     /** Bytes per kB. */
     public static final int BYTES_PER_KB = 1000;
 
-    /** An interface to report the number of bytes counted. */
-    public interface CountListener {
-        /** bytesCounted is called to report the number of bytes already copied.
-         *  @param counter The number of bytes.
-         */
-        void bytesCounted(long counter);
-    }
-
     private long counter;
-    private CountListener listener;
+
+    private List<CountListener> listener = new ArrayList<>();
 
     public CountingInputStream(InputStream in) {
         super(in);
     }
 
-    public CountingInputStream(InputStream in, CountListener listener) {
-        super(in);
-        this.listener = listener;
+    /**
+     * Adds a CountListener.
+     * @param listenerToAdd listener to add, never <code>null</code>
+     */
+    public void addListener(CountListener listenerToAdd) {
+        this.listener.add(listenerToAdd);
     }
+
 
     /** Resets the internal counter back to zero. */
     public void resetCounter() {
@@ -64,7 +65,7 @@ public class CountingInputStream extends FilterInputStream {
     private void reportCount() {
         if (this.listener != null) {
             if (this.counter % BYTES_PER_KB == 0) {
-                this.listener.bytesCounted(this.counter);
+                this.listener.forEach(l -> l.bytesCounted(this.counter));
             }
         }
     }
@@ -90,11 +91,17 @@ public class CountingInputStream extends FilterInputStream {
     }
 
     /** Instance to wrap an inputstream with a reporting counter.
-     * @param listener The listener to report to. Can be null.
+     * @param listeners The listeners to report to. Can be null.
      * @return The factory to create a wrapper.
      */
     public static WrapInputStreamFactory createWrapFactory(
-        final CountListener listener) {
-        return in -> new CountingInputStream(in, listener);
+        final List<CountListener> listeners) {
+        return in -> {
+            CountingInputStream countingInputStream = new CountingInputStream(in);
+            if (listeners != null) {
+                listeners.forEach(l -> countingInputStream.addListener(l));
+            }
+            return countingInputStream;
+        };
     }
 }

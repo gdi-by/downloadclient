@@ -25,16 +25,21 @@ import java.util.EventListener;
 public interface ProcessorListener extends EventListener {
 
     /**
-     * Called if an exception was thrown during job execution.
-     * @param pe The event. pe.getException() returns the
-     * thrown exception.
-     */
-    void receivedException(ProcessorEvent pe);
-
-    /**
      * Called if a message was sent during job execution.
      * @param pe The event. pe.getMessage() returns the
      * message.
      */
     void receivedMessage(ProcessorEvent pe);
+
+    /**
+     * Called if the processing of a DownloadJob failed.
+     * @param pe The event. pe.getException() returns the
+     * thrown exception.
+     */
+    void processingFailed(ProcessorEvent pe);
+
+    /**
+     * Called if the processing of a DownloadJob finished.
+     */
+    void processingFinished();
 }

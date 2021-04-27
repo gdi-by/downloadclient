@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.HTTP;
@@ -85,11 +86,13 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
     /** Total number of bytes of downloaded files do far. */
     protected long totalCount;
 
-    public MultipleFileDownloadJob() {
+    public MultipleFileDownloadJob(String user, String password) {
+        this(user, password, null);
     }
 
     public MultipleFileDownloadJob(String user, String password, Log logger) {
         super(user, password, logger);
+        addListener(this);
     }
 
     @Override
@@ -129,7 +132,7 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         }
 
         WrapInputStreamFactory wrapFactory
-            = CountingInputStream.createWrapFactory(this);
+            = CountingInputStream.createWrapFactory(listener);
 
         CloseableHttpClient client = null;
         try {
@@ -174,9 +177,10 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      * Downloads a list of files.
      * @param files The files to download.
      * @throws JobExecutionException If something went wrong.
+     * @throws InterruptedException if the job was interrupted.
      */
     protected void downloadFiles(List<DLFile> files)
-    throws JobExecutionException {
+        throws JobExecutionException, InterruptedException {
 
         broadcastMessage(I18n.format("file.download.start"));
 
@@ -208,6 +212,9 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
                         numFiles - failed.size()
                              - successful.size()
                              + again.size())));
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException("Download of multiple files interrupted.");
+                }
             }
 
             // Only sleep if there are files to try again.
@@ -218,19 +225,19 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
             again = new ArrayList<>();
         }
 
-        String msg =
+        String downloadedBytesMsg =
             I18n.format("atom.bytes.downloaded.total", this.totalCount);
-        log(msg);
-        LOG.info(msg);
+        log(downloadedBytesMsg);
+        LOG.info(downloadedBytesMsg);
 
         if (!failed.isEmpty()) {
-            msg = I18n.format(
+            String failedMsg = I18n.format(
                 "atom.downloaded.failed", successful.size(), failed.size());
-            JobExecutionException jee = new JobExecutionException(msg);
-            broadcastException(jee);
+            JobExecutionException jee = new JobExecutionException(failedMsg);
+            log(failedMsg);
             throw jee;
         }
-        msg = I18n.format("atom.downloaded.success", successful.size());
-        broadcastMessage(msg);
+        String infosuccess = I18n.format("atom.downloaded.success", successful.size());
+        broadcastMessage(infosuccess);
     }
 }

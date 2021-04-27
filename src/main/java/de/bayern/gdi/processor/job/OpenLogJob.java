@@ -15,26 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
-import de.bayern.gdi.utils.I18n;
+import java.io.IOException;
+
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.I18n;
 
 /**
- * A deferred job which ensures that a download logger is closed.
+ * A job to open a log file.
  */
-public class CloseLogJob implements DeferredJob {
+public class OpenLogJob implements Job {
 
     private Log logger;
 
-    public CloseLogJob(Log logger) {
+    public OpenLogJob(Log logger) {
         this.logger = logger;
     }
 
     @Override
-    public void run(Processor p) {
-        String msg = I18n.getMsg("gml.end.of.protocol");
-        logger.log(msg);
-        logger.close();
+    public void run(Processor p) throws JobExecutionException {
+        try {
+            logger.open();
+        } catch (IOException ioe) {
+            throw new JobExecutionException(
+                I18n.getMsg("processor.cannot.open.log"), ioe);
+        }
     }
 }
+

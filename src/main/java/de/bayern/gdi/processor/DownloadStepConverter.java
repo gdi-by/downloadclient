@@ -23,12 +23,24 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 
+import de.bayern.gdi.processor.job.AtomDownloadJob;
+import de.bayern.gdi.processor.job.BroadcastJob;
+import de.bayern.gdi.processor.job.CloseLogJob;
+import de.bayern.gdi.processor.job.FileDownloadJob;
+import de.bayern.gdi.processor.job.FilesDownloadJob;
+import de.bayern.gdi.processor.job.GMLCheckJob;
+import de.bayern.gdi.processor.job.DownloadStepJob;
+import de.bayern.gdi.processor.job.LogMetaJob;
+import de.bayern.gdi.processor.job.OpenLogJob;
+import de.bayern.gdi.processor.job.UnzipJob;
+import de.bayern.gdi.processor.listener.CountListener;
 import org.apache.http.HttpEntity;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.EntityTemplate;
@@ -87,11 +99,14 @@ public class DownloadStepConverter {
     private static final String GETFEATURE = "GetFeature";
 
     private String user;
+
     private String password;
 
     private DownloadStep dls;
 
     private Log logger;
+
+    private List<CountListener> listener = new ArrayList<>();
 
     public DownloadStepConverter() {
     }
@@ -107,12 +122,20 @@ public class DownloadStepConverter {
     }
 
     /**
+     * Adds a CountListener.
+     * @param listenerToAdd listener to add, never <code>null</code>
+     */
+    public void addListener(CountListener listenerToAdd) {
+        this.listener.add(listenerToAdd);
+    }
+
+    /**
      * Converts a DownloadStep into a sequence of jobs for the processor.
      * @param downloadSteps DownloadStep the configuration to be converted.
      * @return A job list for the download processor.
      * @throws ConverterException If the conversion went wrong.
      */
-    public JobList convert(DownloadStep downloadSteps)
+    public DownloadStepJob convert(DownloadStep downloadSteps)
         throws ConverterException {
 
         this.dls = downloadSteps;
@@ -152,7 +175,7 @@ public class DownloadStepConverter {
 
         psc.convert(dls, fileTracker, logger);
 
-        JobList jl = new JobList();
+        DownloadStepJob jl = new DownloadStepJob();
 
         jl.addJob(olj);
         jl.addJob(lmj);
@@ -302,7 +325,7 @@ public class DownloadStepConverter {
     }
 
     private void unpagedWFSDownload(
-        JobList      jl,
+        DownloadStepJob jl,
         File         workingDir,
         Set<String>  usedVars,
         WFSMeta      meta
@@ -326,8 +349,16 @@ public class DownloadStepConverter {
         File gml = new File(workingDir, "download." + ext);
         LOG.info("Download to file '{}'", gml);
         logGetFeatureRequest(params);
+        FileDownloadJob fdj = createFileDownloadJob(usePost, url, params, gml);
+        jl.addJob(fdj);
+        if (ext.equals("gml")) {
+            jl.addJob(new GMLCheckJob(gml, logger));
+            jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
+        }
+    }
 
-        FileDownloadJob fdj = null;
+    private FileDownloadJob createFileDownloadJob(boolean usePost, String url, Document params, File gml) {
+        final FileDownloadJob fdj;
         if (usePost) {
             HttpEntity ent = new EntityTemplate(
                 XML.toContentProducer(params));
@@ -343,12 +374,8 @@ public class DownloadStepConverter {
                 this.user, this.password,
                 this.logger);
         }
-
-        jl.addJob(fdj);
-        if (ext.equals("gml")) {
-            jl.addJob(new GMLCheckJob(gml, logger));
-            jl.addJob(new BroadcastJob(I18n.getMsg("file.download.success")));
-        }
+        listener.forEach(l -> fdj.addListener(l));
+        return fdj;
     }
 
     private static URL newURL(String url) throws ConverterException {
@@ -463,7 +490,7 @@ public class DownloadStepConverter {
     }
 
     private void createWFSDownload(
-        JobList      jl,
+        DownloadStepJob jl,
         File         workingDir,
         Set<String>  usedVars
     ) throws ConverterException {
@@ -529,6 +556,7 @@ public class DownloadStepConverter {
         LOG.info("Total number of features: {}", numFeatures);
 
         FilesDownloadJob fdj = new FilesDownloadJob(this.user, this.password);
+        listener.forEach(l -> fdj.addListener(l));
         GMLCheckJob gcj = new GMLCheckJob(logger);
 
         String ext = extension();
@@ -578,7 +606,7 @@ public class DownloadStepConverter {
     }
 
     private void createAtomDownload(
-        JobList jl,
+        DownloadStepJob jl,
         File workingDir
     ) throws ConverterException {
 
@@ -597,6 +625,7 @@ public class DownloadStepConverter {
             workingDir,
             this.user, this.password,
             this.logger);
+        listener.forEach(l -> job.addListener(l));
         jl.addJob(job);
     }
 

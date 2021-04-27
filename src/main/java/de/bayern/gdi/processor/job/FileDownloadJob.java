@@ -15,13 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -42,18 +43,13 @@ public class FileDownloadJob extends AbstractDownloadJob {
     private File file;
     private HttpEntity postParams;
 
-    public FileDownloadJob() {
-    }
-
     public FileDownloadJob(
             String urlString,
             File   file,
             String user,
             String password,
             Log    logger) {
-        super(user, password, logger);
-        this.urlString = urlString;
-        this.file = file;
+        this(urlString, file, user, password, null, logger);
     }
 
     public FileDownloadJob(
@@ -67,6 +63,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
         this.urlString = urlString;
         this.file = file;
         this.postParams = postParams;
+        this.listener.add(this);
     }
 
     @Override
@@ -79,7 +76,7 @@ public class FileDownloadJob extends AbstractDownloadJob {
         URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
-            = CountingInputStream.createWrapFactory(this);
+            = CountingInputStream.createWrapFactory(listener);
 
         CloseableHttpClient httpclient = getClient(url);
 
@@ -106,20 +103,17 @@ public class FileDownloadJob extends AbstractDownloadJob {
 
             }
         } catch (ConnectTimeoutException | SocketTimeoutException te) {
-            JobExecutionException jee =
-            new JobExecutionException(
-                    I18n.format(
-                            "file.download.failed_reason",
-                            I18n.getMsg("file.download.failed.timeout")),
-                    te);
-            broadcastException(jee);
+            String failureMsg = I18n.format(
+                "file.download.failed_reason",
+                I18n.getMsg("file.download.failed.timeout"));
+            JobExecutionException jee = new JobExecutionException(failureMsg, te);
+            log(failureMsg);
             throw jee;
 
         } catch (IOException ioe) {
-            JobExecutionException jee =
-                new JobExecutionException(
-                    I18n.getMsg("file.download.failed"), ioe);
-            broadcastException(jee);
+            String failureMsg = I18n.getMsg("file.download.failed");
+            JobExecutionException jee = new JobExecutionException(failureMsg, ioe);
+            log(failureMsg);
             throw jee;
         } finally {
             HTTP.closeGraceful(httpclient);

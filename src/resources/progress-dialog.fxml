@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<DialogPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.bayern.gdi.gui.controller.ProgressDialogController">
+    <content>
+        <GridPane alignment="CENTER_LEFT" hgap="10.0" prefWidth="300.0">
+            <children>
+                <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS" spacing="10">
+                    <children>
+                        <Text text="%progressdialog.download.label"/>
+                        <Text fx:id="downloadUrl" />
+                        <Text fx:id="status" />
+                        <Text fx:id="statusDetails"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="5.0"
+                                left="20.0"
+                                right="10.0"
+                                top="5.0"/>
+                    </VBox.margin>
+                </VBox>
+            </children>
+        </GridPane>
+    </content>
+</DialogPane>

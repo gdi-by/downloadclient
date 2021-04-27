@@ -15,32 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
-import java.io.IOException;
-
-import de.bayern.gdi.utils.Log;
-import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
 
 /**
- * A job to open a log file.
+ * Job implements a job to be run by a processor.
  */
-public class OpenLogJob implements Job {
+public interface Job {
 
-    private Log logger;
-
-    public OpenLogJob(Log logger) {
-        this.logger = logger;
-    }
-
-    @Override
-    public void run(Processor p) throws JobExecutionException {
-        try {
-            logger.open();
-        } catch (IOException ioe) {
-            throw new JobExecutionException(
-                I18n.getMsg("processor.cannot.open.log"), ioe);
-        }
-    }
+    /**
+     * Run the job.
+     * @param p The processor which run this job.
+     * @throws JobExecutionException if the job execution failed.
+     * @throws InterruptedException if the job was interrupted.
+     */
+    void run(Processor p) throws JobExecutionException, InterruptedException;
 }
+
+
 

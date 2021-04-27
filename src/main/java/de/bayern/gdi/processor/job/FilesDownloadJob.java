@@ -15,28 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import org.apache.http.HttpEntity;
 
 /** Download a list of URLs to given files. */
 public class FilesDownloadJob extends MultipleFileDownloadJob {
 
-    private List<DLFile> files;
-
-    public FilesDownloadJob() {
-        this.files = new ArrayList<>();
-    }
+    private List<DLFile> files = new ArrayList<>();
 
     public FilesDownloadJob(String user, String password) {
-        this();
-        this.user = user;
-        this.password = password;
+        super(user, password);
     }
 
     /** Downloads an URL to a file.
@@ -57,7 +52,7 @@ public class FilesDownloadJob extends MultipleFileDownloadJob {
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    protected void download() throws JobExecutionException, InterruptedException {
         downloadFiles(this.files);
     }
 }

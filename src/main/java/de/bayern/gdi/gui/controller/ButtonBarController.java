@@ -17,17 +17,21 @@
  */
 package de.bayern.gdi.gui.controller;
 
+import de.bayern.gdi.gui.ProgressDialog;
 import de.bayern.gdi.model.DownloadStep;
 import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
-import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.config.Config;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -37,8 +41,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static de.bayern.gdi.gui.GuiConstants.USER_DIR;
 
@@ -61,11 +70,19 @@ public class ButtonBarController {
     @Inject
     private StatusLogController statusLogController;
 
+    @Inject
+    private FXMLLoader fxmlLoader;
+
+    @Inject
+    private DownloadListener downloadListener;
+
     @FXML
     private Button buttonDownload;
 
     @FXML
     private Button buttonClose;
+
+    private Future<?> jobExecution;
 
     /**
      * Start the download.
@@ -101,24 +118,30 @@ public class ButtonBarController {
 
             controller.dataBean.setProcessingSteps(controller.extractProcessingSteps());
             String savePath = selectedDir.getPath();
-            Runnable convertTask = () -> {
+            try {
+                this.buttonDownload.setDisable(true);
                 DownloadStep ds = controller.dataBean.convertToDownloadStep(savePath);
+                DownloadStepConverter dsc = new DownloadStepConverter(
+                    controller.dataBean.getSelectedService().getUsername(),
+                    controller.dataBean.getSelectedService().getPassword());
+                ProgressDialog progressDialog = new ProgressDialog(controller);
+                dsc.addListener(progressDialog);
+                DownloadStepJob downloadStepJob = dsc.convert(ds);
+                Processor processor = new Processor(downloadStepJob)
+                    .withListeners(downloadListener, progressDialog);
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                openProgressDialog(progressDialog, selectedDir);
                 try {
-                    this.buttonDownload.setDisable(true);
-                    DownloadStepConverter dsc = new DownloadStepConverter(
-                        controller.dataBean.getSelectedService().getUsername(),
-                        controller.dataBean.getSelectedService().getPassword());
-                    JobList jl = dsc.convert(ds);
-                    Processor p = Processor.getInstance();
-                    p.addJob(jl);
-                } catch (ConverterException ce) {
-                    statusLogController.setStatusTextUI(ce.getMessage());
-                    Controller.logToAppLog(ce.getMessage());
+                    this.jobExecution = executorService.submit(processor);
                 } finally {
-                    this.buttonDownload.setDisable(false);
+                    executorService.shutdown();
                 }
-            };
-            new Thread(convertTask).start();
+            } catch (ConverterException ce) {
+                statusLogController.setStatusTextUI(ce.getMessage());
+                Controller.logToAppLog(ce.getMessage());
+            } finally {
+                this.buttonDownload.setDisable(false);
+            }
         }
     }
 
@@ -203,6 +226,41 @@ public class ButtonBarController {
     protected void handleCloseApp(ActionEvent event) {
         Stage stage = (Stage) buttonClose.getScene().getWindow();
         menuBarController.closeApp(stage);
+    }
+
+    private void cancelJobExecution() {
+        if (jobExecution != null && !jobExecution.isDone()) {
+            // TODO: Job is not cancelled
+            jobExecution.cancel(true);
+        }
+    }
+
+    private void openProgressDialog(ProgressDialog dialog, File selectedDir) {
+        Platform.runLater(
+            () -> {
+                Optional<ButtonType> buttonType = dialog.showAndWait();
+                buttonType.ifPresent(bt -> {
+                    if (buttonType.get() == ButtonType.CANCEL) {
+                        cancelJobExecution();
+                    } else if (buttonType.get() == ProgressDialog.OPEN_FILES) {
+                        openFileSystemBrowser(selectedDir);
+                    }
+                });
+            }
+        );
+    }
+
+    private void openFileSystemBrowser(File selectedDir) {
+        if (Desktop.isDesktopSupported()) {
+            new Thread(() -> {
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.browse(selectedDir.toURI());
+                } catch (IOException e) {
+                    LOG.error("File Browser with the passed uri " + selectedDir + " could not be opened.", e);
+                }
+            }).start();
+        }
     }
 
 }

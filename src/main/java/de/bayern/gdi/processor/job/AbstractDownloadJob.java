@@ -15,23 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.bayern.gdi.processor.JobExecutionException;
+import de.bayern.gdi.processor.Processor;
+import de.bayern.gdi.processor.listener.CountListener;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Log;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob
-    implements Job, CountingInputStream.CountListener {
+    implements Job, CountListener {
 
     /** optional user. */
     protected String user;
@@ -41,9 +45,8 @@ public abstract class AbstractDownloadJob
     protected Processor processor;
     /** The logger to log to. */
     protected Log logger;
-
-    public AbstractDownloadJob() {
-    }
+    /** The count listener. */
+    protected List<CountListener> listener = new ArrayList<>();
 
     private static final String FILE_DOWNLOAD_BAD_URL
             = "file.download.bad.url";
@@ -52,6 +55,14 @@ public abstract class AbstractDownloadJob
         this.user = user;
         this.password = password;
         this.logger = logger;
+    }
+
+    /**
+     * Adds a CountListener.
+     * @param listenerToAdd listener to add, never <code>null</code>
+     */
+    public void addListener(CountListener listenerToAdd) {
+        this.listener.add(listenerToAdd);
     }
 
     /**
@@ -64,7 +75,7 @@ public abstract class AbstractDownloadJob
     }
 
     @Override
-    public void run(Processor p) throws JobExecutionException {
+    public void run(Processor p) throws JobExecutionException, InterruptedException {
         Processor old = this.processor;
         this.processor = p;
         try {
@@ -106,22 +117,12 @@ public abstract class AbstractDownloadJob
     }
 
     /**
-     * Broadcasts an exception to a processor if set.
-     * @param e The exception to broadcast.
-     */
-    protected void broadcastException(JobExecutionException e) {
-        log(e.getMessage());
-        if (this.processor != null) {
-            this.processor.broadcastException(e);
-        }
-    }
-
-    /**
      * Override this for the concrete download.
      * @throws JobExecutionException Something went wrong during
      * the download.
+     * @throws InterruptedException if the job was interrupted.
      */
-    protected abstract void download() throws JobExecutionException;
+    protected abstract void download() throws JobExecutionException, InterruptedException;
 
     /**
      * Converts a string into an URL.

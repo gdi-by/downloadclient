@@ -27,6 +27,7 @@ import de.bayern.gdi.processor.JobExecutionException;
 import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
+import de.bayern.gdi.processor.job.DownloadStepJob;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.Unauthorized;
@@ -38,6 +39,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * The command line tool.
@@ -90,32 +94,30 @@ public class Headless implements ProcessorListener {
      */
     static int runHeadless(Credentials credentials,
                            List<DownloadStep> steps) {
-        Processor processor = new Processor();
-        processor.addListener(new Headless());
-        Thread thread = new Thread(processor);
-        thread.start();
-
         LOG.info("Executing download steps " + steps);
+        List<DownloadStepJob> jobs = createJobs(credentials, steps);
+        Processor processor = new Processor(jobs)
+            .withListeners(new Headless());
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        try {
+            executorService.submit(processor);
+        } finally {
+            executorService.shutdown();
+        }
+        return 0;
+    }
 
-        for (DownloadStep step : steps) {
+    private static List<DownloadStepJob> createJobs(Credentials credentials, List<DownloadStep> steps) {
+        return steps.stream().map(step -> {
             try {
-                DownloadStepConverter dsc = createDownloadStepConverter(credentials);
-                processor.addJob(dsc.convert(step));
+                DownloadStepConverter dsc = createDownloadStepConverter(credentials);;
+                return dsc.convert(step);
             } catch (ConverterException ce) {
                 LOG.warn("Creating download jobs failed", ce);
+                return null;
             }
-        }
-
-        processor.addJob(Processor.QUIT_JOB);
-
-        try {
-            thread.join();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            return 1;
-        }
-
-        return 0;
+        }).filter(job -> job != null)
+                    .collect(Collectors.toList());
     }
 
     @Override
@@ -124,9 +126,13 @@ public class Headless implements ProcessorListener {
     }
 
     @Override
-    public void receivedException(ProcessorEvent pe) {
+    public void processingFailed(ProcessorEvent pe) {
         JobExecutionException jee = pe.getException();
         LOG.error(jee.getMessage(), jee);
+    }
+
+    @Override
+    public void processingFinished() {
     }
 
     private static DownloadStepConverter createDownloadStepConverter(Credentials credentials) {

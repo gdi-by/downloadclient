@@ -15,20 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.listener;
 
 /**
- * Job implements a job to be run by a processor.
+ * An interface to report the number of bytes counted.
  */
-public interface Job {
+public interface CountListener {
 
     /**
-     * Run the job.
-     * @param p The processor which run this job.
-     * @throws JobExecutionException if the job execution failed.
+     * bytesCounted is called to report the number of bytes already copied.
+     *
+     * @param counter The number of bytes.
      */
-    void run(Processor p) throws JobExecutionException;
+    void bytesCounted(long counter);
+
 }
-
-
-

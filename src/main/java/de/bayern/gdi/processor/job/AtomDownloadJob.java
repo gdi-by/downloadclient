@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.processor;
+package de.bayern.gdi.processor.job;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPathConstants;
 
+import de.bayern.gdi.processor.JobExecutionException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.w3c.dom.Document;
@@ -50,9 +51,6 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     private String dataset;
     private String variation;
     private File workingDir;
-
-    public AtomDownloadJob() {
-    }
 
     public AtomDownloadJob(
         String url,
@@ -130,7 +128,7 @@ public class AtomDownloadJob extends MultipleFileDownloadJob {
     }
 
     @Override
-    protected void download() throws JobExecutionException {
+    protected void download() throws JobExecutionException, InterruptedException {
         String dsURL = figureoutDatasource();
         URL root = absoluteURL(this.url, dsURL);
         Document ds = getDocument(root);

@@ -17,11 +17,13 @@
  */
 package de.bayern.gdi.processor;
 
+import de.bayern.gdi.processor.job.DownloadStepJob;
+import de.bayern.gdi.utils.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,87 +35,32 @@ public class Processor implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Processor.class.getName());
 
-    private static final long WAIT_TIME = 1000;
+    private Deque<DownloadStepJob> jobs = new ArrayDeque<>();;
 
-    /** Add this job to shutdown the processor after
-     *  finishing all previous jobs.
-     */
-    public static final Job QUIT_JOB = new Job() {
-        @Override
-        public void run(Processor p) throws JobExecutionException {
-            // Do nothing.
-        }
-    };
+    private List<ProcessorListener> listeners = new CopyOnWriteArrayList<>();
 
-    private static Processor instance;
-
-    private Deque<Job> jobs;
-    private boolean done;
-
-    private List<ProcessorListener> listeners;
-
-    public Processor() {
-        this.jobs = new ArrayDeque<>();
-        this.listeners = new CopyOnWriteArrayList<>();
+    public Processor(DownloadStepJob jobToExecute) {
+        jobs.add(jobToExecute);
     }
 
-    public Processor(Collection<Job> jobs) {
-        this.jobs = new ArrayDeque<>(jobs);
-    }
-
-    /** Returns a singleton processor started as a separate thread.
-     * @return The processor.
-     */
-    public static synchronized Processor getInstance() {
-        if (instance == null) {
-            instance = new Processor();
-            Thread thread = new Thread(instance);
-            thread.setDaemon(true);
-            thread.start();
-        }
-        return instance;
+    public Processor(List<DownloadStepJob> jobsToExecute) {
+        jobs.addAll(jobsToExecute);
     }
 
     /**
-     * Adds a listener to the list of listeners.
-     * @param listener The listener to add.
+     * Adds listeners to the list of listeners.
+     *
+     * @param listenersToAdd The listeners to add.
+     * @return the processor instance, never <code>null</code>
      */
-    public void addListener(ProcessorListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
-    }
-
-    /**
-     * Removes a listener from the list of listeners.
-     * @param listener The listener to remove.
-     */
-    public void removeListener(ProcessorListener listener) {
-        listeners.remove(listener);
-    }
-
-    /** quit the main loop og this processor. */
-    public synchronized void quit() {
-        this.done = true;
-        notifyAll();
-    }
-
-    /** Adds a job at the end of the queue.
-     * @param job The job to add.
-     */
-    public synchronized void addJob(Job job) {
-        this.jobs.add(job);
-        notifyAll();
-    }
-
-    /** Broadcasts an exception to all listeners.
-     * @param jee The exception to broadcast.
-     */
-    public void broadcastException(JobExecutionException jee) {
-        ProcessorEvent pe = new ProcessorEvent(this, jee);
-        for (ProcessorListener pl: listeners) {
-            pl.receivedException(pe);
-        }
+    public Processor withListeners(ProcessorListener... listenersToAdd) {
+        Arrays.stream(listenersToAdd).forEach(listenerToAdd -> {
+                if (!listeners.contains(listenerToAdd)) {
+                    listeners.add(listenerToAdd);
+                }
+            }
+        );
+        return this;
     }
 
     /** Broadcasts a message to all listeners.
@@ -128,31 +75,30 @@ public class Processor implements Runnable {
 
     @Override
     public void run() {
-        for (;;) {
-            Job job;
-            synchronized (this) {
-                try {
-                    while (!this.done && this.jobs.isEmpty()) {
-                        wait(WAIT_TIME);
-                    }
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                if (this.done) {
-                    return;
-                }
-                job = this.jobs.poll();
-            }
-            if (job == QUIT_JOB) {
-                return;
-            }
+        while (!this.jobs.isEmpty()) {
             try {
+                DownloadStepJob job = this.jobs.poll();
                 job.run(this);
+                downloadStepJobFinished();
             } catch (JobExecutionException jee) {
                 LOG.error(jee.getMessage(), jee);
-                broadcastException(jee);
+                downloadStepJobFailed(jee);
+            } catch (InterruptedException e) {
+                broadcastMessage(I18n.getMsg("status.download.cancelled"));
             }
+        }
+    }
+
+    private void downloadStepJobFailed(JobExecutionException jee) {
+        ProcessorEvent pe = new ProcessorEvent(this, jee);
+        for (ProcessorListener pl: listeners) {
+            pl.processingFailed(pe);
+        }
+    }
+
+    private void downloadStepJobFinished() {
+        for (ProcessorListener pl: listeners) {
+            pl.processingFinished();
         }
     }
 }
