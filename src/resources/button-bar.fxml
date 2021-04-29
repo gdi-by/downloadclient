@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <HBox maxHeight="-Infinity"
-      minHeight="-Infinity" prefHeight="54.0"
+      minHeight="-Infinity"
       prefWidth="590.0" VBox.vgrow="NEVER" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="de.bayern.gdi.gui.controller.ButtonBarController">
@@ -15,8 +15,6 @@
         <Button fx:id="buttonDownload"
                 mnemonicParsing="false"
                 onAction="#handleDownload"
-                prefHeight="44.0"
-                prefWidth="134.0"
                 text="%gui.download"
                 textAlignment="CENTER">
             <HBox.margin>
@@ -31,8 +29,6 @@
         <Button fx:id="buttonSaveConfig"
                 mnemonicParsing="false"
                 onAction="#handleSaveConfig"
-                prefHeight="44.0"
-                prefWidth="186.0"
                 text="%gui.save-conf"
                 textAlignment="CENTER"
                 textOverrun="CLIP"
@@ -51,7 +47,6 @@
                 contentDisplay="CENTER"
                 mnemonicParsing="false"
                 onAction="#handleCloseApp"
-                prefHeight="44.0"
                 text="%gui.quit">
             <HBox.margin>
                 <Insets bottom="5.0" left="5.0"
