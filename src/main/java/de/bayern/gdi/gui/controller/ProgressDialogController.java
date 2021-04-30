@@ -70,8 +70,8 @@ public class ProgressDialogController {
      */
     public void showDownloadFinished() {
         status.setText(I18n.getMsg("progressdialog.download.status.finished"));
-        downloadUrl.setVisible( false );
-        downloadUrlLabel.setVisible( false );
+        downloadUrl.setVisible(false);
+        downloadUrlLabel.setVisible(false);
     }
 
     /**
@@ -84,7 +84,7 @@ public class ProgressDialogController {
         statusDetails.setFill(Color.RED);
         status.setText(I18n.getMsg("progressdialog.download.status.failed"));
         statusDetails.setText(exception.getMessage());
-        downloadUrl.setVisible( false );
-        downloadUrlLabel.setVisible( false );
+        downloadUrl.setVisible(false);
+        downloadUrlLabel.setVisible(false);
     }
 }
