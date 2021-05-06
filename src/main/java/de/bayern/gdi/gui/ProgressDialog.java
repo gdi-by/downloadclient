@@ -80,6 +80,7 @@ public class ProgressDialog extends Dialog<ButtonType> implements CountListener,
 
     @Override
     public void processingFinished() {
+        progressDialogController.showDownloadFinished();
         Platform.runLater(
             () -> {
                 dialogPane.getButtonTypes().remove(ButtonType.CANCEL);

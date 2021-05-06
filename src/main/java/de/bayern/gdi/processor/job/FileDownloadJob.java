@@ -18,16 +18,16 @@
 package de.bayern.gdi.processor.job;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import de.bayern.gdi.processor.JobExecutionException;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.conn.ConnectTimeoutException;
 
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.FileResponseHandler;
@@ -72,7 +72,8 @@ public class FileDownloadJob extends AbstractDownloadJob {
     }
 
     @Override
-    public void download() throws JobExecutionException {
+    public void download()
+        throws JobExecutionException, InterruptedException {
         URL url = toURL(this.urlString);
 
         WrapInputStreamFactory wrapFactory
@@ -84,37 +85,30 @@ public class FileDownloadJob extends AbstractDownloadJob {
         broadcastMessage(msg);
 
         try {
+            HttpRequestBase httpRequest;
             if (postParams == null) {
-                HttpGet httpget = getGetRequest(url);
-                FileResponseHandler responseHandler
-                        = new FileResponseHandler(
-                                this.file, wrapFactory, httpget);
-
-                httpclient.execute(httpget, responseHandler);
+                httpRequest = getGetRequest(url);
             } else {
                 HttpPost httppost = new HttpPost(url.toString());
                 httppost.setHeader("Content-Type", "application/xml");
                 httppost.setEntity(postParams);
-                FileResponseHandler responseHandler
-                        = new FileResponseHandler(
-                                this.file, wrapFactory, httppost);
-
-                httpclient.execute(httppost, responseHandler);
-
+                httpRequest = httppost;
             }
-        } catch (ConnectTimeoutException | SocketTimeoutException te) {
-            String failureMsg = I18n.format(
-                "file.download.failed_reason",
-                I18n.getMsg("file.download.failed.timeout"));
-            JobExecutionException jee = new JobExecutionException(failureMsg, te);
-            log(failureMsg);
-            throw jee;
+            FileResponseHandler responseHandler = new FileResponseHandler(this.file, wrapFactory, httpRequest);
 
-        } catch (IOException ioe) {
-            String failureMsg = I18n.getMsg("file.download.failed");
-            JobExecutionException jee = new JobExecutionException(failureMsg, ioe);
-            log(failureMsg);
-            throw jee;
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            HttpDownloadExecutor downloadTask = new HttpDownloadExecutor(httpclient, httpRequest, responseHandler,
+                this);
+            Future<?> submit = executorService.submit(downloadTask);
+            while (!submit.isDone()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    httpRequest.abort();
+                    throw new InterruptedException("Download interrupted.");
+                }
+            }
+            if (downloadTask.isFailed()) {
+                throw downloadTask.getJobExecutionException();
+            }
         } finally {
             HTTP.closeGraceful(httpclient);
         }

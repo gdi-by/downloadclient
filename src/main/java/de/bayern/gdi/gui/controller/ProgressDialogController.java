@@ -31,6 +31,9 @@ import javafx.scene.text.Text;
 public class ProgressDialogController {
 
     @FXML
+    private Text downloadUrlLabel;
+
+    @FXML
     private Text downloadUrl;
 
     @FXML
@@ -49,6 +52,7 @@ public class ProgressDialogController {
     public void init(Controller mainController) {
         this.controller = mainController;
         downloadUrl.setText(mainController.dataBean.getSelectedService().getServiceURL().toString());
+        status.setText(I18n.getMsg("progressdialog.download.status.started"));
 
     }
 
@@ -62,6 +66,15 @@ public class ProgressDialogController {
     }
 
     /**
+     * Shows the status in the progress dialog.
+     */
+    public void showDownloadFinished() {
+        status.setText(I18n.getMsg("progressdialog.download.status.finished"));
+        downloadUrl.setVisible(false);
+        downloadUrlLabel.setVisible(false);
+    }
+
+    /**
      * Shows the exception in the progress dialog.
      *
      * @param exception never <code>null</code>
@@ -71,5 +84,7 @@ public class ProgressDialogController {
         statusDetails.setFill(Color.RED);
         status.setText(I18n.getMsg("progressdialog.download.status.failed"));
         statusDetails.setText(exception.getMessage());
+        downloadUrl.setVisible(false);
+        downloadUrlLabel.setVisible(false);
     }
 }

@@ -230,7 +230,6 @@ public class ButtonBarController {
 
     private void cancelJobExecution() {
         if (jobExecution != null && !jobExecution.isDone()) {
-            // TODO: Job is not cancelled
             jobExecution.cancel(true);
         }
     }

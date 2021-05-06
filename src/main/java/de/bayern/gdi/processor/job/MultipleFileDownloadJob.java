@@ -30,9 +30,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -108,9 +112,9 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
      * @param dlf The file to download.
      * @return true if download succeed false otherwise.
      * @throws JobExecutionException If something went wrong.
+     * @throws InterruptedException if the job was interrupted.
      */
-    protected RemoteFileState downloadFile(DLFile dlf) throws
-            JobExecutionException {
+    protected RemoteFileState downloadFile(DLFile dlf) throws JobExecutionException, InterruptedException {
 
         final String msg = I18n.format("download.file", dlf.url, dlf.file);
         log(msg);
@@ -118,34 +122,45 @@ public abstract class MultipleFileDownloadJob extends AbstractDownloadJob {
         this.currentCount = 0;
         boolean usePost = dlf.postParams != null;
 
-        HttpUriRequest req;
-
+        HttpRequestBase httpRequest;
         if (usePost) {
             final HttpPost httppost = new HttpPost(dlf.url.toString());
             httppost.setEntity(dlf.postParams);
-            req = httppost;
+            httpRequest = httppost;
             LOG.info("WFS GetFeature POST XML request: {}",
                 httpPostToString(dlf.url, dlf.postParams));
         } else {
-            req = getGetRequest(dlf.url);
-            LOG.info("WFS GetFeature GET KVP request: {}", req.toString());
+            httpRequest = getGetRequest(dlf.url);
+            LOG.info("WFS GetFeature GET KVP request: {}", httpRequest.toString());
         }
 
         WrapInputStreamFactory wrapFactory
             = CountingInputStream.createWrapFactory(listener);
 
-        CloseableHttpClient client = null;
+        CloseableHttpClient client = getClient(dlf.url);
         try {
-            client = getClient(dlf.url);
-            FileResponseHandler frh = new FileResponseHandler(
-                dlf.file, wrapFactory, req);
-            client.execute(req, frh);
-
+            FileResponseHandler frh = new FileResponseHandler(dlf.file, wrapFactory, httpRequest);
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            HttpDownloadExecutor downloadTask = new HttpDownloadExecutor(client, httpRequest, frh, this);
+            Future<?> submit = executorService.submit(downloadTask);
+            while (!submit.isDone()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    httpRequest.abort();
+                    throw new InterruptedException("Download interrupted.");
+                }
+            }
+            if (downloadTask.isFailed()) {
+                JobExecutionException jobExecutionException = downloadTask.getJobExecutionException();
+                Throwable cause = jobExecutionException.getCause();
+                if (cause instanceof ClientProtocolException) {
+                    return RemoteFileState.FATAL;
+                } else if (cause instanceof IOException) {
+                    return RemoteFileState.RETRY;
+                } else {
+                    throw jobExecutionException;
+                }
+            }
             return RemoteFileState.SUCCESS;
-        } catch (ClientProtocolException cpe) {
-            return RemoteFileState.FATAL;
-        } catch (IOException ioe) {
-            return RemoteFileState.RETRY;
         } finally {
             HTTP.closeGraceful(client);
             this.totalCount += this.currentCount;
