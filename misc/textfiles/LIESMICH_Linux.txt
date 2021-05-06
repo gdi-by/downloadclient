@@ -29,7 +29,7 @@ welcher den Pfad zu einer Downloadschritt-Datei definiert.
 
 Externe Abhängigkeiten:
 -----------------------
-Der Downloadclient benötigt Java 1.8 (mindestens 1.8.0_40) oder Java 11.0 mit JavaFX (mindestens 11.0.2).
+Der Downloadclient benötigt Java 1.8 (mindestens 1.8.0_171) oder Java 11.0 mit JavaFX (mindestens 11.0.2).
 
 Der Downloadclient benötigt GDAL/OGR (mindestens 2.1) um Verarbeitungsschritte
 durchzuführen.
