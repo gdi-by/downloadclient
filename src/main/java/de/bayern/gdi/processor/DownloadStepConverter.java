@@ -223,7 +223,7 @@ public class DownloadStepConverter {
     ) {
         StringBuilder sb = new StringBuilder();
         for (Parameter p: parameters) {
-            if (p.getValue().isEmpty()
+            if (p.getValue() == null || p.getValue().isEmpty()
             || usedVars.contains(p.getKey())) {
                 continue;
             }
