@@ -42,6 +42,6 @@ public class HeadlessIT {
     @Test
     public void testExecutionOfCLI() {
         System.setProperty("logfilename", "logdlc-TEST.txt");
-        Headless.runHeadless(cliargs, null);
+        new Headless().runHeadless(cliargs, null);
     }
 }

@@ -138,7 +138,8 @@ public class App {
             initConfig(line.getOptionValue("c"));
 
             if (line.hasOption("h")) {
-                System.exit(Headless.runHeadless(
+                Headless headlessRun = new Headless();
+                System.exit(headlessRun.runHeadless(
                     line.getArgs(),
                     createCredentials(line.getOptionValue("u"), line.getOptionValue("p"))));
             }

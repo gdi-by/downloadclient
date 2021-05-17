@@ -352,7 +352,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getAGZConfiguration
         );
-        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
+        int result = new Headless().runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -366,7 +366,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getBiergartenConfiguration
         );
-        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
+        int result = new Headless().runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -380,7 +380,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getNuremburgConfig
         );
-        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
+        int result = new Headless().runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
@@ -395,7 +395,7 @@ public class AppIT extends TestBase {
         List<DownloadStep> steps = prepareStep(
             DOWNLOAD_CONFIGURATION::getCqlConfig
         );
-        int result = Headless.runHeadless(NO_CREDENTIALS, steps);
+        int result = new Headless().runHeadless(NO_CREDENTIALS, steps);
         assertTrue(result == 0);
     }
 
