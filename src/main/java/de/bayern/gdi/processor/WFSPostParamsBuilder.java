@@ -152,7 +152,7 @@ public final class WFSPostParamsBuilder {
 
         for (Parameter p : dls.getParameters()) {
             String value = p.getValue();
-            if (!value.isEmpty() && !usedVars.contains(p.getKey())) {
+            if (value != null && !value.isEmpty() && !usedVars.contains(p.getKey())) {
                 switch (p.getKey()) {
                     case "outputformat":
                         outputFormat = value;
