@@ -39,8 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -50,15 +48,12 @@ public class Headless implements ProcessorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(Headless.class);
 
-    private Headless() {
-    }
-
     /**
      * @param downloadFiles The command line arguments.
      * @param credentials   Optional credentials
      * @return Non zero if the operation fails.
      */
-    public static int runHeadless(String[] downloadFiles, Credentials credentials) {
+    public int runHeadless(String[] downloadFiles, Credentials credentials) {
 
         LOG.info("Running in headless mode");
 
@@ -92,25 +87,20 @@ public class Headless implements ProcessorListener {
      * @param steps       downloadSteps
      * @return exit code
      */
-    static int runHeadless(Credentials credentials,
+    int runHeadless(Credentials credentials,
                            List<DownloadStep> steps) {
         LOG.info("Executing download steps " + steps);
         List<DownloadStepJob> jobs = createJobs(credentials, steps);
         Processor processor = new Processor(jobs)
-            .withListeners(new Headless());
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        try {
-            executorService.submit(processor);
-        } finally {
-            executorService.shutdown();
-        }
+            .withListeners(this);
+        processor.run();
         return 0;
     }
 
-    private static List<DownloadStepJob> createJobs(Credentials credentials, List<DownloadStep> steps) {
+    private List<DownloadStepJob> createJobs(Credentials credentials, List<DownloadStep> steps) {
         return steps.stream().map(step -> {
             try {
-                DownloadStepConverter dsc = createDownloadStepConverter(credentials);;
+                DownloadStepConverter dsc = createDownloadStepConverter(credentials);
                 return dsc.convert(step);
             } catch (ConverterException ce) {
                 LOG.warn("Creating download jobs failed", ce);
@@ -135,7 +125,7 @@ public class Headless implements ProcessorListener {
     public void processingFinished() {
     }
 
-    private static DownloadStepConverter createDownloadStepConverter(Credentials credentials) {
+    private DownloadStepConverter createDownloadStepConverter(Credentials credentials) {
         ApplicationSettings applicationSettings = Config.getInstance().getApplicationSettings();
         if (credentials != null) {
             applicationSettings.persistCredentials(credentials);
