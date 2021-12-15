@@ -6,7 +6,7 @@
     <groupId>de.bayern.gdi</groupId>
     <artifactId>downloadclient</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.4</version>
+    <version>1.2.5-SNAPSHOT</version>
     <name>downloadclient</name>
     <url>https://www.gdi.bayern.de/downloadclient.html</url>
     <properties>
