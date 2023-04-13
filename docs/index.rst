@@ -1,5 +1,5 @@
 =======================================================
-GDI-BY Download-Client Dokumentation - Version 1.2.5
+GDI-BY Download-Client Dokumentation - Version 1.2.6
 =======================================================
 :Autor: Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)
 :Kontakt: gdi-by@ldbv.bayern.de
@@ -17,7 +17,7 @@ Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-
 Installation
 ============
 
-Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: http://www.gdi.bayern/downloadclient
+Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: https://github.com/gdi-by/downloadclient/releases
 
 Für beide Betriebssysteme steht je eine Version des Download-Client für die Java Version 1.8 und Java 11.0 zur Verfügung.
 
