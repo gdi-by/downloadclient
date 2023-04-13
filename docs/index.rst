@@ -1,5 +1,5 @@
 =======================================================
-GDI-BY Download-Client Dokumentation - Version 1.2.5
+GDI-BY Download-Client Dokumentation - Version 1.2.6
 =======================================================
 :Autor: Geschäftsstelle Geodateninfrastruktur Bayern (GDI-BY)
 :Kontakt: gdi-by@ldbv.bayern.de
