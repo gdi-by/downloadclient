@@ -16,7 +16,7 @@ Der Download-Client wird von der Geodateninfrastruktur Bayern (GDI-BY) als Open-
 Installation
 ============
 
-Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: http://www.gdi.bayern/downloadclient
+Der Download-Client steht in Form von Zip-Archiven für Windows und Linux hier bereit: https://github.com/gdi-by/downloadclient/releases
 
 Voraussetzungen - Softwareumgebung
 ------------------------------------
