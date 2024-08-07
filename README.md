@@ -1,6 +1,8 @@
 # GDI-BY DownloadClient
 
-
+___
+> Dieses Projekt wird nicht weiterentwickelt und erhält somit auch keine (Sicherheits-)Updates!
+___ 
 
 Der Download-Client ist eine Desktop-Anwendung zum einfachen Herunterladen von Geodaten, die über Downloaddienste verfügbar sind. Für die heruntergeladenen Geodaten können optional Weiterverarbeitungsschritte (z. B. Formatkonvertierung) definiert und ausgeführt werden. Die Konfiguration der Download- und Weiterverarbeitungsschritte kann darüber hinaus abgespeichert und über ein Konsolenprogramm erneut ausgeführt werden.
 
